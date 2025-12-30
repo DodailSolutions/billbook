@@ -1,3 +1,172 @@
+# BillBook - Complete Feature List
+
+**BillBook** is a modern invoicing and billing solution designed specifically for small businesses and vendors in India. Simple, fast, and built for the Indian market.
+
+---
+
+## 🎯 Core Invoicing & Billing Features
+
+### Invoice Creation & Management
+- ✅ **Quick Invoice Creation** - Create professional invoices in under a minute
+- ✅ **Customizable Templates** - Add your logo, customize fonts, colors, and layout
+- ✅ **Multi-Item Invoices** - Add unlimited items/services per invoice
+- ✅ **Save & Reuse** - Edit and resend past invoices instantly
+- ✅ **Auto-Invoice Numbering** - Sequential invoice numbers (INV-YYYY-NNNN format)
+- ✅ **PDF Generation** - Download professional PDF invoices
+- ✅ **Notes & Terms** - Add custom notes and payment terms
+
+### GST & Tax Compliance
+- ✅ **Automatic GST Calculation** - Configurable GST rates (default 18%)
+- ✅ **GSTIN Support** - Store customer GSTIN numbers
+- ✅ **Tax Breakdown** - Clear subtotal, GST, and total display
+- ✅ **India-Focused** - INR currency, GST-compliant invoicing
+
+### Recurring & Scheduled Billing
+- ✅ **Recurring Invoice Templates** - Set up automatic billing for repeat clients
+- ✅ **Flexible Billing Cycles** - Monthly and yearly billing schedules
+- ✅ **Start/End Date Management** - Define billing periods
+- ✅ **Pause/Resume** - Control recurring invoices anytime
+- ✅ **Manual Generation** - Create invoices from templates on-demand
+
+### Invoice Tracking & Status
+- ✅ **Invoice Status Tracking** - Track draft, sent, and paid invoices
+- ✅ **Due Date Management** - See upcoming and overdue invoices
+- ✅ **Invoice History** - Complete searchable invoice archive
+- ✅ **Dashboard Overview** - Quick stats and recent activity
+
+---
+
+## 💰 Payment & Money Management
+
+### Payment Reminders
+- ✅ **Automated Reminders** - Schedule reminders for due dates
+- ✅ **Overdue Notifications** - Alert for overdue invoices
+- ✅ **Upcoming Invoice Alerts** - Get notified before bills are due
+- ✅ **Reminder Management** - Mark sent or dismiss reminders
+
+### Payment Recording
+- ✅ **Mark as Paid** - Track payment status easily
+- ✅ **Payment Date Tracking** - Record when payments are received
+- ✅ **Outstanding Balance** - See what's pending at a glance
+
+---
+
+## 👥 Customer & Record Management
+
+### Customer Database
+- ✅ **Store Customer Details** - Name, email, phone, address, GSTIN
+- ✅ **Reusable Customer Profiles** - Quick customer selection in invoices
+- ✅ **Customer History** - View all invoices per customer
+- ✅ **Easy Updates** - Edit customer information anytime
+
+### Document Organization
+- ✅ **Searchable Invoices** - Find any invoice quickly
+- ✅ **Customer List** - All contacts organized in one place
+- ✅ **Invoice Filtering** - Sort by status, date, customer
+
+---
+
+## 📊 Reporting & Business Insights
+
+### Dashboard Analytics
+- ✅ **Quick Stats** - Total invoices, revenue, pending payments
+- ✅ **Recent Activity** - Latest invoices and customers
+- ✅ **Visual Overview** - See your business at a glance
+
+### Invoice Reports
+- ✅ **PDF Downloads** - Professional invoice PDFs
+- ✅ **Invoice History** - Complete transaction records
+- ✅ **Customer Reports** - All invoices per customer
+
+---
+
+## 🎨 Customization & Branding
+
+### Invoice Customization
+- ✅ **Logo Upload** - Add your business logo to invoices
+- ✅ **Font Customization** - 4-level typography control:
+  - Company name (16-48px, color, weight)
+  - Company details (10-16px, color)
+  - Invoice body text (10-18px)
+  - Terms & conditions (10-16px)
+- ✅ **Color Selection** - Customize company name and details colors
+- ✅ **Professional Templates** - Clean, GST-compliant layouts
+
+---
+
+## 💻 Platform & Access
+
+### Multi-Device Support
+- ✅ **Web Application** - Full-featured desktop experience
+- ✅ **Responsive Design** - Works on tablets and mobile browsers
+- ✅ **Cloud Storage** - Access your data from anywhere
+- ✅ **Real-time Sync** - Changes update instantly
+
+### Security & Authentication
+- ✅ **Secure Login** - Email/password authentication
+- ✅ **User Accounts** - Individual business accounts
+- ✅ **Data Privacy** - Row-level security on all data
+- ✅ **Session Management** - Secure user sessions
+
+---
+
+## 🚀 Why BillBook for Indian Businesses?
+
+### Built for India
+- **INR Currency** - Designed exclusively for Indian market
+- **GST Compliance** - Automatic GST calculations and GSTIN support
+- **Simple Setup** - No complex configurations needed
+- **Small Business Focus** - Perfect for freelancers, shops, and SMEs
+
+### Easy to Use
+- **Fast Invoice Creation** - Under 1 minute from start to PDF
+- **Clean Interface** - No clutter, just what you need
+- **Instant PDF** - Download professional invoices immediately
+- **No Training Required** - Intuitive design anyone can use
+
+### Reliable & Secure
+- **Cloud-Based** - Never lose your data
+- **Automatic Backups** - Your invoices are always safe
+- **Secure Authentication** - Powered by Supabase
+- **Modern Technology** - Built with Next.js for speed and reliability
+
+---
+
+## 📋 Planned Features (Coming Soon)
+
+### Enhanced Payment Features
+- [ ] Payment link generation
+- [ ] Partial payment recording
+- [ ] Payment receipts
+- [ ] Multiple payment methods
+
+### Advanced Reporting
+- [ ] Monthly revenue reports
+- [ ] GST filing reports
+- [ ] Customer analytics
+- [ ] Export to Excel/CSV
+
+### Additional Features
+- [ ] Expense tracking
+- [ ] Inventory management
+- [ ] Multiple business profiles
+- [ ] Email invoice delivery
+- [ ] SMS notifications
+- [ ] Bank account integration
+
+---
+
+## 💡 Perfect For
+
+- **Freelancers** - Quick invoices for projects and services
+- **Small Shops** - Daily billing and customer management
+- **Service Providers** - Recurring billing for subscriptions
+- **Consultants** - Professional invoicing with GST
+- **Small Vendors** - Simple billing without complexity
+- **Home Businesses** - Easy invoicing from anywhere
+
+---
+
 # BillBook - Feature Implementation Checklist
 
 ## ✅ Core Requirements (All Completed)
