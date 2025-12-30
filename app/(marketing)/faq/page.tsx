@@ -144,7 +144,7 @@ export default function FAQPage() {
                 <details key={idx} className="group bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-all">
                   <summary className="flex items-center justify-between cursor-pointer list-none">
                     <h3 className="text-lg font-semibold text-gray-900 pr-4">{faq.q}</h3>
-                    <ChevronDown className="h-5 w-5 text-gray-500 group-open:rotate-180 transition-transform flex-shrink-0" />
+                    <ChevronDown className="h-5 w-5 text-gray-500 group-open:rotate-180 transition-transform shrink-0" />
                   </summary>
                   <p className="text-gray-600 mt-4 leading-relaxed">{faq.a}</p>
                 </details>

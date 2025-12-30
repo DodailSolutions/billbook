@@ -118,7 +118,7 @@ export default function ContactPage() {
 
             <div className="space-y-6">
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center shrink-0">
                   <Mail className="h-6 w-6 text-emerald-600" />
                 </div>
                 <div>
@@ -129,7 +129,7 @@ export default function ContactPage() {
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center shrink-0">
                   <MessageSquare className="h-6 w-6 text-blue-600" />
                 </div>
                 <div>
@@ -140,7 +140,7 @@ export default function ContactPage() {
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center shrink-0">
                   <Phone className="h-6 w-6 text-purple-600" />
                 </div>
                 <div>
