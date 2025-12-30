@@ -71,7 +71,7 @@ export default function AboutPage() {
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">Simplicity First</h3>
               <p className="text-gray-600">
-                We believe invoicing should be simple. No complex features you don't need, just what works.
+                We believe invoicing should be simple. No complex features you don&apos;t need, just what works.
               </p>
             </div>
             

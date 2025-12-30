@@ -128,7 +128,7 @@ export default function RefundPage() {
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">9. Service Credits</h2>
             <p className="text-gray-600 leading-relaxed">
-              In cases where a refund is not applicable but there's been a service issue, we may offer:
+              In cases where a refund is not applicable but there&apos;s been a service issue, we may offer:
             </p>
             <ul className="list-disc list-inside text-gray-600 space-y-2">
               <li>Account credits for future billing</li>
