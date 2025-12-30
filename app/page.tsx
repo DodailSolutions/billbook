@@ -118,16 +118,16 @@ export default function Home() {
             Ready to Transform Your Invoicing?
           </h3>
           <p className="text-slate-300 text-lg mb-8 max-w-2xl mx-auto">
-           Link href="/signup">
+            Join thousands of businesses already using BillBook to streamline their billing process
+          </p>
+          <Link href="/signup">
             <Button 
               size="lg" 
               className="bg-white text-slate-900 hover:bg-slate-100 font-semibold text-lg px-10 shadow-2xl"
             >
               Get Started for Free
             </Button>
-          </Link
-            <Link href="/signup">Get Started for Free</Link>
-          </Button>
+          </Link>
         </div>
       </section>
 
