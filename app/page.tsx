@@ -455,27 +455,27 @@ export default function Home() {
             <div>
               <h5 className="font-bold text-gray-900 mb-4">Product</h5>
               <ul className="space-y-2 text-sm text-gray-600">
-                <li><Link href="#features" className="hover:text-emerald-600">Features</Link></li>
-                <li><Link href="/signup" className="hover:text-emerald-600">Pricing</Link></li>
-                <li><Link href="#" className="hover:text-emerald-600">FAQ</Link></li>
+                <li><Link href="/features" className="hover:text-emerald-600">Features</Link></li>
+                <li><Link href="/pricing" className="hover:text-emerald-600">Pricing</Link></li>
+                <li><Link href="/faq" className="hover:text-emerald-600">FAQ</Link></li>
               </ul>
             </div>
             
             <div>
               <h5 className="font-bold text-gray-900 mb-4">Company</h5>
               <ul className="space-y-2 text-sm text-gray-600">
-                <li><Link href="#" className="hover:text-emerald-600">About</Link></li>
-                <li><Link href="#" className="hover:text-emerald-600">Contact</Link></li>
-                <li><Link href="#" className="hover:text-emerald-600">Support</Link></li>
+                <li><Link href="/about" className="hover:text-emerald-600">About</Link></li>
+                <li><Link href="/contact" className="hover:text-emerald-600">Contact</Link></li>
+                <li><Link href="/support" className="hover:text-emerald-600">Support</Link></li>
               </ul>
             </div>
             
             <div>
               <h5 className="font-bold text-gray-900 mb-4">Legal</h5>
               <ul className="space-y-2 text-sm text-gray-600">
-                <li><Link href="#" className="hover:text-emerald-600">Privacy Policy</Link></li>
-                <li><Link href="#" className="hover:text-emerald-600">Terms of Service</Link></li>
-                <li><Link href="#" className="hover:text-emerald-600">Refund Policy</Link></li>
+                <li><Link href="/privacy" className="hover:text-emerald-600">Privacy Policy</Link></li>
+                <li><Link href="/terms" className="hover:text-emerald-600">Terms of Service</Link></li>
+                <li><Link href="/refund" className="hover:text-emerald-600">Refund Policy</Link></li>
               </ul>
             </div>
           </div>
