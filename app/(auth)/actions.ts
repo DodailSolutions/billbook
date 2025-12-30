@@ -11,21 +11,30 @@ export async function login(formData: FormData) {
         const email = formData.get('email') as string
         const password = formData.get('password') as string
 
-        const { error } = await supabase.auth.signInWithPassword({
+        if (!email || !password) {
+            return redirect('/login?message=' + encodeURIComponent('Email and password are required'))
+        }
+
+        const { data, error } = await supabase.auth.signInWithPassword({
             email,
             password,
         })
 
         if (error) {
-            console.error('Login error:', error)
-            return redirect('/login?message=Could not authenticate user')
+            console.error('Login error:', error.message, error)
+            return redirect('/login?message=' + encodeURIComponent(error.message || 'Could not authenticate user'))
+        }
+
+        if (!data.session) {
+            return redirect('/login?message=' + encodeURIComponent('Please check your email to confirm your account first'))
         }
 
         revalidatePath('/', 'layout')
         return redirect('/dashboard')
     } catch (error) {
         console.error('Login exception:', error)
-        return redirect('/login?message=An error occurred during login')
+        const errorMessage = error instanceof Error ? error.message : 'An error occurred during login'
+        return redirect('/login?message=' + encodeURIComponent(errorMessage))
     }
 }
 
