@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/Button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/Card"
 import { Input } from "@/components/ui/Input"
 
-export default function LoginPage() {
+export default function LoginPage({ searchParams }: { searchParams: { message?: string } }) {
     return (
         <Card>
             <CardHeader className="space-y-1">
@@ -14,6 +14,11 @@ export default function LoginPage() {
                 </CardDescription>
             </CardHeader>
             <CardContent>
+                {searchParams.message && (
+                    <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg text-sm text-blue-800 dark:text-blue-200">
+                        {searchParams.message}
+                    </div>
+                )}
                 <form action={login} className="space-y-4">
                     <div className="space-y-2">
                         <label htmlFor="email" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">

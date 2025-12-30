@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/Button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/Card"
 import { Input } from "@/components/ui/Input"
 
-export default function SignupPage() {
+export default function SignupPage({ searchParams }: { searchParams: { message?: string } }) {
     return (
         <Card>
             <CardHeader className="space-y-1">
@@ -14,6 +14,11 @@ export default function SignupPage() {
                 </CardDescription>
             </CardHeader>
             <CardContent>
+                {searchParams.message && (
+                    <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-800 dark:text-red-200">
+                        {searchParams.message}
+                    </div>
+                )}
                 <form action={signup} className="space-y-4">
                     <div className="space-y-2">
                         <label htmlFor="fullName" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">

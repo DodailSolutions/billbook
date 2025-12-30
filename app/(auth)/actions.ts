@@ -37,26 +37,37 @@ export async function signup(formData: FormData) {
         const password = formData.get('password') as string
         const fullName = formData.get('fullName') as string
 
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
             email,
             password,
             options: {
                 data: {
                     full_name: fullName,
-                }
+                },
+                emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://billbook-steel.vercel.app'}/auth/callback`
             }
         })
 
         if (error) {
             console.error('Signup error:', error)
-            return redirect('/signup?message=' + error.message)
+            return redirect('/signup?message=' + encodeURIComponent(error.message))
+        }
+
+        // Check if email confirmation is required
+        if (data?.user?.identities?.length === 0) {
+            return redirect('/login?message=' + encodeURIComponent('User already exists. Please login.'))
+        }
+
+        // If email confirmation is required, show message
+        if (data?.user && !data?.session) {
+            return redirect('/login?message=' + encodeURIComponent('Check your email to confirm your account before logging in.'))
         }
 
         revalidatePath('/', 'layout')
         return redirect('/dashboard')
     } catch (error) {
         console.error('Signup exception:', error)
-        return redirect('/signup?message=An error occurred during signup')
+        return redirect('/signup?message=' + encodeURIComponent('An error occurred during signup'))
     }
 }
 
