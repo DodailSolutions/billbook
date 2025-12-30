@@ -49,8 +49,8 @@ export async function updateSession(request: NextRequest) {
             return NextResponse.redirect(url)
         }
 
-        // Redirect to dashboard if logged in and trying to access auth pages
-        if ((request.nextUrl.pathname.startsWith('/login') || request.nextUrl.pathname.startsWith('/signup')) && user) {
+        // Redirect to dashboard if logged in and trying to access auth pages (but allow POST for forms)
+        if ((request.nextUrl.pathname.startsWith('/login') || request.nextUrl.pathname.startsWith('/signup')) && user && request.method === 'GET') {
             const url = request.nextUrl.clone()
             url.pathname = '/dashboard'
             return NextResponse.redirect(url)
