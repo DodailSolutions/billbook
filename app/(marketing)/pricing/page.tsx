@@ -55,23 +55,23 @@ export default function PricingPage() {
             
             <ul className="space-y-4 mb-8">
               <li className="flex items-start gap-3">
-                <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
                 <span className="text-gray-700">Up to 300 invoices total</span>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
                 <span className="text-gray-700">Customer management</span>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
                 <span className="text-gray-700">GST compliant invoices</span>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
                 <span className="text-gray-700">PDF downloads</span>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
                 <span className="text-gray-700">Custom branding</span>
               </li>
             </ul>
@@ -102,23 +102,23 @@ export default function PricingPage() {
             
             <ul className="space-y-4 mb-8">
               <li className="flex items-start gap-3">
-                <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
                 <span className="text-gray-700"><strong>Unlimited</strong> invoices</span>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
                 <span className="text-gray-700">Everything in Free</span>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
                 <span className="text-gray-700">Recurring invoices</span>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
                 <span className="text-gray-700">Payment reminders</span>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
                 <span className="text-gray-700">Priority support</span>
               </li>
             </ul>
@@ -143,23 +143,23 @@ export default function PricingPage() {
             
             <ul className="space-y-4 mb-8">
               <li className="flex items-start gap-3">
-                <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
                 <span className="text-gray-700">Everything in Starter</span>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
                 <span className="text-gray-700"><strong>AI Accountant</strong> assistant</span>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
                 <span className="text-gray-700"><strong>2 team members</strong></span>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
                 <span className="text-gray-700">Advanced analytics</span>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
                 <span className="text-gray-700">Custom reports</span>
               </li>
             </ul>
@@ -173,7 +173,7 @@ export default function PricingPage() {
         </div>
 
         {/* Enterprise Plan */}
-        <div className="max-w-2xl mx-auto bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-8 text-white">
+        <div className="max-w-2xl mx-auto bg-linear-to-br from-gray-900 to-gray-800 rounded-2xl p-8 text-white">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="text-center md:text-left">
               <h4 className="text-2xl font-bold mb-2">Enterprise</h4>

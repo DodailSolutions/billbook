@@ -90,7 +90,7 @@ export default function Home() {
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 pt-4">
               {BENEFITS.map((benefit) => (
                 <div key={benefit} className="flex items-center gap-2 text-sm text-gray-600">
-                  <CheckCircle className="h-4 w-4 text-emerald-600 flex-shrink-0" />
+                  <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0" />
                   <span>{benefit}</span>
                 </div>
               ))}
@@ -99,7 +99,7 @@ export default function Home() {
 
           {/* Right Visual */}
           <div className="relative">
-            <div className="relative bg-gradient-to-br from-emerald-50 to-blue-50 rounded-2xl p-8 border border-gray-200 shadow-2xl">
+            <div className="relative bg-linear-to-br from-emerald-50 to-blue-50 rounded-2xl p-8 border border-gray-200 shadow-2xl">
               <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-4">
                 <div className="flex items-center justify-between pb-3 border-b border-gray-200">
                   <span className="text-xs font-semibold text-gray-500 uppercase">Invoice</span>
@@ -238,23 +238,23 @@ export default function Home() {
               
               <ul className="space-y-4 mb-8">
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
                   <span className="text-gray-700">Up to 300 invoices total</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
                   <span className="text-gray-700">Customer management</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
                   <span className="text-gray-700">GST compliant invoices</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
                   <span className="text-gray-700">PDF downloads</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
                   <span className="text-gray-700">Custom branding</span>
                 </li>
               </ul>
@@ -285,23 +285,23 @@ export default function Home() {
               
               <ul className="space-y-4 mb-8">
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
                   <span className="text-gray-700"><strong>Unlimited</strong> invoices</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
                   <span className="text-gray-700">Everything in Free</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
                   <span className="text-gray-700">Recurring invoices</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
                   <span className="text-gray-700">Payment reminders</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
                   <span className="text-gray-700">Priority support</span>
                 </li>
               </ul>
@@ -326,23 +326,23 @@ export default function Home() {
               
               <ul className="space-y-4 mb-8">
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
                   <span className="text-gray-700">Everything in Starter</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
                   <span className="text-gray-700"><strong>AI Accountant</strong> assistant</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
                   <span className="text-gray-700"><strong>2 team members</strong></span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
                   <span className="text-gray-700">Advanced analytics</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
                   <span className="text-gray-700">Custom reports</span>
                 </li>
               </ul>
@@ -359,7 +359,7 @@ export default function Home() {
             <p className="text-gray-600 mb-8">All plans include 14-day free trial • Cancel anytime</p>
             
             {/* Enterprise Plan Card */}
-            <div className="max-w-2xl mx-auto bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-8 text-white">
+            <div className="max-w-2xl mx-auto bg-linear-to-br from-gray-900 to-gray-800 rounded-2xl p-8 text-white">
               <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="text-center md:text-left">
                   <h4 className="text-2xl font-bold mb-2">Enterprise</h4>
@@ -417,7 +417,7 @@ export default function Home() {
 
       {/* CTA Section */}
       <section className="px-6 py-16 md:py-24 max-w-5xl mx-auto">
-        <div className="bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-3xl p-12 md:p-16 text-center text-white shadow-2xl">
+        <div className="bg-linear-to-br from-emerald-600 to-emerald-700 rounded-3xl p-12 md:p-16 text-center text-white shadow-2xl">
           <h3 className="text-3xl md:text-5xl font-bold mb-4">
             Ready to Simplify Your Invoicing?
           </h3>

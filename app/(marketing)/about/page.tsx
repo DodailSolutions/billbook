@@ -118,7 +118,7 @@ export default function AboutPage() {
 
       {/* CTA */}
       <section className="px-6 py-16 md:py-24 max-w-5xl mx-auto">
-        <div className="bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-3xl p-12 text-center text-white">
+        <div className="bg-linear-to-br from-emerald-600 to-emerald-700 rounded-3xl p-12 text-center text-white">
           <h3 className="text-3xl md:text-4xl font-bold mb-4">Join Us on This Journey</h3>
           <p className="text-lg text-emerald-100 mb-8">
             Start creating professional invoices today
