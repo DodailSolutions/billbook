@@ -127,7 +127,7 @@ export default function FAQPage() {
           Frequently Asked Questions
         </h1>
         <p className="text-xl text-gray-600 mb-8">
-          Everything you need to know about BillBook. Can't find what you're looking for? {' '}
+          Everything you need to know about BillBook. Can&apos;t find what you&apos;re looking for? {' '}
           <Link href="/contact" className="text-emerald-600 hover:text-emerald-700 font-semibold">
             Contact us
           </Link>

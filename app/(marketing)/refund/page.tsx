@@ -30,7 +30,7 @@ export default function RefundPage() {
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">1. 14-Day Money-Back Guarantee</h2>
             <p className="text-gray-600 leading-relaxed">
-              We offer a 14-day money-back guarantee for all new paid subscriptions. If you're not satisfied with 
+              We offer a 14-day money-back guarantee for all new paid subscriptions. If you&apos;re not satisfied with 
               BillBook for any reason, you can request a full refund within 14 days of your initial purchase.
             </p>
           </section>
@@ -74,7 +74,7 @@ export default function RefundPage() {
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-2">Important Distinction:</h3>
               <ul className="list-disc list-inside text-gray-600 space-y-2">
-                <li><strong>Cancellation:</strong> You can cancel your subscription anytime. You'll retain access until the end of your paid period, but won't receive a refund for the remaining time.</li>
+                <li><strong>Cancellation:</strong> You can cancel your subscription anytime. You&apos;ll retain access until the end of your paid period, but won&apos;t receive a refund for the remaining time.</li>
                 <li><strong>Refund:</strong> Available only within 14 days of initial purchase with full refund of payment.</li>
               </ul>
             </div>

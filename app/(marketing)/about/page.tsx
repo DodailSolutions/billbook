@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
-import { FileText, Target, Heart, Zap, Shield, Users } from 'lucide-react'
+import { FileText, Heart, Zap, Shield } from 'lucide-react'
 
 export default function AboutPage() {
   return (
@@ -46,7 +46,7 @@ export default function AboutPage() {
           <h2 className="text-3xl font-bold text-gray-900 mb-6">Our Story</h2>
           <p className="text-gray-600 leading-relaxed mb-4">
             We started BillBook after seeing countless small business owners in India struggle with complex invoicing software 
-            that wasn't built for their needs. Most solutions were either too expensive, too complicated, or didn't support 
+            that wasn&apos;t built for their needs. Most solutions were either too expensive, too complicated, or didn&apos;t support 
             GST properly.
           </p>
           <p className="text-gray-600 leading-relaxed mb-4">
@@ -55,7 +55,7 @@ export default function AboutPage() {
           </p>
           <p className="text-gray-600 leading-relaxed">
             Today, hundreds of businesses across India use BillBook to create professional invoices, manage customers, 
-            and get paid faster. And we're just getting started.
+            and get paid faster. And we&apos;re just getting started.
           </p>
         </div>
       </section>

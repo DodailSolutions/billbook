@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
-import { FileText, Users, IndianRupee, CheckCircle, RefreshCw, Clock, Shield, BarChart3, Palette, Download, Mail, Smartphone, Cloud, Lock } from 'lucide-react'
+import { FileText, Users, IndianRupee, CheckCircle, RefreshCw, Shield, BarChart3, Palette, Download, Mail, Smartphone, Cloud, Lock } from 'lucide-react'
 
 const FEATURES = [
   {
