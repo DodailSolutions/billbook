@@ -12,7 +12,7 @@ export default function TermsPage() {
             <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center">
               <FileText className="h-5 w-5 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">BillBook</h1>
+            <h1 className="text-2xl font-bold text-gray-900">BillBooky</h1>
           </Link>
           <Link href="/">
             <Button variant="secondary" className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50">
@@ -30,7 +30,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">1. Acceptance of Terms</h2>
             <p className="text-gray-600 leading-relaxed">
-              By accessing or using BillBook, you agree to be bound by these Terms of Service. If you do not agree 
+              By accessing or using BillBooky, you agree to be bound by these Terms of Service. If you do not agree 
               with any part of these terms, you may not use our service.
             </p>
           </section>
@@ -38,7 +38,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">2. Description of Service</h2>
             <p className="text-gray-600 leading-relaxed">
-              BillBook provides cloud-based invoicing and billing software for businesses in India. Our service 
+              BillBooky provides cloud-based invoicing and billing software for businesses in India. Our service 
               includes invoice creation, customer management, GST calculation, payment tracking, and related features.
             </p>
           </section>
@@ -130,7 +130,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">10. Intellectual Property</h2>
             <ul className="list-disc list-inside text-gray-600 space-y-2">
-              <li>BillBook and all related trademarks are our property</li>
+              <li>BillBooky and all related trademarks are our property</li>
               <li>Our software, design, and content are protected by copyright</li>
               <li>You may not copy, modify, or reverse engineer our service</li>
               <li>You grant us permission to use your company name/logo in our marketing materials</li>
@@ -140,7 +140,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">11. Limitation of Liability</h2>
             <p className="text-gray-600 leading-relaxed">
-              To the maximum extent permitted by law, BillBook shall not be liable for any indirect, incidental, 
+              To the maximum extent permitted by law, BillBooky shall not be liable for any indirect, incidental, 
               special, or consequential damages arising from your use of the service. Our total liability is limited 
               to the amount you paid us in the past 12 months.
             </p>
@@ -149,7 +149,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">12. Indemnification</h2>
             <p className="text-gray-600 leading-relaxed">
-              You agree to indemnify and hold BillBook harmless from any claims, damages, or expenses arising from 
+              You agree to indemnify and hold BillBooky harmless from any claims, damages, or expenses arising from 
               your use of the service or violation of these terms.
             </p>
           </section>

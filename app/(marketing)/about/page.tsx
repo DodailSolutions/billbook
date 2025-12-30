@@ -12,7 +12,7 @@ export default function AboutPage() {
             <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center">
               <FileText className="h-5 w-5 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">BillBook</h1>
+            <h1 className="text-2xl font-bold text-gray-900">BillBooky</h1>
           </Link>
           <div className="flex items-center gap-3">
             <Link href="/login">
@@ -36,7 +36,7 @@ export default function AboutPage() {
           <span className="block text-emerald-600 mt-2">Indian Businesses</span>
         </h1>
         <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-          BillBook was created with one mission: to help small businesses in India manage their invoicing effortlessly.
+          BillBooky was created with one mission: to help small businesses in India manage their invoicing effortlessly.
         </p>
       </section>
 
@@ -45,16 +45,16 @@ export default function AboutPage() {
         <div className="prose prose-lg max-w-none">
           <h2 className="text-3xl font-bold text-gray-900 mb-6">Our Story</h2>
           <p className="text-gray-600 leading-relaxed mb-4">
-            We started BillBook after seeing countless small business owners in India struggle with complex invoicing software 
+            We started BillBooky after seeing countless small business owners in India struggle with complex invoicing software 
             that wasn&apos;t built for their needs. Most solutions were either too expensive, too complicated, or didn&apos;t support 
             GST properly.
           </p>
           <p className="text-gray-600 leading-relaxed mb-4">
-            We knew there had to be a better way. So we built BillBook - a simple, affordable, and GST-compliant invoicing 
+            We knew there had to be a better way. So we built BillBooky - a simple, affordable, and GST-compliant invoicing 
             solution designed specifically for Indian freelancers, small shops, and growing businesses.
           </p>
           <p className="text-gray-600 leading-relaxed">
-            Today, hundreds of businesses across India use BillBook to create professional invoices, manage customers, 
+            Today, hundreds of businesses across India use BillBooky to create professional invoices, manage customers, 
             and get paid faster. And we&apos;re just getting started.
           </p>
         </div>

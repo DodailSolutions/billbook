@@ -12,7 +12,7 @@ export default function RefundPage() {
             <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center">
               <FileText className="h-5 w-5 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">BillBook</h1>
+            <h1 className="text-2xl font-bold text-gray-900">BillBooky</h1>
           </Link>
           <Link href="/">
             <Button variant="secondary" className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50">
@@ -31,7 +31,7 @@ export default function RefundPage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-4">1. 14-Day Money-Back Guarantee</h2>
             <p className="text-gray-600 leading-relaxed">
               We offer a 14-day money-back guarantee for all new paid subscriptions. If you&apos;re not satisfied with 
-              BillBook for any reason, you can request a full refund within 14 days of your initial purchase.
+              BillBooky for any reason, you can request a full refund within 14 days of your initial purchase.
             </p>
           </section>
 
@@ -185,7 +185,7 @@ export default function RefundPage() {
           <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-6 mt-8">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">💡 Try Before You Buy</h3>
             <p className="text-gray-600">
-              Start with our Free plan (up to 300 invoices) to test BillBook risk-free before committing to a paid plan. 
+              Start with our Free plan (up to 300 invoices) to test BillBooky risk-free before committing to a paid plan. 
               This way, you can ensure it meets your needs before making a payment.
             </p>
           </div>

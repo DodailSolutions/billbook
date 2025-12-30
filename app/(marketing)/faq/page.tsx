@@ -7,16 +7,16 @@ const FAQS = [
     category: 'Getting Started',
     questions: [
       {
-        q: 'How do I get started with BillBook?',
+        q: 'How do I get started with BillBooky?',
         a: 'Simply sign up for a free account, add your business details, and you can create your first invoice in under 60 seconds. No credit card required for the free plan.'
       },
       {
-        q: 'Is BillBook really free?',
+        q: 'Is BillBooky really free?',
         a: 'Yes! Our Free plan allows you to create up to 300 invoices with all basic features including GST calculation, customer management, and PDF downloads. After 300 invoices, you can upgrade to a paid plan.'
       },
       {
         q: 'Do I need to install any software?',
-        a: 'No installation needed! BillBook is a cloud-based application that works directly in your web browser. Access it from any device with an internet connection.'
+        a: 'No installation needed! BillBooky is a cloud-based application that works directly in your web browser. Access it from any device with an internet connection.'
       },
     ]
   },
@@ -45,8 +45,8 @@ const FAQS = [
     category: 'Features & Functionality',
     questions: [
       {
-        q: 'Is BillBook GST compliant?',
-        a: 'Yes! BillBook is fully GST compliant. It automatically calculates GST, supports GSTIN, and generates invoices that meet all Indian GST requirements.'
+        q: 'Is BillBooky GST compliant?',
+        a: 'Yes! BillBooky is fully GST compliant. It automatically calculates GST, supports GSTIN, and generates invoices that meet all Indian GST requirements.'
       },
       {
         q: 'Can I customize my invoices?',
@@ -104,7 +104,7 @@ export default function FAQPage() {
             <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center">
               <FileText className="h-5 w-5 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">BillBook</h1>
+            <h1 className="text-2xl font-bold text-gray-900">BillBooky</h1>
           </Link>
           <div className="flex items-center gap-3">
             <Link href="/login">
@@ -127,7 +127,7 @@ export default function FAQPage() {
           Frequently Asked Questions
         </h1>
         <p className="text-xl text-gray-600 mb-8">
-          Everything you need to know about BillBook. Can&apos;t find what you&apos;re looking for? {' '}
+          Everything you need to know about BillBooky. Can&apos;t find what you&apos;re looking for? {' '}
           <Link href="/contact" className="text-emerald-600 hover:text-emerald-700 font-semibold">
             Contact us
           </Link>

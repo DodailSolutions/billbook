@@ -12,7 +12,7 @@ export default function PrivacyPage() {
             <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center">
               <FileText className="h-5 w-5 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">BillBook</h1>
+            <h1 className="text-2xl font-bold text-gray-900">BillBooky</h1>
           </Link>
           <Link href="/">
             <Button variant="secondary" className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50">
@@ -30,7 +30,7 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">1. Introduction</h2>
             <p className="text-gray-600 leading-relaxed">
-              At BillBook, we take your privacy seriously. This Privacy Policy explains how we collect, use, disclose, 
+              At BillBooky, we take your privacy seriously. This Privacy Policy explains how we collect, use, disclose, 
               and safeguard your information when you use our invoicing application and services.
             </p>
           </section>

@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BillBook - Invoice Management System",
+  title: "BillBooky - Invoice Management System",
   description: "Professional invoice management with customer tracking and GST calculations",
   icons: {
     icon: '/logo-icon.svg',

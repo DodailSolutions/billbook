@@ -30,7 +30,7 @@ export default function Home() {
             <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center">
               <FileText className="h-5 w-5 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">BillBook</h1>
+            <h1 className="text-2xl font-bold text-gray-900">BillBooky</h1>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/login">
@@ -422,7 +422,7 @@ export default function Home() {
             Ready to Simplify Your Invoicing?
           </h3>
           <p className="text-lg text-emerald-100 mb-8 max-w-2xl mx-auto">
-            Join hundreds of Indian businesses already using BillBook. Start creating professional invoices today.
+            Join hundreds of Indian businesses already using BillBooky. Start creating professional invoices today.
           </p>
           <Link href="/signup">
             <Button 
@@ -445,7 +445,7 @@ export default function Home() {
                 <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center">
                   <FileText className="h-5 w-5 text-white" />
                 </div>
-                <h4 className="text-xl font-bold text-gray-900">BillBook</h4>
+                <h4 className="text-xl font-bold text-gray-900">BillBooky</h4>
               </div>
               <p className="text-sm text-gray-600">
                 Professional invoicing for Indian businesses. GST-compliant, simple, and secure.
@@ -481,7 +481,7 @@ export default function Home() {
           </div>
           
           <div className="pt-8 border-t border-gray-200 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-gray-600">© 2025 BillBook. Built with ❤️ for Indian businesses.</p>
+            <p className="text-sm text-gray-600">© 2025 BillBooky. Built with ❤️ for Indian businesses.</p>
             <p className="text-sm text-gray-600">Made in India 🇮🇳</p>
           </div>
         </div>

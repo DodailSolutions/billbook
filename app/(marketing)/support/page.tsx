@@ -12,7 +12,7 @@ export default function SupportPage() {
             <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center">
               <FileText className="h-5 w-5 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">BillBook</h1>
+            <h1 className="text-2xl font-bold text-gray-900">BillBooky</h1>
           </Link>
           <div className="flex items-center gap-3">
             <Link href="/login">
@@ -35,7 +35,7 @@ export default function SupportPage() {
           How Can We Help?
         </h1>
         <p className="text-xl text-gray-600">
-          Get the support you need to make the most of BillBook
+          Get the support you need to make the most of BillBooky
         </p>
       </section>
 

@@ -49,7 +49,7 @@ export default function FeaturesPage() {
             <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center">
               <FileText className="h-5 w-5 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">BillBook</h1>
+            <h1 className="text-2xl font-bold text-gray-900">BillBooky</h1>
           </Link>
           <div className="flex items-center gap-3">
             <Link href="/login">
@@ -73,7 +73,7 @@ export default function FeaturesPage() {
           <span className="block text-emerald-600 mt-2">Manage Your Business</span>
         </h1>
         <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-          BillBook provides everything you need to create professional invoices, manage customers, and get paid faster.
+          BillBooky provides everything you need to create professional invoices, manage customers, and get paid faster.
         </p>
         <Link href="/signup">
           <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 text-white px-8">

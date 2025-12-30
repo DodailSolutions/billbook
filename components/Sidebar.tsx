@@ -56,14 +56,14 @@ export function Sidebar() {
                     <div className="relative w-10 h-10 shrink-0">
                         <Image 
                             src="/logo-icon.svg" 
-                            alt="BillBook Logo" 
+                            alt="BillBooky Logo" 
                             width={40} 
                             height={40}
                             className="transition-transform duration-200 group-hover:scale-110"
                         />
                     </div>
                     <h1 className="text-2xl font-bold bg-linear-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent transition-all duration-200 group-hover:scale-105">
-                        BillBook
+                        BillBooky
                     </h1>
                 </Link>
                 <div className="space-y-2">
