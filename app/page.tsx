@@ -29,13 +29,14 @@ export default function Home() {
         <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-violet-400 to-emerald-400">
           BillBook
         </h1>
-        <Button 
-          asChild 
-          variant="secondary" 
-          className="bg-white/10 text-white border border-white/20 hover:bg-white/20 backdrop-blur-sm"
-        >
-          <Link href="/login">Sign In</Link>
-        </Button>
+        <Link href="/login">
+          <Button 
+            variant="secondary" 
+            className="bg-white/10 text-white border border-white/20 hover:bg-white/20 backdrop-blur-sm"
+          >
+            Sign In
+          </Button>
+        </Link>
       </nav>
 
       {/* Hero Section */}
@@ -59,21 +60,23 @@ export default function Home() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
-            <Button 
-              asChild 
-              size="lg" 
-              className="bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 text-white border-0 shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all text-lg px-8"
-            >
-              <Link href="/signup">Start Free Trial →</Link>
-            </Button>
-            <Button 
-              asChild 
-              size="lg" 
-              variant="secondary" 
-              className="bg-white/10 text-white border border-white/30 hover:bg-white/20 hover:border-white/50 backdrop-blur-sm text-lg px-8"
-            >
-              <Link href="#features">Learn More</Link>
-            </Button>
+            <Link href="/signup">
+              <Button 
+                size="lg" 
+                className="bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 text-white border-0 shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all text-lg px-8"
+              >
+                Start Free Trial →
+              </Button>
+            </Link>
+            <Link href="#features">
+              <Button 
+                size="lg" 
+                variant="secondary" 
+                className="bg-white/10 text-white border border-white/30 hover:bg-white/20 hover:border-white/50 backdrop-blur-sm text-lg px-8"
+              >
+                Learn More
+              </Button>
+            </Link>
           </div>
 
           <p className="text-sm text-slate-400 mt-4">No credit card required • Free forever plan available</p>
@@ -115,13 +118,14 @@ export default function Home() {
             Ready to Transform Your Invoicing?
           </h3>
           <p className="text-slate-300 text-lg mb-8 max-w-2xl mx-auto">
-            Join thousands of businesses already using BillBook to streamline their billing process
-          </p>
-          <Button 
-            asChild 
-            size="lg" 
-            className="bg-white text-slate-900 hover:bg-slate-100 font-semibold text-lg px-10 shadow-2xl"
-          >
+           Link href="/signup">
+            <Button 
+              size="lg" 
+              className="bg-white text-slate-900 hover:bg-slate-100 font-semibold text-lg px-10 shadow-2xl"
+            >
+              Get Started for Free
+            </Button>
+          </Link
             <Link href="/signup">Get Started for Free</Link>
           </Button>
         </div>
