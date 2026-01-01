@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
 import { FileText, Mail, Book, MessageSquare } from 'lucide-react'
+import Footer from '@/components/Footer'
 
 export default function SupportPage() {
   return (
@@ -152,6 +153,7 @@ export default function SupportPage() {
           </Link>
         </div>
       </section>
+      <Footer />
     </div>
   )
 }

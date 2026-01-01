@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { FileText } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
+import Footer from '@/components/Footer'
 
 export default function PrivacyPage() {
   return (
@@ -151,6 +152,7 @@ export default function PrivacyPage() {
           </section>
         </div>
       </div>
+      <Footer />
     </div>
   )
 }

@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
 import { FileText, Heart, Zap, Shield } from 'lucide-react'
+import Footer from '@/components/Footer'
 
 export default function AboutPage() {
   return (
@@ -130,6 +131,7 @@ export default function AboutPage() {
           </Link>
         </div>
       </section>
+      <Footer />
     </div>
   )
 }

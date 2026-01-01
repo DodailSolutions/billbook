@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
 import { FileText, Users, IndianRupee, CheckCircle, RefreshCw, Shield, BarChart3, Palette, Download, Mail, Smartphone, Cloud, Lock } from 'lucide-react'
+import Footer from '@/components/Footer'
 
 const FEATURES = [
   {
@@ -119,6 +120,7 @@ export default function FeaturesPage() {
           </Link>
         </div>
       </section>
+      <Footer />
     </div>
   )
 }

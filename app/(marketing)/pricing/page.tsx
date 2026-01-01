@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
 import { FileText, CheckCircle } from 'lucide-react'
+import Footer from '@/components/Footer'
 
 export default function PricingPage() {
   return (
@@ -41,7 +42,7 @@ export default function PricingPage() {
 
       {/* Pricing Cards */}
       <section className="px-6 pb-24 max-w-7xl mx-auto">
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-12">
+        <div className="grid md:grid-cols-4 gap-8 max-w-7xl mx-auto mb-12">
           {/* Free Plan */}
           <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 hover:shadow-xl transition-all">
             <div className="mb-6">
@@ -170,6 +171,56 @@ export default function PricingPage() {
               </Button>
             </Link>
           </div>
+
+          {/* Lifetime Pro Plan */}
+          <div className="bg-linear-to-br from-amber-50 to-amber-100 border-2 border-amber-400 rounded-2xl p-8 hover:shadow-xl transition-all relative">
+            <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+              <span className="bg-amber-500 text-white px-4 py-1 rounded-full text-sm font-semibold">
+                Best Value
+              </span>
+            </div>
+            
+            <div className="mb-6">
+              <h4 className="text-2xl font-bold text-gray-900 mb-2">Lifetime Pro Plan</h4>
+              <div className="flex items-baseline gap-1 mb-4">
+                <span className="text-5xl font-bold text-gray-900">₹9,999</span>
+              </div>
+              <p className="text-gray-700 font-semibold">One-time payment</p>
+            </div>
+            
+            <ul className="space-y-4 mb-8">
+              <li className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+                <span className="text-gray-700">Single business</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+                <span className="text-gray-700"><strong>Unlimited invoices*</strong></span>
+              </li>
+              <li className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+                <span className="text-gray-700">GST invoices</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+                <span className="text-gray-700">PDF export</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+                <span className="text-gray-700">Basic reports</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+                <span className="text-gray-700">Standard support</span>
+              </li>
+            </ul>
+            
+            <Link href="/signup">
+              <Button className="w-full bg-amber-600 hover:bg-amber-700 text-white">
+                Get Lifetime Access
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {/* Enterprise Plan */}
@@ -188,6 +239,7 @@ export default function PricingPage() {
           </div>
         </div>
       </section>
+      <Footer />
     </div>
   )
 }

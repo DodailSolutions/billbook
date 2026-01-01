@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
 import { FileText, ChevronDown } from 'lucide-react'
+import Footer from '@/components/Footer'
 
 const FAQS = [
   {
@@ -175,6 +176,7 @@ export default function FAQPage() {
           </div>
         </div>
       </section>
+      <Footer />
     </div>
   )
 }

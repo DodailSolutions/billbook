@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button'
 import { FileText, Mail, MessageSquare, Phone, CheckCircle, XCircle } from 'lucide-react'
 import { submitContactForm } from './actions'
 import { useState, useTransition } from 'react'
+import Footer from '@/components/Footer'
 
 export default function ContactPage() {
   const [isPending, startTransition] = useTransition()
@@ -211,6 +212,7 @@ export default function ContactPage() {
           </div>
         </div>
       </section>
+      <Footer />
     </div>
   )
 }

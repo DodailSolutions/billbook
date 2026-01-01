@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { FileText } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
+import Footer from '@/components/Footer'
 
 export default function TermsPage() {
   return (
@@ -181,6 +182,7 @@ export default function TermsPage() {
           </section>
         </div>
       </div>
+      <Footer />
     </div>
   )
 }
