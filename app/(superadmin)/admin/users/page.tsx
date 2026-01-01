@@ -40,7 +40,7 @@ export default async function UsersManagementPage() {
 
     return (
         <div className="min-h-screen p-4 md:p-6 lg:p-8">
-            <div className="max-w-[1600px] mx-auto space-y-6">
+            <div className="max-w-400 mx-auto space-y-6">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div>

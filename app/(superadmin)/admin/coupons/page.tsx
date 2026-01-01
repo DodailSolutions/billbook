@@ -7,7 +7,7 @@ import Link from 'next/link'
 export default function CouponsManagementPage() {
     return (
         <div className="min-h-screen p-4 md:p-6 lg:p-8">
-            <div className="max-w-[1600px] mx-auto space-y-6">
+            <div className="max-w-400 mx-auto space-y-6">
                 <div className="flex items-center justify-between">
                     <div>
                         <Link href="/admin" className="text-sm text-blue-600 hover:underline mb-2 inline-block">
