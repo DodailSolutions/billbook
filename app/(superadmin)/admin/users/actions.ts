@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { checkSuperAdminAccess, createAuditLog } from '@/lib/admin-auth'
 import { revalidatePath } from 'next/cache'
-import type { UserWithDetails } from '@/lib/types-admin'
+import type { UserWithDetails, UserSubscription } from '@/lib/types-admin'
 
 export async function getAllUsers(): Promise<UserWithDetails[]> {
     try {
