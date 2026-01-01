@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
 import { FileText, Users, IndianRupee, TrendingUp, Zap, Shield, CheckCircle, Clock, BarChart3, RefreshCw } from 'lucide-react'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 const FEATURES = [
   { icon: FileText, title: 'Quick Invoice Creation', desc: 'Create professional invoices in under 60 seconds', color: 'emerald' },
@@ -22,19 +23,20 @@ const BENEFITS = [
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-gray-950">
       {/* Navigation */}
-      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
+      <nav className="sticky top-0 z-50 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800">
         <div className="flex items-center justify-between p-4 md:p-6 max-w-7xl mx-auto">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center">
               <FileText className="h-5 w-5 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">BillBooky</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">BillBooky</h1>
           </div>
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             <Link href="/login">
-              <Button variant="secondary" className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50">
+              <Button variant="secondary" className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">
                 Sign In
               </Button>
             </Link>
@@ -52,17 +54,17 @@ export default function Home() {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Content */}
           <div className="space-y-8">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 border border-emerald-200 rounded-full text-emerald-700 text-sm font-medium">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800 rounded-full text-emerald-700 dark:text-emerald-300 text-sm font-medium">
               <Zap className="h-4 w-4" />
               Built for Indian Businesses
             </div>
             
-            <h2 className="text-4xl md:text-6xl font-bold text-gray-900 leading-tight">
+            <h2 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white leading-tight">
               Professional Invoicing
-              <span className="block text-emerald-600 mt-2">Made Simple</span>
+              <span className="block text-emerald-600 dark:text-emerald-400 mt-2">Made Simple</span>
             </h2>
             
-            <p className="text-lg text-gray-600 leading-relaxed">
+            <p className="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
               Create GST-compliant invoices, manage customers, and get paid faster. 
               Built specifically for Indian small businesses and freelancers.
             </p>
@@ -80,7 +82,7 @@ export default function Home() {
                 <Button 
                   size="lg" 
                   variant="secondary"
-                  className="bg-white border-2 border-gray-300 text-gray-700 hover:bg-gray-50 px-8 text-base"
+                  className="bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 px-8 text-base"
                 >
                   See Features
                 </Button>
@@ -89,8 +91,8 @@ export default function Home() {
 
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 pt-4">
               {BENEFITS.map((benefit) => (
-                <div key={benefit} className="flex items-center gap-2 text-sm text-gray-600">
-                  <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0" />
+                <div key={benefit} className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                  <CheckCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                   <span>{benefit}</span>
                 </div>
               ))}
