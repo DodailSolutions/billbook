@@ -117,7 +117,7 @@ export default function SupportPage() {
           <div className="space-y-4">
             <details className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-all">
               <summary className="font-semibold text-gray-900 cursor-pointer">Can&apos;t log in to my account</summary>
-              <p className="text-gray-600 mt-4">Try resetting your password using the &quot;Forgot Password&quot; link on the login page. If that doesn&apos;t work, contact support at support@billbook.in</p>
+              <p className="text-gray-600 mt-4">Try resetting your password using the &quot;Forgot Password&quot; link on the login page. If that doesn&apos;t work, contact support at support@billbooky.com</p>
             </details>
 
             <details className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-all">

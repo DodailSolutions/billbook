@@ -1,8 +1,30 @@
+'use client'
+
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
-import { FileText, Mail, MessageSquare, Phone } from 'lucide-react'
+import { FileText, Mail, MessageSquare, Phone, CheckCircle, XCircle } from 'lucide-react'
+import { submitContactForm } from './actions'
+import { useState, useTransition } from 'react'
 
 export default function ContactPage() {
+  const [isPending, startTransition] = useTransition()
+  const [result, setResult] = useState<{ success: boolean; message: string } | null>(null)
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+    
+    startTransition(async () => {
+      const response = await submitContactForm(formData)
+      setResult(response)
+      
+      if (response.success) {
+        // Reset form on success
+        e.currentTarget.reset()
+      }
+    })
+  }
+
   return (
     <div className="min-h-screen bg-white">
       {/* Navigation */}
@@ -44,7 +66,25 @@ export default function ContactPage() {
           {/* Contact Form */}
           <div className="bg-white border border-gray-200 rounded-2xl p-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Send us a message</h2>
-            <form className="space-y-6">
+            
+            {result && (
+              <div className={`mb-6 p-4 rounded-lg flex items-start gap-3 ${
+                result.success 
+                  ? 'bg-green-50 border border-green-200' 
+                  : 'bg-red-50 border border-red-200'
+              }`}>
+                {result.success ? (
+                  <CheckCircle className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
+                ) : (
+                  <XCircle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />
+                )}
+                <p className={`text-sm ${result.success ? 'text-green-800' : 'text-red-800'}`}>
+                  {result.message}
+                </p>
+              </div>
+            )}
+            
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label htmlFor="name" className="block text-sm font-semibold text-gray-900 mb-2">
                   Your Name
@@ -56,6 +96,7 @@ export default function ContactPage() {
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                   placeholder="John Doe"
                   required
+                  disabled={isPending}
                 />
               </div>
               
@@ -70,6 +111,7 @@ export default function ContactPage() {
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                   placeholder="john@example.com"
                   required
+                  disabled={isPending}
                 />
               </div>
               
@@ -84,6 +126,7 @@ export default function ContactPage() {
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                   placeholder="How can we help?"
                   required
+                  disabled={isPending}
                 />
               </div>
               
@@ -98,11 +141,16 @@ export default function ContactPage() {
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                   placeholder="Tell us more about your inquiry..."
                   required
+                  disabled={isPending}
                 />
               </div>
               
-              <Button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">
-                Send Message
+              <Button 
+                type="submit" 
+                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-50"
+                disabled={isPending}
+              >
+                {isPending ? 'Sending...' : 'Send Message'}
               </Button>
             </form>
           </div>
@@ -123,7 +171,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-1">Email</h3>
-                  <p className="text-gray-600">support@billbook.in</p>
+                  <p className="text-gray-600">support@billbooky.com</p>
                   <p className="text-sm text-gray-500 mt-1">We&apos;ll respond within 24 hours</p>
                 </div>
               </div>

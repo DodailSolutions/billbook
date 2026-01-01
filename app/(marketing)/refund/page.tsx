@@ -61,7 +61,7 @@ export default function RefundPage() {
               To request a refund within the 14-day window:
             </p>
             <ol className="list-decimal list-inside text-gray-600 space-y-2">
-              <li>Email us at refunds@billbook.in</li>
+              <li>Email us at support@billbooky.com</li>
               <li>Include your account email and reason for refund</li>
               <li>We will process your request within 2-3 business days</li>
               <li>Refunds are issued to the original payment method</li>
