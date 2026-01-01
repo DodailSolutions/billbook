@@ -46,13 +46,13 @@ export async function submitContactForm(formData: FormData) {
     if (errorMessage.includes('RESEND_API_KEY')) {
       return {
         success: false,
-        message: 'Email service is not configured yet. Please email us directly at support@billbooky.com',
+        message: 'Email service is not configured yet. Please email us directly at support@dodail.com',
       }
     }
     
     return {
       success: false,
-      message: 'Failed to send message. Please try again or email us directly at support@billbooky.com',
+      message: 'Failed to send message. Please try again or email us directly at support@dodail.com',
     }
   }
 }

@@ -2,7 +2,7 @@
 
 import { Resend } from 'resend'
 
-const FROM_EMAIL = 'support@billbooky.com'
+const FROM_EMAIL = 'support@dodail.com'
 
 function getResendClient() {
   const apiKey = process.env.RESEND_API_KEY

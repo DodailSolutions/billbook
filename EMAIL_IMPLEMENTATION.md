@@ -2,7 +2,7 @@
 
 ## Overview
 
-The email system has been successfully implemented using [Resend](https://resend.com) as the email service provider. All email addresses have been updated to `support@billbooky.com`.
+The email system has been successfully implemented using [Resend](https://resend.com) as the email service provider. All email addresses have been updated to `support@dodail.com`.
 
 ## Changes Made
 
@@ -28,7 +28,7 @@ Created `/app/(marketing)/contact/actions.ts`:
 - Includes email validation and error handling
 
 ### 5. **Email Addresses Updated**
-Changed all email addresses from `*@billbook.in` to `support@billbooky.com`:
+Changed all email addresses from `*@billbook.in` to `support@dodail.com`:
 - Contact page
 - Support page
 - Refund policy page
@@ -57,12 +57,12 @@ RESEND_API_KEY=re_xxxxxxxxxxxx
 
 ### Domain Configuration (Production)
 
-For production use with `support@billbooky.com`:
+For production use with `support@dodail.com`:
 
-1. Add and verify the `billbooky.com` domain in Resend
+1. Add and verify the `dodail.com` domain in Resend
 2. Configure DNS records as per Resend's instructions
 3. Wait for domain verification
-4. The `FROM_EMAIL` in `/lib/email.ts` is already set to `support@billbooky.com`
+4. The `FROM_EMAIL` in `/lib/email.ts` is already set to `support@dodail.com`
 
 ## Testing
 
@@ -81,7 +81,7 @@ npm run dev
 - Contact form submission
 - Email validation
 - Success/error feedback
-- Email delivery to support@billbooky.com
+- Email delivery to support@dodail.com
 
 ## Features
 
@@ -145,7 +145,7 @@ See [Resend Pricing](https://resend.com/pricing) for details.
 ## Next Steps
 
 1. **Immediate**: Add `RESEND_API_KEY` to your environment variables
-2. **Before Production**: Configure and verify `billbooky.com` domain in Resend
+2. **Before Production**: Configure and verify `dodail.com` domain in Resend
 3. **Optional**: Implement invoice email delivery feature
 4. **Optional**: Set up automated reminder emails
 
@@ -154,7 +154,7 @@ See [Resend Pricing](https://resend.com/pricing) for details.
 For issues or questions:
 - Email functionality: Check `/lib/email.ts` and `EMAIL_SETUP.md`
 - Resend service: [Resend Documentation](https://resend.com/docs)
-- General support: support@billbooky.com
+- General support: support@dodail.com
 
 ---
 

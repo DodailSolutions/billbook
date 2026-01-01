@@ -24,11 +24,11 @@ For production use, you should configure a custom domain:
 
 1. Go to **Domains** in the Resend dashboard
 2. Click **Add Domain**
-3. Enter your domain (e.g., `billbooky.com`)
+3. Enter your domain (e.g., `dodail.com`)
 4. Follow the DNS configuration instructions
 5. Wait for DNS verification (usually takes a few minutes)
 
-Once verified, you can send emails from `support@billbooky.com` or any other address at your domain.
+Once verified, you can send emails from `support@dodail.com` or any other address at your domain.
 
 ### 4. Add API Key to Environment Variables
 
@@ -52,7 +52,7 @@ const FROM_EMAIL = 'support@yourdomain.com'
 
 ### Contact Form
 - Located at `/contact`
-- Sends emails to `support@billbooky.com`
+- Sends emails to `support@dodail.com`
 - Includes reply-to field for easy responses
 - Shows success/error feedback to users
 
@@ -112,4 +112,4 @@ For Resend-specific issues:
 For BillBooky email issues:
 - Check the email sending logic in `/lib/email.ts`
 - Review server actions in `/app/(marketing)/contact/actions.ts`
-- Contact: support@billbooky.com
+- Contact: support@dodail.com

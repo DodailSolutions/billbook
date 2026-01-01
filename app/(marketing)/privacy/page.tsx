@@ -145,7 +145,7 @@ export default function PrivacyPage() {
               If you have questions about this Privacy Policy, please contact us at:
             </p>
             <p className="text-gray-600 leading-relaxed mt-4">
-              Email: support@billbooky.com<br />
+              Email: support@dodail.com<br />
               Address: India
             </p>
           </section>
