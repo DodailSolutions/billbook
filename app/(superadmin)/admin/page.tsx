@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { 
-    LayoutDashboard, 
     Users, 
     Building2, 
     CreditCard, 
@@ -17,6 +16,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/Button'
 import { getDashboardStats, getRecentActivity } from './actions'
 
+import type { LucideIcon } from 'lucide-react'
+
 function StatCard({ 
     title, 
     value, 
@@ -28,7 +29,7 @@ function StatCard({
     title: string
     value: string | number
     description: string
-    icon: any
+    icon: LucideIcon
     trend?: string
     colorClass: string
 }) {
@@ -71,7 +72,7 @@ function QuickActionCard({
 }: {
     title: string
     description: string
-    icon: any
+    icon: LucideIcon
     href: string
     colorClass: string
 }) {
@@ -122,11 +123,11 @@ export default async function SuperAdminDashboard() {
 
     return (
         <div className="min-h-screen p-4 md:p-6 lg:p-8">
-            <div className="max-w-[1600px] mx-auto space-y-8">
+            <div className="max-w-7xl mx-auto space-y-8">
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent flex items-center gap-3">
+                        <h1 className="text-4xl font-bold bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent flex items-center gap-3">
                             <Shield className="h-10 w-10 text-blue-600" />
                             Super Admin Dashboard
                         </h1>

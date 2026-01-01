@@ -41,7 +41,7 @@ export async function getAllUsers(): Promise<UserWithDetails[]> {
             return {
                 ...profile,
                 email: authUser?.email,
-                subscription: subscription as any
+                subscription: subscription as UserSubscription | undefined
             }
         })
 

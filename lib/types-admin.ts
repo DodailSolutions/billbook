@@ -88,7 +88,7 @@ export interface Payment {
     gateway_transaction_id?: string
     status: 'pending' | 'completed' | 'failed' | 'refunded'
     description?: string
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
     created_at: string
     updated_at: string
 }
@@ -132,7 +132,7 @@ export interface SupportTicketMessage {
     user_id: string
     message: string
     is_internal: boolean
-    attachments?: any[]
+    attachments?: string[]
     created_at: string
 }
 
@@ -142,7 +142,7 @@ export interface AuditLog {
     action: string
     entity_type?: string
     entity_id?: string
-    changes?: Record<string, any>
+    changes?: Record<string, unknown>
     ip_address?: string
     user_agent?: string
     created_at: string
@@ -151,7 +151,7 @@ export interface AuditLog {
 export interface SystemSettings {
     id: string
     key: string
-    value: any
+    value: unknown
     description?: string
     updated_by?: string
     created_at: string
