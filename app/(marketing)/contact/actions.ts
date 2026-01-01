@@ -40,6 +40,16 @@ export async function submitContactForm(formData: FormData) {
     }
   } catch (error) {
     console.error('Error submitting contact form:', error)
+    
+    // Check if it's a configuration error
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    if (errorMessage.includes('RESEND_API_KEY')) {
+      return {
+        success: false,
+        message: 'Email service is not configured yet. Please email us directly at support@billbooky.com',
+      }
+    }
+    
     return {
       success: false,
       message: 'Failed to send message. Please try again or email us directly at support@billbooky.com',

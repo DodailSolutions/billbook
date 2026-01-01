@@ -2,9 +2,15 @@
 
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 const FROM_EMAIL = 'support@billbooky.com'
+
+function getResendClient() {
+  const apiKey = process.env.RESEND_API_KEY
+  if (!apiKey) {
+    throw new Error('RESEND_API_KEY is not configured. Please add it to your environment variables.')
+  }
+  return new Resend(apiKey)
+}
 
 export async function sendContactEmail({
   name,
@@ -18,11 +24,8 @@ export async function sendContactEmail({
   message: string
 }) {
   try {
-    if (!process.env.RESEND_API_KEY) {
-      console.error('RESEND_API_KEY is not configured')
-      throw new Error('Email service is not configured. Please add RESEND_API_KEY to your environment variables.')
-    }
-
+    const resend = getResendClient()
+    
     const { data, error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: FROM_EMAIL, // Send to support email
@@ -127,11 +130,8 @@ export async function sendInvoiceEmail({
   pdfUrl: string
 }) {
   try {
-    if (!process.env.RESEND_API_KEY) {
-      console.error('RESEND_API_KEY is not configured')
-      throw new Error('Email service is not configured')
-    }
-
+    const resend = getResendClient()
+    
     const { data, error } = await resend.emails.send({
       from: FROM_EMAIL,
       to,
