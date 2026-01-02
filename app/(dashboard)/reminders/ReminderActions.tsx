@@ -18,8 +18,12 @@ export default function ReminderActions({ reminder }: ReminderActionsProps) {
     const handleMarkAsSent = async () => {
         setIsLoading(true)
         try {
-            await markReminderAsSent(reminder.id)
-            router.refresh()
+            const result = await markReminderAsSent(reminder.id)
+            if (result.success) {
+                router.refresh()
+            } else {
+                alert(result.error || 'Failed to mark reminder as sent')
+            }
         } catch (err) {
             console.error('Error marking reminder as sent:', err)
             alert('Failed to mark reminder as sent')
@@ -32,8 +36,12 @@ export default function ReminderActions({ reminder }: ReminderActionsProps) {
         if (confirm('Dismiss this reminder?')) {
             setIsLoading(true)
             try {
-                await deleteReminder(reminder.id)
-                router.refresh()
+                const result = await deleteReminder(reminder.id)
+                if (result.success) {
+                    router.refresh()
+                } else {
+                    alert(result.error || 'Failed to dismiss reminder')
+                }
             } catch (err) {
                 console.error('Error dismissing reminder:', err)
                 alert('Failed to dismiss reminder')

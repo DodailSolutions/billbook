@@ -121,8 +121,18 @@ export default async function RemindersPage() {
                                                                 ₹{reminder.invoice.total.toFixed(2)}
                                                             </span>
                                                         </div>
+                                                        {reminder.invoice.customer && (
+                                                            <div className="text-sm text-gray-600 dark:text-gray-400">
+                                                                Customer: {reminder.invoice.customer.name}
+                                                            </div>
+                                                        )}
                                                         <div className="text-sm text-gray-600 dark:text-gray-400">
                                                             Due: {formatDate(reminder.invoice.due_date || '')}
+                                                        </div>
+                                                        <div className="mt-1">
+                                                            <span className={`inline-flex px-2 py-0.5 text-xs font-medium rounded-full ${\n                                                                reminder.invoice.status === 'paid'\n                                                                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200'\n                                                                    : reminder.invoice.status === 'cancelled'\n                                                                    ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200'\n                                                                    : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200'\n                                                            }`}>
+                                                                {reminder.invoice.status}
+                                                            </span>
                                                         </div>
                                                     </div>
                                                 )}
@@ -133,6 +143,11 @@ export default async function RemindersPage() {
                                                         <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
                                                             Recurring Invoice
                                                         </div>
+                                                        {reminder.recurring_invoice.customer && (
+                                                            <div className="text-sm text-gray-600 dark:text-gray-400">
+                                                                Customer: {reminder.recurring_invoice.customer.name}
+                                                            </div>
+                                                        )}
                                                         <div className="text-sm text-gray-600 dark:text-gray-400">
                                                             Next: {formatDate(reminder.recurring_invoice.next_invoice_date)}
                                                         </div>

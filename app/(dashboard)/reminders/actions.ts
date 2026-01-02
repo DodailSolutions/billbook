@@ -18,8 +18,18 @@ export async function getReminders(): Promise<ReminderWithDetails[]> {
             .from('reminders')
             .select(`
                 *,
-                invoice:invoices(invoice_number, total, due_date, status),
-                recurring_invoice:recurring_invoices(frequency, next_invoice_date)
+                invoice:invoices(
+                    invoice_number,
+                    total,
+                    due_date,
+                    status,
+                    customer:customers(name, email, phone)
+                ),
+                recurring_invoice:recurring_invoices(
+                    frequency,
+                    next_invoice_date,
+                    customer:customers(name, email, phone)
+                )
             `)
             .eq('user_id', user.id)
             .eq('is_sent', false)
@@ -55,8 +65,18 @@ export async function getUpcomingReminders(days: number = 7): Promise<ReminderWi
             .from('reminders')
             .select(`
                 *,
-                invoice:invoices(invoice_number, total, due_date, status),
-                recurring_invoice:recurring_invoices(frequency, next_invoice_date)
+                invoice:invoices(
+                    invoice_number,
+                    total,
+                    due_date,
+                    status,
+                    customer:customers(name, email, phone)
+                ),
+                recurring_invoice:recurring_invoices(
+                    frequency,
+                    next_invoice_date,
+                    customer:customers(name, email, phone)
+                )
             `)
             .eq('user_id', user.id)
             .eq('is_sent', false)
@@ -76,13 +96,13 @@ export async function getUpcomingReminders(days: number = 7): Promise<ReminderWi
     }
 }
 
-export async function markReminderAsSent(reminderId: string) {
+export async function markReminderAsSent(reminderId: string): Promise<{ success: boolean; error?: string }> {
     try {
         const supabase = await createClient()
 
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) {
-            return
+            return { success: false, error: 'Not authenticated' }
         }
 
         const { error } = await supabase
@@ -96,13 +116,14 @@ export async function markReminderAsSent(reminderId: string) {
 
         if (error) {
             console.error('Error marking reminder as sent:', error)
-            throw new Error('Failed to mark reminder as sent')
+            return { success: false, error: 'Failed to mark reminder as sent' }
         }
 
         revalidatePath('/reminders')
+        return { success: true }
     } catch (err) {
         console.error('Error in markReminderAsSent:', err)
-        throw err
+        return { success: false, error: 'An unexpected error occurred' }
     }
 }
 
@@ -143,13 +164,13 @@ export async function createReminderForInvoice(
     }
 }
 
-export async function deleteReminder(reminderId: string) {
+export async function deleteReminder(reminderId: string): Promise<{ success: boolean; error?: string }> {
     try {
         const supabase = await createClient()
 
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) {
-            return
+            return { success: false, error: 'Not authenticated' }
         }
 
         const { error } = await supabase
@@ -160,12 +181,13 @@ export async function deleteReminder(reminderId: string) {
 
         if (error) {
             console.error('Error deleting reminder:', error)
-            throw new Error('Failed to delete reminder')
+            return { success: false, error: 'Failed to delete reminder' }
         }
 
         revalidatePath('/reminders')
+        return { success: true }
     } catch (err) {
         console.error('Error in deleteReminder:', err)
-        throw err
+        return { success: false, error: 'An unexpected error occurred' }
     }
 }

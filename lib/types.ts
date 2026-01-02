@@ -105,7 +105,21 @@ export interface Reminder {
     created_at: string
 }
 
+export interface InvoiceForReminder {
+    invoice_number: string
+    total: number
+    due_date?: string
+    status: 'draft' | 'sent' | 'paid' | 'cancelled'
+    customer: Customer
+}
+
+export interface RecurringInvoiceForReminder {
+    frequency: 'monthly' | 'yearly'
+    next_invoice_date: string
+    customer: Customer
+}
+
 export interface ReminderWithDetails extends Reminder {
-    invoice?: Invoice
-    recurring_invoice?: RecurringInvoice
+    invoice?: InvoiceForReminder
+    recurring_invoice?: RecurringInvoiceForReminder
 }
