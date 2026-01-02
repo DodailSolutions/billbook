@@ -33,6 +33,8 @@ export interface InvoiceSettings {
     show_logo?: boolean
     show_company_details?: boolean
     show_gstin?: boolean
+    payment_qr_code_url?: string
+    show_qr_code?: boolean
 }
 
 export async function getInvoiceSettings(): Promise<InvoiceSettings | null> {

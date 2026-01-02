@@ -28,6 +28,8 @@ interface InvoicePreviewProps {
         show_company_details: boolean
         show_gstin: boolean
         show_logo: boolean
+        payment_qr_code_url?: string
+        show_qr_code?: boolean
     }
 }
 
@@ -218,6 +220,30 @@ export default function InvoicePreview({ settings }: InvoicePreviewProps) {
                             }}
                         >
                             {payment_instructions}
+                        </div>
+                    </div>
+                )}
+
+                {/* Payment QR Code */}
+                {settings.show_qr_code && settings.payment_qr_code_url && (
+                    <div className="mb-6 pt-4 border-t">
+                        <div 
+                            className="text-sm font-semibold mb-3 text-center"
+                            style={{ color: primary_color }}
+                        >
+                            Scan to Pay
+                        </div>
+                        <div className="flex justify-center">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img 
+                                src={settings.payment_qr_code_url} 
+                                alt="Payment QR Code" 
+                                className="h-32 w-32 object-contain border-2 rounded-lg"
+                                style={{ borderColor: primary_color }}
+                            />
+                        </div>
+                        <div className="text-center text-xs text-gray-500 mt-2">
+                            GPay | PhonePe | Paytm | UPI
                         </div>
                     </div>
                 )}

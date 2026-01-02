@@ -36,6 +36,8 @@ export default function SettingsWithPreview({ initialSettings }: SettingsWithPre
         show_company_details: initialSettings?.show_company_details ?? true,
         show_gstin: initialSettings?.show_gstin ?? true,
         show_logo: initialSettings?.show_logo ?? true,
+        payment_qr_code_url: initialSettings?.payment_qr_code_url || '',
+        show_qr_code: initialSettings?.show_qr_code ?? true,
     })
 
     return (

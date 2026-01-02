@@ -46,6 +46,9 @@ export default function InvoiceSettingsForm({ initialSettings, onPreviewUpdate }
     const [termsFontSize, setTermsFontSize] = useState(initialSettings?.terms_font_size || 12)
     const [invoiceFontFamily, setInvoiceFontFamily] = useState(initialSettings?.invoice_font_family || 'Arial')
     const [invoiceFontSize, setInvoiceFontSize] = useState(initialSettings?.invoice_font_size || 12)
+    const [qrCodeUrl, setQrCodeUrl] = useState(initialSettings?.payment_qr_code_url || '')
+    const [qrCodePreview, setQrCodePreview] = useState(initialSettings?.payment_qr_code_url || '')
+    const [showQrCode, setShowQrCode] = useState(initialSettings?.show_qr_code ?? true)
 
     const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
@@ -78,6 +81,37 @@ export default function InvoiceSettingsForm({ initialSettings, onPreviewUpdate }
         setLogoPreview('')
     }
 
+    const handleQrCodeUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (!file) return
+
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+            alert('Please upload an image file')
+            return
+        }
+
+        // Validate file size (max 2MB)
+        if (file.size > 2 * 1024 * 1024) {
+            alert('Image size should be less than 2MB')
+            return
+        }
+
+        // Convert to base64
+        const reader = new FileReader()
+        reader.onloadend = () => {
+            const base64String = reader.result as string
+            setQrCodeUrl(base64String)
+            setQrCodePreview(base64String)
+        }
+        reader.readAsDataURL(file)
+    }
+
+    const handleRemoveQrCode = () => {
+        setQrCodeUrl('')
+        setQrCodePreview('')
+    }
+
     // Update preview when any field changes
     useEffect(() => {
         if (onPreviewUpdate) {
@@ -97,6 +131,8 @@ export default function InvoiceSettingsForm({ initialSettings, onPreviewUpdate }
                 company_logo_url: logoPreview,
                 show_logo: showLogo,
                 logo_size: logoSize,
+                payment_qr_code_url: qrCodePreview,
+                show_qr_code: showQrCode,
                 company_font_family: companyFontFamily,
                 company_font_size: companyFontSize,
                 company_name_color: companyNameColor,
@@ -142,7 +178,9 @@ export default function InvoiceSettingsForm({ initialSettings, onPreviewUpdate }
                 footer_text: footerText || undefined,
                 show_logo: showLogo,
                 show_company_details: showCompanyDetails,
-                show_gstin: showGstin
+                show_gstin: showGstin,
+                payment_qr_code_url: qrCodeUrl || undefined,
+                show_qr_code: showQrCode
             })
 
             alert('Invoice settings saved successfully!')
@@ -764,6 +802,76 @@ export default function InvoiceSettingsForm({ initialSettings, onPreviewUpdate }
                             onChange={(e) => setPaymentInstructions(e.target.value)}
                             placeholder="Bank details, payment methods, etc."
                         />
+                    </div>
+
+                    {/* Payment QR Code Upload */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                            Payment QR Code (GPay, PhonePe, Paytm, etc.)
+                        </label>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                            Upload your payment QR code to display on invoices for easy customer payments
+                        </p>
+                        <div className="flex items-start gap-4">
+                            {qrCodePreview ? (
+                                <div className="relative">
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img 
+                                        src={qrCodePreview} 
+                                        alt="Payment QR Code" 
+                                        className="h-32 w-32 object-contain border-2 border-gray-300 dark:border-gray-600 rounded-lg"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={handleRemoveQrCode}
+                                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                                    >
+                                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="h-32 w-32 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center">
+                                    <svg className="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                                    </svg>
+                                </div>
+                            )}
+                            <div className="flex-1">
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleQrCodeUpload}
+                                    className="block w-full text-sm text-gray-500 dark:text-gray-400
+                                        file:mr-4 file:py-2 file:px-4
+                                        file:rounded-full file:border-0
+                                        file:text-sm file:font-semibold
+                                        file:bg-blue-50 file:text-blue-700
+                                        dark:file:bg-blue-900/20 dark:file:text-blue-400
+                                        hover:file:bg-blue-100 dark:hover:file:bg-blue-900/30
+                                        file:cursor-pointer cursor-pointer"
+                                />
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                                    Recommended: Square image, PNG/JPG, max 2MB
+                                </p>
+                            </div>
+                        </div>
+                        {qrCodePreview && (
+                            <div className="mt-3">
+                                <label className="flex items-center gap-3 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={showQrCode}
+                                        onChange={(e) => setShowQrCode(e.target.checked)}
+                                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                    />
+                                    <span className="text-sm text-gray-700 dark:text-gray-200">
+                                        Show QR code on invoices
+                                    </span>
+                                </label>
+                            </div>
+                        )}
                     </div>
 
                     <div>
