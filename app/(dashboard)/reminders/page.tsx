@@ -130,7 +130,13 @@ export default async function RemindersPage() {
                                                             Due: {formatDate(reminder.invoice.due_date || '')}
                                                         </div>
                                                         <div className="mt-1">
-                                                            <span className={`inline-flex px-2 py-0.5 text-xs font-medium rounded-full ${\n                                                                reminder.invoice.status === 'paid'\n                                                                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200'\n                                                                    : reminder.invoice.status === 'cancelled'\n                                                                    ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200'\n                                                                    : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200'\n                                                            }`}>
+                                                            <span className={`inline-flex px-2 py-0.5 text-xs font-medium rounded-full ${
+                                                                reminder.invoice.status === 'paid'
+                                                                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200'
+                                                                    : reminder.invoice.status === 'cancelled'
+                                                                    ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200'
+                                                                    : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200'
+                                                            }`}>
                                                                 {reminder.invoice.status}
                                                             </span>
                                                         </div>
