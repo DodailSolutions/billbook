@@ -23,6 +23,9 @@ export interface Invoice {
     total: number
     notes?: string
     status: 'draft' | 'sent' | 'paid' | 'cancelled'
+    payment_method?: string
+    payment_notes?: string
+    paid_at?: string
     created_at: string
     updated_at: string
 }

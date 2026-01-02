@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Plus, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
@@ -20,6 +21,7 @@ interface InvoiceItem {
 }
 
 export function InvoiceForm({ customers, invoice, mode = 'create' }: InvoiceFormProps) {
+    const router = useRouter()
     const [items, setItems] = useState<InvoiceItem[]>(
         invoice?.invoice_items.map(item => ({
             description: item.description,
@@ -75,9 +77,17 @@ export function InvoiceForm({ customers, invoice, mode = 'create' }: InvoiceForm
             }
 
             if (mode === 'edit' && invoice) {
-                await updateInvoice(invoice.id, invoiceData)
+                const result = await updateInvoice(invoice.id, invoiceData)
+                if (result.success) {
+                    router.push('/invoices')
+                    router.refresh()
+                }
             } else {
-                await createInvoice(invoiceData)
+                const result = await createInvoice(invoiceData)
+                if (result.success) {
+                    router.push('/invoices')
+                    router.refresh()
+                }
             }
         } catch (error) {
             console.error(`Error ${mode === 'edit' ? 'updating' : 'creating'} invoice:`, error)

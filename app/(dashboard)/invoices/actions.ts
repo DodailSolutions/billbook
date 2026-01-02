@@ -161,7 +161,7 @@ export async function createInvoice(data: CreateInvoiceData) {
     }
 
     revalidatePath('/invoices')
-    return redirect('/invoices')
+    return { success: true, invoiceId: invoice.id }
 }
 
 interface UpdateInvoiceData {
@@ -244,7 +244,7 @@ export async function updateInvoice(id: string, data: UpdateInvoiceData) {
     }
 
     revalidatePath('/invoices')
-    return redirect('/invoices')
+    return { success: true, invoiceId: id }
 }
 
 export async function updateInvoiceStatus(id: string, status: Invoice['status']) {

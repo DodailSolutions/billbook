@@ -4,7 +4,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { LayoutDashboard, FileText, Users, RefreshCw, Bell, Settings } from "lucide-react"
+import { LayoutDashboard, FileText, Users, RefreshCw, Bell, Settings, User } from "lucide-react"
 import { SignOutButton } from "./SignOutButton"
 
 const routes = [
@@ -39,7 +39,13 @@ const routes = [
         color: "text-pink-700",
     },
     {
-        label: 'Settings',
+        label: 'Account',
+        icon: User,
+        href: '/settings',
+        color: "text-emerald-500",
+    },
+    {
+        label: 'Invoice Settings',
         icon: Settings,
         href: '/invoices/settings',
         color: "text-gray-400",

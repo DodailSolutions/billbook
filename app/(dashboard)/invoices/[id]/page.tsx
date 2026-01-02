@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/Button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card"
 import { getInvoice } from "../actions"
 import { DownloadPDFButton } from "./DownloadPDFButton"
+import { MarkAsPaidButton } from "./MarkAsPaidButton"
 import { formatDate } from "@/lib/utils"
 
 export default async function InvoiceDetailPage({
@@ -18,6 +19,8 @@ export default async function InvoiceDetailPage({
     if (!invoice) {
         notFound()
     }
+
+    const isPaid = invoice.status === 'paid'
 
     return (
         <div className="space-y-4 max-w-4xl mx-auto">
@@ -131,6 +134,47 @@ export default async function InvoiceDetailPage({
                             <p className="text-sm text-muted-foreground whitespace-pre-wrap">{invoice.notes}</p>
                         </div>
                     )}
+
+                    {/* Payment Status */}
+                    <div className="border-t pt-6">
+                        {isPaid ? (
+                            <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="h-10 w-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                                        <svg className="h-6 w-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </div>
+                                    <div className="flex-1">
+                                        <p className="font-semibold text-green-800 dark:text-green-300">Payment Received</p>
+                                        <p className="text-sm text-green-600 dark:text-green-400">
+                                            {invoice.payment_method && `Via ${invoice.payment_method.replace('_', ' ')}`}
+                                            {invoice.paid_at && ` on ${formatDate(invoice.paid_at)}`}
+                                        </p>
+                                        {invoice.payment_notes && (
+                                            <p className="text-xs text-green-600 dark:text-green-400 mt-1">
+                                                {invoice.payment_notes}
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        ) : invoice.status === 'cancelled' ? (
+                            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                                <p className="font-semibold text-red-800 dark:text-red-300">This invoice has been cancelled</p>
+                            </div>
+                        ) : (
+                            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="font-semibold text-yellow-800 dark:text-yellow-300">Payment Pending</p>
+                                        <p className="text-sm text-yellow-600 dark:text-yellow-400">Customer can pay via cash or QR code</p>
+                                    </div>
+                                    <MarkAsPaidButton invoiceId={invoice.id} invoiceNumber={invoice.invoice_number} />
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </CardContent>
             </Card>
         </div>
