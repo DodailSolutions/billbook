@@ -126,13 +126,13 @@ export default function PricingPage() {
               </li>
               <li className="flex items-start gap-3">
                 <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                <span className?plan=starter">
+                <span className="text-gray-700">Priority support</span>
+              </li>
+            </ul>
+            
+            <Link href="/signup?plan=starter">
               <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">
                 Start Free Trial
-            
-            <Link href="/signup">
-              <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">
-                Get Started
               </Button>
             </Link>
           </div>
