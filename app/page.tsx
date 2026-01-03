@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
 import { FileText, Users, IndianRupee, TrendingUp, Zap, Shield, CheckCircle, Clock, BarChart3, RefreshCw } from 'lucide-react'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { createClient } from '@/lib/supabase/server'
 
 const FEATURES = [
   { icon: FileText, title: 'Quick Invoice Creation', desc: 'Create professional invoices in under 60 seconds', color: 'emerald' },
@@ -21,7 +22,11 @@ const BENEFITS = [
   'Mobile responsive',
 ]
 
-export default function Home() {
+export default async function Home() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  const isAuthenticated = !!user
+
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950">
       {/* Navigation */}
@@ -31,16 +36,26 @@ export default function Home() {
             <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center">
               <FileText className="h-5 w-5 text-white" />
             </div>
-            <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">BillBooky</h1>
-          </div>
-          <div className="flex items-center gap-2 md:gap-3">
-            <ThemeToggle />
-            <Link href="/login" className="hidden sm:inline-block">
-              <Button variant="secondary" className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">
-                Sign In
-              </Button>
-            </Link>
-            <Link href="/signup">
+            {isAuthenticated ? (
+              <Link href="/dashboard">
+                <Button className="bg-emerald-600 hover:bg-emerald-700 text-white text-sm md:text-base">
+                  Dashboard
+                </Button>
+              </Link>
+            ) : (
+              <>
+                <Link href="/login" className="hidden sm:inline-block">
+                  <Button variant="secondary" className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">
+                    Sign In
+                  </Button>
+                </Link>
+                <Link href="/signup">
+                  <Button className="bg-emerald-600 hover:bg-emerald-700 text-white text-sm md:text-base">
+                    Get Started
+                  </Button>
+                </Link>
+              </>
+            )}ref="/signup">
               <Button className="bg-emerald-600 hover:bg-emerald-700 text-white text-sm md:text-base">
                 Get Started
               </Button>
@@ -60,23 +75,47 @@ export default function Home() {
             </div>
             
             <h2 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white leading-tight">
-              Professional Invoicing
-              <span className="block text-emerald-600 dark:text-emerald-400 mt-2">Made Simple</span>
-            </h2>
-            
-            <p className="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
-              Create GST-compliant invoices, manage customers, and get paid faster. 
-              Built specifically for Indian small businesses and freelancers.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/signup">
-                <Button 
-                  size="lg" 
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 text-base shadow-lg hover:shadow-xl transition-all"
-                >
-                  Start Free Trial
-                </Button>
+              {isAuthenticated ? (
+                <>
+                  <Link href="/dashboard">
+                    <Button 
+                      size="lg" 
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 text-base shadow-lg hover:shadow-xl transition-all"
+                    >
+                      Go to Dashboard
+                    </Button>
+                  </Link>
+                  <Link href="/pricing">
+                    <Button 
+                      size="lg" 
+                      variant="secondary"
+                      className="bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 px-8 text-base"
+                    >
+                      View Plans
+                    </Button>
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link href="/signup">
+                    <Button 
+                      size="lg" 
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 text-base shadow-lg hover:shadow-xl transition-all"
+                    >
+                      Start Free Trial
+                    </Button>
+                  </Link>
+                  <Link href="#features">
+                    <Button 
+                      size="lg" 
+                      variant="secondary"
+                      className="bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 px-8 text-base"
+                    >
+                      See Features
+                    </Button>
+                  </Link>
+                </>
+              )}ton>
               </Link>
               <Link href="#features">
                 <Button 
