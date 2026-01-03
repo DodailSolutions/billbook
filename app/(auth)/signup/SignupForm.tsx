@@ -90,13 +90,14 @@ export function SignupForm({ selectedPlan, message }: SignupFormProps) {
 
         try {
             await signup(formElement)
+            // If we reach here without redirect, something went wrong
         } catch (error) {
-            // NEXT_REDIRECT is not an error, it's how Next.js handles redirects
-            if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
-                // This is expected, let the redirect happen
-                return
+            // Don't catch NEXT_REDIRECT - let it propagate for the redirect to work
+            if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
+                throw error
             }
             console.error('Signup error:', error)
+            alert('Failed to create account. Please try again.')
             setIsSubmitting(false)
         }
     }
