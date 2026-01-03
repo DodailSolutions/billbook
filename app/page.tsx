@@ -2,7 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
 import { Button } from '@/components/ui/Button'
-import { Zap } from 'lucide-react'
+import { Zap, CheckCircle, Shield, TrendingUp } from 'lucide-react'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { createClient } from '@/lib/supabase/server'
 
@@ -13,6 +13,15 @@ const LandingFeatures = dynamic(() => import('./_components/LandingFeatures').th
 const LandingBenefits = dynamic(() => import('./_components/LandingBenefits').then(mod => ({ default: mod.LandingBenefits })), {
   loading: () => <div className="h-24 animate-pulse bg-gray-100" />
 })
+
+const BENEFITS = [
+  'No credit card required',
+  'Free forever plan',
+  'No installation needed',
+  'Instant PDF download',
+  'Secure cloud storage',
+  'Mobile responsive',
+]
 
 export default async function Home() {
   const supabase = await createClient()
