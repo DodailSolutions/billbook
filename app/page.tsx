@@ -364,7 +364,7 @@ export default function Home() {
       </section>
 
       {/* Lifetime Deal Section - Prominent */}
-      <section className="px-6 py-16 md:py-24 bg-gradient-to-br from-amber-500 via-amber-600 to-orange-600">
+      <section className="px-6 py-16 md:py-24 bg-linear-to-br from-amber-500 via-amber-600 to-orange-600">
         <div className="max-w-5xl mx-auto text-center text-white">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 rounded-full text-white text-sm font-semibold mb-6">
             <Zap className="h-4 w-4" />
@@ -438,7 +438,7 @@ export default function Home() {
             <Link href="/pricing#lifetime-deal">
               <Button 
                 size="lg"
-                className="w-full md:w-auto bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold text-lg px-12 py-6 shadow-xl"
+                className="w-full md:w-auto bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold text-lg px-12 py-6 shadow-xl"
               >
                 Get Lifetime Access Now →
               </Button>
