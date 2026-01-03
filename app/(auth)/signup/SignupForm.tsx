@@ -348,11 +348,11 @@ export function SignupForm({ selectedPlan, message }: SignupFormProps) {
                                     <div className="space-y-2">
                                         <div className="flex justify-between text-sm">
                                             <span className="text-gray-600 dark:text-gray-400">Full Name:</span>
-                                            <span className="font-medium">{formData.fullName}</span>
+                                            <span className="font-medium text-gray-900 dark:text-white">{formData.fullName}</span>
                                         </div>
                                         <div className="flex justify-between text-sm">
                                             <span className="text-gray-600 dark:text-gray-400">Email:</span>
-                                            <span className="font-medium">{formData.email}</span>
+                                            <span className="font-medium text-gray-900 dark:text-white">{formData.email}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -362,38 +362,38 @@ export function SignupForm({ selectedPlan, message }: SignupFormProps) {
                                     <div className="space-y-2">
                                         <div className="flex justify-between text-sm">
                                             <span className="text-gray-600 dark:text-gray-400">Business Type:</span>
-                                            <span className="font-medium">{BUSINESS_TYPES.find(t => t.value === formData.businessType)?.label}</span>
+                                            <span className="font-medium text-gray-900 dark:text-white">{BUSINESS_TYPES.find(t => t.value === formData.businessType)?.label}</span>
                                         </div>
                                         <div className="flex justify-between text-sm">
                                             <span className="text-gray-600 dark:text-gray-400">Business Name:</span>
-                                            <span className="font-medium">{formData.businessName}</span>
+                                            <span className="font-medium text-gray-900 dark:text-white">{formData.businessName}</span>
                                         </div>
                                         {formData.ownerName && (
                                             <div className="flex justify-between text-sm">
                                                 <span className="text-gray-600 dark:text-gray-400">Owner Name:</span>
-                                                <span className="font-medium">{formData.ownerName}</span>
+                                                <span className="font-medium text-gray-900 dark:text-white">{formData.ownerName}</span>
                                             </div>
                                         )}
                                         <div className="flex justify-between text-sm">
                                             <span className="text-gray-600 dark:text-gray-400">Phone:</span>
-                                            <span className="font-medium">{formData.businessPhone}</span>
+                                            <span className="font-medium text-gray-900 dark:text-white">{formData.businessPhone}</span>
                                         </div>
                                         {formData.businessEmail && (
                                             <div className="flex justify-between text-sm">
                                                 <span className="text-gray-600 dark:text-gray-400">Business Email:</span>
-                                                <span className="font-medium">{formData.businessEmail}</span>
+                                                <span className="font-medium text-gray-900 dark:text-white">{formData.businessEmail}</span>
                                             </div>
                                         )}
                                         {formData.businessAddress && (
                                             <div className="flex justify-between text-sm">
                                                 <span className="text-gray-600 dark:text-gray-400">Address:</span>
-                                                <span className="font-medium text-right">{formData.businessAddress}</span>
+                                                <span className="font-medium text-right text-gray-900 dark:text-white">{formData.businessAddress}</span>
                                             </div>
                                         )}
                                         {formData.gstin && (
                                             <div className="flex justify-between text-sm">
                                                 <span className="text-gray-600 dark:text-gray-400">GSTIN:</span>
-                                                <span className="font-medium">{formData.gstin}</span>
+                                                <span className="font-medium text-gray-900 dark:text-white">{formData.gstin}</span>
                                             </div>
                                         )}
                                     </div>
