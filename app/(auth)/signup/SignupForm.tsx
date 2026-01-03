@@ -81,6 +81,23 @@ export function SignupForm({ selectedPlan, message }: SignupFormProps) {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+        
+        // Validate all required fields before submission
+        if (!formData.fullName || !formData.email || !formData.password) {
+            alert('Please fill in all required fields')
+            return
+        }
+
+        if (formData.password.length < 6) {
+            alert('Password must be at least 6 characters long')
+            return
+        }
+
+        if (!formData.businessType || !formData.businessName || !formData.businessPhone) {
+            alert('Please fill in all required business information')
+            return
+        }
+
         setIsSubmitting(true)
 
         const formElement = new FormData()
@@ -88,12 +105,30 @@ export function SignupForm({ selectedPlan, message }: SignupFormProps) {
             formElement.append(key, value)
         })
 
-        // Call the server action - it handles redirects internally
-        await signup(formElement)
+        try {
+            // Call the server action - it handles redirects internally
+            await signup(formElement)
+        } catch (error) {
+            console.error('Signup submission error:', error)
+            // Only reset if not a redirect
+            setIsSubmitting(false)
+        }
     }
 
     return (
-        <Card className="max-w-2xl mx-auto">
+        <Card className="max-w-2xl mx-auto relative">
+            {isSubmitting && (
+                <div className="absolute inset-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm z-50 flex items-center justify-center rounded-lg">
+                    <div className="text-center">
+                        <svg className="animate-spin h-12 w-12 mx-auto mb-4 text-emerald-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <p className="text-lg font-semibold text-gray-900 dark:text-white">Creating your account...</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">Please wait, this may take a moment</p>
+                    </div>
+                </div>
+            )}
             <CardHeader className="space-y-1">
                 <CardTitle className="text-2xl font-bold">Create Your Account</CardTitle>
                 <CardDescription>

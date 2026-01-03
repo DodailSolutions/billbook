@@ -54,6 +54,13 @@ export async function signup(formData: FormData) {
         const gstin = formData.get('gstin') as string
         const selectedPlan = formData.get('selectedPlan') as string
 
+        // Log for debugging
+        console.log('Signup attempt for:', email)
+
+        if (!email || !password || !fullName) {
+            return redirect('/signup?message=' + encodeURIComponent('Missing required fields'))
+        }
+
         const { data, error } = await supabase.auth.signUp({
             email,
             password,
@@ -69,12 +76,12 @@ export async function signup(formData: FormData) {
                     gstin: gstin,
                     selected_plan: selectedPlan || 'free',
                 },
-                emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://billbook-steel.vercel.app'}/auth/callback`
+                emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://billbooky.dodail.com'}/auth/callback`
             }
         })
 
         if (error) {
-            console.error('Signup error:', error)
+            console.error('Supabase signup error:', error)
             return redirect('/signup?message=' + encodeURIComponent(error.message))
         }
 
@@ -85,6 +92,8 @@ export async function signup(formData: FormData) {
 
         // If user is created, store business profile in user_profiles table
         if (data?.user) {
+            console.log('User created successfully:', data.user.id)
+            
             const { error: profileError } = await supabase
                 .from('user_profiles')
                 .insert({
@@ -97,11 +106,13 @@ export async function signup(formData: FormData) {
                     business_phone: businessPhone,
                     business_email: businessEmail || email,
                     gstin: gstin,
+                    plan_name: 'free',
                     status: 'active'
                 })
 
             if (profileError) {
                 console.error('Profile creation error:', profileError)
+                // Continue anyway - profile can be created later
             }
         }
 
