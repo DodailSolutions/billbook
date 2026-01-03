@@ -36,18 +36,22 @@ CREATE TABLE IF NOT EXISTS invoice_settings (
 ALTER TABLE invoice_settings ENABLE ROW LEVEL SECURITY;
 
 -- Policies
+DROP POLICY IF EXISTS "Users can view their own invoice settings" ON invoice_settings;
 CREATE POLICY "Users can view their own invoice settings"
   ON invoice_settings FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert their own invoice settings" ON invoice_settings;
 CREATE POLICY "Users can insert their own invoice settings"
   ON invoice_settings FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update their own invoice settings" ON invoice_settings;
 CREATE POLICY "Users can update their own invoice settings"
   ON invoice_settings FOR UPDATE
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can delete their own invoice settings" ON invoice_settings;
 CREATE POLICY "Users can delete their own invoice settings"
   ON invoice_settings FOR DELETE
   USING (auth.uid() = user_id);
