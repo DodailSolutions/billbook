@@ -12,6 +12,18 @@ export default async function PricingPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   const isAuthenticated = !!user
+
+  // Fetch user's current plan if authenticated
+  let currentPlan = null
+  if (user) {
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('plan_name')
+      .eq('id', user.id)
+      .single()
+    currentPlan = profile?.plan_name || 'free'
+  }
+
   return (
     <>
       <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
@@ -90,6 +102,7 @@ export default async function PricingPage() {
             buttonText="Start Free"
             buttonClass="w-full bg-gray-900 dark:bg-gray-700 hover:bg-gray-800 dark:hover:bg-gray-600 text-white"
             isAuthenticated={isAuthenticated}
+            currentPlan={currentPlan}
           />
 
           {/* Starter Plan */}
@@ -114,6 +127,7 @@ export default async function PricingPage() {
             buttonText="Start Free Trial"
             buttonClass="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
             isAuthenticated={isAuthenticated}
+            currentPlan={currentPlan}
           />
 
           {/* Professional Plan */}
@@ -137,6 +151,7 @@ export default async function PricingPage() {
             buttonText="Start Free Trial"
             buttonClass="w-full bg-gray-900 dark:bg-gray-700 hover:bg-gray-800 dark:hover:bg-gray-600 text-white"
             isAuthenticated={isAuthenticated}
+            currentPlan={currentPlan}
           />
 
           {/* Lifetime Pro Plan */}
@@ -168,6 +183,7 @@ export default async function PricingPage() {
             buttonText="Get Lifetime Access →"
             buttonClass="w-full bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold shadow-lg"
             isAuthenticated={isAuthenticated}
+            currentPlan={currentPlan}
           />
         </div>
 

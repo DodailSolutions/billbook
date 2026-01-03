@@ -14,6 +14,7 @@ interface PricingCardProps {
     buttonText: string
     buttonClass: string
     isAuthenticated: boolean
+    currentPlan?: string | null
 }
 
 export function PricingCard({
@@ -26,8 +27,12 @@ export function PricingCard({
     isDeal = false,
     buttonText,
     buttonClass,
-    isAuthenticated
+    isAuthenticated,
+    currentPlan
 }: PricingCardProps) {
+    // Check if this is the user's current plan
+    const isCurrentPlan = currentPlan === planId
+
     // Determine the link based on authentication status
     const getButtonLink = () => {
         if (isAuthenticated) {
@@ -41,13 +46,23 @@ export function PricingCard({
 
     const cardClass = isDeal
         ? "bg-gradient-to-br from-amber-50 via-orange-50 to-amber-50 dark:from-amber-950/30 dark:via-orange-950/30 dark:to-amber-950/30 border-2 sm:border-3 border-amber-400 dark:border-amber-600 rounded-xl sm:rounded-2xl p-6 sm:p-8 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 relative mt-6 sm:mt-8 h-full flex flex-col"
+        : isCurrentPlan
+        ? "bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 border-2 sm:border-3 border-emerald-500 dark:border-emerald-500 rounded-xl sm:rounded-2xl p-6 sm:p-8 shadow-xl shadow-emerald-500/20 transition-all duration-300 relative mt-6 sm:mt-8 ring-2 ring-emerald-400/50 h-full flex flex-col"
         : isPopular
         ? "bg-white dark:bg-gray-900 border-2 border-emerald-600 dark:border-emerald-500 rounded-xl sm:rounded-2xl p-6 sm:p-8 hover:shadow-2xl hover:shadow-emerald-500/20 hover:-translate-y-1 transition-all duration-300 relative mt-6 sm:mt-8 ring-2 ring-emerald-500/10 h-full flex flex-col"
         : "bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-800 rounded-xl sm:rounded-2xl p-6 sm:p-8 hover:shadow-xl hover:-translate-y-1 hover:border-emerald-300 dark:hover:border-emerald-700 transition-all duration-300 mt-6 sm:mt-8 h-full flex flex-col"
 
     return (
         <div className={cardClass}>
-            {isPopular && !isDeal && (
+            {isCurrentPlan && (
+                <div className="absolute -top-4 sm:-top-5 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                    <span className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-4 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold shadow-lg">
+                        ✓ Current Plan
+                    </span>
+                </div>
+            )}
+
+            {isPopular && !isDeal && !isCurrentPlan && (
                 <div className="absolute -top-4 sm:-top-5 left-1/2 -translate-x-1/2 whitespace-nowrap">
                     <span className="bg-linear-to-r from-emerald-600 to-teal-600 text-white px-4 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold shadow-lg animate-pulse">
                         ⭐ Most Popular
@@ -89,11 +104,17 @@ export function PricingCard({
             </ul>
 
             <div className="mt-auto">
-                <Link href={getButtonLink()}>
-                    <Button className={`${buttonClass} text-sm sm:text-base transition-all duration-300 hover:scale-105 hover:shadow-lg`}>
-                        {isAuthenticated && planId !== 'free' ? 'Upgrade Now' : buttonText}
+                {isCurrentPlan ? (
+                    <Button disabled className="w-full bg-gray-400 text-white cursor-not-allowed text-sm sm:text-base">
+                        Current Plan ✓
                     </Button>
-                </Link>
+                ) : (
+                    <Link href={getButtonLink()}>
+                        <Button className={`${buttonClass} text-sm sm:text-base transition-all duration-300 hover:scale-105 hover:shadow-lg`}>
+                            {isAuthenticated && planId !== 'free' ? 'Upgrade Now' : buttonText}
+                        </Button>
+                    </Link>
+                )}
 
                 {isDeal && (
                     <p className="text-xs text-center text-amber-700 dark:text-amber-600 mt-3 sm:mt-4 font-medium">
