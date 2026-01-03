@@ -284,41 +284,53 @@ CREATE POLICY "Users can view own profile" ON user_profiles
 DROP POLICY IF EXISTS "Super admins can update user profiles" ON user_profiles;
 CREATE POLICY "Super admins can update user profiles" ON user_profiles
     FOR ALL USING (is_super_admin(auth.uid()));
+
+-- Subscription Plans: Anyone can view active plans, only super admins can modify
 DROP POLICY IF EXISTS "Anyone can view active plans" ON subscription_plans;
 CREATE POLICY "Anyone can view active plans" ON subscription_plans
     FOR SELECT USING (is_active = true OR is_super_admin(auth.uid()));
 
-DROP POLICY IF EXISTS "Only super admins can modify plans" ON subscription_plans;CREATE POLICY "Anyone can view active plans" ON subscription_plans
-    FOR SELECT USING (is_active = true OR is_super_admin(auth.uid()));
+DROP POLICY IF EXISTS "Only super admins can modify plans" ON subscription_plans;
+CREATE POLICY "Only super admins can modify plans" ON subscription_plans
+    FOR ALL USING (is_super_admin(auth.uid()));
 
+-- User Subscriptions: Users see own, super admins see all
 DROP POLICY IF EXISTS "Users can view own subscriptions" ON user_subscriptions;
 CREATE POLICY "Users can view own subscriptions" ON user_subscriptions
     FOR SELECT USING (auth.uid() = user_id OR is_super_admin(auth.uid()));
 
 DROP POLICY IF EXISTS "Super admins manage subscriptions" ON user_subscriptions;
--- User Subscriptions: Users see own, super admins see all
-CREATE POLICY "Users can view own subscriptions" ON user_subscriptions
+CREATE POLICY "Super admins manage subscriptions" ON user_subscriptions
+    FOR ALL USING (is_super_admin(auth.uid()));
+
+-- Coupons: Anyone can view active coupons, super admins manage all
 DROP POLICY IF EXISTS "Anyone can view active coupons" ON coupons;
 CREATE POLICY "Anyone can view active coupons" ON coupons
     FOR SELECT USING (is_active = true OR is_super_admin(auth.uid()));
 
-DROP POLICY IF EXISTS "Super admins manage coupons" ON coupons;CREATE POLICY "Super admins manage subscriptions" ON user_subscriptions
+DROP POLICY IF EXISTS "Super admins manage coupons" ON coupons;
+CREATE POLICY "Super admins manage coupons" ON coupons
     FOR ALL USING (is_super_admin(auth.uid()));
 
+-- Payments: Users see own, super admins see all
 DROP POLICY IF EXISTS "Users view own payments" ON payments;
 CREATE POLICY "Users view own payments" ON payments
     FOR SELECT USING (auth.uid() = user_id OR is_super_admin(auth.uid()));
 
-DROP POLICY IF EXISTS "Super admins manage payments" ON payments;    FOR SELECT USING (is_active = true OR is_super_admin(auth.uid()));
+DROP POLICY IF EXISTS "Super admins manage payments" ON payments;
+CREATE POLICY "Super admins manage payments" ON payments
+    FOR ALL USING (is_super_admin(auth.uid()));
 
-CREATE POLICY "Super admins manage coupons" ON coupons
+-- Refunds: Users see own, super admins manage all
 DROP POLICY IF EXISTS "Users view own refunds" ON refunds;
 CREATE POLICY "Users view own refunds" ON refunds
     FOR SELECT USING (auth.uid() = user_id OR is_super_admin(auth.uid()));
 
-DROP POLICY IF EXISTS "Super admins manage refunds" ON refunds;-- Payments: Users see own, super admins see all
-CREATE POLICY "Users view own payments" ON payments
-    FOR SELECT USING (auth.uid() = user_id OR is_super_admin(auth.uid()));
+DROP POLICY IF EXISTS "Super admins manage refunds" ON refunds;
+CREATE POLICY "Super admins manage refunds" ON refunds
+    FOR ALL USING (is_super_admin(auth.uid()));
+
+-- Support Tickets: Users manage own, super admins manage all
 DROP POLICY IF EXISTS "Users view own tickets" ON support_tickets;
 CREATE POLICY "Users view own tickets" ON support_tickets
     FOR SELECT USING (auth.uid() = user_id OR is_super_admin(auth.uid()));
@@ -327,8 +339,11 @@ DROP POLICY IF EXISTS "Users create own tickets" ON support_tickets;
 CREATE POLICY "Users create own tickets" ON support_tickets
     FOR INSERT WITH CHECK (auth.uid() = user_id);
 
-DROP POLICY IF EXISTS "Super admins manage all tickets" ON support_tickets;CREATE POLICY "Users view own refunds" ON refunds
-    FOR SELECT USING (auth.uid() = user_id OR is_super_admin(auth.uid()));
+DROP POLICY IF EXISTS "Super admins manage all tickets" ON support_tickets;
+CREATE POLICY "Super admins manage all tickets" ON support_tickets
+    FOR ALL USING (is_super_admin(auth.uid()));
+
+-- Support Messages: Access based on ticket access
 DROP POLICY IF EXISTS "View messages for accessible tickets" ON support_ticket_messages;
 CREATE POLICY "View messages for accessible tickets" ON support_ticket_messages
     FOR SELECT USING (
@@ -339,24 +354,7 @@ CREATE POLICY "View messages for accessible tickets" ON support_ticket_messages
         )
     );
 
-DROP POLICY IF EXISTS "Create messages for accessible tickets" ON support_ticket_messages;CREATE POLICY "Users create own tickets" ON support_tickets
-    FOR INSERT WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Super admins manage all tickets" ON support_tickets
-    FOR ALL USING (is_super_admin(auth.uid()));
-
--- Support Messages: Access based on ticket access
-CREATE POLICY "View messages for accessible tickets" ON support_ticket_messages
-    FOR SELECT USING (
-DROP POLICY IF EXISTS "Super admins view audit logs" ON audit_logs;
-CREATE POLICY "Super admins view audit logs" ON audit_logs
-    FOR SELECT USING (is_super_admin(auth.uid()));
-
--- System Settings: Super admins only
-DROP POLICY IF EXISTS "Super admins manage settings" ON system_settings; OR is_super_admin(auth.uid()))
-        )
-    );
-
+DROP POLICY IF EXISTS "Create messages for accessible tickets" ON support_ticket_messages;
 CREATE POLICY "Create messages for accessible tickets" ON support_ticket_messages
     FOR INSERT WITH CHECK (
         EXISTS (
@@ -367,8 +365,14 @@ CREATE POLICY "Create messages for accessible tickets" ON support_ticket_message
     );
 
 -- Audit Logs: Super admins only
+DROP POLICY IF EXISTS "Super admins view audit logs" ON audit_logs;
 CREATE POLICY "Super admins view audit logs" ON audit_logs
     FOR SELECT USING (is_super_admin(auth.uid()));
+
+-- System Settings: Super admins only
+DROP POLICY IF EXISTS "Super admins manage settings" ON system_settings;
+CREATE POLICY "Super admins manage settings" ON system_settings
+    FOR ALL USING (is_super_admin(auth.uid()));
 DROP TRIGGER IF EXISTS update_user_profiles_updated_at ON user_profiles;
 CREATE TRIGGER update_user_profiles_updated_at BEFORE UPDATE ON user_profiles
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
