@@ -51,13 +51,13 @@ export function CheckoutHandler() {
                 // Fetch user profile for name
                 const { data: profile } = await supabase
                     .from('user_profiles')
-                    .select('name, email')
+                    .select('owner_name, business_name')
                     .eq('id', user.id)
                     .single()
 
                 setUserInfo({
-                    name: profile?.name || user.email?.split('@')[0] || '',
-                    email: profile?.email || user.email || ''
+                    name: profile?.owner_name || profile?.business_name || user.email?.split('@')[0] || '',
+                    email: user.email || ''
                 })
             }
         }
