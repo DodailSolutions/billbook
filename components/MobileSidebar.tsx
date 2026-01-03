@@ -5,7 +5,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { LayoutDashboard, FileText, Users, RefreshCw, Bell, Settings, User, Menu, X } from "lucide-react"
+import { LayoutDashboard, FileText, Users, RefreshCw, Bell, Settings, User, Menu, X, Bot } from "lucide-react"
 import { SignOutButton } from "./SignOutButton"
 import { PlanBanner } from "./PlanBanner"
 
@@ -41,10 +41,17 @@ const routes = [
         color: "text-pink-700",
     },
     {
+        label: 'AI Accountant',
+        icon: Bot,
+        href: '/ai-accountant',
+        color: "text-emerald-500",
+        badge: 'PRO'
+    },
+    {
         label: 'Account',
         icon: User,
         href: '/settings',
-        color: "text-emerald-500",
+        color: "text-gray-400",
     },
     {
         label: 'Invoice Settings',
@@ -142,6 +149,11 @@ export function MobileSidebar() {
                                     <div className="flex items-center flex-1 relative z-10">
                                         <route.icon className={cn("h-5 w-5 mr-3", route.color)} />
                                         {route.label}
+                                        {route.badge && (
+                                            <span className="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-600 text-white">
+                                                {route.badge}
+                                            </span>
+                                        )}
                                     </div>
                                 </Link>
                             ))}
