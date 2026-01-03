@@ -93,83 +93,100 @@ export default async function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="px-6 py-16 md:py-24 max-w-7xl mx-auto">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Left Content */}
-          <div className="space-y-8">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800 rounded-full text-emerald-700 dark:text-emerald-300 text-sm font-medium">
-              <Zap className="h-4 w-4" />
-              🇮🇳 Made in India • Free Forever
-            </div>
-            
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white leading-tight">
-              Free Invoice Generator for Indian Businesses
-              <span className="block text-emerald-600 dark:text-emerald-400 mt-2">GST Compliant • Made Simple</span>
-            </h1>
-            
-            <p className="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
-              <strong>100% Free</strong> GST-compliant invoice generator. Perfect for MSMEs, freelancers, and businesses of all sizes. 
-              Made in India 🇮🇳 for Indian businesses. No credit card required. Start creating professional invoices in 60 seconds!
-            </p>
+      <section className="relative px-6 py-20 md:py-32 overflow-hidden">
+        {/* Background gradients */}
+        <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] dark:bg-grid-slate-700/25 dark:[mask-image:linear-gradient(0deg,rgba(255,255,255,0.1),rgba(255,255,255,0.5))]" />
+        <div className="absolute top-0 right-0 -translate-y-12 translate-x-12 blur-3xl opacity-30 w-96 h-96 bg-gradient-to-br from-emerald-400 to-blue-500 rounded-full" />
+        <div className="absolute bottom-0 left-0 translate-y-12 -translate-x-12 blur-3xl opacity-20 w-96 h-96 bg-gradient-to-tr from-purple-400 to-pink-500 rounded-full" />
+        
+        <div className="relative max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* Left Content */}
+            <div className="space-y-8">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 backdrop-blur-sm">
+                <Zap className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                <span className="text-sm font-medium text-emerald-700 dark:text-emerald-300">🇮🇳 Made in India • Free Forever</span>
+              </div>
+              
+              <div className="space-y-4">
+                <h1 className="text-5xl md:text-7xl font-bold tracking-tight">
+                  <span className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-gray-100 dark:to-white bg-clip-text text-transparent">
+                    Free Invoice Generator
+                  </span>
+                  <span className="block mt-2 bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                    for Indian Businesses
+                  </span>
+                </h1>
+                <p className="text-xl text-muted-foreground leading-relaxed max-w-xl">
+                  <strong className="text-foreground">100% Free</strong> GST-compliant invoice generator. Perfect for MSMEs, freelancers, and businesses of all sizes. 
+                  <span className="text-emerald-600 dark:text-emerald-400 font-semibold">No credit card required</span>.
+                </p>
+              </div>
 
-            <div className="flex flex-col sm:flex-row gap-4">
-              {isAuthenticated ? (
-                <>
-                  <Link href="/dashboard">
-                    <Button 
-                      size="lg" 
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 text-base shadow-lg hover:shadow-xl transition-all"
-                    >
-                      Go to Dashboard
-                    </Button>
-                  </Link>
-                  <Link href="/pricing">
-                    <Button 
-                      size="lg" 
-                      variant="secondary"
-                      className="bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 px-8 text-base"
-                    >
-                      View Plans
-                    </Button>
-                  </Link>
-                </>
-              ) : (
-                <>
-                  <Link href="/signup">
-                    <Button 
-                      size="lg" 
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 text-base shadow-lg hover:shadow-xl transition-all"
-                    >
-                      Start Free Trial
-                    </Button>
-                  </Link>
-                  <Link href="#features">
-                    <Button 
-                      size="lg" 
-                      variant="secondary"
-                      className="bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 px-8 text-base"
-                    >
-                      See Features
-                    </Button>
-                  </Link>
-                </>
-              )}
-            </div>
+              <div className="flex flex-col sm:flex-row gap-4">
+                {isAuthenticated ? (
+                  <>
+                    <Link href="/dashboard">
+                      <Button 
+                        size="lg" 
+                        className="w-full sm:w-auto bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-8 shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/40 transition-all duration-300"
+                      >
+                        <span className="flex items-center gap-2">
+                          Go to Dashboard
+                          <TrendingUp className="h-4 w-4" />
+                        </span>
+                      </Button>
+                    </Link>
+                    <Link href="/pricing">
+                      <Button 
+                        size="lg" 
+                        variant="outline"
+                        className="w-full sm:w-auto border-2 hover:bg-accent"
+                      >
+                        View Plans
+                      </Button>
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/signup">
+                      <Button 
+                        size="lg" 
+                        className="w-full sm:w-auto bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-8 shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/40 transition-all duration-300"
+                      >
+                        <span className="flex items-center gap-2">
+                          Start Free Trial
+                          <Zap className="h-4 w-4" />
+                        </span>
+                      </Button>
+                    </Link>
+                    <Link href="#features">
+                      <Button 
+                        size="lg" 
+                        variant="outline"
+                        className="w-full sm:w-auto border-2 hover:bg-accent"
+                      >
+                        See Features
+                      </Button>
+                    </Link>
+                  </>
+                )}
+              </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 pt-4">
-              {BENEFITS.map((benefit) => (
-                <div key={benefit} className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                  <CheckCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                  <span>{benefit}</span>
-                </div>
-              ))}
-            </div>
+              <div className="flex flex-wrap gap-4 pt-4">
+                {BENEFITS.map((benefit) => (
+                  <div key={benefit} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/50 border border-border">
+                    <CheckCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                    <span className="text-sm font-medium text-foreground">{benefit}</span>
+                  </div>
+                ))}
+              </div>
           </div>
 
-          {/* Right Visual */}
-          <div className="relative">
-            <div className="relative bg-linear-to-br from-emerald-50 to-blue-50 rounded-2xl p-8 border border-gray-200 shadow-2xl">
-              <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-4">
+            {/* Right Visual */}
+            <div className="relative hidden lg:block">
+              <div className="relative bg-gradient-to-br from-emerald-50/50 via-blue-50/50 to-purple-50/50 dark:from-emerald-950/20 dark:via-blue-950/20 dark:to-purple-950/20 rounded-3xl p-8 border border-border/50 backdrop-blur-sm shadow-2xl shadow-black/5">
+                <div className="bg-card rounded-xl border border-border p-6 space-y-4 shadow-lg">
                 <div className="flex items-center justify-between pb-3 border-b border-gray-200">
                   <span className="text-xs font-semibold text-gray-500 uppercase">Invoice</span>
                   <span className="text-sm font-bold text-emerald-600">#INV-2025-0001</span>
@@ -203,80 +220,110 @@ export default async function Home() {
               </div>
             </div>
             
-            {/* Floating badges */}
-            <div className="absolute -top-4 -right-4 bg-white rounded-lg shadow-lg p-3 border border-gray-200">
-              <div className="flex items-center gap-2">
-                <Shield className="h-5 w-5 text-emerald-600" />
-                <span className="text-sm font-semibold text-gray-900">GST Ready</span>
+              {/* Floating badges */}
+              <div className="absolute -top-4 -right-4 bg-card/95 backdrop-blur-sm rounded-xl shadow-xl p-3 border border-border animate-in fade-in slide-in-from-top-2 duration-500">
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 bg-emerald-500/10 rounded-lg">
+                    <Shield className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                  <span className="text-sm font-semibold text-foreground">GST Ready</span>
+                </div>
               </div>
-            </div>
-            
-            <div className="absolute -bottom-4 -left-4 bg-white rounded-lg shadow-lg p-3 border border-gray-200">
-              <div className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-blue-600" />
-                <span className="text-sm font-semibold text-gray-900">Track Payments</span>
+              
+              <div className="absolute -bottom-4 -left-4 bg-card/95 backdrop-blur-sm rounded-xl shadow-xl p-3 border border-border animate-in fade-in slide-in-from-bottom-2 duration-500 delay-200">
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 bg-blue-500/10 rounded-lg">
+                    <TrendingUp className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <span className="text-sm font-semibold text-foreground">Track Payments</span>
+                </div>
               </div>
-            </div>
           </div>
         </div>
       </section>
 
+        </div>
+      </section>
+
       {/* Stats Section */}
-      <section className="px-6 py-12 bg-gray-50 border-y border-gray-200">
+      <section className="px-6 py-16 bg-muted/30">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-emerald-600 mb-2">60sec</div>
-              <div className="text-sm text-gray-600">Invoice Creation</div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300">
+              <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="relative">
+                <div className="text-4xl md:text-5xl font-bold mb-2">60sec</div>
+                <div className="text-sm text-emerald-50">Invoice Creation</div>
+              </div>
             </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-blue-600 mb-2">100%</div>
-              <div className="text-sm text-gray-600">GST Compliant</div>
+            <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300">
+              <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="relative">
+                <div className="text-4xl md:text-5xl font-bold mb-2">100%</div>
+                <div className="text-sm text-blue-50">GST Compliant</div>
+              </div>
             </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-purple-600 mb-2">₹ INR</div>
-              <div className="text-sm text-gray-600">India-Focused</div>
+            <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300">
+              <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="relative">
+                <div className="text-4xl md:text-5xl font-bold mb-2">₹ INR</div>
+                <div className="text-sm text-purple-50">India-Focused</div>
+              </div>
             </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-orange-600 mb-2">Free</div>
-              <div className="text-sm text-gray-600">Forever Plan</div>
+            <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-orange-500 to-red-600 p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300">
+              <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="relative">
+                <div className="text-4xl md:text-5xl font-bold mb-2">Free</div>
+                <div className="text-sm text-orange-50">Forever Plan</div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Features Grid */}
-      <section id="features" className="px-6 py-16 md:py-24 max-w-7xl mx-auto">
-        <div className="text-center mb-16">
-          <h3 className="text-3xl md:text-5xl font-bold text-gray-900 mb-4">
-            Everything You Need to Manage Invoices
-          </h3>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Powerful features designed specifically for Indian small businesses
+      <section id="features" className="px-6 py-20 md:py-32 max-w-7xl mx-auto">
+        <div className="text-center mb-16 space-y-4">
+          <div className="inline-block">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-4">
+              <span className="text-sm font-medium text-primary">Features</span>
+            </div>
+          </div>
+          <h2 className="text-4xl md:text-6xl font-bold tracking-tight">
+            <span className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-gray-100 dark:to-white bg-clip-text text-transparent">
+              Everything You Need
+            </span>
+          </h2>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Powerful features designed specifically for Indian businesses
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {FEATURES.map((feature) => {
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {FEATURES.map((feature, idx) => {
             const Icon = feature.icon
             const colorClasses = {
-              emerald: 'bg-emerald-100 text-emerald-700',
-              blue: 'bg-blue-100 text-blue-700',
-              purple: 'bg-purple-100 text-purple-700',
-              orange: 'bg-orange-100 text-orange-700',
-              teal: 'bg-teal-100 text-teal-700',
-              rose: 'bg-rose-100 text-rose-700',
+              emerald: 'from-emerald-500 to-teal-600',
+              blue: 'from-blue-500 to-indigo-600',
+              purple: 'from-purple-500 to-pink-600',
+              orange: 'from-orange-500 to-red-600',
+              teal: 'from-teal-500 to-cyan-600',
+              rose: 'from-rose-500 to-pink-600',
             }
             return (
               <div 
                 key={feature.title}
-                className="group bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-xl hover:border-gray-300 transition-all duration-300"
+                className="group relative bg-card border border-border rounded-2xl p-6 hover:shadow-xl hover:border-primary/50 transition-all duration-300 hover:-translate-y-1"
+                style={{ animationDelay: `${idx * 100}ms` }}
               >
-                <div className={`inline-flex p-3 ${colorClasses[feature.color]} rounded-xl mb-4 group-hover:scale-110 transition-transform`}>
-                  <Icon className="h-6 w-6" />
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="relative">
+                  <div className={`inline-flex p-3 bg-gradient-to-br ${colorClasses[feature.color]} rounded-xl mb-4 shadow-lg group-hover:scale-110 transition-transform`}>
+                    <Icon className="h-6 w-6 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">{feature.title}</h3>
+                  <p className="text-muted-foreground leading-relaxed">{feature.desc}</p>
                 </div>
-                <h4 className="text-xl font-bold text-gray-900 mb-2">{feature.title}</h4>
-                <p className="text-gray-600">{feature.desc}</p>
               </div>
             )
           })}
