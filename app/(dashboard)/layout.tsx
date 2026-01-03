@@ -20,7 +20,7 @@ export default function DashboardLayout({
             </div>
             
             {/* Main Content */}
-            <main className="md:pl-72 min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:bg-slate-900">
+            <main className="md:pl-72 min-h-screen bg-linear-to-br from-slate-50 via-white to-slate-50 dark:bg-slate-900">
                 {/* Add top padding on mobile for fixed header */}
                 <div className="p-4 md:p-8 pt-20 md:pt-8">
                     {children}
