@@ -4,7 +4,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { LayoutDashboard, FileText, Users, RefreshCw, Bell, Settings, User, Bot } from "lucide-react"
+import { LayoutDashboard, FileText, Users, RefreshCw, Bell, Settings, User, Bot, UserCog } from "lucide-react"
 import { SignOutButton } from "./SignOutButton"
 import { PlanBanner } from "./PlanBanner"
 
@@ -44,6 +44,13 @@ const routes = [
         icon: Bot,
         href: '/ai-accountant',
         color: "text-emerald-500",
+        badge: 'PRO'
+    },
+    {
+        label: 'Team',
+        icon: UserCog,
+        href: '/team',
+        color: "text-blue-500",
         badge: 'PRO'
     },
     {
