@@ -1,20 +1,11 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import dynamic from 'next/dynamic'
 import { Button } from '@/components/ui/Button'
 import { FileText, Users, IndianRupee, Zap, CheckCircle, Shield, TrendingUp, RefreshCw, Clock, Building2 } from 'lucide-react'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { createClient } from '@/lib/supabase/server'
 import { FAQSection } from './_components/FAQSection'
 import { TestimonialCarousel } from './_components/TestimonialCarousel'
-
-// Lazy load heavy components
-const LandingFeatures = dynamic(() => import('./_components/LandingFeatures').then(mod => ({ default: mod.LandingFeatures })), {
-  loading: () => <div className="h-96 animate-pulse bg-gray-100" />
-})
-const LandingBenefits = dynamic(() => import('./_components/LandingBenefits').then(mod => ({ default: mod.LandingBenefits })), {
-  loading: () => <div className="h-24 animate-pulse bg-gray-100" />
-})
 
 const FEATURES = [
   { icon: FileText, title: 'Quick Invoice Creation', desc: 'Create professional invoices in under 60 seconds', color: 'emerald' },
@@ -291,7 +282,7 @@ export default async function Home() {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {FEATURES.map((feature, idx) => {
+          {FEATURES.map((feature) => {
             const Icon = feature.icon
             const iconColorClasses = {
               emerald: 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600',
@@ -745,7 +736,7 @@ export default async function Home() {
               Why Choose Us
             </span>
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
-              India's #1 Free Invoice Generator
+              India&apos;s #1 Free Invoice Generator
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
               Built specifically for Indian businesses, trusted by 10,000+ MSMEs, freelancers, and startups across India
