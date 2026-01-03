@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server'
 import { getRazorpayInstance } from '@/lib/razorpay'
 
+// Force Node.js runtime for Razorpay SDK compatibility
+export const runtime = 'nodejs'
+
 export async function GET() {
     try {
         const keyId = process.env.RAZORPAY_KEY_ID
