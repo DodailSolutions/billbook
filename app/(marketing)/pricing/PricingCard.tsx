@@ -49,7 +49,7 @@ export function PricingCard({
         <div className={cardClass}>
             {isPopular && !isDeal && (
                 <div className="absolute -top-4 sm:-top-5 left-1/2 -translate-x-1/2 whitespace-nowrap">
-                    <span className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-4 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold shadow-lg animate-pulse">
+                    <span className="bg-linear-to-r from-emerald-600 to-teal-600 text-white px-4 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold shadow-lg animate-pulse">
                         ⭐ Most Popular
                     </span>
                 </div>
@@ -57,7 +57,7 @@ export function PricingCard({
             
             {isDeal && (
                 <div className="absolute -top-4 sm:-top-5 left-1/2 -translate-x-1/2 w-[90%] max-w-xs">
-                    <span className="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold shadow-xl block text-center whitespace-nowrap overflow-hidden text-ellipsis animate-pulse">
+                    <span className="bg-linear-to-r from-amber-500 via-orange-500 to-amber-500 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold shadow-xl block text-center whitespace-nowrap overflow-hidden text-ellipsis animate-pulse">
                         💎 BEST VALUE - Limited Time
                     </span>
                 </div>
@@ -75,7 +75,7 @@ export function PricingCard({
                 </p>
             </div>
 
-            <ul className="space-y-3 sm:space-y-4 mb-6 sm:mb-8 flex-grow">
+            <ul className="space-y-3 sm:space-y-4 mb-6 sm:mb-8 grow">
                 {features.map((feature, index) => (
                     <li key={index} className="flex items-start gap-2 sm:gap-3">
                         <CheckCircle className={`h-4 w-4 sm:h-5 sm:w-5 shrink-0 mt-0.5 ${
