@@ -263,7 +263,7 @@ xl: 1280px  /* Extra large devices */
 **Solution**: Wrap in horizontal scroll container
 ```tsx
 <div className="overflow-x-auto">
-  <table className="min-w-[800px]">
+  <Table className="min-w-200">
 ```
 
 ### Issue 3: Buttons Too Small on Mobile
