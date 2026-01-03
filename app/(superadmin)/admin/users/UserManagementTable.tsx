@@ -1,14 +1,23 @@
 'use client'
 
-import { useState } from 'react'
-import { MoreVertical, Edit, Ban, CheckCircle, Trash2 } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { MoreVertical, Edit, Ban, CheckCircle, Trash2, Crown } from 'lucide-react'
 import type { UserWithDetails } from '@/lib/types-admin'
 import { updateUserStatus, updateUserRole } from './actions'
+import { UpgradePlanModal } from './UpgradePlanModal'
 
 interface UserManagementTableProps {
     users: UserWithDetails[]
     getRoleBadgeColor: (role: string) => string
     getStatusBadgeColor: (status: string) => string
+}
+
+interface Plan {
+  id: string
+  name: string
+  slug: string
+  price: number
+  billing_period: string
 }
 
 export default function UserManagementTable({ 
@@ -18,6 +27,20 @@ export default function UserManagementTable({
 }: UserManagementTableProps) {
     const [selectedUser, setSelectedUser] = useState<string | null>(null)
     const [loading, setLoading] = useState(false)
+    const [upgradeModalUser, setUpgradeModalUser] = useState<{id: string, email: string, currentPlan?: string} | null>(null)
+    const [plans, setPlans] = useState<Plan[]>([])
+
+    useEffect(() => {
+        // Fetch available plans
+        fetch('/api/admin/users/upgrade-plan')
+          .then(res => res.json())
+          .then(data => {
+            if (data.plans) {
+              setPlans(data.plans)
+            }
+          })
+          .catch(err => console.error('Failed to fetch plans:', err))
+    }, [])
 
     const handleStatusChange = async (userId: string, newStatus: 'active' | 'suspended' | 'inactive') => {
         setLoading(true)
@@ -126,11 +149,39 @@ export default function UserManagementTable({
                                                     Change Role
                                                 </button>
                                                 <button
+                                                    onClick={() => {
+                                                        setUpgradeModalUser({
+                                                            id: user.id,
+                                                            email: user.email || 'No email',
+                                                            currentPlan: user.subscription?.plan?.name
+                                                        })
+                                                        setSelectedUser(null)
+                                                    }}
+                                                    className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 text-emerald-600"
+                                                >
+                                                    <Crown className="h-4 w-4" />
+                                                    Upgrade Plan
+                                                </button>
+                                                <button
                                                     className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 text-red-600"
                                                 >
                                                     <Trash2 className="h-4 w-4" />
                                                     Delete User
                                                 </button>
+
+            {/* Upgrade Modal */}
+            {upgradeModalUser && (
+                <UpgradePlanModal
+                    userId={upgradeModalUser.id}
+                    userEmail={upgradeModalUser.email}
+                    currentPlan={upgradeModalUser.currentPlan}
+                    plans={plans}
+                    onClose={() => setUpgradeModalUser(null)}
+                    onSuccess={() => {
+                        window.location.reload()
+                    }}
+                />
+            )}
                                             </div>
                                         </div>
                                     )}
