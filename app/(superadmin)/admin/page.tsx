@@ -11,7 +11,8 @@ import {
     RefreshCw,
     Tag,
     Shield,
-    BarChart3
+    BarChart3,
+    MessageSquareQuote
 } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
@@ -273,6 +274,13 @@ export default async function SuperAdminDashboard() {
                             icon={Ticket}
                             href="/admin/support"
                             colorClass="bg-gradient-to-br from-pink-500 to-pink-600"
+                        />
+                        <QuickActionCard
+                            title="Testimonials"
+                            description="Manage customer reviews"
+                            icon={MessageSquareQuote}
+                            href="/admin/testimonials"
+                            colorClass="bg-gradient-to-br from-yellow-500 to-yellow-600"
                         />
                         <QuickActionCard
                             title="Settings"

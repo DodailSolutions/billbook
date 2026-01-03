@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/Button'
 import { FileText, Users, IndianRupee, Zap, CheckCircle, Shield, TrendingUp, RefreshCw, Clock } from 'lucide-react'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { createClient } from '@/lib/supabase/server'
+import { FAQSection } from './_components/FAQSection'
+import { TestimonialCarousel } from './_components/TestimonialCarousel'
 
 // Lazy load heavy components
 const LandingFeatures = dynamic(() => import('./_components/LandingFeatures').then(mod => ({ default: mod.LandingFeatures })), {
@@ -93,33 +95,29 @@ export default async function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative px-6 py-20 md:py-32 overflow-hidden">
-        {/* Background gradients */}
-        <div className="absolute inset-0 bg-grid-slate-100 mask-[linear-gradient(0deg,white,rgba(255,255,255,0.6))] dark:bg-grid-slate-700/25 dark:mask-[linear-gradient(0deg,rgba(255,255,255,0.1),rgba(255,255,255,0.5))]" />
-        <div className="absolute top-0 right-0 -translate-y-12 translate-x-12 blur-3xl opacity-30 w-96 h-96 bg-linear-to-br from-emerald-400 to-blue-500 rounded-full" />
-        <div className="absolute bottom-0 left-0 translate-y-12 -translate-x-12 blur-3xl opacity-20 w-96 h-96 bg-linear-to-tr from-purple-400 to-pink-500 rounded-full" />
+      <section className="relative px-6 py-20 md:py-32 bg-linear-to-b from-emerald-50/50 to-white dark:from-gray-900 dark:to-gray-950">
+        {/* Subtle background pattern */}
+        <div className="absolute inset-0 bg-grid-slate-100/50 dark:bg-grid-slate-800/50 opacity-30" />
         
         <div className="relative max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Left Content */}
             <div className="space-y-8">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 backdrop-blur-sm">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20">
                 <Zap className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                 <span className="text-sm font-medium text-emerald-700 dark:text-emerald-300">🇮🇳 Made in India • Free Forever</span>
               </div>
               
               <div className="space-y-4">
-                <h1 className="text-5xl md:text-7xl font-bold tracking-tight">
-                  <span className="bg-linear-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-gray-100 dark:to-white bg-clip-text text-transparent">
-                    Free Invoice Generator
-                  </span>
-                  <span className="block mt-2 bg-linear-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-gray-900 dark:text-white">
+                  Free Invoice Generator
+                  <span className="block mt-2 text-emerald-600">
                     for Indian Businesses
                   </span>
                 </h1>
-                <p className="text-xl text-muted-foreground leading-relaxed max-w-xl">
-                  <strong className="text-foreground">100% Free</strong> GST-compliant invoice generator. Perfect for MSMEs, freelancers, and businesses of all sizes. 
-                  <span className="text-emerald-600 dark:text-emerald-400 font-semibold">No credit card required</span>.
+                <p className="text-xl text-gray-600 dark:text-gray-300 leading-relaxed max-w-xl">
+                  <strong className="text-gray-900 dark:text-white">100% Free</strong> GST-compliant invoice generator. Perfect for MSMEs, freelancers, and businesses of all sizes. 
+                  <span className="text-emerald-600 font-semibold">No credit card required</span>.
                 </p>
               </div>
 
@@ -129,7 +127,7 @@ export default async function Home() {
                     <Link href="/dashboard">
                       <Button 
                         size="lg" 
-                        className="w-full sm:w-auto bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-8 shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/40 transition-all duration-300"
+                        className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white px-8 shadow-sm hover:shadow-md transition-all duration-200"
                       >
                         <span className="flex items-center gap-2">
                           Go to Dashboard
@@ -141,7 +139,7 @@ export default async function Home() {
                       <Button 
                         size="lg" 
                         variant="outline"
-                        className="w-full sm:w-auto border-2 hover:bg-accent"
+                        className="w-full sm:w-auto border-2 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
                       >
                         View Plans
                       </Button>
@@ -152,7 +150,7 @@ export default async function Home() {
                     <Link href="/signup">
                       <Button 
                         size="lg" 
-                        className="w-full sm:w-auto bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-8 shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/40 transition-all duration-300"
+                        className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white px-8 shadow-sm hover:shadow-md transition-all duration-200"
                       >
                         <span className="flex items-center gap-2">
                           Start Free Trial
@@ -164,7 +162,7 @@ export default async function Home() {
                       <Button 
                         size="lg" 
                         variant="outline"
-                        className="w-full sm:w-auto border-2 hover:bg-accent"
+                        className="w-full sm:w-auto border-2 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
                       >
                         See Features
                       </Button>
@@ -175,9 +173,9 @@ export default async function Home() {
 
               <div className="flex flex-wrap gap-4 pt-4">
                 {BENEFITS.map((benefit) => (
-                  <div key={benefit} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/50 border border-border">
-                    <CheckCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                    <span className="text-sm font-medium text-foreground">{benefit}</span>
+                  <div key={benefit} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                    <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0" />
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{benefit}</span>
                   </div>
                 ))}
               </div>
@@ -185,35 +183,35 @@ export default async function Home() {
 
             {/* Right Visual */}
             <div className="relative hidden lg:block">
-              <div className="relative bg-linear-to-br from-emerald-50/50 via-blue-50/50 to-purple-50/50 dark:from-emerald-950/20 dark:via-blue-950/20 dark:to-purple-950/20 rounded-3xl p-8 border border-border/50 backdrop-blur-sm shadow-2xl shadow-black/5">
-                <div className="bg-card rounded-xl border border-border p-6 space-y-4 shadow-lg">
-                <div className="flex items-center justify-between pb-3 border-b border-gray-200">
+              <div className="relative bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 shadow-lg">
+                <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-6 space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-gray-200 dark:border-gray-700">
                   <span className="text-xs font-semibold text-gray-500 uppercase">Invoice</span>
                   <span className="text-sm font-bold text-emerald-600">#INV-2025-0001</span>
                 </div>
                 
                 <div className="space-y-3">
-                  <div className="h-3 bg-gray-200 rounded-full w-3/4"></div>
-                  <div className="h-3 bg-gray-200 rounded-full w-1/2"></div>
+                  <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full w-3/4"></div>
+                  <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full w-1/2"></div>
                 </div>
 
                 <div className="pt-4 space-y-2">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Subtotal</span>
-                    <span className="text-sm font-semibold">₹10,000</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">Subtotal</span>
+                    <span className="text-sm font-semibold text-gray-900 dark:text-white">₹10,000</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">GST (18%)</span>
-                    <span className="text-sm font-semibold">₹1,800</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">GST (18%)</span>
+                    <span className="text-sm font-semibold text-gray-900 dark:text-white">₹1,800</span>
                   </div>
-                  <div className="flex justify-between items-center pt-2 border-t border-gray-200">
-                    <span className="font-bold text-gray-900">Total</span>
+                  <div className="flex justify-between items-center pt-2 border-t border-gray-200 dark:border-gray-700">
+                    <span className="font-bold text-gray-900 dark:text-white">Total</span>
                     <span className="font-bold text-emerald-600 text-lg">₹11,800</span>
                   </div>
                 </div>
 
                 <div className="pt-4">
-                  <div className="bg-emerald-600 text-white text-center py-2 rounded-lg text-sm font-semibold">
+                  <div className="bg-emerald-600 text-white text-center py-2 rounded-lg text-sm font-semibold hover:bg-emerald-700 transition-colors">
                     Pay Now
                   </div>
                 </div>
@@ -221,21 +219,21 @@ export default async function Home() {
             </div>
             
               {/* Floating badges */}
-              <div className="absolute -top-4 -right-4 bg-card/95 backdrop-blur-sm rounded-xl shadow-xl p-3 border border-border animate-in fade-in slide-in-from-top-2 duration-500">
+              <div className="absolute -top-4 -right-4 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-3 border border-gray-200 dark:border-gray-700 animate-in fade-in slide-in-from-top-2 duration-500">
                 <div className="flex items-center gap-2">
-                  <div className="p-1.5 bg-emerald-500/10 rounded-lg">
-                    <Shield className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                  <div className="p-1.5 bg-emerald-50 dark:bg-emerald-500/10 rounded-lg">
+                    <Shield className="h-5 w-5 text-emerald-600" />
                   </div>
-                  <span className="text-sm font-semibold text-foreground">GST Ready</span>
+                  <span className="text-sm font-semibold text-gray-900 dark:text-white">GST Ready</span>
                 </div>
               </div>
               
-              <div className="absolute -bottom-4 -left-4 bg-card/95 backdrop-blur-sm rounded-xl shadow-xl p-3 border border-border animate-in fade-in slide-in-from-bottom-2 duration-500 delay-200">
+              <div className="absolute -bottom-4 -left-4 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-3 border border-gray-200 dark:border-gray-700 animate-in fade-in slide-in-from-bottom-2 duration-500 delay-200">
                 <div className="flex items-center gap-2">
-                  <div className="p-1.5 bg-blue-500/10 rounded-lg">
-                    <TrendingUp className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  <div className="p-1.5 bg-blue-50 dark:bg-blue-500/10 rounded-lg">
+                    <TrendingUp className="h-5 w-5 text-blue-600" />
                   </div>
-                  <span className="text-sm font-semibold text-foreground">Track Payments</span>
+                  <span className="text-sm font-semibold text-gray-900 dark:text-white">Track Payments</span>
                 </div>
               </div>
           </div>
@@ -245,35 +243,31 @@ export default async function Home() {
       </section>
 
       {/* Stats Section */}
-      <section className="px-6 py-16 bg-muted/30">
+      <section className="px-6 py-16 bg-gray-50 dark:bg-gray-900/50">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="group relative overflow-hidden rounded-2xl bg-linear-to-br from-emerald-500 to-teal-600 p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300">
-              <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="group relative rounded-2xl bg-white dark:bg-gray-800 p-6 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-200">
               <div className="relative">
-                <div className="text-4xl md:text-5xl font-bold mb-2">60sec</div>
-                <div className="text-sm text-emerald-50">Invoice Creation</div>
+                <div className="text-4xl md:text-5xl font-bold mb-2 text-emerald-600">60sec</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Invoice Creation</div>
               </div>
             </div>
-            <div className="group relative overflow-hidden rounded-2xl bg-linear-to-br from-blue-500 to-indigo-600 p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300">
-              <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="group relative rounded-2xl bg-white dark:bg-gray-800 p-6 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-200">
               <div className="relative">
-                <div className="text-4xl md:text-5xl font-bold mb-2">100%</div>
-                <div className="text-sm text-blue-50">GST Compliant</div>
+                <div className="text-4xl md:text-5xl font-bold mb-2 text-blue-600">100%</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">GST Compliant</div>
               </div>
             </div>
-            <div className="group relative overflow-hidden rounded-2xl bg-linear-to-br from-purple-500 to-pink-600 p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300">
-              <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="group relative rounded-2xl bg-white dark:bg-gray-800 p-6 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-200">
               <div className="relative">
-                <div className="text-4xl md:text-5xl font-bold mb-2">₹ INR</div>
-                <div className="text-sm text-purple-50">India-Focused</div>
+                <div className="text-4xl md:text-5xl font-bold mb-2 text-purple-600">₹ INR</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">India-Focused</div>
               </div>
             </div>
-            <div className="group relative overflow-hidden rounded-2xl bg-linear-to-br from-orange-500 to-red-600 p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300">
-              <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="group relative rounded-2xl bg-white dark:bg-gray-800 p-6 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-200">
               <div className="relative">
-                <div className="text-4xl md:text-5xl font-bold mb-2">Free</div>
-                <div className="text-sm text-orange-50">Forever Plan</div>
+                <div className="text-4xl md:text-5xl font-bold mb-2 text-orange-600">Free</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Forever Plan</div>
               </div>
             </div>
           </div>
@@ -284,16 +278,14 @@ export default async function Home() {
       <section id="features" className="px-6 py-20 md:py-32 max-w-7xl mx-auto">
         <div className="text-center mb-16 space-y-4">
           <div className="inline-block">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-4">
-              <span className="text-sm font-medium text-primary">Features</span>
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 mb-4">
+              <span className="text-sm font-medium text-emerald-600">Features</span>
             </div>
           </div>
-          <h2 className="text-4xl md:text-6xl font-bold tracking-tight">
-            <span className="bg-linear-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-gray-100 dark:to-white bg-clip-text text-transparent">
-              Everything You Need
-            </span>
+          <h2 className="text-4xl md:text-6xl font-bold tracking-tight text-gray-900 dark:text-white">
+            Everything You Need
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
             Powerful features designed specifically for Indian businesses
           </p>
         </div>
@@ -301,27 +293,25 @@ export default async function Home() {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {FEATURES.map((feature, idx) => {
             const Icon = feature.icon
-            const colorClasses = {
-              emerald: 'from-emerald-500 to-teal-600',
-              blue: 'from-blue-500 to-indigo-600',
-              purple: 'from-purple-500 to-pink-600',
-              orange: 'from-orange-500 to-red-600',
-              teal: 'from-teal-500 to-cyan-600',
-              rose: 'from-rose-500 to-pink-600',
+            const iconColorClasses = {
+              emerald: 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600',
+              blue: 'bg-blue-100 dark:bg-blue-500/10 text-blue-600',
+              purple: 'bg-purple-100 dark:bg-purple-500/10 text-purple-600',
+              orange: 'bg-orange-100 dark:bg-orange-500/10 text-orange-600',
+              teal: 'bg-teal-100 dark:bg-teal-500/10 text-teal-600',
+              rose: 'bg-rose-100 dark:bg-rose-500/10 text-rose-600',
             }
             return (
               <div 
                 key={feature.title}
-                className="group relative bg-card border border-border rounded-2xl p-6 hover:shadow-xl hover:border-primary/50 transition-all duration-300 hover:-translate-y-1"
-                style={{ animationDelay: `${idx * 100}ms` }}
+                className="group bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md hover:border-emerald-200 dark:hover:border-emerald-700 transition-all duration-200"
               >
-                <div className="absolute inset-0 bg-linear-to-br from-primary/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="relative">
-                  <div className={`inline-flex p-3 bg-linear-to-br ${colorClasses[feature.color]} rounded-xl mb-4 shadow-lg group-hover:scale-110 transition-transform`}>
-                    <Icon className="h-6 w-6 text-white" />
+                <div>
+                  <div className={`inline-flex p-3 ${iconColorClasses[feature.color]} rounded-xl mb-4 group-hover:scale-105 transition-transform`}>
+                    <Icon className="h-6 w-6" />
                   </div>
-                  <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">{feature.title}</h3>
-                  <p className="text-muted-foreground leading-relaxed">{feature.desc}</p>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{feature.title}</h3>
+                  <p className="text-gray-600 dark:text-gray-300 leading-relaxed">{feature.desc}</p>
                 </div>
               </div>
             )
@@ -341,14 +331,14 @@ export default async function Home() {
 
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {/* Free Plan */}
-            <div className={`bg-white border-2 rounded-2xl p-8 hover:shadow-xl transition-all ${
+            <div className={`bg-white border-2 rounded-2xl p-8 hover:shadow-lg transition-all ${
               currentPlan === 'free' 
-                ? 'border-emerald-500 bg-linear-to-br from-emerald-50 to-teal-50 shadow-xl ring-2 ring-emerald-400/50 relative' 
+                ? 'border-emerald-500 shadow-lg ring-2 ring-emerald-200 relative' 
                 : 'border-gray-200'
             }`}>
               {currentPlan === 'free' && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                  <span className="bg-linear-to-r from-emerald-600 to-teal-600 text-white px-4 py-1.5 rounded-full text-sm font-semibold shadow-lg">
+                  <span className="bg-emerald-600 text-white px-4 py-1.5 rounded-full text-sm font-semibold shadow-sm">
                     ✓ Current Plan
                   </span>
                 </div>
@@ -399,14 +389,14 @@ export default async function Home() {
             </div>
 
             {/* Starter Plan */}
-            <div className={`bg-white border-2 rounded-2xl p-8 hover:shadow-xl transition-all relative ${
+            <div className={`bg-white border-2 rounded-2xl p-8 hover:shadow-lg transition-all relative ${
               currentPlan === 'starter' 
-                ? 'border-emerald-500 bg-linear-to-br from-emerald-50 to-teal-50 shadow-xl ring-2 ring-emerald-400/50' 
+                ? 'border-emerald-500 shadow-lg ring-2 ring-emerald-200' 
                 : 'border-emerald-600'
             }`}>
               {currentPlan === 'starter' ? (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                  <span className="bg-linear-to-r from-emerald-600 to-teal-600 text-white px-4 py-1.5 rounded-full text-sm font-semibold shadow-lg">
+                  <span className="bg-emerald-600 text-white px-4 py-1.5 rounded-full text-sm font-semibold shadow-sm">
                     ✓ Current Plan
                   </span>
                 </div>
@@ -471,7 +461,7 @@ export default async function Home() {
             }`}>
               {currentPlan === 'professional' && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                  <span className="bg-linear-to-r from-emerald-600 to-teal-600 text-white px-4 py-1.5 rounded-full text-sm font-semibold shadow-lg">
+                  <span className="bg-emerald-600 text-white px-4 py-1.5 rounded-full text-sm font-semibold shadow-sm">
                     ✓ Current Plan
                   </span>
                 </div>
@@ -529,21 +519,21 @@ export default async function Home() {
       </section>
 
       {/* Lifetime Deal Section - Prominent */}
-      <section className="px-6 py-16 md:py-24 bg-linear-to-br from-amber-500 via-amber-600 to-orange-600">
-        <div className="max-w-5xl mx-auto text-center text-white">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 rounded-full text-white text-sm font-semibold mb-6">
+      <section className="px-6 py-16 md:py-24 bg-amber-50 dark:bg-amber-900/20">
+        <div className="max-w-5xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-100 dark:bg-amber-900/50 border border-amber-200 dark:border-amber-800 rounded-full text-amber-900 dark:text-amber-100 text-sm font-semibold mb-6">
             <Zap className="h-4 w-4" />
             Limited Time Offer
           </div>
           
-          <h3 className="text-4xl md:text-6xl font-bold mb-4">
+          <h3 className="text-4xl md:text-6xl font-bold mb-4 text-gray-900 dark:text-white">
             Lifetime Deal
           </h3>
-          <p className="text-xl md:text-2xl text-amber-50 mb-8 max-w-3xl mx-auto">
+          <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
             Pay once, use forever. No monthly fees, no hidden charges.
           </p>
 
-          <div className="bg-white rounded-3xl p-8 md:p-12 shadow-2xl max-w-3xl mx-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 md:p-12 shadow-lg border border-gray-200 dark:border-gray-700 max-w-3xl mx-auto">
             <div className="mb-6">
               <div className="text-gray-500 text-lg mb-2">
                 <span className="line-through">₹15,999</span>
@@ -841,37 +831,48 @@ export default async function Home() {
             <div>
               <h5 className="font-bold text-gray-900 mb-4">Product</h5>
               <ul className="space-y-2 text-sm text-gray-600">
-                <li><Link href="/features" className="hover:text-emerald-600">Features</Link></li>
-                <li><Link href="/pricing" className="hover:text-emerald-600">Pricing</Link></li>
-                <li><Link href="/faq" className="hover:text-emerald-600">FAQ</Link></li>
+                <li><Link href="/features" className="hover:text-emerald-600 transition-colors">Features</Link></li>
+                <li><Link href="/pricing" className="hover:text-emerald-600 transition-colors">Pricing Plans</Link></li>
+                <li><Link href="/faq" className="hover:text-emerald-600 transition-colors">FAQ</Link></li>
+                <li><Link href="/dashboard" className="hover:text-emerald-600 transition-colors">Dashboard</Link></li>
               </ul>
             </div>
             
             <div>
-              <h5 className="font-bold text-gray-900 mb-4">Company</h5>
+              <h5 className="font-bold text-gray-900 mb-4">Support</h5>
               <ul className="space-y-2 text-sm text-gray-600">
-                <li><Link href="/about" className="hover:text-emerald-600">About</Link></li>
-                <li><Link href="/contact" className="hover:text-emerald-600">Contact</Link></li>
-                <li><Link href="/support" className="hover:text-emerald-600">Support</Link></li>
+                <li><Link href="/support" className="hover:text-emerald-600 transition-colors">Help Center</Link></li>
+                <li><Link href="/contact" className="hover:text-emerald-600 transition-colors">Contact Us</Link></li>
+                <li><Link href="/about" className="hover:text-emerald-600 transition-colors">About Us</Link></li>
+                <li><a href="mailto:support@billbooky.com" className="hover:text-emerald-600 transition-colors">Email Support</a></li>
               </ul>
             </div>
             
             <div>
               <h5 className="font-bold text-gray-900 mb-4">Legal</h5>
               <ul className="space-y-2 text-sm text-gray-600">
-                <li><Link href="/privacy" className="hover:text-emerald-600">Privacy Policy</Link></li>
-                <li><Link href="/terms" className="hover:text-emerald-600">Terms of Service</Link></li>
-                <li><Link href="/refund" className="hover:text-emerald-600">Refund Policy</Link></li>
+                <li><Link href="/privacy" className="hover:text-emerald-600 transition-colors">Privacy Policy</Link></li>
+                <li><Link href="/terms" className="hover:text-emerald-600 transition-colors">Terms of Service</Link></li>
+                <li><Link href="/refund" className="hover:text-emerald-600 transition-colors">Refund Policy</Link></li>
               </ul>
             </div>
           </div>
           
           <div className="pt-8 border-t border-gray-200 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-gray-600">© 2025 BillBooky. Built with ❤️ for Indian businesses.</p>
-            <p className="text-sm text-gray-600">Made in India 🇮🇳</p>
+            <p className="text-sm text-gray-600">© 2026 BillBooky. Proudly serving Indian businesses with ❤️</p>
+            <div className="flex items-center gap-4 text-sm text-gray-600">
+              <span className="font-semibold">Made in India 🇮🇳</span>
+              <span className="text-emerald-600">GST Compliant • 100% Free</span>
+            </div>
           </div>
         </div>
       </footer>
+
+      {/* Testimonial Section */}
+      <TestimonialCarousel />
+
+      {/* FAQ Section */}
+      <FAQSection />
     </div>
   )
 }
