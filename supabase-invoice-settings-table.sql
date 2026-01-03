@@ -61,6 +61,12 @@ CREATE INDEX IF NOT EXISTS idx_invoice_settings_user_id ON invoice_settings(user
 -- Enable Row Level Security
 ALTER TABLE invoice_settings ENABLE ROW LEVEL SECURITY;
 
+-- Drop existing policies if they exist
+DROP POLICY IF EXISTS "Users can view their own invoice settings" ON invoice_settings;
+DROP POLICY IF EXISTS "Users can insert their own invoice settings" ON invoice_settings;
+DROP POLICY IF EXISTS "Users can update their own invoice settings" ON invoice_settings;
+DROP POLICY IF EXISTS "Users can delete their own invoice settings" ON invoice_settings;
+
 -- RLS Policies for invoice_settings
 CREATE POLICY "Users can view their own invoice settings"
   ON invoice_settings FOR SELECT
