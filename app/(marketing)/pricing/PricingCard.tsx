@@ -56,7 +56,7 @@ export function PricingCard({
         <div className={cardClass}>
             {isCurrentPlan && (
                 <div className="absolute -top-4 sm:-top-5 left-1/2 -translate-x-1/2 whitespace-nowrap">
-                    <span className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-4 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold shadow-lg">
+                    <span className="bg-linear-to-r from-emerald-600 to-teal-600 text-white px-4 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold shadow-lg">
                         ✓ Current Plan
                     </span>
                 </div>
