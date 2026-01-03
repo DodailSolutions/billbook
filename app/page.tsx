@@ -95,9 +95,9 @@ export default async function Home() {
       {/* Hero Section */}
       <section className="relative px-6 py-20 md:py-32 overflow-hidden">
         {/* Background gradients */}
-        <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] dark:bg-grid-slate-700/25 dark:[mask-image:linear-gradient(0deg,rgba(255,255,255,0.1),rgba(255,255,255,0.5))]" />
-        <div className="absolute top-0 right-0 -translate-y-12 translate-x-12 blur-3xl opacity-30 w-96 h-96 bg-gradient-to-br from-emerald-400 to-blue-500 rounded-full" />
-        <div className="absolute bottom-0 left-0 translate-y-12 -translate-x-12 blur-3xl opacity-20 w-96 h-96 bg-gradient-to-tr from-purple-400 to-pink-500 rounded-full" />
+        <div className="absolute inset-0 bg-grid-slate-100 mask-[linear-gradient(0deg,white,rgba(255,255,255,0.6))] dark:bg-grid-slate-700/25 dark:mask-[linear-gradient(0deg,rgba(255,255,255,0.1),rgba(255,255,255,0.5))]" />
+        <div className="absolute top-0 right-0 -translate-y-12 translate-x-12 blur-3xl opacity-30 w-96 h-96 bg-linear-to-br from-emerald-400 to-blue-500 rounded-full" />
+        <div className="absolute bottom-0 left-0 translate-y-12 -translate-x-12 blur-3xl opacity-20 w-96 h-96 bg-linear-to-tr from-purple-400 to-pink-500 rounded-full" />
         
         <div className="relative max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
@@ -110,10 +110,10 @@ export default async function Home() {
               
               <div className="space-y-4">
                 <h1 className="text-5xl md:text-7xl font-bold tracking-tight">
-                  <span className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-gray-100 dark:to-white bg-clip-text text-transparent">
+                  <span className="bg-linear-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-gray-100 dark:to-white bg-clip-text text-transparent">
                     Free Invoice Generator
                   </span>
-                  <span className="block mt-2 bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                  <span className="block mt-2 bg-linear-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
                     for Indian Businesses
                   </span>
                 </h1>
@@ -129,7 +129,7 @@ export default async function Home() {
                     <Link href="/dashboard">
                       <Button 
                         size="lg" 
-                        className="w-full sm:w-auto bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-8 shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/40 transition-all duration-300"
+                        className="w-full sm:w-auto bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-8 shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/40 transition-all duration-300"
                       >
                         <span className="flex items-center gap-2">
                           Go to Dashboard
@@ -152,7 +152,7 @@ export default async function Home() {
                     <Link href="/signup">
                       <Button 
                         size="lg" 
-                        className="w-full sm:w-auto bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-8 shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/40 transition-all duration-300"
+                        className="w-full sm:w-auto bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-8 shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/40 transition-all duration-300"
                       >
                         <span className="flex items-center gap-2">
                           Start Free Trial
@@ -185,7 +185,7 @@ export default async function Home() {
 
             {/* Right Visual */}
             <div className="relative hidden lg:block">
-              <div className="relative bg-gradient-to-br from-emerald-50/50 via-blue-50/50 to-purple-50/50 dark:from-emerald-950/20 dark:via-blue-950/20 dark:to-purple-950/20 rounded-3xl p-8 border border-border/50 backdrop-blur-sm shadow-2xl shadow-black/5">
+              <div className="relative bg-linear-to-br from-emerald-50/50 via-blue-50/50 to-purple-50/50 dark:from-emerald-950/20 dark:via-blue-950/20 dark:to-purple-950/20 rounded-3xl p-8 border border-border/50 backdrop-blur-sm shadow-2xl shadow-black/5">
                 <div className="bg-card rounded-xl border border-border p-6 space-y-4 shadow-lg">
                 <div className="flex items-center justify-between pb-3 border-b border-gray-200">
                   <span className="text-xs font-semibold text-gray-500 uppercase">Invoice</span>
@@ -249,28 +249,28 @@ export default async function Home() {
       <section className="px-6 py-16 bg-muted/30">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300">
+            <div className="group relative overflow-hidden rounded-2xl bg-linear-to-br from-emerald-500 to-teal-600 p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300">
               <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="relative">
                 <div className="text-4xl md:text-5xl font-bold mb-2">60sec</div>
                 <div className="text-sm text-emerald-50">Invoice Creation</div>
               </div>
             </div>
-            <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300">
+            <div className="group relative overflow-hidden rounded-2xl bg-linear-to-br from-blue-500 to-indigo-600 p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300">
               <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="relative">
                 <div className="text-4xl md:text-5xl font-bold mb-2">100%</div>
                 <div className="text-sm text-blue-50">GST Compliant</div>
               </div>
             </div>
-            <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300">
+            <div className="group relative overflow-hidden rounded-2xl bg-linear-to-br from-purple-500 to-pink-600 p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300">
               <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="relative">
                 <div className="text-4xl md:text-5xl font-bold mb-2">₹ INR</div>
                 <div className="text-sm text-purple-50">India-Focused</div>
               </div>
             </div>
-            <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-orange-500 to-red-600 p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300">
+            <div className="group relative overflow-hidden rounded-2xl bg-linear-to-br from-orange-500 to-red-600 p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300">
               <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="relative">
                 <div className="text-4xl md:text-5xl font-bold mb-2">Free</div>
@@ -290,7 +290,7 @@ export default async function Home() {
             </div>
           </div>
           <h2 className="text-4xl md:text-6xl font-bold tracking-tight">
-            <span className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-gray-100 dark:to-white bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-gray-100 dark:to-white bg-clip-text text-transparent">
               Everything You Need
             </span>
           </h2>
@@ -316,9 +316,9 @@ export default async function Home() {
                 className="group relative bg-card border border-border rounded-2xl p-6 hover:shadow-xl hover:border-primary/50 transition-all duration-300 hover:-translate-y-1"
                 style={{ animationDelay: `${idx * 100}ms` }}
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="absolute inset-0 bg-linear-to-br from-primary/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="relative">
-                  <div className={`inline-flex p-3 bg-gradient-to-br ${colorClasses[feature.color]} rounded-xl mb-4 shadow-lg group-hover:scale-110 transition-transform`}>
+                  <div className={`inline-flex p-3 bg-linear-to-br ${colorClasses[feature.color]} rounded-xl mb-4 shadow-lg group-hover:scale-110 transition-transform`}>
                     <Icon className="h-6 w-6 text-white" />
                   </div>
                   <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">{feature.title}</h3>
