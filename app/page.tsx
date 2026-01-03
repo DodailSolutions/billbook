@@ -55,11 +55,7 @@ export default async function Home() {
                   </Button>
                 </Link>
               </>
-            )}ref="/signup">
-              <Button className="bg-emerald-600 hover:bg-emerald-700 text-white text-sm md:text-base">
-                Get Started
-              </Button>
-            </Link>
+            )}
           </div>
         </div>
       </nav>
