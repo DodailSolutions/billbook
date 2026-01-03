@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import Image from 'next/image'
 import { ChevronLeft, ChevronRight, Star, Quote } from 'lucide-react'
 
 interface Testimonial {
@@ -36,9 +37,9 @@ export function TestimonialCarousel() {
     }
   }
 
-  const nextTestimonial = () => {
+  const nextTestimonial = useCallback(() => {
     setCurrentIndex((prev) => (prev + 1) % testimonials.length)
-  }
+  }, [testimonials.length])
 
   const prevTestimonial = () => {
     setCurrentIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length)
@@ -49,7 +50,7 @@ export function TestimonialCarousel() {
       const interval = setInterval(nextTestimonial, 5000)
       return () => clearInterval(interval)
     }
-  }, [testimonials.length])
+  }, [testimonials.length, nextTestimonial])
 
   if (isLoading || testimonials.length === 0) {
     return null
@@ -90,16 +91,18 @@ export function TestimonialCarousel() {
                 ))}
               </div>
               <p className="text-xl md:text-2xl text-gray-900 dark:text-white leading-relaxed mb-8">
-                "{current.content}"
+                &ldquo;{current.content}&rdquo;
               </p>
             </div>
 
             <div className="flex items-center gap-4">
               {current.image_url && (
-                <img
+                <Image
                   src={current.image_url}
                   alt={current.name}
-                  className="w-14 h-14 rounded-full object-cover"
+                  width={56}
+                  height={56}
+                  className="rounded-full object-cover"
                 />
               )}
               <div>

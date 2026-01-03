@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/Button'
-import { Plus, Edit, Trash2, Star, Check, X, MoveUp, MoveDown } from 'lucide-react'
+import { Edit, Trash2, Star, Check, X, MoveUp, MoveDown } from 'lucide-react'
 
 interface Testimonial {
   id: string
@@ -280,7 +280,7 @@ export default function TestimonialsAdmin() {
                     />
                   ))}
                 </div>
-                <p className="text-gray-700 dark:text-gray-300 italic">"{testimonial.content}"</p>
+                <p className="text-gray-700 dark:text-gray-300 italic">&ldquo;{testimonial.content}&rdquo;</p>
               </div>
               
               <div className="flex flex-col gap-2">
