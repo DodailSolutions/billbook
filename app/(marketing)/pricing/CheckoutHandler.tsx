@@ -49,18 +49,37 @@ export function CheckoutHandler() {
             const { data: { user } } = await supabase.auth.getUser()
             
             if (user) {
-                // Fetch user profile for name and phone
-                const { data: profile } = await supabase
-                    .from('user_profiles')
-                    .select('owner_name, business_name, business_phone')
-                    .eq('id', user.id)
-                    .single()
+                // Try to fetch user profile, but don't fail if it doesn't exist
+                try {
+                    const { data: profile, error } = await supabase
+                        .from('user_profiles')
+                        .select('owner_name, business_name, business_phone')
+                        .eq('id', user.id)
+                        .single()
 
-                setUserInfo({
-                    name: profile?.owner_name || profile?.business_name || user.email?.split('@')[0] || '',
-                    email: user.email || '',
-                    contact: profile?.business_phone || ''
-                })
+                    if (!error && profile) {
+                        setUserInfo({
+                            name: profile.owner_name || profile.business_name || user.email?.split('@')[0] || '',
+                            email: user.email || '',
+                            contact: profile.business_phone || ''
+                        })
+                    } else {
+                        // Fallback to auth user data only
+                        setUserInfo({
+                            name: user.email?.split('@')[0] || '',
+                            email: user.email || '',
+                            contact: ''
+                        })
+                    }
+                } catch (err) {
+                    // If profile fetch fails, use auth user data
+                    console.warn('Failed to fetch user profile:', err)
+                    setUserInfo({
+                        name: user.email?.split('@')[0] || '',
+                        email: user.email || '',
+                        contact: ''
+                    })
+                }
             }
         }
 
