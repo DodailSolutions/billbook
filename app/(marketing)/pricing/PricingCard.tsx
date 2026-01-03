@@ -40,24 +40,24 @@ export function PricingCard({
     }
 
     const cardClass = isDeal
-        ? "bg-linear-to-br from-amber-50 to-orange-50 border-2 sm:border-3 border-amber-400 rounded-xl sm:rounded-2xl p-6 sm:p-8 hover:shadow-2xl transition-all relative"
+        ? "bg-linear-to-br from-amber-50 to-orange-50 border-2 sm:border-3 border-amber-400 rounded-xl sm:rounded-2xl p-6 sm:p-8 hover:shadow-2xl transition-all relative mt-6 sm:mt-8"
         : isPopular
-        ? "bg-white dark:bg-gray-900 border-2 border-emerald-600 dark:border-emerald-500 rounded-xl sm:rounded-2xl p-6 sm:p-8 hover:shadow-xl transition-all relative"
+        ? "bg-white dark:bg-gray-900 border-2 border-emerald-600 dark:border-emerald-500 rounded-xl sm:rounded-2xl p-6 sm:p-8 hover:shadow-xl transition-all relative mt-6 sm:mt-8"
         : "bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-800 rounded-xl sm:rounded-2xl p-6 sm:p-8 hover:shadow-xl transition-all"
 
     return (
         <div className={cardClass}>
             {isPopular && !isDeal && (
-                <div className="absolute -top-3 sm:-top-4 left-1/2 -translate-x-1/2">
-                    <span className="bg-emerald-600 text-white px-3 sm:px-4 py-1 rounded-full text-xs sm:text-sm font-semibold">
+                <div className="absolute -top-4 sm:-top-5 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                    <span className="bg-emerald-600 text-white px-4 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold shadow-md">
                         Most Popular
                     </span>
                 </div>
             )}
             
             {isDeal && (
-                <div className="absolute -top-3 sm:-top-4 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)]">
-                    <span className="bg-linear-to-r from-amber-500 to-orange-500 text-white px-4 sm:px-6 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold shadow-lg block text-center">
+                <div className="absolute -top-4 sm:-top-5 left-1/2 -translate-x-1/2 w-[90%] max-w-xs">
+                    <span className="bg-linear-to-r from-amber-500 to-orange-500 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold shadow-lg block text-center whitespace-nowrap overflow-hidden text-ellipsis">
                         💎 BEST VALUE - Limited Time
                     </span>
                 </div>
