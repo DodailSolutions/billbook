@@ -240,7 +240,6 @@ export default async function Home() {
               </div>
           </div>
         </div>
-      </section>
 
         </div>
       </section>
