@@ -6,12 +6,12 @@ export default async function DashboardPage() {
     const stats = await getDashboardStats()
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-4 md:space-y-6">
             <div>
-                <h2 className="text-3xl font-bold tracking-tight bg-linear-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">Dashboard</h2>
-                <p className="text-muted-foreground mt-2">Overview of your business metrics</p>
+                <h2 className="text-2xl md:text-3xl font-bold tracking-tight bg-linear-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent dark:from-gray-100 dark:to-gray-400">Dashboard</h2>
+                <p className="text-sm md:text-base text-muted-foreground mt-1 md:mt-2">Overview of your business metrics</p>
             </div>
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-3 sm:gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
                 <Card className="border-l-4 border-l-green-500 hover:scale-105 transition-transform duration-200">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">
@@ -22,7 +22,7 @@ export default async function DashboardPage() {
                         </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-bold text-green-600 dark:text-green-400">₹{stats.totalRevenue.toFixed(2)}</div>
+                        <div className="text-2xl md:text-3xl font-bold text-green-600 dark:text-green-400">₹{stats.totalRevenue.toFixed(2)}</div>
                         <p className="text-xs text-muted-foreground mt-1">
                             From paid invoices
                         </p>
@@ -39,7 +39,7 @@ export default async function DashboardPage() {
                         </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{stats.totalInvoices}</div>
+                        <div className="text-2xl md:text-3xl font-bold text-blue-600 dark:text-blue-400">{stats.totalInvoices}</div>
                         <p className="text-xs text-muted-foreground mt-1">
                             All invoices created
                         </p>
@@ -56,7 +56,7 @@ export default async function DashboardPage() {
                         </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">{stats.paidInvoices}</div>
+                        <div className="text-2xl md:text-3xl font-bold text-emerald-600 dark:text-emerald-400">{stats.paidInvoices}</div>
                         <p className="text-xs text-muted-foreground mt-1">
                             Successfully paid
                         </p>
@@ -73,7 +73,7 @@ export default async function DashboardPage() {
                         </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-bold text-orange-600 dark:text-orange-400">{stats.pendingInvoices}</div>
+                        <div className="text-2xl md:text-3xl font-bold text-orange-600 dark:text-orange-400">{stats.pendingInvoices}</div>
                         <p className="text-xs text-muted-foreground mt-1">
                             Awaiting payment
                         </p>

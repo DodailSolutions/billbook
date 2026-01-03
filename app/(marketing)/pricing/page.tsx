@@ -53,29 +53,29 @@ export default async function PricingPage() {
       </nav>
 
       {/* Hero */}
-      <section className="px-6 py-16 md:py-24 max-w-7xl mx-auto text-center">
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800 rounded-full text-emerald-700 dark:text-emerald-300 text-sm font-semibold mb-6">
-          <Zap className="h-4 w-4" />
+      <section className="px-4 sm:px-6 py-12 sm:py-16 md:py-24 max-w-7xl mx-auto text-center">
+        <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-emerald-50 dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800 rounded-full text-emerald-700 dark:text-emerald-300 text-xs sm:text-sm font-semibold mb-4 sm:mb-6">
+          <Zap className="h-3 w-3 sm:h-4 sm:w-4" />
           14-day free trial on all paid plans
         </div>
-        <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
+        <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6 px-4">
           Simple, Transparent Pricing
         </h1>
-        <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto mb-8">
+        <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto mb-6 sm:mb-8 px-4">
           Choose the plan that fits your business needs. Upgrade, downgrade, or cancel anytime.
         </p>
       </section>
 
       {/* Pricing Cards */}
-      <section className="px-6 pb-24 max-w-7xl mx-auto">
-        <div className="grid md:grid-cols-4 gap-8 max-w-7xl mx-auto mb-12">
+      <section className="px-4 sm:px-6 pb-16 sm:pb-24 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 max-w-7xl mx-auto mb-12">
           {/* Free Plan */}
           <PricingCard
             title="Free"
             price={
               <div className="flex items-baseline gap-1">
-                <span className="text-5xl font-bold text-gray-900 dark:text-white">₹0</span>
-                <span className="text-gray-600 dark:text-gray-400">/month</span>
+                <span className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white">\u20b90</span>
+                <span className="text-sm sm:text-base text-gray-600 dark:text-gray-400">/month</span>
               </div>
             }
             description="Perfect for getting started"
@@ -97,7 +97,7 @@ export default async function PricingPage() {
             title="Starter"
             price={
               <div className="flex items-baseline gap-1">
-                <span className="text-5xl font-bold text-gray-900 dark:text-white">₹299</span>
+                <span className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white">\u20b9299</span>
                 <span className="text-gray-600 dark:text-gray-400">/month</span>
               </div>
             }

@@ -10,10 +10,10 @@ export default async function CustomersPage() {
 
     return (
         <div className="space-y-4">
-            <div className="flex items-center justify-between">
-                <h2 className="text-3xl font-bold tracking-tight">Customers</h2>
-                <Link href="/customers/new">
-                    <Button className="gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Customers</h2>
+                <Link href="/customers/new" className="w-full sm:w-auto">
+                    <Button className="gap-2 w-full sm:w-auto">
                         <Plus className="h-4 w-4" />
                         Add Customer
                     </Button>

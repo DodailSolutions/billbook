@@ -49,11 +49,76 @@ export function InvoicesList({ invoices }: InvoicesListProps) {
     }
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-3 md:space-y-4">
             {invoices.map((invoice) => (
                 <Card key={invoice.id} className="hover:shadow-lg transition-shadow">
-                    <CardContent className="p-6">
-                        <div className="flex items-center justify-between">
+                    <CardContent className="p-4 md:p-6">
+                        {/* Mobile Layout */}
+                        <div className="flex flex-col md:hidden space-y-3">
+                            <div className="flex items-start justify-between">
+                                <div className="flex-1">
+                                    <h3 className="text-base font-semibold mb-1">{invoice.invoice_number}</h3>
+                                    <span className={cn(
+                                        "inline-block px-2 py-1 rounded-full text-xs font-medium",
+                                        statusColors[invoice.status]
+                                    )}>
+                                        {invoice.status.toUpperCase()}
+                                    </span>
+                                </div>
+                                <p className="text-lg font-bold">₹{invoice.total.toFixed(2)}</p>
+                            </div>
+                            
+                            <div className="space-y-1 text-sm">
+                                <p className="text-muted-foreground">
+                                    Customer: <span className="font-medium text-foreground">{invoice.customer.name}</span>
+                                </p>
+                                <p className="text-muted-foreground">
+                                    Date: {formatDate(invoice.invoice_date)}
+                                </p>
+                                {invoice.gst_percentage > 0 && (
+                                    <p className="text-xs text-muted-foreground">
+                                        (incl. {invoice.gst_percentage}% GST)
+                                    </p>
+                                )}
+                            </div>
+
+                            <div className="flex gap-2 pt-2 border-t">
+                                <select
+                                    value={invoice.status}
+                                    onChange={(e) => handleStatusChange(invoice.id, e.target.value as any)}
+                                    className="flex-1 h-9 rounded-md border border-input bg-transparent px-3 text-sm"
+                                >
+                                    <option value="draft">Draft</option>
+                                    <option value="sent">Sent</option>
+                                    <option value="paid">Paid</option>
+                                    <option value="cancelled">Cancelled</option>
+                                </select>
+
+                                <Link href={`/invoices/${invoice.id}`}>
+                                    <Button variant="outline" size="sm">
+                                        <Eye className="h-4 w-4" />
+                                    </Button>
+                                </Link>
+
+                                <a href={`/invoices/${invoice.id}/pdf`} target="_blank" rel="noopener noreferrer">
+                                    <Button variant="outline" size="sm">
+                                        <Download className="h-4 w-4" />
+                                    </Button>
+                                </a>
+
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handleDelete(invoice.id)}
+                                    disabled={deletingId === invoice.id}
+                                >
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        </div>
+
+                        {/* Desktop Layout */}
+                        <div className="hidden md:flex items-center justify-between">
                             <div className="flex-1">
                                 <div className="flex items-center gap-3 mb-2">
                                     <h3 className="text-lg font-semibold">{invoice.invoice_number}</h3>
@@ -99,6 +164,12 @@ export function InvoicesList({ invoices }: InvoicesListProps) {
                                             <Eye className="h-4 w-4" />
                                         </Button>
                                     </Link>
+
+                                    <a href={`/invoices/${invoice.id}/pdf`} target="_blank" rel="noopener noreferrer">
+                                        <Button variant="outline" size="icon">
+                                            <Download className="h-4 w-4" />
+                                        </Button>
+                                    </a>
 
                                     <Button
                                         variant="ghost"

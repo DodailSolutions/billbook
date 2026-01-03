@@ -10,17 +10,18 @@ export default async function InvoicesPage() {
 
     return (
         <div className="space-y-4">
-            <div className="flex items-center justify-between">
-                <h2 className="text-3xl font-bold tracking-tight">Invoices</h2>
-                <div className="flex gap-2">
-                    <Link href="/invoices/settings">
-                        <Button variant="outline" className="gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Invoices</h2>
+                <div className="flex gap-2 flex-wrap">
+                    <Link href="/invoices/settings" className="flex-1 sm:flex-none">
+                        <Button variant="outline" className="gap-2 w-full">
                             <Settings className="h-4 w-4" />
-                            Template Settings
+                            <span className="hidden sm:inline">Template Settings</span>
+                            <span className="sm:hidden">Settings</span>
                         </Button>
                     </Link>
-                    <Link href="/invoices/new">
-                        <Button className="gap-2">
+                    <Link href="/invoices/new" className="flex-1 sm:flex-none">
+                        <Button className="gap-2 w-full">
                             <Plus className="h-4 w-4" />
                             Create Invoice
                         </Button>
