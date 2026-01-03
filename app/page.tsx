@@ -608,16 +608,16 @@ export default async function Home() {
 
           <div className="mt-12 grid md:grid-cols-3 gap-6 text-center">
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
-              <div className="text-3xl font-bold mb-2">500+</div>
-              <div className="text-amber-50">Happy Customers</div>
+              <div className="text-3xl font-bold mb-2 text-white">500+</div>
+              <div className="text-amber-100 font-medium">Happy Customers</div>
             </div>
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
-              <div className="text-3xl font-bold mb-2">₹0</div>
-              <div className="text-amber-50">Monthly Fees</div>
+              <div className="text-3xl font-bold mb-2 text-white">₹0</div>
+              <div className="text-amber-100 font-medium">Monthly Fees</div>
             </div>
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
-              <div className="text-3xl font-bold mb-2">Forever</div>
-              <div className="text-amber-50">Access Guaranteed</div>
+              <div className="text-3xl font-bold mb-2 text-white">Forever</div>
+              <div className="text-amber-100 font-medium">Access Guaranteed</div>
             </div>
           </div>
         </div>
