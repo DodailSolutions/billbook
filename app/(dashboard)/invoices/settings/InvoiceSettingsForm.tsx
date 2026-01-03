@@ -196,11 +196,13 @@ export default function InvoiceSettingsForm({ initialSettings, onPreviewUpdate }
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
             {/* Company Information */}
-            <Card className="border-2 dark:border-gray-700">
+            <Card className="border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-800 shadow-sm">
                 <div className="p-6 space-y-4">
-                    <div className="flex items-center gap-2 mb-4">
-                        <Building2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                        <h2 className="text-xl font-bold text-gray-900" style={{ color: 'var(--foreground)' }}>
+                    <div className="flex items-center gap-3 mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+                        <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm">
+                            <Building2 className="h-5 w-5 text-white" />
+                        </div>
+                        <h2 className="text-xl font-bold" style={{ color: 'var(--foreground)' }}>
                             Company Information
                         </h2>
                     </div>
@@ -382,11 +384,13 @@ export default function InvoiceSettingsForm({ initialSettings, onPreviewUpdate }
             </Card>
 
             {/* Branding & Typography */}
-            <Card className="border-2 dark:border-gray-700">
+            <Card className="border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-800 shadow-sm">
                 <div className="p-6 space-y-4">
-                    <div className="flex items-center gap-2 mb-4">
-                        <Palette className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-                        <h2 className="text-xl font-bold text-gray-900" style={{ color: 'var(--foreground)' }}>
+                    <div className="flex items-center gap-3 mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+                        <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-sm">
+                            <Palette className="h-5 w-5 text-white" />
+                        </div>
+                        <h2 className="text-xl font-bold" style={{ color: 'var(--foreground)' }}>
                             Branding & Typography
                         </h2>
                     </div>
@@ -769,11 +773,13 @@ export default function InvoiceSettingsForm({ initialSettings, onPreviewUpdate }
             </Card>
 
             {/* Terms and Footer */}
-            <Card className="border-2 dark:border-gray-700">
+            <Card className="border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-800 shadow-sm">
                 <div className="p-6 space-y-4">
-                    <div className="flex items-center gap-2 mb-4">
-                        <FileText className="h-5 w-5 text-green-600 dark:text-green-400" />
-                        <h2 className="text-xl font-bold text-gray-900" style={{ color: 'var(--foreground)' }}>
+                    <div className="flex items-center gap-3 mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+                        <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-sm">
+                            <FileText className="h-5 w-5 text-white" />
+                        </div>
+                        <h2 className="text-xl font-bold" style={{ color: 'var(--foreground)' }}>
                             Terms & Footer
                         </h2>
                     </div>
