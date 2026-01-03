@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Loader2, CheckCircle, CreditCard } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
 
 interface RazorpayOptions {
     key: string | undefined
@@ -38,8 +39,32 @@ export function CheckoutHandler() {
     const router = useRouter()
     const checkoutPlan = searchParams.get('checkout')
     const [loading, setLoading] = useState(false)
-    const [error, setError] = useState<string | null>(null)
+    const [error, setError] = useState<string | null>(null)    const [userInfo, setUserInfo] = useState<{ name: string; email: string } | null>(null)
 
+    useEffect(() => {
+        const fetchUserInfo = async () => {
+            const supabase = createClient()
+            const { data: { user } } = await supabase.auth.getUser()
+            
+            if (user) {
+                // Fetch user profile for name
+                const { data: profile } = await supabase
+                    .from('user_profiles')
+                    .select('full_name, business_name')
+                    .eq('user_id', user.id)
+                    .single()
+
+                setUserInfo({
+                    name: profile?.full_name || profile?.business_name || user.email?.split('@')[0] || '',
+                    email: user.email || ''
+                })
+            }
+        }
+
+        if (checkoutPlan) {
+            fetchUserInfo()
+        }
+    }, [checkoutPlan])
     const handleCheckout = async () => {
         if (!checkoutPlan) return
 
@@ -119,8 +144,8 @@ export function CheckoutHandler() {
                     }
                 },
                 prefill: {
-                    name: '',
-                    email: '',
+                    name: userInfo?.name || '',
+                    email: userInfo?.email || '',
                 },
                 theme: {
                     color: '#10b981'
