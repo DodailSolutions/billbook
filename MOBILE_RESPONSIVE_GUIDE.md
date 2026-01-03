@@ -164,7 +164,7 @@ xl: 1280px  /* Extra large devices */
 ```tsx
 // Horizontal scroll container for tables
 <div className="overflow-x-auto">
-  <table className="min-w-[800px]">
+  <Table className="min-w-200">
 ```
 
 ## Touch Optimization

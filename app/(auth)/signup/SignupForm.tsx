@@ -91,6 +91,11 @@ export function SignupForm({ selectedPlan, message }: SignupFormProps) {
         try {
             await signup(formElement)
         } catch (error) {
+            // NEXT_REDIRECT is not an error, it's how Next.js handles redirects
+            if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
+                // This is expected, let the redirect happen
+                return
+            }
             console.error('Signup error:', error)
             setIsSubmitting(false)
         }

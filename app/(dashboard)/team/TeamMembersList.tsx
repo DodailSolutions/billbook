@@ -148,7 +148,7 @@ export function TeamMembersList({ members, roles }: TeamMembersListProps) {
 
       <div className="border rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
-          <Table className="min-w-[800px]">
+          <Table className="min-w-200">
           <TableHeader>
             <TableRow>
               <TableHead>Email</TableHead>
