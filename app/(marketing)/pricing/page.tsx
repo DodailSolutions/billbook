@@ -74,7 +74,7 @@ export default async function PricingPage() {
             title="Free"
             price={
               <div className="flex items-baseline gap-1">
-                <span className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white">\u20b90</span>
+                <span className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white">₹0</span>
                 <span className="text-sm sm:text-base text-gray-600 dark:text-gray-400">/month</span>
               </div>
             }
@@ -97,8 +97,8 @@ export default async function PricingPage() {
             title="Starter"
             price={
               <div className="flex items-baseline gap-1">
-                <span className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white">\u20b9299</span>
-                <span className="text-gray-600 dark:text-gray-400">/month</span>
+                <span className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white">₹299</span>
+                <span className="text-sm sm:text-base text-gray-600 dark:text-gray-400">/month</span>
               </div>
             }
             description="For growing businesses"
@@ -121,8 +121,8 @@ export default async function PricingPage() {
             title="Professional"
             price={
               <div className="flex items-baseline gap-1">
-                <span className="text-5xl font-bold text-gray-900 dark:text-white">₹599</span>
-                <span className="text-gray-600 dark:text-gray-400">/month</span>
+                <span className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white">₹599</span>
+                <span className="text-sm sm:text-base text-gray-600 dark:text-gray-400">/month</span>
               </div>
             }
             description="For established teams"
@@ -144,12 +144,12 @@ export default async function PricingPage() {
             title="Lifetime Professional"
             price={
               <>
-                <div className="text-gray-500 text-sm mb-1">
+                <div className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm mb-1">
                   <span className="line-through">₹15,999</span>
                   <span className="ml-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded font-semibold">38% OFF</span>
                 </div>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-5xl font-bold text-gray-900">₹9,999</span>
+                  <span className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white">₹9,999</span>
                 </div>
               </>
             }
