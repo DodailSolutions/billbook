@@ -36,6 +36,10 @@ export default async function Home() {
             <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center">
               <FileText className="h-5 w-5 text-white" />
             </div>
+            <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">BillBooky</h1>
+          </div>
+          <div className="flex items-center gap-2 md:gap-3">
+            <ThemeToggle />
             {isAuthenticated ? (
               <Link href="/dashboard">
                 <Button className="bg-emerald-600 hover:bg-emerald-700 text-white text-sm md:text-base">
@@ -58,6 +62,7 @@ export default async function Home() {
             )}
           </div>
         </div>
+      </nav>
       </nav>
 
       {/* Hero Section */}
