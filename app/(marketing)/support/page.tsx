@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '@/components/ui/Button'
-import { Mail, Book, MessageSquare } from 'lucide-react'
+import { FileText, Mail, Book, MessageSquare } from 'lucide-react'
 import Footer from '@/components/Footer'
 
 export default function SupportPage() {
