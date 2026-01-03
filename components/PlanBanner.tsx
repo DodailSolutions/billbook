@@ -30,7 +30,7 @@ export function PlanBanner() {
     if (planStatus.isLifetime) {
         return (
             <div className="px-3 pb-4">
-                <div className="bg-linear-to-r from-amber-500 to-orange-500 rounded-lg p-3 shadow-lg">
+                <div className="bg-gradient-to-r from-amber-500 to-orange-500 rounded-lg p-3 shadow-lg">
                     <div className="flex items-center gap-2 mb-1">
                         <Crown className="h-4 w-4 text-white" />
                         <p className="text-xs font-bold text-white">LIFETIME PRO</p>
@@ -45,7 +45,7 @@ export function PlanBanner() {
     if (planStatus.planSlug === 'free') {
         return (
             <Link href="/pricing" className="px-3 pb-4 block">
-                <div className="bg-linear-to-r from-emerald-500 to-blue-500 rounded-lg p-3 shadow-lg hover:shadow-xl transition-shadow cursor-pointer">
+                <div className="bg-gradient-to-r from-emerald-500 to-blue-500 rounded-lg p-3 shadow-lg hover:shadow-xl transition-shadow cursor-pointer">
                     <div className="flex items-center gap-2 mb-1">
                         <Zap className="h-4 w-4 text-white" />
                         <p className="text-xs font-bold text-white">FREE PLAN</p>
@@ -66,7 +66,7 @@ export function PlanBanner() {
     return (
         <div className="px-3 pb-4">
             <Link href="/pricing">
-                <div className={`bg-linear-to-r ${bgColor} rounded-lg p-3 shadow-lg hover:shadow-xl transition-shadow cursor-pointer`}>
+                <div className={`bg-gradient-to-r ${bgColor} rounded-lg p-3 shadow-lg hover:shadow-xl transition-shadow cursor-pointer`}>
                     <div className="flex items-center justify-between mb-1">
                         <p className="text-xs font-bold text-white uppercase">{planStatus.planName}</p>
                         {planStatus.hasActivePlan && <span className="text-xs text-white/90">●</span>}

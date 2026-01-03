@@ -121,7 +121,7 @@ export function PlanExpiryModal({ isExpired, daysUntilExpiry, planName }: PlanEx
                         </div>
 
                         {/* Lifetime Deal */}
-                        <div className="bg-linear-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-2 border-amber-400 dark:border-amber-600 rounded-lg p-4">
+                        <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-2 border-amber-400 dark:border-amber-600 rounded-lg p-4">
                             <div className="flex items-start gap-3">
                                 <Zap className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
                                 <div className="flex-1">
@@ -137,7 +137,7 @@ export function PlanExpiryModal({ isExpired, daysUntilExpiry, planName }: PlanEx
                                     </p>
                                     <Link href="/pricing#lifetime-deal" className="w-full">
                                         <Button 
-                                            className="w-full bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold shadow-lg"
+                                            className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold shadow-lg"
                                         >
                                             Get Lifetime Access →
                                         </Button>

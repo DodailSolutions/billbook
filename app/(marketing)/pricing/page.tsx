@@ -179,9 +179,9 @@ export default function PricingPage() {
           </div>
 
           {/* Lifetime Pro Plan */}
-          <div id="lifetime-deal" className="bg-linear-to-br from-amber-50 to-orange-50 border-3 border-amber-400 rounded-2xl p-8 hover:shadow-2xl transition-all relative">
+          <div id="lifetime-deal" className="bg-gradient-to-br from-amber-50 to-orange-50 border-3 border-amber-400 rounded-2xl p-8 hover:shadow-2xl transition-all relative">
             <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-              <span className="bg-linear-to-r from-amber-500 to-orange-500 text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg">
+              <span className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg">
                 💎 BEST VALUE - Limited Time
               </span>
             </div>
@@ -233,7 +233,7 @@ export default function PricingPage() {
             </ul>
             
             <Link href="/signup?plan=lifetime">
-              <Button className="w-full bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold shadow-lg">
+              <Button className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold shadow-lg">
                 Get Lifetime Access →
               </Button>
             </Link>
