@@ -27,6 +27,17 @@ export default async function Home() {
   const { data: { user } } = await supabase.auth.getUser()
   const isAuthenticated = !!user
 
+  // Fetch user's current plan if authenticated
+  let currentPlan = null
+  if (user) {
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('plan_name')
+      .eq('id', user.id)
+      .single()
+    currentPlan = profile?.plan_name || 'free'
+  }
+
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950">
       {/* Navigation */}
@@ -267,7 +278,18 @@ export default async function Home() {
 
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {/* Free Plan */}
-            <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 hover:shadow-xl transition-all">
+            <div className={`bg-white border-2 rounded-2xl p-8 hover:shadow-xl transition-all ${
+              currentPlan === 'free' 
+                ? 'border-emerald-500 bg-gradient-to-br from-emerald-50 to-teal-50 shadow-xl ring-2 ring-emerald-400/50 relative' 
+                : 'border-gray-200'
+            }`}>
+              {currentPlan === 'free' && (
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                  <span className="bg-linear-to-r from-emerald-600 to-teal-600 text-white px-4 py-1.5 rounded-full text-sm font-semibold shadow-lg">
+                    ✓ Current Plan
+                  </span>
+                </div>
+              )}
               <div className="mb-6">
                 <h4 className="text-2xl font-bold text-gray-900 mb-2">Free</h4>
                 <div className="flex items-baseline gap-1 mb-4">
@@ -300,20 +322,38 @@ export default async function Home() {
                 </li>
               </ul>
               
-              <Link href="/signup">
-                <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white">
-                  Start Free
+              {currentPlan === 'free' ? (
+                <Button disabled className="w-full bg-gray-400 text-white cursor-not-allowed">
+                  Current Plan ✓
                 </Button>
-              </Link>
+              ) : (
+                <Link href={isAuthenticated ? "/pricing?checkout=free" : "/signup"}>
+                  <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white">
+                    {isAuthenticated ? 'Switch to Free' : 'Start Free'}
+                  </Button>
+                </Link>
+              )}
             </div>
 
             {/* Starter Plan */}
-            <div className="bg-white border-2 border-emerald-600 rounded-2xl p-8 hover:shadow-xl transition-all relative">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                <span className="bg-emerald-600 text-white px-4 py-1 rounded-full text-sm font-semibold">
-                  Most Popular
-                </span>
-              </div>
+            <div className={`bg-white border-2 rounded-2xl p-8 hover:shadow-xl transition-all relative ${
+              currentPlan === 'starter' 
+                ? 'border-emerald-500 bg-gradient-to-br from-emerald-50 to-teal-50 shadow-xl ring-2 ring-emerald-400/50' 
+                : 'border-emerald-600'
+            }`}>
+              {currentPlan === 'starter' ? (
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                  <span className="bg-linear-to-r from-emerald-600 to-teal-600 text-white px-4 py-1.5 rounded-full text-sm font-semibold shadow-lg">
+                    ✓ Current Plan
+                  </span>
+                </div>
+              ) : (
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                  <span className="bg-emerald-600 text-white px-4 py-1 rounded-full text-sm font-semibold">
+                    Most Popular
+                  </span>
+                </div>
+              )}
               
               <div className="mb-6">
                 <h4 className="text-2xl font-bold text-gray-900 mb-2">Starter</h4>
@@ -347,15 +387,32 @@ export default async function Home() {
                 </li>
               </ul>
               
-              <Link href="/signup">
-                <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">
-                  Get Started
+              {currentPlan === 'starter' ? (
+                <Button disabled className="w-full bg-gray-400 text-white cursor-not-allowed">
+                  Current Plan ✓
                 </Button>
-              </Link>
+              ) : (
+                <Link href={isAuthenticated ? "/pricing?checkout=starter" : "/signup"}>
+                  <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">
+                    {isAuthenticated ? 'Upgrade Now' : 'Get Started'}
+                  </Button>
+                </Link>
+              )}
             </div>
 
             {/* Professional Plan */}
-            <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 hover:shadow-xl transition-all">
+            <div className={`bg-white border-2 rounded-2xl p-8 hover:shadow-xl transition-all ${
+              currentPlan === 'professional' 
+                ? 'border-emerald-500 bg-gradient-to-br from-emerald-50 to-teal-50 shadow-xl ring-2 ring-emerald-400/50 relative' 
+                : 'border-gray-200'
+            }`}>
+              {currentPlan === 'professional' && (
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                  <span className="bg-linear-to-r from-emerald-600 to-teal-600 text-white px-4 py-1.5 rounded-full text-sm font-semibold shadow-lg">
+                    ✓ Current Plan
+                  </span>
+                </div>
+              )}
               <div className="mb-6">
                 <h4 className="text-2xl font-bold text-gray-900 mb-2">Professional</h4>
                 <div className="flex items-baseline gap-1 mb-4">
@@ -388,11 +445,17 @@ export default async function Home() {
                 </li>
               </ul>
               
-              <Link href="/signup">
-                <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white">
-                  Get Started
+              {currentPlan === 'professional' ? (
+                <Button disabled className="w-full bg-gray-400 text-white cursor-not-allowed">
+                  Current Plan ✓
                 </Button>
-              </Link>
+              ) : (
+                <Link href={isAuthenticated ? "/pricing?checkout=professional" : "/signup"}>
+                  <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white">
+                    {isAuthenticated ? 'Upgrade Now' : 'Get Started'}
+                  </Button>
+                </Link>
+              )}
             </div>
           </div>
 
