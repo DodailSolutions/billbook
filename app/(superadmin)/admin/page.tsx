@@ -10,7 +10,8 @@ import {
     AlertCircle,
     RefreshCw,
     Tag,
-    Shield
+    Shield,
+    BarChart3
 } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
@@ -217,6 +218,13 @@ export default async function SuperAdminDashboard() {
                         Quick Actions
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <QuickActionCard
+                            title="Business Analytics"
+                            description="View business type insights"
+                            icon={BarChart3}
+                            href="/admin/analytics"
+                            colorClass="bg-gradient-to-br from-indigo-500 to-indigo-600"
+                        />
                         <QuickActionCard
                             title="Manage Users"
                             description="View and manage all users"

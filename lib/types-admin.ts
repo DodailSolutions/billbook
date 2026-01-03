@@ -5,6 +5,12 @@ export interface UserProfile {
     role: 'user' | 'admin' | 'super_admin'
     business_name?: string
     business_id?: string
+    business_type?: string
+    owner_name?: string
+    business_address?: string
+    business_phone?: string
+    business_email?: string
+    gstin?: string
     status: 'active' | 'suspended' | 'inactive'
     created_at: string
     updated_at: string
