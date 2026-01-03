@@ -199,7 +199,7 @@ export default function InvoiceSettingsForm({ initialSettings, onPreviewUpdate }
             <Card className="border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-800 shadow-sm">
                 <div className="p-6 space-y-4">
                     <div className="flex items-center gap-3 mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
-                        <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm">
+                        <div className="h-10 w-10 rounded-lg bg-linear-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm">
                             <Building2 className="h-5 w-5 text-white" />
                         </div>
                         <h2 className="text-xl font-bold" style={{ color: 'var(--foreground)' }}>
@@ -387,7 +387,7 @@ export default function InvoiceSettingsForm({ initialSettings, onPreviewUpdate }
             <Card className="border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-800 shadow-sm">
                 <div className="p-6 space-y-4">
                     <div className="flex items-center gap-3 mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
-                        <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-sm">
+                        <div className="h-10 w-10 rounded-lg bg-linear-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-sm">
                             <Palette className="h-5 w-5 text-white" />
                         </div>
                         <h2 className="text-xl font-bold" style={{ color: 'var(--foreground)' }}>
@@ -776,7 +776,7 @@ export default function InvoiceSettingsForm({ initialSettings, onPreviewUpdate }
             <Card className="border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-slate-800 shadow-sm">
                 <div className="p-6 space-y-4">
                     <div className="flex items-center gap-3 mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
-                        <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-sm">
+                        <div className="h-10 w-10 rounded-lg bg-linear-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-sm">
                             <FileText className="h-5 w-5 text-white" />
                         </div>
                         <h2 className="text-xl font-bold" style={{ color: 'var(--foreground)' }}>

@@ -9,7 +9,7 @@ export default async function InvoiceSettingsPage() {
         <div className="max-w-7xl mx-auto space-y-6">
             <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
                 <div className="flex items-center gap-3">
-                    <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg">
+                    <div className="h-12 w-12 rounded-xl bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg">
                         <Settings className="h-6 w-6 text-white" />
                     </div>
                     <div>

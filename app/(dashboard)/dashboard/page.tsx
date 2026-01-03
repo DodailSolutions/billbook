@@ -17,7 +17,7 @@ export default async function DashboardPage() {
                         <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">
                             Total Revenue
                         </CardTitle>
-                        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-green-100 to-emerald-100 dark:bg-green-900/30 flex items-center justify-center shadow-sm">
+                        <div className="h-10 w-10 rounded-full bg-linear-to-br from-green-100 to-emerald-100 dark:bg-green-900/30 flex items-center justify-center shadow-sm">
                             <DollarSign className="h-5 w-5 text-green-600 dark:text-green-400" />
                         </div>
                     </CardHeader>
@@ -34,7 +34,7 @@ export default async function DashboardPage() {
                         <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">
                             Total Invoices
                         </CardTitle>
-                        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 dark:bg-blue-900/30 flex items-center justify-center shadow-sm">
+                        <div className="h-10 w-10 rounded-full bg-linear-to-br from-blue-100 to-indigo-100 dark:bg-blue-900/30 flex items-center justify-center shadow-sm">
                             <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                         </div>
                     </CardHeader>
@@ -51,7 +51,7 @@ export default async function DashboardPage() {
                         <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">
                             Paid Invoices
                         </CardTitle>
-                        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-emerald-100 to-teal-100 dark:bg-emerald-900/30 flex items-center justify-center shadow-sm">
+                        <div className="h-10 w-10 rounded-full bg-linear-to-br from-emerald-100 to-teal-100 dark:bg-emerald-900/30 flex items-center justify-center shadow-sm">
                             <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                         </div>
                     </CardHeader>
@@ -68,7 +68,7 @@ export default async function DashboardPage() {
                         <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">
                             Pending Invoices
                         </CardTitle>
-                        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-orange-100 to-amber-100 dark:bg-orange-900/30 flex items-center justify-center shadow-sm">
+                        <div className="h-10 w-10 rounded-full bg-linear-to-br from-orange-100 to-amber-100 dark:bg-orange-900/30 flex items-center justify-center shadow-sm">
                             <Clock className="h-5 w-5 text-orange-600 dark:text-orange-400" />
                         </div>
                     </CardHeader>
