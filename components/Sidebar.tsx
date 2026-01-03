@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { LayoutDashboard, FileText, Users, RefreshCw, Bell, Settings, User } from "lucide-react"
 import { SignOutButton } from "./SignOutButton"
+import { PlanBanner } from "./PlanBanner"
 
 const routes = [
     {
@@ -95,7 +96,8 @@ export function Sidebar() {
                     ))}
                 </div>
             </div>
-            <div className="px-3 pb-2">
+            <div className="px-3 pb-2 space-y-2">
+                <PlanBanner />
                 <SignOutButton />
             </div>
         </div>

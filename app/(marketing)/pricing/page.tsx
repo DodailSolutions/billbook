@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
-import { FileText, CheckCircle } from 'lucide-react'
+import { FileText, CheckCircle, Zap, Shield, TrendingUp } from 'lucide-react'
 import Footer from '@/components/Footer'
 import { ThemeToggle } from '@/components/ThemeToggle'
 
@@ -34,11 +34,15 @@ export default function PricingPage() {
 
       {/* Hero */}
       <section className="px-6 py-16 md:py-24 max-w-7xl mx-auto text-center">
+        <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800 rounded-full text-emerald-700 dark:text-emerald-300 text-sm font-semibold mb-6">
+          <Zap className="h-4 w-4" />
+          14-day free trial on all paid plans
+        </div>
         <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
           Simple, Transparent Pricing
         </h1>
         <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto mb-8">
-          Choose the plan that fits your business needs. All paid plans include 14-day free trial.
+          Choose the plan that fits your business needs. Upgrade, downgrade, or cancel anytime.
         </p>
       </section>
 
@@ -122,9 +126,9 @@ export default function PricingPage() {
               </li>
               <li className="flex items-start gap-3">
                 <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                <span className="text-gray-700">Priority support</span>
-              </li>
-            </ul>
+                <span className?plan=starter">
+              <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">
+                Start Free Trial
             
             <Link href="/signup">
               <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">
@@ -167,61 +171,76 @@ export default function PricingPage() {
               </li>
             </ul>
             
-            <Link href="/signup">
+            <Link href="/signup?plan=professional">
               <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white">
-                Get Started
+                Start Free Trial
               </Button>
             </Link>
           </div>
 
           {/* Lifetime Pro Plan */}
-          <div className="bg-linear-to-br from-amber-50 to-amber-100 border-2 border-amber-400 rounded-2xl p-8 hover:shadow-xl transition-all relative">
+          <div id="lifetime-deal" className="bg-linear-to-br from-amber-50 to-orange-50 border-3 border-amber-400 rounded-2xl p-8 hover:shadow-2xl transition-all relative">
             <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-              <span className="bg-amber-500 text-white px-4 py-1 rounded-full text-sm font-semibold">
-                Best Value
+              <span className="bg-linear-to-r from-amber-500 to-orange-500 text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg">
+                💎 BEST VALUE - Limited Time
               </span>
             </div>
             
             <div className="mb-6">
-              <h4 className="text-2xl font-bold text-gray-900 mb-2">Lifetime Pro Plan</h4>
-              <div className="flex items-baseline gap-1 mb-4">
-                <span className="text-5xl font-bold text-gray-900">₹9,999</span>
+              <h4 className="text-2xl font-bold text-gray-900 mb-3">Lifetime Professional</h4>
+              <div className="mb-4">
+                <div className="text-gray-500 text-sm mb-1">
+                  <span className="line-through">₹15,999</span>
+                  <span className="ml-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded font-semibold">38% OFF</span>
+                </div>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-5xl font-bold text-gray-900">₹9,999</span>
+                </div>
               </div>
-              <p className="text-gray-700 font-semibold">One-time payment</p>
+              <p className="text-amber-700 font-bold text-lg">Pay once, use forever</p>
+              <p className="text-sm text-gray-600 mt-1">No monthly fees, ever!</p>
             </div>
             
             <ul className="space-y-4 mb-8">
               <li className="flex items-start gap-3">
                 <CheckCircle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
-                <span className="text-gray-700">Single business</span>
+                <span className="text-gray-700"><strong>Unlimited invoices</strong> forever</span>
               </li>
               <li className="flex items-start gap-3">
                 <CheckCircle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
-                <span className="text-gray-700"><strong>Unlimited invoices*</strong></span>
+                <span className="text-gray-700"><strong>All Professional features</strong></span>
               </li>
               <li className="flex items-start gap-3">
                 <CheckCircle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
-                <span className="text-gray-700">GST invoices</span>
+                <span className="text-gray-700">Recurring invoices & reminders</span>
               </li>
               <li className="flex items-start gap-3">
                 <CheckCircle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
-                <span className="text-gray-700">PDF export</span>
+                <span className="text-gray-700">Custom branding & templates</span>
               </li>
               <li className="flex items-start gap-3">
                 <CheckCircle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
-                <span className="text-gray-700">Basic reports</span>
+                <span className="text-gray-700">Priority lifetime support</span>
               </li>
               <li className="flex items-start gap-3">
                 <CheckCircle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
-                <span className="text-gray-700">Standard support</span>
+                <span className="text-gray-700">Free future updates</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+                <span className="text-gray-700">Single business entity</span>
               </li>
             </ul>
             
-            <Link href="/signup">
-              <Button className="w-full bg-amber-600 hover:bg-amber-700 text-white">
-                Get Lifetime Access
+            <Link href="/signup?plan=lifetime">
+              <Button className="w-full bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold shadow-lg">
+                Get Lifetime Access →
               </Button>
             </Link>
+            
+            <p className="text-xs text-center text-gray-600 mt-4">
+              ✨ Limited spots • 14-day money-back guarantee
+            </p>
           </div>
         </div>
 

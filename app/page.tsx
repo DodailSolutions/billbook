@@ -359,18 +359,161 @@ export default function Home() {
 
           <div className="text-center mt-12">
             <p className="text-gray-600 mb-8">All plans include 14-day free trial • Cancel anytime</p>
-            
-            {/* Enterprise Plan Card */}
-            <div className="max-w-2xl mx-auto bg-linear-to-br from-gray-900 to-gray-800 rounded-2xl p-8 text-white">
-              <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                <div className="text-center md:text-left">
-                  <h4 className="text-2xl font-bold mb-2">Enterprise</h4>
-                  <p className="text-gray-300 mb-2">₹999/month • Up to 10 team members</p>
-                  <p className="text-sm text-gray-400">Everything in Professional + larger team size</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Lifetime Deal Section - Prominent */}
+      <section className="px-6 py-16 md:py-24 bg-linear-to-br from-amber-500 via-amber-600 to-orange-600">
+        <div className="max-w-5xl mx-auto text-center text-white">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 rounded-full text-white text-sm font-semibold mb-6">
+            <Zap className="h-4 w-4" />
+            Limited Time Offer
+          </div>
+          
+          <h3 className="text-4xl md:text-6xl font-bold mb-4">
+            Lifetime Deal
+          </h3>
+          <p className="text-xl md:text-2xl text-amber-50 mb-8 max-w-3xl mx-auto">
+            Pay once, use forever. No monthly fees, no hidden charges.
+          </p>
+
+          <div className="bg-white rounded-3xl p-8 md:p-12 shadow-2xl max-w-3xl mx-auto">
+            <div className="mb-6">
+              <div className="text-gray-500 text-lg mb-2">
+                <span className="line-through">₹15,999</span>
+                <span className="ml-2 bg-red-500 text-white text-sm px-2 py-1 rounded">38% OFF</span>
+              </div>
+              <div className="flex items-baseline justify-center gap-2 mb-3">
+                <span className="text-6xl md:text-7xl font-bold text-gray-900">₹9,999</span>
+              </div>
+              <p className="text-lg font-semibold text-amber-600">One-time payment • Lifetime access</p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-4 my-8 text-left">
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-1" />
+                <div>
+                  <p className="font-semibold text-gray-900">Unlimited Invoices</p>
+                  <p className="text-sm text-gray-600">No monthly limits, ever</p>
                 </div>
-                <Link href="/signup">
-                  <Button className="bg-white text-gray-900 hover:bg-gray-100 font-semibold px-8">
-                    Get Started
+              </div>
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-1" />
+                <div>
+                  <p className="font-semibold text-gray-900">All Premium Features</p>
+                  <p className="text-sm text-gray-600">Everything in Professional plan</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-1" />
+                <div>
+                  <p className="font-semibold text-gray-900">Free Updates</p>
+                  <p className="text-sm text-gray-600">All future features included</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-1" />
+                <div>
+                  <p className="font-semibold text-gray-900">Priority Support</p>
+                  <p className="text-sm text-gray-600">Lifetime priority assistance</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-1" />
+                <div>
+                  <p className="font-semibold text-gray-900">Recurring Billing</p>
+                  <p className="text-sm text-gray-600">Automated invoices & reminders</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-1" />
+                <div>
+                  <p className="font-semibold text-gray-900">Custom Branding</p>
+                  <p className="text-sm text-gray-600">Logo, colors, fonts</p>
+                </div>
+              </div>
+            </div>
+
+            <Link href="/pricing#lifetime-deal">
+              <Button 
+                size="lg"
+                className="w-full md:w-auto bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold text-lg px-12 py-6 shadow-xl"
+              >
+                Get Lifetime Access Now →
+              </Button>
+            </Link>
+
+            <div className="mt-6 space-y-2">
+              <p className="text-sm text-gray-600">
+                ✨ <strong>Limited spots available</strong> • Secure your lifetime deal before price increases
+              </p>
+              <p className="text-sm text-gray-600">
+                💳 One-time payment via Razorpay • 14-day money-back guarantee
+              </p>
+            </div>
+
+            <div className="mt-8 pt-6 border-t border-gray-200">
+              <p className="text-xs text-gray-500">
+                * Fair usage policy applies. Lifetime access for single business entity. Unlimited invoices with reasonable usage.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-12 grid md:grid-cols-3 gap-6 text-center">
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
+              <div className="text-3xl font-bold mb-2">500+</div>
+              <div className="text-amber-50">Happy Customers</div>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
+              <div className="text-3xl font-bold mb-2">₹0</div>
+              <div className="text-amber-50">Monthly Fees</div>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
+              <div className="text-3xl font-bold mb-2">Forever</div>
+              <div className="text-amber-50">Access Guaranteed</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Enterprise Plan Section */}
+      <section className="px-6 py-16 bg-gray-50">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-linear-to-br from-gray-900 to-gray-800 rounded-2xl p-8 md:p-12 text-white">
+            <div className="text-center md:text-left">
+              <h4 className="text-3xl font-bold mb-3">Enterprise</h4>
+              <p className="text-gray-300 mb-2 text-lg">₹999/month • Up to 10 team members</p>
+              <p className="text-gray-400 mb-6">Everything in Professional + larger team size + AI Accountant + Advanced Analytics</p>
+              
+              <div className="grid md:grid-cols-2 gap-4 mb-8">
+                <div className="flex items-center gap-2 text-gray-300">
+                  <CheckCircle className="h-5 w-5 text-emerald-400" />
+                  <span>Custom integrations</span>
+                </div>
+                <div className="flex items-center gap-2 text-gray-300">
+                  <CheckCircle className="h-5 w-5 text-emerald-400" />
+                  <span>Dedicated support</span>
+                </div>
+                <div className="flex items-center gap-2 text-gray-300">
+                  <CheckCircle className="h-5 w-5 text-emerald-400" />
+                  <span>API access</span>
+                </div>
+                <div className="flex items-center gap-2 text-gray-300">
+                  <CheckCircle className="h-5 w-5 text-emerald-400" />
+                  <span>White label option</span>
+                </div>
+              </div>
+
+              <div className="flex flex-col md:flex-row gap-4">
+                <Link href="/pricing" className="flex-1">
+                  <Button className="w-full bg-white text-gray-900 hover:bg-gray-100 font-semibold px-8">
+                    View Pricing
+                  </Button>
+                </Link>
+                <Link href="/contact" className="flex-1">
+                  <Button variant="secondary" className="w-full border-white/20 text-white hover:bg-white/10">
+                    Contact Sales
                   </Button>
                 </Link>
               </div>
