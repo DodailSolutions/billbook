@@ -115,7 +115,7 @@ export function MobileSidebar() {
                                     height={40}
                                 />
                             </div>
-                            <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent">
+                            <h1 className="text-2xl font-bold bg-linear-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent">
                                 BillBooky
                             </h1>
                         </Link>
@@ -137,7 +137,7 @@ export function MobileSidebar() {
                                     )}
                                 >
                                     {pathname === route.href && (
-                                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-violet-500/20" />
+                                        <div className="absolute inset-0 bg-linear-to-r from-blue-500/20 to-violet-500/20" />
                                     )}
                                     <div className="flex items-center flex-1 relative z-10">
                                         <route.icon className={cn("h-5 w-5 mr-3", route.color)} />
