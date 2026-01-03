@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils"
 import { LayoutDashboard, FileText, Users, RefreshCw, Bell, Settings, User, Bot, UserCog } from "lucide-react"
 import { SignOutButton } from "./SignOutButton"
 import { PlanBanner } from "./PlanBanner"
+import { ThemeToggle } from "./ThemeToggle"
 
 const routes = [
     {
@@ -117,6 +118,10 @@ export function Sidebar() {
             </div>
             <div className="px-3 pb-2 space-y-2">
                 <PlanBanner />
+                <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                    <span className="text-sm text-zinc-400">Theme</span>
+                    <ThemeToggle />
+                </div>
                 <SignOutButton />
             </div>
         </div>
