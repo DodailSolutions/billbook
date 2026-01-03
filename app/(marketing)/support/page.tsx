@@ -1,6 +1,7 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { Button } from '@/components/ui/Button'
-import { FileText, Mail, Book, MessageSquare } from 'lucide-react'
+import { Mail, Book, MessageSquare } from 'lucide-react'
 import Footer from '@/components/Footer'
 
 export default function SupportPage() {
@@ -10,8 +11,14 @@ export default function SupportPage() {
       <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
         <div className="flex items-center justify-between p-4 md:p-6 max-w-7xl mx-auto">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center">
-              <FileText className="h-5 w-5 text-white" />
+            <div className="relative w-8 h-8 shrink-0">
+              <Image 
+                src="/logo-icon.svg" 
+                alt="BillBooky Logo" 
+                width={32} 
+                height={32}
+                className="transition-transform duration-200 hover:scale-110"
+              />
             </div>
             <h1 className="text-2xl font-bold text-gray-900">BillBooky</h1>
           </Link>

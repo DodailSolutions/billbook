@@ -1,0 +1,24 @@
+# Allow all search engines
+User-agent: *
+Allow: /
+
+# Disallow private areas
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /api/
+Disallow: /auth/
+
+# Allow specific pages
+Allow: /
+Allow: /pricing
+Allow: /features
+Allow: /about
+Allow: /contact
+Allow: /faq
+Allow: /terms
+Allow: /privacy
+Allow: /signup
+Allow: /login
+
+# Sitemap location
+Sitemap: https://billbooky.dodail.com/sitemap.xml

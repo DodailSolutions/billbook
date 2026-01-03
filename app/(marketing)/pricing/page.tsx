@@ -1,12 +1,29 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { Button } from '@/components/ui/Button'
-import { FileText, Zap } from 'lucide-react'
+import { Zap } from 'lucide-react'
 import Footer from '@/components/Footer'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { createClient } from '@/lib/supabase/server'
 import { PricingCard } from './PricingCard'
 import { CheckoutHandler } from './CheckoutHandler'
 import Script from 'next/script'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Pricing - Affordable Plans Starting Free | BillBooky Invoice Generator',
+  description: '100% Free plan with 300 invoices. Upgrade to Premium (₹299/month) or Lifetime (₹2,999 one-time) for unlimited invoices. No hidden charges. GST-compliant invoice software for Indian businesses.',
+  keywords: [
+    'invoice generator pricing',
+    'free invoice software',
+    'affordable billing software',
+    'invoice software plans',
+    'lifetime invoice software',
+    'cheap invoice generator',
+    'GST software pricing India',
+    'invoice maker cost'
+  ],
+}
 
 export default async function PricingPage() {
   const supabase = await createClient()
@@ -33,8 +50,14 @@ export default async function PricingPage() {
       <nav className="sticky top-0 z-50 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800">
         <div className="flex items-center justify-between p-4 md:p-6 max-w-7xl mx-auto">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center">
-              <FileText className="h-5 w-5 text-white" />
+            <div className="relative w-8 h-8 shrink-0">
+              <Image 
+                src="/logo-icon.svg" 
+                alt="BillBooky Logo" 
+                width={32} 
+                height={32}
+                className="transition-transform duration-200 hover:scale-110"
+              />
             </div>
             <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">BillBooky</h1>
           </Link>

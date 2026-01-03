@@ -1,7 +1,24 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { Button } from '@/components/ui/Button'
-import { FileText, ChevronDown } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import Footer from '@/components/Footer'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'FAQ - Free Invoice Generator India | BillBooky Help & Support',
+  description: 'Get answers to common questions about BillBooky invoice generator. Learn about GST compliance, pricing, features, and how to create professional invoices for your Indian business.',
+  keywords: [
+    'invoice generator faq',
+    'billing software help',
+    'GST invoice questions',
+    'invoice maker support',
+    'free invoice generator help',
+    'BillBooky support',
+    'invoice software India',
+    'billing questions'
+  ],
+}
 
 const FAQS = [
   {
@@ -96,14 +113,42 @@ const FAQS = [
 ]
 
 export default function FAQPage() {
+  // Generate FAQ schema markup
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: FAQS.flatMap(category =>
+      category.questions.map(faq => ({
+        '@type': 'Question',
+        name: faq.q,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: faq.a
+        }
+      }))
+    )
+  }
+
   return (
     <div className="min-h-screen bg-white">
+      {/* FAQ Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+
       {/* Navigation */}
       <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
         <div className="flex items-center justify-between p-4 md:p-6 max-w-7xl mx-auto">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center">
-              <FileText className="h-5 w-5 text-white" />
+            <div className="relative w-8 h-8 shrink-0">
+              <Image 
+                src="/logo-icon.svg" 
+                alt="BillBooky Logo" 
+                width={32} 
+                height={32}
+                className="transition-transform duration-200 hover:scale-110"
+              />
             </div>
             <h1 className="text-2xl font-bold text-gray-900">BillBooky</h1>
           </Link>

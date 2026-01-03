@@ -1,26 +1,18 @@
 import Link from 'next/link'
+import Image from 'next/image'
+import dynamic from 'next/dynamic'
 import { Button } from '@/components/ui/Button'
-import { FileText, Users, IndianRupee, TrendingUp, Zap, Shield, CheckCircle, Clock, BarChart3, RefreshCw } from 'lucide-react'
+import { Zap } from 'lucide-react'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { createClient } from '@/lib/supabase/server'
 
-const FEATURES = [
-  { icon: FileText, title: 'Quick Invoice Creation', desc: 'Create professional invoices in under 60 seconds', color: 'emerald' },
-  { icon: IndianRupee, title: 'GST Compliant', desc: 'Automatic GST calculations with GSTIN support', color: 'blue' },
-  { icon: Users, title: 'Customer Management', desc: 'Store and organize all customer details securely', color: 'purple' },
-  { icon: CheckCircle, title: 'Custom Branding', desc: 'Add logo, fonts, and colors to match your brand', color: 'orange' },
-  { icon: RefreshCw, title: 'Recurring Billing', desc: 'Set up automatic invoices for repeat clients', color: 'teal' },
-  { icon: Clock, title: 'Payment Reminders', desc: 'Automated reminders for due and overdue payments', color: 'rose' },
-] as const
-
-const BENEFITS = [
-  'No credit card required',
-  'Free forever plan',
-  'No installation needed',
-  'Instant PDF download',
-  'Secure cloud storage',
-  'Mobile responsive',
-]
+// Lazy load heavy components
+const LandingFeatures = dynamic(() => import('./_components/LandingFeatures').then(mod => ({ default: mod.LandingFeatures })), {
+  loading: () => <div className="h-96 animate-pulse bg-gray-100" />
+})
+const LandingBenefits = dynamic(() => import('./_components/LandingBenefits').then(mod => ({ default: mod.LandingBenefits })), {
+  loading: () => <div className="h-24 animate-pulse bg-gray-100" />
+})
 
 export default async function Home() {
   const supabase = await createClient()
@@ -43,12 +35,19 @@ export default async function Home() {
       {/* Navigation */}
       <nav className="sticky top-0 z-50 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800">
         <div className="flex items-center justify-between p-4 md:p-6 max-w-7xl mx-auto">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center">
-              <FileText className="h-5 w-5 text-white" />
+          <Link href="/" className="flex items-center gap-2">
+            <div className="relative w-8 h-8 shrink-0">
+              <Image 
+                src="/logo-icon.svg" 
+                alt="BillBooky Logo" 
+                width={32} 
+                height={32}
+                className="transition-transform duration-200 hover:scale-110"
+                priority
+              />
             </div>
             <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">BillBooky</h1>
-          </div>
+          </Link>
           <div className="flex items-center gap-2 md:gap-3">
             <ThemeToggle />
             {isAuthenticated ? (
@@ -82,17 +81,17 @@ export default async function Home() {
           <div className="space-y-8">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800 rounded-full text-emerald-700 dark:text-emerald-300 text-sm font-medium">
               <Zap className="h-4 w-4" />
-              Built for Indian Businesses
+              🇮🇳 Made in India • Free Forever
             </div>
             
-            <h2 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white leading-tight">
-              Professional Invoicing
-              <span className="block text-emerald-600 dark:text-emerald-400 mt-2">Made Simple</span>
-            </h2>
+            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white leading-tight">
+              Free Invoice Generator for Indian Businesses
+              <span className="block text-emerald-600 dark:text-emerald-400 mt-2">GST Compliant • Made Simple</span>
+            </h1>
             
             <p className="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
-              Create GST-compliant invoices, manage customers, and get paid faster. 
-              Built specifically for Indian small businesses and freelancers.
+              <strong>100% Free</strong> GST-compliant invoice generator. Perfect for MSMEs, freelancers, and businesses of all sizes. 
+              Made in India 🇮🇳 for Indian businesses. No credit card required. Start creating professional invoices in 60 seconds!
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4">
@@ -683,14 +682,90 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* SEO Content Section */}
+      <section className="px-6 py-16 bg-white border-t border-gray-100">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+            Why Choose BillBooky - The Best Free Invoice Generator in India?
+          </h2>
+          
+          <div className="prose prose-emerald max-w-none">
+            <p className="text-gray-700 leading-relaxed mb-6">
+              <strong>BillBooky</strong> is India's leading <strong>free invoice generator</strong> designed specifically for Indian businesses, freelancers, and MSMEs. Whether you're a small business owner, consultant, freelancer, or startup, our platform makes creating <strong>GST-compliant invoices</strong> effortless and completely free.
+            </p>
+            
+            <h3 className="text-2xl font-bold text-gray-900 mt-8 mb-4">
+              Free Invoice Generator for Every Business Size
+            </h3>
+            <p className="text-gray-700 leading-relaxed mb-6">
+              From solo entrepreneurs to growing enterprises, BillBooky's <strong>invoice creator</strong> serves businesses across all sectors in India. Generate unlimited professional invoices with GST calculations, customizable templates, and instant PDF downloads - all at <strong>₹0 cost forever</strong>. Our invoice maker is trusted by thousands of Indian businesses for its simplicity and reliability.
+            </p>
+            
+            <h3 className="text-2xl font-bold text-gray-900 mt-8 mb-4">
+              GST-Compliant Billing Software - Made in India
+            </h3>
+            <p className="text-gray-700 leading-relaxed mb-6">
+              Built specifically for the Indian market, BillBooky ensures <strong>100% GST compliance</strong> with automatic tax calculations (CGST, SGST, IGST). Our <strong>invoice billing software</strong> includes features like GSTIN validation, HSN/SAC codes, reverse charge mechanism, and e-way bill support. Create tax invoices that meet all Indian tax regulations effortlessly.
+            </p>
+            
+            <h3 className="text-2xl font-bold text-gray-900 mt-8 mb-4">
+              Features That Make Us the Best Invoice Software in India
+            </h3>
+            <ul className="list-disc list-inside text-gray-700 space-y-2 mb-6">
+              <li><strong>100% Free Forever</strong> - No hidden charges, no credit card required</li>
+              <li><strong>GST-Compliant Invoicing</strong> - Automatic tax calculations for Indian businesses</li>
+              <li><strong>Custom Invoice Templates</strong> - Add your logo, customize colors and fonts</li>
+              <li><strong>Instant PDF Generation</strong> - Download and send invoices immediately</li>
+              <li><strong>Customer Management</strong> - Store and manage all your client details</li>
+              <li><strong>Recurring Invoices</strong> - Automate invoices for subscription businesses</li>
+              <li><strong>Payment Tracking</strong> - Monitor paid and pending invoices</li>
+              <li><strong>Multi-Language Support</strong> - Create invoices in Hindi, English, and regional languages</li>
+              <li><strong>Mobile Friendly</strong> - Create invoices on-the-go from any device</li>
+            </ul>
+            
+            <h3 className="text-2xl font-bold text-gray-900 mt-8 mb-4">
+              Perfect for Indian MSMEs, Freelancers & Startups
+            </h3>
+            <p className="text-gray-700 leading-relaxed mb-6">
+              BillBooky is designed for the Indian market - whether you run a <strong>retail shop in Mumbai</strong>, a <strong>consulting firm in Delhi</strong>, a <strong>software company in Bangalore</strong>, or work as a <strong>freelancer in Pune</strong>. Our <strong>billing software</strong> supports all types of businesses: services, retail, wholesale, manufacturing, consulting, and more.
+            </p>
+            
+            <h3 className="text-2xl font-bold text-gray-900 mt-8 mb-4">
+              Made in India, For India 🇮🇳
+            </h3>
+            <p className="text-gray-700 leading-relaxed mb-6">
+              As a <strong>proudly Indian product</strong>, BillBooky understands the unique needs of Indian businesses. We support Indian rupee (₹) as default currency, include all GST slab rates, provide Hindi and regional language support, and ensure data storage complies with Indian regulations. Join the Digital India movement with our free invoice software.
+            </p>
+            
+            <h3 className="text-2xl font-bold text-gray-900 mt-8 mb-4">
+              Start Creating Professional Invoices in 60 Seconds
+            </h3>
+            <p className="text-gray-700 leading-relaxed mb-6">
+              No complicated setup, no lengthy tutorials. Just sign up for free, add your business details, and start generating professional invoices instantly. Our <strong>online invoice generator</strong> is so simple, anyone can use it - no accounting knowledge required.
+            </p>
+            
+            <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-6 mt-8">
+              <p className="text-emerald-900 font-semibold text-center">
+                🎉 Join 10,000+ Indian businesses using BillBooky as their trusted invoice generator. Start for FREE today!
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="border-t border-gray-200 bg-gray-50">
         <div className="max-w-7xl mx-auto px-6 py-12">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center">
-                  <FileText className="h-5 w-5 text-white" />
+                <div className="relative w-8 h-8 shrink-0">
+                  <Image 
+                    src="/logo-icon.svg" 
+                    alt="BillBooky Logo" 
+                    width={32} 
+                    height={32}
+                  />
                 </div>
                 <h4 className="text-xl font-bold text-gray-900">BillBooky</h4>
               </div>
