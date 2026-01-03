@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import Link from 'next/link'
 import { TeamMembersList } from './TeamMembersList'
 import { InviteMemberModal } from './InviteMemberModal'
+import { PurchaseAddonModal } from './PurchaseAddonModal'
 
 export default async function TeamMembersPage() {
   const supabase = await createClient()
@@ -19,13 +20,21 @@ export default async function TeamMembersPage() {
   // Check plan status and team member limits
   const planStatus = await getUserPlanStatus()
   const hasTeamAccess = planStatus && ['professional', 'lifetime', 'enterprise'].includes(planStatus.planSlug)
+  const isLifetimePlan = planStatus?.planSlug === 'lifetime'
 
   // Get team member limits
   const { data: limits } = await supabase.rpc('check_team_member_limit', {
     p_owner_id: user.id
   })
 
-  const teamLimit = limits?.[0] || { allowed: 1, current: 0, can_add: false }
+  const teamLimit = limits?.[0] || { allowed: 1, current: 0, can_add: false, base_limit: 0, purchased_slots: 0, plan_slug: '' }
+
+  // Get addon info for lifetime users
+  const { data: addonInfo } = isLifetimePlan 
+    ? await supabase.rpc('get_user_team_addons', { p_user_id: user.id })
+    : { data: null }
+
+  const addons = addonInfo?.[0] || { active_slots: 0, monthly_slots: 0, yearly_slots: 0 }
 
   // Get team members
   const { data: teamMembers } = await supabase
@@ -97,15 +106,54 @@ export default async function TeamMembersPage() {
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mt-1">
               Collaborate with your team • {teamLimit.current} of {teamLimit.allowed} members used
+              {isLifetimePlan && teamLimit.purchased_slots > 0 && (
+                <span className="ml-2 text-blue-600 dark:text-blue-400">
+                  ({teamLimit.base_limit} base + {teamLimit.purchased_slots} purchased)
+                </span>
+              )}
             </p>
           </div>
-          <InviteMemberModal 
-            canAdd={teamLimit.can_add}
-            currentCount={teamLimit.current}
-            maxAllowed={teamLimit.allowed}
-            roles={roles || []}
-          />
+          <div className="flex gap-2">
+            <InviteMemberModal 
+              canAdd={teamLimit.can_add}
+              currentCount={teamLimit.current}
+              maxAllowed={teamLimit.allowed}
+              roles={roles || []}
+            />
+            {isLifetimePlan && (
+              <PurchaseAddonModal
+                isLifetimePlan={isLifetimePlan}
+                currentSlots={teamLimit.purchased_slots}
+                onSuccess={() => {}}
+              />
+            )}
+          </div>
         </div>
+
+        {/* Addon Info Card for Lifetime Users */}
+        {isLifetimePlan && addons.active_slots > 0 && (
+          <Card className="bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
+            <CardContent className="pt-6">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="font-semibold text-blue-900 dark:text-blue-300 mb-2">
+                    Active Additional Slots
+                  </h3>
+                  <div className="space-y-1 text-sm text-blue-800 dark:text-blue-200">
+                    <p>✓ Total purchased slots: {addons.active_slots}</p>
+                    {addons.monthly_slots > 0 && <p>  • Monthly: {addons.monthly_slots} slot(s)</p>}
+                    {addons.yearly_slots > 0 && <p>  • Yearly: {addons.yearly_slots} slot(s)</p>}
+                  </div>
+                </div>
+                <PurchaseAddonModal
+                  isLifetimePlan={isLifetimePlan}
+                  currentSlots={teamLimit.purchased_slots}
+                  onSuccess={() => {}}
+                />
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
