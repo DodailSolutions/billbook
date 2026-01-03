@@ -105,14 +105,9 @@ export function SignupForm({ selectedPlan, message }: SignupFormProps) {
             formElement.append(key, value)
         })
 
-        try {
-            // Call the server action - it handles redirects internally
-            await signup(formElement)
-        } catch (error) {
-            console.error('Signup submission error:', error)
-            // Only reset if not a redirect
-            setIsSubmitting(false)
-        }
+        // Call the server action - it will handle redirects
+        // Don't catch errors here - let redirects propagate naturally
+        await signup(formElement)
     }
 
     return (
