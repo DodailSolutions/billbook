@@ -2,7 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
 import { Button } from '@/components/ui/Button'
-import { Zap, CheckCircle, Shield, TrendingUp } from 'lucide-react'
+import { FileText, Users, IndianRupee, Zap, CheckCircle, Shield, TrendingUp, RefreshCw, Clock } from 'lucide-react'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { createClient } from '@/lib/supabase/server'
 
@@ -13,6 +13,15 @@ const LandingFeatures = dynamic(() => import('./_components/LandingFeatures').th
 const LandingBenefits = dynamic(() => import('./_components/LandingBenefits').then(mod => ({ default: mod.LandingBenefits })), {
   loading: () => <div className="h-24 animate-pulse bg-gray-100" />
 })
+
+const FEATURES = [
+  { icon: FileText, title: 'Quick Invoice Creation', desc: 'Create professional invoices in under 60 seconds', color: 'emerald' },
+  { icon: IndianRupee, title: 'GST Compliant', desc: 'Automatic GST calculations with GSTIN support', color: 'blue' },
+  { icon: Users, title: 'Customer Management', desc: 'Store and organize all customer details securely', color: 'purple' },
+  { icon: CheckCircle, title: 'Custom Branding', desc: 'Add logo, fonts, and colors to match your brand', color: 'orange' },
+  { icon: RefreshCw, title: 'Recurring Billing', desc: 'Set up automatic invoices for repeat clients', color: 'teal' },
+  { icon: Clock, title: 'Payment Reminders', desc: 'Automated reminders for due and overdue payments', color: 'rose' },
+] as const
 
 const BENEFITS = [
   'No credit card required',
