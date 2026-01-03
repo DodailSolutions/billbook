@@ -171,8 +171,9 @@ export function InvoiceForm({ customers, invoice, mode = 'create' }: InvoiceForm
 
                 <div className="space-y-3">
                     {items.map((item, index) => (
-                        <div key={index} className="flex gap-2 items-start">
+                        <div key={index} className="border rounded-lg p-3 space-y-3 md:space-y-0 md:flex md:gap-2 md:items-start">
                             <div className="flex-1 space-y-2">
+                                <label className="text-xs text-gray-600 dark:text-gray-400 md:hidden">Description</label>
                                 <Input
                                     placeholder="Description"
                                     value={item.description}
@@ -180,29 +181,34 @@ export function InvoiceForm({ customers, invoice, mode = 'create' }: InvoiceForm
                                     required
                                 />
                             </div>
-                            <div className="w-24 space-y-2">
-                                <Input
-                                    type="number"
-                                    placeholder="Qty"
-                                    min="0"
-                                    step="0.01"
-                                    value={item.quantity}
-                                    onChange={(e) => updateItem(index, 'quantity', parseFloat(e.target.value) || 0)}
-                                    required
-                                />
+                            <div className="grid grid-cols-2 gap-2 md:flex md:gap-2">
+                                <div className="w-full md:w-24 space-y-2">
+                                    <label className="text-xs text-gray-600 dark:text-gray-400 md:hidden">Quantity</label>
+                                    <Input
+                                        type="number"
+                                        placeholder="Qty"
+                                        min="0"
+                                        step="0.01"
+                                        value={item.quantity}
+                                        onChange={(e) => updateItem(index, 'quantity', parseFloat(e.target.value) || 0)}
+                                        required
+                                    />
+                                </div>
+                                <div className="w-full md:w-32 space-y-2">
+                                    <label className="text-xs text-gray-600 dark:text-gray-400 md:hidden">Price</label>
+                                    <Input
+                                        type="number"
+                                        placeholder="Price"
+                                        min="0"
+                                        step="0.01"
+                                        value={item.unit_price}
+                                        onChange={(e) => updateItem(index, 'unit_price', parseFloat(e.target.value) || 0)}
+                                        required
+                                    />
+                                </div>
                             </div>
-                            <div className="w-32 space-y-2">
-                                <Input
-                                    type="number"
-                                    placeholder="Price"
-                                    min="0"
-                                    step="0.01"
-                                    value={item.unit_price}
-                                    onChange={(e) => updateItem(index, 'unit_price', parseFloat(e.target.value) || 0)}
-                                    required
-                                />
-                            </div>
-                            <div className="w-32 flex items-center justify-end">
+                            <div className="flex items-center justify-between md:w-32 md:justify-end md:pt-2">
+                                <span className="text-sm text-gray-600 dark:text-gray-400 md:hidden">Total:</span>
                                 <span className="text-sm font-medium">
                                     ₹{(item.quantity * item.unit_price).toFixed(2)}
                                 </span>
@@ -213,7 +219,7 @@ export function InvoiceForm({ customers, invoice, mode = 'create' }: InvoiceForm
                                 size="icon"
                                 onClick={() => removeItem(index)}
                                 disabled={items.length === 1}
-                                className="text-destructive hover:text-destructive"
+                                className="text-destructive hover:text-destructive md:mt-2"
                             >
                                 <Trash2 className="h-4 w-4" />
                             </Button>
