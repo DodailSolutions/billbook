@@ -63,7 +63,6 @@ export default async function Home() {
           </div>
         </div>
       </nav>
-      </nav>
 
       {/* Hero Section */}
       <section className="px-6 py-16 md:py-24 max-w-7xl mx-auto">
