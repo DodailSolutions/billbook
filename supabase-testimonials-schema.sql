@@ -45,4 +45,10 @@ INSERT INTO public.testimonials (name, company, role, content, rating, display_o
   ('Amit Patel', 'Patel Traders', 'Managing Director', 'The free plan is generous and the paid plans are very affordable. Perfect for small businesses like ours.', 5, 3, true),
   ('Sneha Reddy', 'Reddy Designs', 'Creative Director', 'Love the customization options! Our invoices now match our brand perfectly. Great tool!', 5, 4, true),
   ('Vikram Singh', 'Singh Logistics', 'Operations Manager', 'Payment tracking and automated reminders have improved our cash flow significantly. Worth every rupee!', 5, 5, true),
-  ('Meena Iyer', 'Iyer & Co', 'Partner', 'Cloud-based solution means I can create invoices from anywhere. The mobile experience is excellent too!', 5, 6, true);
+  ('Meena Iyer', 'Iyer & Co', 'Partner', 'Cloud-based solution means I can create invoices from anywhere. The mobile experience is excellent too!', 5, 6, true),
+  ('Arjun Mehta', 'Mehta Electronics', 'Owner', 'Finally found an invoicing tool that understands Indian business needs. GST calculations are spot-on!', 5, 7, true),
+  ('Kavita Gupta', 'Gupta Fashion', 'Founder & Designer', 'The recurring invoice feature saves me hours every month. Absolutely fantastic for subscription-based services!', 5, 8, true),
+  ('Sanjay Desai', 'Desai Constructions', 'Project Manager', 'Professional invoices with my company logo make such a difference. Clients are impressed!', 5, 9, true),
+  ('Neha Kapoor', 'Kapoor Digital Marketing', 'CEO', 'Customer support is outstanding! They helped me set up everything in minutes. Highly satisfied!', 5, 10, true),
+  ('Rahul Nair', 'Nair Tech Solutions', 'Director', 'The analytics dashboard helps me track all payments effortlessly. This is exactly what my business needed!', 5, 11, true),
+  ('Divya Srinivasan', 'Srinivasan Interiors', 'Interior Designer', 'Beautiful invoice templates and easy customization. My clients love the professional look!', 5, 12, true);

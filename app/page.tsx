@@ -2,7 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
 import { Button } from '@/components/ui/Button'
-import { FileText, Users, IndianRupee, Zap, CheckCircle, Shield, TrendingUp, RefreshCw, Clock } from 'lucide-react'
+import { FileText, Users, IndianRupee, Zap, CheckCircle, Shield, TrendingUp, RefreshCw, Clock, Building2 } from 'lucide-react'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { createClient } from '@/lib/supabase/server'
 import { FAQSection } from './_components/FAQSection'
@@ -736,76 +736,175 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* SEO Content Section */}
-      <section className="px-6 py-16 bg-white border-t border-gray-100">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-            Why Choose BillBooky - The Best Free Invoice Generator in India?
-          </h2>
-          
-          <div className="prose prose-emerald max-w-none">
-            <p className="text-gray-700 leading-relaxed mb-6">
-              <strong>BillBooky</strong> is India's leading <strong>free invoice generator</strong> designed specifically for Indian businesses, freelancers, and MSMEs. Whether you're a small business owner, consultant, freelancer, or startup, our platform makes creating <strong>GST-compliant invoices</strong> effortless and completely free.
+      {/* SEO Content Section - Why Choose BillBooky */}
+      <section className="px-6 py-20 md:py-32 bg-linear-to-b from-white to-gray-50">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-16">
+            <span className="inline-block px-4 py-1.5 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full text-sm font-medium mb-4">
+              Why Choose Us
+            </span>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+              India's #1 Free Invoice Generator
+            </h2>
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+              Built specifically for Indian businesses, trusted by 10,000+ MSMEs, freelancers, and startups across India
             </p>
-            
-            <h3 className="text-2xl font-bold text-gray-900 mt-8 mb-4">
-              Free Invoice Generator for Every Business Size
-            </h3>
-            <p className="text-gray-700 leading-relaxed mb-6">
-              From solo entrepreneurs to growing enterprises, BillBooky's <strong>invoice creator</strong> serves businesses across all sectors in India. Generate unlimited professional invoices with GST calculations, customizable templates, and instant PDF downloads - all at <strong>₹0 cost forever</strong>. Our invoice maker is trusted by thousands of Indian businesses for its simplicity and reliability.
-            </p>
-            
-            <h3 className="text-2xl font-bold text-gray-900 mt-8 mb-4">
-              GST-Compliant Billing Software - Made in India
-            </h3>
-            <p className="text-gray-700 leading-relaxed mb-6">
-              Built specifically for the Indian market, BillBooky ensures <strong>100% GST compliance</strong> with automatic tax calculations (CGST, SGST, IGST). Our <strong>invoice billing software</strong> includes features like GSTIN validation, HSN/SAC codes, reverse charge mechanism, and e-way bill support. Create tax invoices that meet all Indian tax regulations effortlessly.
-            </p>
-            
-            <h3 className="text-2xl font-bold text-gray-900 mt-8 mb-4">
-              Features That Make Us the Best Invoice Software in India
-            </h3>
-            <ul className="list-disc list-inside text-gray-700 space-y-2 mb-6">
-              <li><strong>100% Free Forever</strong> - No hidden charges, no credit card required</li>
-              <li><strong>GST-Compliant Invoicing</strong> - Automatic tax calculations for Indian businesses</li>
-              <li><strong>Custom Invoice Templates</strong> - Add your logo, customize colors and fonts</li>
-              <li><strong>Instant PDF Generation</strong> - Download and send invoices immediately</li>
-              <li><strong>Customer Management</strong> - Store and manage all your client details</li>
-              <li><strong>Recurring Invoices</strong> - Automate invoices for subscription businesses</li>
-              <li><strong>Payment Tracking</strong> - Monitor paid and pending invoices</li>
-              <li><strong>Multi-Language Support</strong> - Create invoices in Hindi, English, and regional languages</li>
-              <li><strong>Mobile Friendly</strong> - Create invoices on-the-go from any device</li>
-            </ul>
-            
-            <h3 className="text-2xl font-bold text-gray-900 mt-8 mb-4">
-              Perfect for Indian MSMEs, Freelancers & Startups
-            </h3>
-            <p className="text-gray-700 leading-relaxed mb-6">
-              BillBooky is designed for the Indian market - whether you run a <strong>retail shop in Mumbai</strong>, a <strong>consulting firm in Delhi</strong>, a <strong>software company in Bangalore</strong>, or work as a <strong>freelancer in Pune</strong>. Our <strong>billing software</strong> supports all types of businesses: services, retail, wholesale, manufacturing, consulting, and more.
-            </p>
-            
-            <h3 className="text-2xl font-bold text-gray-900 mt-8 mb-4">
-              Made in India, For India 🇮🇳
-            </h3>
-            <p className="text-gray-700 leading-relaxed mb-6">
-              As a <strong>proudly Indian product</strong>, BillBooky understands the unique needs of Indian businesses. We support Indian rupee (₹) as default currency, include all GST slab rates, provide Hindi and regional language support, and ensure data storage complies with Indian regulations. Join the Digital India movement with our free invoice software.
-            </p>
-            
-            <h3 className="text-2xl font-bold text-gray-900 mt-8 mb-4">
-              Start Creating Professional Invoices in 60 Seconds
-            </h3>
-            <p className="text-gray-700 leading-relaxed mb-6">
-              No complicated setup, no lengthy tutorials. Just sign up for free, add your business details, and start generating professional invoices instantly. Our <strong>online invoice generator</strong> is so simple, anyone can use it - no accounting knowledge required.
-            </p>
-            
-            <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-6 mt-8">
-              <p className="text-emerald-900 font-semibold text-center">
-                🎉 Join 10,000+ Indian businesses using BillBooky as their trusted invoice generator. Start for FREE today!
+          </div>
+
+          {/* Key Benefits Grid */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-lg transition-all duration-200">
+              <div className="inline-flex p-3 bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600 rounded-xl mb-4">
+                <IndianRupee className="h-6 w-6" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                100% Free Forever
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                No hidden charges, no credit card required. Create up to 300 invoices absolutely free. Premium plans start at just ₹299/month for unlimited invoices.
               </p>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-lg transition-all duration-200">
+              <div className="inline-flex p-3 bg-blue-100 dark:bg-blue-500/10 text-blue-600 rounded-xl mb-4">
+                <CheckCircle className="h-6 w-6" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                GST Compliant
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                Automatic CGST, SGST, IGST calculations. Includes GSTIN validation, HSN/SAC codes, reverse charge mechanism, and full compliance with Indian tax laws.
+              </p>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-lg transition-all duration-200">
+              <div className="inline-flex p-3 bg-purple-100 dark:bg-purple-500/10 text-purple-600 rounded-xl mb-4">
+                <Zap className="h-6 w-6" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                Create in 60 Seconds
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                No complicated setup or lengthy tutorials. Sign up, add your business details, and generate professional invoices instantly. So simple, anyone can use it!
+              </p>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-lg transition-all duration-200">
+              <div className="inline-flex p-3 bg-orange-100 dark:bg-orange-500/10 text-orange-600 rounded-xl mb-4">
+                <Shield className="h-6 w-6" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                Secure & Reliable
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                Cloud-based with automatic backups. Your data is encrypted and stored securely. Access from anywhere, anytime on any device with bank-level security.
+              </p>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-lg transition-all duration-200">
+              <div className="inline-flex p-3 bg-teal-100 dark:bg-teal-500/10 text-teal-600 rounded-xl mb-4">
+                <RefreshCw className="h-6 w-6" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                Recurring Invoices
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                Perfect for subscription businesses. Automate monthly, quarterly, or yearly invoices. Set it once and never miss a billing cycle again.
+              </p>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-lg transition-all duration-200">
+              <div className="inline-flex p-3 bg-rose-100 dark:bg-rose-500/10 text-rose-600 rounded-xl mb-4">
+                <FileText className="h-6 w-6" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
+                Custom Branding
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                Add your company logo, choose custom colors and fonts. Make professional invoices that match your brand identity perfectly.
+              </p>
+            </div>
+          </div>
+
+          {/* Who It's For Section */}
+          <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 md:p-12 border border-gray-200 dark:border-gray-700 shadow-lg mb-16">
+            <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">
+              Perfect For Every Indian Business
+            </h3>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="text-center">
+                <div className="inline-flex p-4 bg-emerald-50 dark:bg-emerald-500/10 rounded-2xl mb-4">
+                  <Users className="h-8 w-8 text-emerald-600" />
+                </div>
+                <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Freelancers</h4>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Consultants, designers, developers, writers</p>
+              </div>
+              <div className="text-center">
+                <div className="inline-flex p-4 bg-blue-50 dark:bg-blue-500/10 rounded-2xl mb-4">
+                  <Building2 className="h-8 w-8 text-blue-600" />
+                </div>
+                <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Small Business</h4>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Retail shops, service providers, traders</p>
+              </div>
+              <div className="text-center">
+                <div className="inline-flex p-4 bg-purple-50 dark:bg-purple-500/10 rounded-2xl mb-4">
+                  <TrendingUp className="h-8 w-8 text-purple-600" />
+                </div>
+                <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Startups</h4>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Tech companies, SaaS, e-commerce</p>
+              </div>
+              <div className="text-center">
+                <div className="inline-flex p-4 bg-orange-50 dark:bg-orange-500/10 rounded-2xl mb-4">
+                  <Building2 className="h-8 w-8 text-orange-600" />
+                </div>
+                <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Enterprises</h4>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Manufacturing, wholesale, agencies</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Made in India Section */}
+          <div className="bg-linear-to-br from-emerald-600 to-teal-600 rounded-3xl p-8 md:p-12 text-white text-center">
+            <div className="max-w-3xl mx-auto">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-medium mb-6">
+                <span className="text-2xl">🇮🇳</span>
+                <span>Proudly Made in India</span>
+              </div>
+              <h3 className="text-3xl md:text-4xl font-bold mb-4">
+                Built for India, By Indians
+              </h3>
+              <p className="text-xl text-emerald-50 mb-8">
+                Supporting Indian rupee (₹), all GST slabs, Hindi & regional languages. Data stored in India complying with all regulations. Join the Digital India movement!
+              </p>
+              <div className="flex flex-wrap justify-center gap-4 text-emerald-50">
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5" />
+                  <span>₹ INR Currency</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5" />
+                  <span>GST Compliant</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5" />
+                  <span>Hindi Support</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5" />
+                  <span>India Servers</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
+
+      {/* Testimonial Section */}
+      <TestimonialCarousel />
+
+      {/* FAQ Section */}
+      <FAQSection />
 
       {/* Footer */}
       <footer className="border-t border-gray-200 bg-gray-50">
@@ -867,12 +966,6 @@ export default async function Home() {
           </div>
         </div>
       </footer>
-
-      {/* Testimonial Section */}
-      <TestimonialCarousel />
-
-      {/* FAQ Section */}
-      <FAQSection />
     </div>
   )
 }
