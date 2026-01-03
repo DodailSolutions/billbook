@@ -88,18 +88,8 @@ export function SignupForm({ selectedPlan, message }: SignupFormProps) {
             formElement.append(key, value)
         })
 
-        try {
-            await signup(formElement)
-            // If we reach here without redirect, something went wrong
-        } catch (error) {
-            // Don't catch NEXT_REDIRECT - let it propagate for the redirect to work
-            if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
-                throw error
-            }
-            console.error('Signup error:', error)
-            alert('Failed to create account. Please try again.')
-            setIsSubmitting(false)
-        }
+        // Call the server action - it handles redirects internally
+        await signup(formElement)
     }
 
     return (
@@ -197,11 +187,15 @@ export function SignupForm({ selectedPlan, message }: SignupFormProps) {
                                         id="email" 
                                         name="email" 
                                         type="email" 
-                                        placeholder="john@example.com"
+                                        placeholder="your.email@example.com"
                                         value={formData.email}
                                         onChange={handleInputChange}
-                                        required 
+                                        required
+                                        className={formData.email && !formData.email.includes('@') ? 'border-red-500' : ''}
                                     />
+                                    {formData.email && !formData.email.includes('@') && formData.email.length > 0 && (
+                                        <p className="text-xs text-red-500">Please enter a valid email address</p>
+                                    )}
                                 </div>
                                 <div className="space-y-2">
                                     <label htmlFor="password" className="text-sm font-medium leading-none">
@@ -211,12 +205,20 @@ export function SignupForm({ selectedPlan, message }: SignupFormProps) {
                                         id="password" 
                                         name="password" 
                                         type="password"
+                                        placeholder="Create a strong password"
                                         value={formData.password}
                                         onChange={handleInputChange}
                                         minLength={6} 
-                                        required 
+                                        required
+                                        className={formData.password && formData.password.length < 6 ? 'border-red-500' : ''}
                                     />
-                                    <p className="text-xs text-gray-500">Minimum 6 characters</p>
+                                    <p className="text-xs text-gray-500">
+                                        {formData.password && formData.password.length > 0 && formData.password.length < 6 ? (
+                                            <span className="text-red-500">Password must be at least 6 characters</span>
+                                        ) : (
+                                            'Minimum 6 characters'
+                                        )}
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -449,16 +451,19 @@ export function SignupForm({ selectedPlan, message }: SignupFormProps) {
                             <Button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
+                                className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-50 disabled:cursor-not-allowed min-w-[200px] justify-center"
                             >
                                 {isSubmitting ? (
                                     <>
-                                        <span className="animate-spin">⏳</span>
+                                        <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
                                         Creating Account...
                                     </>
                                 ) : (
                                     <>
-                                        {selectedPlan !== 'free' ? 'Create Account & Proceed' : 'Create Free Account'}
+                                        Create Free Account
                                         <Check className="w-4 h-4" />
                                     </>
                                 )}
