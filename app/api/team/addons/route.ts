@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import Razorpay from 'razorpay'
 
 export const runtime = 'nodejs'
 
@@ -106,7 +107,6 @@ export async function POST(request: Request) {
     const amountInRupees = totalAmount / 100
 
     // Create Razorpay order
-    const Razorpay = require('razorpay')
     const razorpay = new Razorpay({
       key_id: process.env.RAZORPAY_KEY_ID!,
       key_secret: process.env.RAZORPAY_KEY_SECRET!

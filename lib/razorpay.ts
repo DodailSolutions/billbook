@@ -149,6 +149,26 @@ export function verifyPaymentSignature(
 }
 
 /**
+ * Load Razorpay SDK script dynamically
+ */
+export function loadRazorpayScript(): Promise<boolean> {
+    return new Promise((resolve) => {
+        // Check if script already loaded
+        if (typeof window !== 'undefined' && (window as any).Razorpay) {
+            resolve(true)
+            return
+        }
+
+        const script = document.createElement('script')
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js'
+        script.async = true
+        script.onload = () => resolve(true)
+        script.onerror = () => resolve(false)
+        document.body.appendChild(script)
+    })
+}
+
+/**
  * Fetch payment details from Razorpay
  */
 export async function fetchPaymentDetails(paymentId: string): Promise<RazorpayPayment> {

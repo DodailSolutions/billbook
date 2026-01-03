@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Plus, Loader2, Check, Calendar, Users } from 'lucide-react'
 import { loadRazorpayScript } from '@/lib/razorpay'
 
@@ -88,7 +88,7 @@ export function PurchaseAddonModal({ isLifetimePlan, currentSlots, onSuccess }: 
         name: 'BillBook',
         description: `${quantity} Additional Team Member${quantity > 1 ? 's' : ''} - ${selectedPeriod === 'yearly' ? 'Yearly' : 'Monthly'}`,
         order_id: orderData.order_id,
-        handler: async function (response: any) {
+        handler: async function (response: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) {
           // Verify payment
           const verifyResponse = await fetch('/api/team/addons/verify', {
             method: 'POST',
@@ -128,7 +128,9 @@ export function PurchaseAddonModal({ isLifetimePlan, currentSlots, onSuccess }: 
         }
       }
 
-      const razorpay = new (window as any).Razorpay(options)
+      const razorpay = new (window as Window & { 
+        Razorpay: new (options: unknown) => { open: () => void } 
+      }).Razorpay(options)
       razorpay.open()
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'An error occurred')
