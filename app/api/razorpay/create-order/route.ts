@@ -18,9 +18,23 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Invalid amount' }, { status: 400 })
         }
 
+        // Verify Razorpay credentials
+        const keyId = process.env.RAZORPAY_KEY_ID
+        const keySecret = process.env.RAZORPAY_KEY_SECRET
+
+        if (!keyId || !keySecret) {
+            console.error('Razorpay credentials missing:', { keyId: !!keyId, keySecret: !!keySecret })
+            return NextResponse.json(
+                { error: 'Payment service not configured' },
+                { status: 500 }
+            )
+        }
+
         // Create Razorpay order
+        console.log('Creating Razorpay order with amount:', amount * 100, 'paise')
+        
         const razorpay = getRazorpayInstance()
-        const order = await razorpay.orders.create({
+        const orderOptions = {
             amount: amount * 100, // Razorpay expects amount in paise
             currency,
             receipt: `subscription_${Date.now()}`,
@@ -29,13 +43,26 @@ export async function POST(request: NextRequest) {
                 user_email: user.email || '',
                 ...notes
             }
-        })
+        }
+        
+        console.log('Order options:', JSON.stringify(orderOptions, null, 2))
+        
+        const order = await razorpay.orders.create(orderOptions)
+        
+        console.log('Order created successfully:', order.id)
 
         return NextResponse.json({ order }, { status: 200 })
     } catch (error) {
         console.error('Error creating Razorpay order:', error)
+        
+        // Log detailed error information
+        if (error && typeof error === 'object') {
+            console.error('Error details:', JSON.stringify(error, null, 2))
+        }
+        
+        const errorMessage = error instanceof Error ? error.message : 'Failed to create order'
         return NextResponse.json(
-            { error: 'Failed to create order' },
+            { error: errorMessage, details: error },
             { status: 500 }
         )
     }
