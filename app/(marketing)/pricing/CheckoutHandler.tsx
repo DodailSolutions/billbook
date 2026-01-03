@@ -40,7 +40,7 @@ export function CheckoutHandler() {
     const checkoutPlan = searchParams.get('checkout')
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
-    const [userInfo, setUserInfo] = useState({ name: '', email: '' })
+    const [userInfo, setUserInfo] = useState({ name: '', email: '', contact: '' })
 
     useEffect(() => {
         const fetchUserInfo = async () => {
@@ -48,16 +48,17 @@ export function CheckoutHandler() {
             const { data: { user } } = await supabase.auth.getUser()
             
             if (user) {
-                // Fetch user profile for name
+                // Fetch user profile for name and phone
                 const { data: profile } = await supabase
                     .from('user_profiles')
-                    .select('owner_name, business_name')
+                    .select('owner_name, business_name, business_phone')
                     .eq('id', user.id)
                     .single()
 
                 setUserInfo({
                     name: profile?.owner_name || profile?.business_name || user.email?.split('@')[0] || '',
-                    email: user.email || ''
+                    email: user.email || '',
+                    contact: profile?.business_phone || ''
                 })
             }
         }
@@ -127,6 +128,7 @@ export function CheckoutHandler() {
                 prefill: {
                     name: userInfo.name,
                     email: userInfo.email,
+                    contact: userInfo.contact,
                 },
                 theme: {
                     color: '#10b981'
