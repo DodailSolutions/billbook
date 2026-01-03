@@ -401,26 +401,7 @@ DROP TRIGGER IF EXISTS update_support_tickets_updated_at ON support_tickets;
 CREATE TRIGGER update_support_tickets_updated_at BEFORE UPDATE ON support_tickets
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-DROP TRIGGER IF EXISTS update_system_settings_updated_at ON system_settings;    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_subscription_plans_updated_at BEFORE UPDATE ON subscription_plans
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_user_subscriptions_updated_at BEFORE UPDATE ON user_subscriptions
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_coupons_updated_at BEFORE UPDATE ON coupons
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_payments_updated_at BEFORE UPDATE ON payments
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_refunds_updated_at BEFORE UPDATE ON refunds
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_support_tickets_updated_at BEFORE UPDATE ON support_tickets
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
+DROP TRIGGER IF EXISTS update_system_settings_updated_at ON system_settings;
 CREATE TRIGGER update_system_settings_updated_at BEFORE UPDATE ON system_settings
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
