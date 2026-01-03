@@ -71,6 +71,16 @@ export default async function Home() {
             </div>
             
             <h2 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white leading-tight">
+              Professional Invoicing
+              <span className="block text-emerald-600 dark:text-emerald-400 mt-2">Made Simple</span>
+            </h2>
+            
+            <p className="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
+              Create GST-compliant invoices, manage customers, and get paid faster. 
+              Built specifically for Indian small businesses and freelancers.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4">
               {isAuthenticated ? (
                 <>
                   <Link href="/dashboard">
@@ -113,7 +123,6 @@ export default async function Home() {
                 </>
               )}
             </div>
-          </div>
 
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 pt-4">
               {BENEFITS.map((benefit) => (
