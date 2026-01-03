@@ -111,18 +111,9 @@ export default async function Home() {
                     </Button>
                   </Link>
                 </>
-              )}ton>
-              </Link>
-              <Link href="#features">
-                <Button 
-                  size="lg" 
-                  variant="secondary"
-                  className="bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 px-8 text-base"
-                >
-                  See Features
-                </Button>
-              </Link>
+              )}
             </div>
+          </div>
 
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 pt-4">
               {BENEFITS.map((benefit) => (
