@@ -280,7 +280,7 @@ export default async function Home() {
             {/* Free Plan */}
             <div className={`bg-white border-2 rounded-2xl p-8 hover:shadow-xl transition-all ${
               currentPlan === 'free' 
-                ? 'border-emerald-500 bg-gradient-to-br from-emerald-50 to-teal-50 shadow-xl ring-2 ring-emerald-400/50 relative' 
+                ? 'border-emerald-500 bg-linear-to-br from-emerald-50 to-teal-50 shadow-xl ring-2 ring-emerald-400/50 relative' 
                 : 'border-gray-200'
             }`}>
               {currentPlan === 'free' && (
@@ -338,7 +338,7 @@ export default async function Home() {
             {/* Starter Plan */}
             <div className={`bg-white border-2 rounded-2xl p-8 hover:shadow-xl transition-all relative ${
               currentPlan === 'starter' 
-                ? 'border-emerald-500 bg-gradient-to-br from-emerald-50 to-teal-50 shadow-xl ring-2 ring-emerald-400/50' 
+                ? 'border-emerald-500 bg-linear-to-br from-emerald-50 to-teal-50 shadow-xl ring-2 ring-emerald-400/50' 
                 : 'border-emerald-600'
             }`}>
               {currentPlan === 'starter' ? (
@@ -403,7 +403,7 @@ export default async function Home() {
             {/* Professional Plan */}
             <div className={`bg-white border-2 rounded-2xl p-8 hover:shadow-xl transition-all ${
               currentPlan === 'professional' 
-                ? 'border-emerald-500 bg-gradient-to-br from-emerald-50 to-teal-50 shadow-xl ring-2 ring-emerald-400/50 relative' 
+                ? 'border-emerald-500 bg-linear-to-br from-emerald-50 to-teal-50 shadow-xl ring-2 ring-emerald-400/50 relative' 
                 : 'border-gray-200'
             }`}>
               {currentPlan === 'professional' && (
