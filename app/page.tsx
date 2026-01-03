@@ -512,7 +512,7 @@ export default function Home() {
                   </Button>
                 </Link>
                 <Link href="/contact" className="flex-1">
-                  <Button variant="secondary" className="w-full border-white/20 text-white hover:bg-white/10">
+                  <Button variant="secondary" className="w-full bg-white/10 border-2 border-white/30 text-white hover:bg-white/20 font-semibold px-8">
                     Contact Sales
                   </Button>
                 </Link>
