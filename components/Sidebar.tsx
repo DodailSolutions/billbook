@@ -73,8 +73,8 @@ export function Sidebar() {
 
     return (
         <div className="space-y-4 py-4 flex flex-col h-full bg-linear-to-b from-slate-900 to-slate-800 text-white border-r border-slate-700">
-            <div className="px-3 py-2 flex-1">
-                <Link href="/dashboard" className="flex items-center pl-3 mb-14 gap-3 group">
+            <div className="px-3 py-2 flex-1 overflow-y-auto">
+                <Link href="/dashboard" className="flex items-center pl-3 mb-8 gap-3 group">
                     <div className="relative w-10 h-10 shrink-0">
                         <Image 
                             src="/logo-icon.svg" 
@@ -116,7 +116,7 @@ export function Sidebar() {
                     ))}
                 </div>
             </div>
-            <div className="px-3 pb-2 space-y-2">
+            <div className="px-3 pb-4 space-y-2 shrink-0">
                 <PlanBanner />
                 <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
                     <span className="text-sm text-zinc-400">Theme</span>
