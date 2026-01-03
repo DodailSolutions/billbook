@@ -39,7 +39,8 @@ export function CheckoutHandler() {
     const router = useRouter()
     const checkoutPlan = searchParams.get('checkout')
     const [loading, setLoading] = useState(false)
-    const [error, setError] = useState<string | null>(null)    const [userInfo, setUserInfo] = useState<{ name: string; email: string } | null>(null)
+    const [error, setError] = useState<string | null>(null)
+    const [userInfo, setUserInfo] = useState({ name: '', email: '' })
 
     useEffect(() => {
         const fetchUserInfo = async () => {
@@ -50,13 +51,13 @@ export function CheckoutHandler() {
                 // Fetch user profile for name
                 const { data: profile } = await supabase
                     .from('user_profiles')
-                    .select('full_name, business_name')
-                    .eq('user_id', user.id)
+                    .select('name, email')
+                    .eq('id', user.id)
                     .single()
 
                 setUserInfo({
-                    name: profile?.full_name || profile?.business_name || user.email?.split('@')[0] || '',
-                    email: user.email || ''
+                    name: profile?.name || user.email?.split('@')[0] || '',
+                    email: profile?.email || user.email || ''
                 })
             }
         }
@@ -96,26 +97,6 @@ export function CheckoutHandler() {
             const { order } = await response.json()
 
             // Load Razorpay checkout
-            interface RazorpayOptions {
-                key: string | undefined
-                amount: number
-                currency: string
-                name: string
-                description: string
-                order_id: string
-                handler: (response: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) => Promise<void>
-                prefill: {
-                    name: string
-                    email: string
-                }
-                theme: {
-                    color: string
-                }
-                modal: {
-                    ondismiss: () => void
-                }
-            }
-
             const options: RazorpayOptions = {
                 key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
                 amount: order.amount,
@@ -144,8 +125,8 @@ export function CheckoutHandler() {
                     }
                 },
                 prefill: {
-                    name: userInfo?.name || '',
-                    email: userInfo?.email || '',
+                    name: userInfo.name,
+                    email: userInfo.email,
                 },
                 theme: {
                     color: '#10b981'
