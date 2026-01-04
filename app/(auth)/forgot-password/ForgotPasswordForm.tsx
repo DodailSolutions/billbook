@@ -23,11 +23,13 @@ export function ForgotPasswordForm({ message }: ForgotPasswordFormProps) {
             const formData = new FormData(e.currentTarget)
             await resetPassword(formData)
         } catch (error) {
+            // NEXT_REDIRECT is expected behavior - it means the redirect is working
+            if (error && typeof error === 'object' && 'digest' in error && 
+                String(error.digest).includes('NEXT_REDIRECT')) {
+                // This is a Next.js redirect, which is expected
+                return
+            }
             console.error('Form submission error:', error)
-            // Error handling is done in the server action via redirects
-        } finally {
-            // Note: setIsSubmitting(false) might not execute if redirect happens
-            // This is expected behavior with Next.js server actions
         }
     }
 
