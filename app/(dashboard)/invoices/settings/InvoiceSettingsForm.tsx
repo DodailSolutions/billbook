@@ -148,7 +148,7 @@ export default function InvoiceSettingsForm({ initialSettings, onPreviewUpdate }
         companyFontFamily, companyFontSize, companyNameColor, companyFontWeight,
         companyDetailsFontFamily, companyDetailsFontSize, companyDetailsColor,
         termsFontFamily, termsFontSize,
-        invoiceFontFamily, invoiceFontSize, onPreviewUpdate
+        invoiceFontFamily, invoiceFontSize, qrCodePreview, showQrCode, onPreviewUpdate
     ])
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -172,6 +172,11 @@ export default function InvoiceSettingsForm({ initialSettings, onPreviewUpdate }
                 company_font_size: companyFontSize,
                 company_name_color: companyNameColor,
                 company_font_weight: companyFontWeight,
+                company_details_font_family: companyDetailsFontFamily,
+                company_details_font_size: companyDetailsFontSize,
+                company_details_color: companyDetailsColor,
+                terms_font_family: termsFontFamily,
+                terms_font_size: termsFontSize,
                 invoice_font_family: invoiceFontFamily,
                 invoice_font_size: invoiceFontSize,
                 invoice_prefix: invoicePrefix || 'INV',
