@@ -156,13 +156,17 @@ export default function InvoiceSettingsForm({ initialSettings, onPreviewUpdate }
         setIsLoading(true)
 
         try {
+            // Normalize empty strings to undefined and validate base64 strings
+            const normalizedLogoUrl = logoUrl && logoUrl.trim() && logoUrl.startsWith('data:image') ? logoUrl : undefined
+            const normalizedQrCodeUrl = qrCodeUrl && qrCodeUrl.trim() && qrCodeUrl.startsWith('data:image') ? qrCodeUrl : undefined
+
             await saveInvoiceSettings({
                 company_name: companyName || undefined,
                 company_email: companyEmail || undefined,
                 company_phone: companyPhone || undefined,
                 company_address: companyAddress || undefined,
                 company_gstin: companyGstin || undefined,
-                company_logo_url: logoUrl || undefined,
+                company_logo_url: normalizedLogoUrl,
                 logo_size: logoSize,
                 company_font_family: companyFontFamily,
                 company_font_size: companyFontSize,
@@ -179,7 +183,7 @@ export default function InvoiceSettingsForm({ initialSettings, onPreviewUpdate }
                 show_logo: showLogo,
                 show_company_details: showCompanyDetails,
                 show_gstin: showGstin,
-                payment_qr_code_url: qrCodeUrl || undefined,
+                payment_qr_code_url: normalizedQrCodeUrl,
                 show_qr_code: showQrCode
             })
 

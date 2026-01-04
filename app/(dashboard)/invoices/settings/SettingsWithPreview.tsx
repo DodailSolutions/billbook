@@ -9,13 +9,20 @@ interface SettingsWithPreviewProps {
 }
 
 export default function SettingsWithPreview({ initialSettings }: SettingsWithPreviewProps) {
+    // Validate and normalize logo/QR code URLs
+    const normalizeImageUrl = (url: string | undefined) => {
+        if (!url || !url.trim()) return ''
+        if (url.startsWith('data:image')) return url
+        return '' // Invalid format, return empty string
+    }
+
     const [previewSettings, setPreviewSettings] = useState({
         company_name: initialSettings?.company_name || '',
         company_email: initialSettings?.company_email || '',
         company_phone: initialSettings?.company_phone || '',
         company_address: initialSettings?.company_address || '',
         company_gstin: initialSettings?.company_gstin || '',
-        company_logo_url: initialSettings?.company_logo_url || '',
+        company_logo_url: normalizeImageUrl(initialSettings?.company_logo_url),
         logo_size: initialSettings?.logo_size || 'medium',
         company_font_family: initialSettings?.company_font_family || 'Arial',
         company_font_size: initialSettings?.company_font_size || 24,
@@ -36,7 +43,7 @@ export default function SettingsWithPreview({ initialSettings }: SettingsWithPre
         show_company_details: initialSettings?.show_company_details ?? true,
         show_gstin: initialSettings?.show_gstin ?? true,
         show_logo: initialSettings?.show_logo ?? true,
-        payment_qr_code_url: initialSettings?.payment_qr_code_url || '',
+        payment_qr_code_url: normalizeImageUrl(initialSettings?.payment_qr_code_url),
         show_qr_code: initialSettings?.show_qr_code ?? true,
     })
 

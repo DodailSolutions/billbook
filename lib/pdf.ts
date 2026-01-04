@@ -219,9 +219,9 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
     <div class="invoice-container">
         <div class="header">
             <div class="company-info">
-                ${showLogo && companyLogoUrl ? `
+                ${showLogo && companyLogoUrl && companyLogoUrl.trim() && companyLogoUrl.startsWith('data:image') ? `
                 <div style="margin-bottom: 12px;">
-                    <img src="${companyLogoUrl}" alt="Company Logo" style="height: ${logoSize === 'large' ? '128px' : logoSize === 'small' ? '64px' : '96px'}; width: ${logoSize === 'large' ? '128px' : logoSize === 'small' ? '64px' : '96px'}; object-fit: contain;" />
+                    <img src="${companyLogoUrl}" alt="Company Logo" style="height: ${logoSize === 'large' ? '128px' : logoSize === 'small' ? '64px' : '96px'}; width: ${logoSize === 'large' ? '128px' : logoSize === 'small' ? '64px' : '96px'}; object-fit: contain;" onerror="this.style.display='none'" />
                 </div>
                 ` : ''}
                 <div class="company-name">${companyName}</div>

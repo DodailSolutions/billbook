@@ -63,7 +63,7 @@ export default function InvoicePreview({ settings }: InvoicePreviewProps) {
                 >
                     <div className="flex-1">
                         {/* Logo - centered and prominent */}
-                        {settings.show_logo && settings.company_logo_url && (() => {
+                        {settings.show_logo && settings.company_logo_url && settings.company_logo_url.trim() && settings.company_logo_url.startsWith('data:image') && (() => {
                             const sizeClasses = {
                                 small: 'h-16 w-16',
                                 medium: 'h-24 w-24',
@@ -77,6 +77,7 @@ export default function InvoicePreview({ settings }: InvoicePreviewProps) {
                                         src={settings.company_logo_url} 
                                         alt="Company Logo" 
                                         className={`${logoClass} object-contain`}
+                                        onError={(e) => { e.currentTarget.style.display = 'none' }}
                                     />
                                 </div>
                             )
@@ -225,7 +226,7 @@ export default function InvoicePreview({ settings }: InvoicePreviewProps) {
                 )}
 
                 {/* Payment QR Code */}
-                {settings.show_qr_code && settings.payment_qr_code_url && (
+                {settings.show_qr_code && settings.payment_qr_code_url && settings.payment_qr_code_url.trim() && settings.payment_qr_code_url.startsWith('data:image') && (
                     <div className="mb-6 pt-4 border-t">
                         <div 
                             className="text-sm font-semibold mb-3 text-center"
@@ -240,6 +241,7 @@ export default function InvoicePreview({ settings }: InvoicePreviewProps) {
                                 alt="Payment QR Code" 
                                 className="h-32 w-32 object-contain border-2 rounded-lg"
                                 style={{ borderColor: primary_color }}
+                                onError={(e) => { e.currentTarget.style.display = 'none' }}
                             />
                         </div>
                         <div className="text-center text-xs text-gray-500 mt-2">
