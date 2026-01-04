@@ -33,9 +33,14 @@ export default function LoginPage({ searchParams }: { searchParams: { message?: 
                         <Input id="email" name="email" type="email" placeholder="m@example.com" required />
                     </div>
                     <div className="space-y-2">
-                        <label htmlFor="password" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Password
-                        </label>
+                        <div className="flex items-center justify-between">
+                            <label htmlFor="password" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                Password
+                            </label>
+                            <Link href="/forgot-password" className="text-xs text-emerald-600 hover:underline">
+                                Forgot password?
+                            </Link>
+                        </div>
                         <Input id="password" name="password" type="password" required />
                     </div>
                     <Button type="submit" className="w-full">

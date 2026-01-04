@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { sendWelcomeEmail } from '@/lib/email'
 
 export async function login(formData: FormData) {
     try {
@@ -116,6 +117,18 @@ export async function signup(formData: FormData) {
             } else {
                 console.log('Profile created successfully')
             }
+
+            // Send welcome email (non-blocking)
+            try {
+                await sendWelcomeEmail({
+                    to: email,
+                    name: fullName || ownerName || email.split('@')[0]
+                })
+                console.log('Welcome email sent successfully')
+            } catch (emailError) {
+                console.error('Error sending welcome email:', emailError)
+                // Don't fail signup if email fails
+            }
         } catch (err) {
             console.error('Profile creation exception:', err)
             // Continue anyway - profile can be created later
@@ -142,4 +155,60 @@ export async function signout() {
     const supabase = await createClient()
     await supabase.auth.signOut()
     return redirect('/login')
+}
+
+export async function resetPassword(formData: FormData) {
+    try {
+        const supabase = await createClient()
+        const email = formData.get('email') as string
+
+        if (!email) {
+            return redirect('/forgot-password?message=' + encodeURIComponent('Email is required'))
+        }
+
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: `${process.env.NEXT_PUBLIC_APP_URL || 'https://billbooky.com'}/reset-password`
+        })
+
+        if (error) {
+            console.error('Password reset error:', error)
+            return redirect('/forgot-password?message=' + encodeURIComponent(error.message))
+        }
+
+        return redirect('/forgot-password?message=' + encodeURIComponent('Check your email for a password reset link'))
+    } catch (error) {
+        console.error('Password reset exception:', error)
+        const errorMessage = error instanceof Error ? error.message : 'An error occurred'
+        return redirect('/forgot-password?message=' + encodeURIComponent(errorMessage))
+    }
+}
+
+export async function updatePassword(formData: FormData) {
+    try {
+        const supabase = await createClient()
+        const password = formData.get('password') as string
+
+        if (!password) {
+            return redirect('/reset-password?message=' + encodeURIComponent('Password is required'))
+        }
+
+        if (password.length < 6) {
+            return redirect('/reset-password?message=' + encodeURIComponent('Password must be at least 6 characters'))
+        }
+
+        const { error } = await supabase.auth.updateUser({
+            password: password
+        })
+
+        if (error) {
+            console.error('Password update error:', error)
+            return redirect('/reset-password?message=' + encodeURIComponent(error.message))
+        }
+
+        return redirect('/login?message=' + encodeURIComponent('Password updated successfully! Please login with your new password.'))
+    } catch (error) {
+        console.error('Password update exception:', error)
+        const errorMessage = error instanceof Error ? error.message : 'An error occurred'
+        return redirect('/reset-password?message=' + encodeURIComponent(errorMessage))
+    }
 }

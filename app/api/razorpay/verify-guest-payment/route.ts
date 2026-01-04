@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import crypto from 'crypto'
+import { sendWelcomeEmail, sendPurchaseConfirmationEmail } from '@/lib/email'
 
 // Force Node.js runtime for crypto compatibility
 export const runtime = 'nodejs'
@@ -158,6 +159,27 @@ export async function POST(request: NextRequest) {
         } catch (err) {
             console.error('Error recording payment:', err)
             // Don't fail the request if payment recording fails
+        }
+
+        // Send welcome and purchase confirmation emails
+        try {
+            await Promise.all([
+                sendWelcomeEmail({
+                    to: email,
+                    name: fullName || ownerName || email.split('@')[0]
+                }),
+                sendPurchaseConfirmationEmail({
+                    to: email,
+                    name: fullName || ownerName || email.split('@')[0],
+                    plan: plan,
+                    amount: amount,
+                    paymentId: razorpay_payment_id
+                })
+            ])
+            console.log('Welcome and purchase confirmation emails sent successfully')
+        } catch (emailError) {
+            console.error('Error sending emails:', emailError)
+            // Don't fail the request if email sending fails
         }
 
         return NextResponse.json(
