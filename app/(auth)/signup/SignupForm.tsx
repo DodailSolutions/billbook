@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
@@ -45,6 +45,13 @@ export function SignupForm({ selectedPlan, message }: SignupFormProps) {
         gstin: '',
         selectedPlan: selectedPlan
     })
+
+    // Reset submitting state if there's an error message (means we've been redirected back)
+    useEffect(() => {
+        if (message) {
+            setIsSubmitting(false)
+        }
+    }, [message])
 
     const totalSteps = 3
     const progress = (currentStep / totalSteps) * 100
@@ -194,8 +201,15 @@ export function SignupForm({ selectedPlan, message }: SignupFormProps) {
 
             <CardContent>
                 {message && (
-                    <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-800 dark:text-red-200">
-                        {message}
+                    <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                        <p className="text-sm font-semibold text-red-800 dark:text-red-200 mb-2">
+                            {message}
+                        </p>
+                        {message.toLowerCase().includes('already') && (
+                            <p className="text-xs text-red-700 dark:text-red-300">
+                                Already have an account? <a href="/login" className="underline font-semibold hover:text-red-900 dark:hover:text-red-100">Login here</a>
+                            </p>
+                        )}
                     </div>
                 )}
 
