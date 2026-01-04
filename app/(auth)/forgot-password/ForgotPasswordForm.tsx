@@ -1,52 +1,56 @@
 'use client'
 
-import { useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Input } from '@/components/ui/Input'
-import { Mail, CheckCircle, AlertCircle, Loader2 } from 'lucide-react'
+import { Mail, CheckCircle, AlertCircle } from 'lucide-react'
 import { resetPassword } from '../actions'
+import { useFormStatus } from 'react-dom'
 
 interface ForgotPasswordFormProps {
     message?: string
 }
 
+function SubmitButton() {
+    const { pending } = useFormStatus()
+    const searchParams = useSearchParams()
+    const success = searchParams.get('success') === 'true'
+    
+    return (
+        <Button 
+            type="submit" 
+            className="w-full bg-emerald-600 hover:bg-emerald-700"
+            disabled={pending || success}
+        >
+            {pending ? (
+                <>
+                    <Mail className="h-4 w-4 mr-2 animate-pulse" />
+                    Sending Reset Link...
+                </>
+            ) : success ? (
+                <>
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Email Sent
+                </>
+            ) : (
+                'Send Reset Link'
+            )}
+        </Button>
+    )
+}
+
 export function ForgotPasswordForm({ message }: ForgotPasswordFormProps) {
     const searchParams = useSearchParams()
     
-    // Derive all state from URL params directly (no useEffect needed)
+    // Derive all state from URL params directly
     const errorParam = searchParams.get('error')
     const successParam = searchParams.get('success')
     const emailParam = searchParams.get('email')
     
     const error = errorParam ? decodeURIComponent(errorParam) : null
     const success = successParam === 'true'
-    
-    // Initialize email from URL param or empty string
-    const [email, setEmail] = useState(emailParam ? decodeURIComponent(emailParam) : '')
-    const [isSubmitting, setIsSubmitting] = useState(false)
-
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault()
-        setIsSubmitting(true)
-
-        // Client-side validation
-        if (!email.trim()) {
-            setIsSubmitting(false)
-            return
-        }
-
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-        if (!emailRegex.test(email)) {
-            setIsSubmitting(false)
-            return
-        }
-
-        // Submit form - server action handles all logic and redirects
-        const formData = new FormData(e.currentTarget)
-        await resetPassword(formData)
-    }
+    const email = emailParam ? decodeURIComponent(emailParam) : ''
 
     return (
         <Card className="max-w-md mx-auto">
@@ -109,7 +113,7 @@ export function ForgotPasswordForm({ message }: ForgotPasswordFormProps) {
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form action={resetPassword} className="space-y-4">
                     <div className="space-y-2">
                         <label htmlFor="email" className="text-sm font-medium leading-none">
                             Email Address
@@ -119,34 +123,15 @@ export function ForgotPasswordForm({ message }: ForgotPasswordFormProps) {
                             name="email" 
                             type="email" 
                             placeholder="your.email@example.com" 
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            disabled={isSubmitting || success}
+                            defaultValue={email}
+                            disabled={success}
                             required 
                             autoComplete="email"
                             className={error ? 'border-red-300' : ''}
                         />
                     </div>
 
-                    <Button 
-                        type="submit" 
-                        className="w-full bg-emerald-600 hover:bg-emerald-700"
-                        disabled={isSubmitting || success}
-                    >
-                        {isSubmitting ? (
-                            <>
-                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                Sending Reset Link...
-                            </>
-                        ) : success ? (
-                            <>
-                                <CheckCircle className="h-4 w-4 mr-2" />
-                                Email Sent
-                            </>
-                        ) : (
-                            'Send Reset Link'
-                        )}
-                    </Button>
+                    <SubmitButton />
                 </form>
 
                 <div className="mt-6 text-center">
