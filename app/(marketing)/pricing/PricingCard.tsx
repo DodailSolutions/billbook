@@ -116,13 +116,15 @@ export function PricingCard({
                         Current Plan ✓
                     </Button>
                 ) : (
-                    <Link href={getButtonLink()}>
-                        <Button className={`${buttonClass} text-sm sm:text-base transition-all duration-300 hover:scale-105 hover:shadow-lg ${isDeal ? 'text-white font-bold' : ''}`}>
+                    <Link href={getButtonLink()} className="block">
+                        <button 
+                            className={`${buttonClass} text-sm sm:text-base transition-all duration-300 hover:scale-105 hover:shadow-lg inline-flex items-center justify-center whitespace-nowrap rounded-lg font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 active:scale-95 h-11 px-8 ${isDeal ? 'text-white! font-bold!' : ''}`}
+                        >
                             {isAuthenticated && planId !== 'free' 
                                 ? (isLifetime ? 'Buy Lifetime Now' : 'Upgrade Now') 
                                 : buttonText
                             }
-                        </Button>
+                        </button>
                     </Link>
                 )}
 

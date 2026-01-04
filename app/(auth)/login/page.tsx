@@ -3,10 +3,16 @@ import { login } from "../actions"
 import { Button } from "@/components/ui/Button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/Card"
 import { Input } from "@/components/ui/Input"
+import { ArrowLeft } from "lucide-react"
 
 export default function LoginPage({ searchParams }: { searchParams: { message?: string } }) {
     return (
-        <Card>
+        <>
+            <Link href="/" className="inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 mb-4">
+                <ArrowLeft className="h-4 w-4" />
+                Back to Home
+            </Link>
+            <Card>
             <CardHeader className="space-y-1">
                 <CardTitle className="text-2xl font-bold">Login</CardTitle>
                 <CardDescription>
@@ -46,5 +52,6 @@ export default function LoginPage({ searchParams }: { searchParams: { message?: 
                 </p>
             </CardFooter>
         </Card>
+        </>
     )
 }

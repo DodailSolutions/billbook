@@ -581,10 +581,10 @@ export default async function Home() {
               </div>
             </div>
 
-            <Link href="/pricing#lifetime-deal">
+            <Link href="/pricing?checkout=lifetime">
               <Button 
                 size="lg"
-                className="w-full md:w-auto bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold text-lg px-12 py-6 shadow-xl"
+                className="w-full md:w-auto bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold text-lg px-12 py-6 shadow-xl"
               >
                 Get Lifetime Access Now →
               </Button>
