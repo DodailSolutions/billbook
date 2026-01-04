@@ -158,26 +158,32 @@ export async function signout() {
 }
 
 export async function resetPassword(formData: FormData) {
+    console.log('🔍 resetPassword called')
     try {
         const supabase = await createClient()
         const email = formData.get('email') as string
 
+        console.log('📧 Email from form:', email)
+
         if (!email) {
+            console.log('❌ No email provided')
             return redirect('/forgot-password?message=' + encodeURIComponent('Email is required'))
         }
 
+        console.log('🚀 Calling Supabase resetPasswordForEmail...')
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
             redirectTo: `${process.env.NEXT_PUBLIC_APP_URL || 'https://billbooky.dodail.com'}/reset-password`
         })
 
         if (error) {
-            console.error('Password reset error:', error)
+            console.error('❌ Password reset error:', error)
             return redirect('/forgot-password?message=' + encodeURIComponent(error.message))
         }
 
+        console.log('✅ Password reset email sent successfully')
         return redirect('/forgot-password?message=' + encodeURIComponent('Check your email for a password reset link'))
     } catch (error) {
-        console.error('Password reset exception:', error)
+        console.error('💥 Password reset exception:', error)
         const errorMessage = error instanceof Error ? error.message : 'An error occurred'
         return redirect('/forgot-password?message=' + encodeURIComponent(errorMessage))
     }
