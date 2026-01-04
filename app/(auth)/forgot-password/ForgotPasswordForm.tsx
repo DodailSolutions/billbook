@@ -19,10 +19,16 @@ export function ForgotPasswordForm({ message }: ForgotPasswordFormProps) {
         e.preventDefault()
         setIsSubmitting(true)
 
-        const formData = new FormData(e.currentTarget)
-        await resetPassword(formData)
-        
-        setIsSubmitting(false)
+        try {
+            const formData = new FormData(e.currentTarget)
+            await resetPassword(formData)
+        } catch (error) {
+            console.error('Form submission error:', error)
+            // Error handling is done in the server action via redirects
+        } finally {
+            // Note: setIsSubmitting(false) might not execute if redirect happens
+            // This is expected behavior with Next.js server actions
+        }
     }
 
     return (

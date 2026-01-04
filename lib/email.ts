@@ -323,7 +323,7 @@ export async function sendWelcomeEmail({
                 </div>
                 
                 <div style="text-align: center; margin: 30px 0;">
-                  <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://billbooky.com'}/dashboard" class="button">Go to Dashboard</a>
+                  <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://billbooky.dodail.com'}/dashboard" class="button">Go to Dashboard</a>
                 </div>
                 
                 <p style="margin-top: 30px;">Need help getting started? Reply to this email anytime.</p>
@@ -497,7 +497,7 @@ export async function sendPurchaseConfirmationEmail({
                 ` : ''}
                 
                 <div style="text-align: center; margin: 30px 0;">
-                  <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://billbooky.com'}/dashboard" class="button">Go to Dashboard</a>
+                  <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://billbooky.dodail.com'}/dashboard" class="button">Go to Dashboard</a>
                 </div>
                 
                 <p style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">If you have any questions or need assistance, please don't hesitate to contact us.</p>
