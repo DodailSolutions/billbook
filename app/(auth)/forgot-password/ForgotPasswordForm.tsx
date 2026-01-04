@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
@@ -14,10 +14,8 @@ interface ForgotPasswordFormProps {
 
 export function ForgotPasswordForm({ message }: ForgotPasswordFormProps) {
     const searchParams = useSearchParams()
-    const [email, setEmail] = useState('')
-    const [isSubmitting, setIsSubmitting] = useState(false)
     
-    // Derive error and success from URL params directly (no useEffect needed)
+    // Derive all state from URL params directly (no useEffect needed)
     const errorParam = searchParams.get('error')
     const successParam = searchParams.get('success')
     const emailParam = searchParams.get('email')
@@ -25,12 +23,9 @@ export function ForgotPasswordForm({ message }: ForgotPasswordFormProps) {
     const error = errorParam ? decodeURIComponent(errorParam) : null
     const success = successParam === 'true'
     
-    // Set email from URL param on mount only
-    useEffect(() => {
-        if (emailParam && !email) {
-            setEmail(decodeURIComponent(emailParam))
-        }
-    }, [emailParam]) // Only run when emailParam changes
+    // Initialize email from URL param or empty string
+    const [email, setEmail] = useState(emailParam ? decodeURIComponent(emailParam) : '')
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
