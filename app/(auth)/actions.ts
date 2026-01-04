@@ -155,7 +155,7 @@ export async function resetPassword(formData: FormData) {
     console.log('🔍 resetPassword action called')
     
     const email = formData.get('email') as string
-    console.log('📧 Processing email:', email ? 'provided' : 'missing')
+    console.log('📧 Email received:', email)
 
     // Validation
     if (!email || email.trim() === '') {
@@ -170,35 +170,48 @@ export async function resetPassword(formData: FormData) {
         redirect('/forgot-password?error=' + encodeURIComponent('Please enter a valid email address'))
     }
 
-    const supabase = await createClient()
-    const redirectUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://billbooky.dodail.com'}/reset-password`
-    
-    console.log('🚀 Calling Supabase resetPasswordForEmail')
-    console.log('📍 Redirect URL:', redirectUrl)
+    try {
+        const supabase = await createClient()
+        const redirectUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://billbooky.dodail.com'}/reset-password`
+        
+        console.log('🚀 Calling Supabase resetPasswordForEmail')
+        console.log('📍 Redirect URL:', redirectUrl)
+        console.log('📧 Email being processed:', email)
 
-    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: redirectUrl
-    })
+        const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: redirectUrl
+        })
 
-    if (error) {
-        console.error('❌ Supabase error:', error.message, error.status)
-        
-        // Handle specific error cases
-        if (error.message.includes('rate limit')) {
-            redirect('/forgot-password?error=' + encodeURIComponent('Too many requests. Please try again in a few minutes.'))
+        console.log('📨 Supabase response:', { data, error })
+
+        if (error) {
+            console.error('❌ Supabase error:', {
+                message: error.message,
+                status: error.status,
+                code: error.code,
+                name: error.name
+            })
+            
+            // Handle specific error cases
+            if (error.message.includes('rate limit')) {
+                redirect('/forgot-password?error=' + encodeURIComponent('Too many requests. Please try again in a few minutes.'))
+            }
+            
+            if (error.message.includes('Invalid email')) {
+                redirect('/forgot-password?error=' + encodeURIComponent('Please enter a valid email address'))
+            }
+            
+            // Generic error with actual error message for debugging
+            redirect('/forgot-password?error=' + encodeURIComponent(`Error: ${error.message}`))
         }
-        
-        if (error.message.includes('Invalid email')) {
-            redirect('/forgot-password?error=' + encodeURIComponent('Please enter a valid email address'))
-        }
-        
-        // Generic error
-        redirect('/forgot-password?error=' + encodeURIComponent('Unable to send reset email. Please try again.'))
+
+        console.log('✅ Reset email sent successfully')
+        // Always show success even if email doesn't exist (security best practice)
+        redirect('/forgot-password?success=true&email=' + encodeURIComponent(email))
+    } catch (err) {
+        console.error('💥 Exception in resetPassword:', err)
+        redirect('/forgot-password?error=' + encodeURIComponent('An unexpected error occurred. Please try again.'))
     }
-
-    console.log('✅ Reset email sent successfully')
-    // Always show success even if email doesn't exist (security best practice)
-    redirect('/forgot-password?success=true&email=' + encodeURIComponent(email))
 }
 
 export async function updatePassword(formData: FormData) {
