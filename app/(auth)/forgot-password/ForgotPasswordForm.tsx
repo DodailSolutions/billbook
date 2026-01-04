@@ -19,19 +19,9 @@ export function ForgotPasswordForm({ message }: ForgotPasswordFormProps) {
         e.preventDefault()
         setIsSubmitting(true)
 
-        try {
-            const formData = new FormData(e.currentTarget)
-            await resetPassword(formData)
-        } catch (error) {
-            // NEXT_REDIRECT is expected behavior - it means the redirect is working
-            if (error && typeof error === 'object' && 'digest' in error && 
-                String(error.digest).includes('NEXT_REDIRECT')) {
-                // This is a Next.js redirect, which is expected - let it propagate
-                throw error
-            }
-            console.error('Form submission error:', error)
-            setIsSubmitting(false)
-        }
+        const formData = new FormData(e.currentTarget)
+        // Server action will handle redirects automatically
+        await resetPassword(formData)
     }
 
     return (
