@@ -211,6 +211,10 @@ export function CheckoutHandler() {
                         </div>
                         <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
                             <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                            <span>{checkoutPlan === 'lifetime' ? 'One-time payment, lifetime access' : '14-day free trial included'}</span>
+                        </div>
+                        <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
+                            <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
                             <span>14-day money-back guarantee</span>
                         </div>
                     </div>

@@ -12,7 +12,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Pricing - Affordable Plans Starting Free | BillBooky Invoice Generator',
-  description: '100% Free plan with 300 invoices. Upgrade to Premium (₹299/month) or Lifetime (₹2,999 one-time) for unlimited invoices. No hidden charges. GST-compliant invoice software for Indian businesses.',
+  description: '100% Free plan with 300 invoices. Upgrade to Premium (₹299/month) or Lifetime (₹9,999 one-time) for unlimited invoices. 14-day trial on monthly plans. No hidden charges. GST-compliant invoice software for Indian businesses.',
   keywords: [
     'invoice generator pricing',
     'free invoice software',
@@ -21,7 +21,9 @@ export const metadata: Metadata = {
     'lifetime invoice software',
     'cheap invoice generator',
     'GST software pricing India',
-    'invoice maker cost'
+    'invoice maker cost',
+    'lifetime deal invoice software',
+    'one-time payment billing software'
   ],
 }
 
@@ -91,7 +93,7 @@ export default async function PricingPage() {
       <section className="px-4 sm:px-6 py-12 sm:py-16 md:py-24 max-w-7xl mx-auto text-center">
         <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-linear-to-r from-emerald-50 to-teal-50 dark:from-emerald-950 dark:to-teal-950 border border-emerald-200 dark:border-emerald-800 rounded-full text-emerald-700 dark:text-emerald-300 text-xs sm:text-sm font-semibold mb-6 sm:mb-8 shadow-sm hover:shadow-md transition-shadow">
           <Zap className="h-3 w-3 sm:h-4 sm:w-4 fill-emerald-600 dark:fill-emerald-400" />
-          14-day free trial on all paid plans
+          14-day free trial on monthly plans • Lifetime deal available
         </div>
         <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold bg-linear-to-r from-gray-900 via-emerald-800 to-gray-900 dark:from-white dark:via-emerald-400 dark:to-white bg-clip-text text-transparent mb-4 sm:mb-6 px-4">
           Simple, Transparent Pricing
@@ -203,10 +205,11 @@ export default async function PricingPage() {
             ]}
             planId="lifetime"
             isDeal={true}
-            buttonText="Get Lifetime Access →"
+            buttonText="Buy Now - Lifetime Access →"
             buttonClass="w-full bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold shadow-lg"
             isAuthenticated={isAuthenticated}
             currentPlan={currentPlan}
+            isLifetime={true}
           />
         </div>
 

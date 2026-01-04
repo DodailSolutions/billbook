@@ -11,6 +11,7 @@ interface PricingCardProps {
     planId: string
     isPopular?: boolean
     isDeal?: boolean
+    isLifetime?: boolean
     buttonText: string
     buttonClass: string
     isAuthenticated: boolean
@@ -25,6 +26,7 @@ export function PricingCard({
     planId,
     isPopular = false,
     isDeal = false,
+    isLifetime = false,
     buttonText,
     buttonClass,
     isAuthenticated,
@@ -111,14 +113,17 @@ export function PricingCard({
                 ) : (
                     <Link href={getButtonLink()}>
                         <Button className={`${buttonClass} text-sm sm:text-base transition-all duration-300 hover:scale-105 hover:shadow-lg`}>
-                            {isAuthenticated && planId !== 'free' ? 'Upgrade Now' : buttonText}
+                            {isAuthenticated && planId !== 'free' 
+                                ? (isLifetime ? 'Buy Lifetime Now' : 'Upgrade Now') 
+                                : buttonText
+                            }
                         </Button>
                     </Link>
                 )}
 
                 {isDeal && (
                     <p className="text-xs text-center text-amber-700 dark:text-amber-600 mt-3 sm:mt-4 font-medium">
-                        ✨ Limited spots • 14-day money-back guarantee
+                        ✨ One-time payment • No trial needed • 14-day money-back guarantee
                     </p>
                 )}
             </div>
