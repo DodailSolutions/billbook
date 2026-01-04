@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Input } from '@/components/ui/Input'
-import { Loader2, Mail } from 'lucide-react'
+import { Mail } from 'lucide-react'
 import { resetPassword } from '../actions'
 
 interface ForgotPasswordFormProps {
@@ -12,17 +12,7 @@ interface ForgotPasswordFormProps {
 }
 
 export function ForgotPasswordForm({ message }: ForgotPasswordFormProps) {
-    const [isSubmitting, setIsSubmitting] = useState(false)
     const [email, setEmail] = useState('')
-
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault()
-        setIsSubmitting(true)
-
-        const formData = new FormData(e.currentTarget)
-        // Server action will handle redirects automatically
-        await resetPassword(formData)
-    }
 
     return (
         <Card className="max-w-md mx-auto">
@@ -46,7 +36,7 @@ export function ForgotPasswordForm({ message }: ForgotPasswordFormProps) {
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form action={resetPassword} className="space-y-4">
                     <div className="space-y-2">
                         <label htmlFor="email" className="text-sm font-medium leading-none">
                             Email Address
@@ -59,23 +49,15 @@ export function ForgotPasswordForm({ message }: ForgotPasswordFormProps) {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required 
-                            disabled={isSubmitting}
+                            autoComplete="email"
                         />
                     </div>
 
                     <Button 
                         type="submit" 
                         className="w-full bg-emerald-600 hover:bg-emerald-700"
-                        disabled={isSubmitting}
                     >
-                        {isSubmitting ? (
-                            <>
-                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                Sending Reset Link...
-                            </>
-                        ) : (
-                            'Send Reset Link'
-                        )}
+                        Send Reset Link
                     </Button>
                 </form>
 
