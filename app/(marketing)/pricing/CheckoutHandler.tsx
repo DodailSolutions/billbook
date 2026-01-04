@@ -42,6 +42,7 @@ export function CheckoutHandler() {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [userInfo, setUserInfo] = useState({ name: '', email: '', contact: '' })
+    const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
 
     useEffect(() => {
         const fetchUserInfo = async () => {
@@ -49,6 +50,7 @@ export function CheckoutHandler() {
             const { data: { user } } = await supabase.auth.getUser()
             
             if (user) {
+                setIsAuthenticated(true)
                 // Try to fetch user profile, but don't fail if it doesn't exist
                 try {
                     const { data: profile, error } = await supabase
@@ -80,6 +82,8 @@ export function CheckoutHandler() {
                         contact: ''
                     })
                 }
+            } else {
+                setIsAuthenticated(false)
             }
         }
 
@@ -174,6 +178,72 @@ export function CheckoutHandler() {
     const planDetails = PLAN_DETAILS[checkoutPlan]
     if (!planDetails) return null
 
+    // If user is not authenticated, show login/signup prompt first
+    if (isAuthenticated === false) {
+        return (
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <Card className="max-w-md w-full">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <CreditCard className="h-5 w-5 text-emerald-600" />
+                            Complete Purchase - {planDetails.name}
+                        </CardTitle>
+                        <CardDescription>
+                            Please login or create an account to continue with payment
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+                            <div className="flex justify-between items-baseline mb-2">
+                                <span className="text-gray-600 dark:text-gray-400">Selected Plan</span>
+                                <span className="font-semibold text-gray-900 dark:text-white">{planDetails.name}</span>
+                            </div>
+                            <div className="flex justify-between items-baseline">
+                                <span className="text-gray-600 dark:text-gray-400">Amount</span>
+                                <span className="text-2xl font-bold text-emerald-600">
+                                    ₹{planDetails.amount.toLocaleString('en-IN')}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
+                                <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                                <span>Account will be created automatically after payment</span>
+                            </div>
+                            <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
+                                <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                                <span>Instant activation with {checkoutPlan === 'lifetime' ? 'lifetime access' : 'premium features'}</span>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-3">
+                            <Button
+                                variant="secondary"
+                                onClick={() => router.push('/pricing')}
+                                className="flex-1"
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                onClick={() => router.push(`/signup?plan=${checkoutPlan}&redirect=checkout`)}
+                                className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white"
+                            >
+                                Continue →
+                            </Button>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        )
+    }
+
+    // Loading state while checking authentication
+    if (isAuthenticated === null) {
+        return null
+    }
+
+    // User is authenticated, show checkout modal
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <Card className="max-w-md w-full">

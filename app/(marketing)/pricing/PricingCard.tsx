@@ -41,7 +41,12 @@ export function PricingCard({
             // For logged-in users, go directly to checkout
             return `/pricing?checkout=${planId}`
         } else {
-            // For guests, go to signup with plan parameter
+            // For lifetime plan (one-time payment), go directly to checkout
+            // User will be prompted to login/signup during payment
+            if (isLifetime) {
+                return `/pricing?checkout=${planId}`
+            }
+            // For other plans, go to signup with plan parameter
             return `/signup?plan=${planId}`
         }
     }
@@ -112,7 +117,7 @@ export function PricingCard({
                     </Button>
                 ) : (
                     <Link href={getButtonLink()}>
-                        <Button className={`${buttonClass} text-sm sm:text-base transition-all duration-300 hover:scale-105 hover:shadow-lg`}>
+                        <Button className={`${buttonClass} text-sm sm:text-base transition-all duration-300 hover:scale-105 hover:shadow-lg ${isDeal ? 'text-white font-bold' : ''}`}>
                             {isAuthenticated && planId !== 'free' 
                                 ? (isLifetime ? 'Buy Lifetime Now' : 'Upgrade Now') 
                                 : buttonText

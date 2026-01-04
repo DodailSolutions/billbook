@@ -26,9 +26,10 @@ const BUSINESS_TYPES = [
 interface SignupFormProps {
     selectedPlan: string
     message?: string
+    redirectAfter?: string
 }
 
-export function SignupForm({ selectedPlan, message }: SignupFormProps) {
+export function SignupForm({ selectedPlan, message, redirectAfter }: SignupFormProps) {
     const router = useRouter()
     const [currentStep, setCurrentStep] = useState(1)
     const [isSubmitting, setIsSubmitting] = useState(false)
@@ -43,7 +44,8 @@ export function SignupForm({ selectedPlan, message }: SignupFormProps) {
         businessPhone: '',
         businessEmail: '',
         gstin: '',
-        selectedPlan: selectedPlan
+        selectedPlan: selectedPlan,
+        redirectAfter: redirectAfter || ''
     })
 
     // Reset submitting state if there's an error message (means we've been redirected back)

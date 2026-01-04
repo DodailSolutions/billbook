@@ -52,9 +52,10 @@ export async function signup(formData: FormData) {
     const businessEmail = formData.get('businessEmail') as string
     const gstin = formData.get('gstin') as string
     const selectedPlan = formData.get('selectedPlan') as string
+    const redirectAfter = formData.get('redirectAfter') as string
 
     // Log for debugging
-    console.log('Signup attempt for:', email)
+    console.log('Signup attempt for:', email, 'with plan:', selectedPlan, 'redirect:', redirectAfter)
 
     if (!email || !password || !fullName) {
         return redirect('/signup?message=' + encodeURIComponent('Missing required fields'))
@@ -122,7 +123,9 @@ export async function signup(formData: FormData) {
     }
 
     // If paid plan selected and session exists, redirect to payment
-    if (data?.session && selectedPlan && selectedPlan !== 'free') {
+    // OR if redirectAfter is 'checkout', go to checkout even without session (for paid plans)
+    if ((data?.session || redirectAfter === 'checkout') && selectedPlan && selectedPlan !== 'free') {
+        console.log('Redirecting to checkout for plan:', selectedPlan)
         return redirect(`/pricing?checkout=${selectedPlan}`)
     }
 
