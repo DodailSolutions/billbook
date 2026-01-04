@@ -93,24 +93,30 @@ export async function signup(formData: FormData) {
     if (data?.user) {
         console.log('User created successfully:', data.user.id)
         
-        const { error: profileError } = await supabase
-            .from('user_profiles')
-            .insert({
-                id: data.user.id,
-                role: 'user',
-                business_name: businessName,
-                business_type: businessType,
-                owner_name: ownerName || fullName,
-                business_address: businessAddress,
-                business_phone: businessPhone,
-                business_email: businessEmail || email,
-                gstin: gstin,
-                plan_name: 'free',
-                status: 'active'
-            })
+        try {
+            const { error: profileError } = await supabase
+                .from('user_profiles')
+                .insert({
+                    id: data.user.id,
+                    role: 'user',
+                    business_name: businessName || undefined,
+                    business_type: businessType || undefined,
+                    owner_name: ownerName || fullName || undefined,
+                    business_address: businessAddress || undefined,
+                    business_phone: businessPhone || undefined,
+                    business_email: businessEmail || email || undefined,
+                    gstin: gstin || undefined,
+                    status: 'active'
+                })
 
-        if (profileError) {
-            console.error('Profile creation error:', profileError)
+            if (profileError) {
+                console.error('Profile creation error:', profileError)
+                // Continue anyway - user can complete profile later
+            } else {
+                console.log('Profile created successfully')
+            }
+        } catch (err) {
+            console.error('Profile creation exception:', err)
             // Continue anyway - profile can be created later
         }
     }

@@ -100,14 +100,26 @@ export function SignupForm({ selectedPlan, message }: SignupFormProps) {
 
         setIsSubmitting(true)
 
-        const formElement = new FormData()
-        Object.entries(formData).forEach(([key, value]) => {
-            formElement.append(key, value)
-        })
+        try {
+            const formElement = new FormData()
+            Object.entries(formData).forEach(([key, value]) => {
+                formElement.append(key, value)
+            })
 
-        // Call the server action - it will handle redirects
-        // Don't catch errors here - let redirects propagate naturally
-        await signup(formElement)
+            // Call the server action - it will handle redirects
+            await signup(formElement)
+        } catch (error) {
+            // Redirects throw NEXT_REDIRECT error which is expected
+            // Only handle actual errors here
+            if (error && typeof error === 'object' && 'digest' in error) {
+                // This is a Next.js redirect, let it propagate
+                throw error
+            }
+            // Handle other errors
+            console.error('Signup error:', error)
+            alert('An error occurred during signup. Please try again.')
+            setIsSubmitting(false)
+        }
     }
 
     return (
