@@ -4,39 +4,57 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Input } from '@/components/ui/Input'
-import { Loader2, Lock } from 'lucide-react'
+import { Lock } from 'lucide-react'
 import { updatePassword } from '../actions'
+import { useFormStatus } from 'react-dom'
 
 interface ResetPasswordFormProps {
     message?: string
 }
 
+function SubmitButton() {
+    const { pending } = useFormStatus()
+    
+    return (
+        <Button 
+            type="submit" 
+            className="w-full bg-emerald-600 hover:bg-emerald-700"
+            disabled={pending}
+        >
+            {pending ? (
+                <>
+                    <Lock className="h-4 w-4 mr-2 animate-pulse" />
+                    Updating Password...
+                </>
+            ) : (
+                'Update Password'
+            )}
+        </Button>
+    )
+}
+
 export function ResetPasswordForm({ message }: ResetPasswordFormProps) {
-    const [isSubmitting, setIsSubmitting] = useState(false)
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
-    const [error, setError] = useState('')
+    const [clientError, setClientError] = useState('')
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault()
-        setError('')
+    const handleFormAction = async (formData: FormData) => {
+        setClientError('')
+
+        const password = formData.get('password') as string
+        const confirmPassword = formData.get('confirmPassword') as string
 
         if (password.length < 6) {
-            setError('Password must be at least 6 characters long')
+            setClientError('Password must be at least 6 characters long')
             return
         }
 
         if (password !== confirmPassword) {
-            setError('Passwords do not match')
+            setClientError('Passwords do not match')
             return
         }
 
-        setIsSubmitting(true)
-
-        const formData = new FormData(e.currentTarget)
         await updatePassword(formData)
-        
-        setIsSubmitting(false)
     }
 
     return (
@@ -51,17 +69,17 @@ export function ResetPasswordForm({ message }: ResetPasswordFormProps) {
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                {(message || error) && (
+                {(message || clientError) && (
                     <div className={`mb-4 p-3 rounded-lg text-sm ${
                         message?.includes('success') || message?.includes('updated')
                             ? 'bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200'
                             : 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-200'
                     }`}>
-                        {message || error}
+                        {message || clientError}
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form action={handleFormAction} className="space-y-4">
                     <div className="space-y-2">
                         <label htmlFor="password" className="text-sm font-medium leading-none">
                             New Password
@@ -74,7 +92,6 @@ export function ResetPasswordForm({ message }: ResetPasswordFormProps) {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required 
-                            disabled={isSubmitting}
                             minLength={6}
                         />
                     </div>
@@ -91,25 +108,11 @@ export function ResetPasswordForm({ message }: ResetPasswordFormProps) {
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             required 
-                            disabled={isSubmitting}
                             minLength={6}
                         />
                     </div>
 
-                    <Button 
-                        type="submit" 
-                        className="w-full bg-emerald-600 hover:bg-emerald-700"
-                        disabled={isSubmitting}
-                    >
-                        {isSubmitting ? (
-                            <>
-                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                Updating Password...
-                            </>
-                        ) : (
-                            'Update Password'
-                        )}
-                    </Button>
+                    <SubmitButton />
                 </form>
             </CardContent>
         </Card>

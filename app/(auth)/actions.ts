@@ -172,7 +172,9 @@ export async function resetPassword(formData: FormData) {
 
     try {
         const supabase = await createClient()
-        const redirectUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://billbooky.dodail.com'}/reset-password`
+        // Supabase requires the redirect URL to go through /auth/callback
+        // The callback will then redirect to /reset-password
+        const redirectUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://billbooky.dodail.com'}/auth/callback?next=/reset-password`
         
         console.log('🚀 Calling Supabase resetPasswordForEmail')
         console.log('📍 Redirect URL:', redirectUrl)
