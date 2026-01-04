@@ -130,7 +130,20 @@ export function CheckoutHandler() {
                 description: planDetails.name,
                 order_id: order.id,
                 handler: async function (response: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) {
-                    // Verify payment
+                    // For lifetime plan without authentication, redirect to signup with payment details
+                    if (checkoutPlan === 'lifetime' && isAuthenticated === false) {
+                        // Store payment details in URL for signup verification
+                        const paymentData = btoa(JSON.stringify({
+                            order_id: response.razorpay_order_id,
+                            payment_id: response.razorpay_payment_id,
+                            signature: response.razorpay_signature,
+                            plan: checkoutPlan
+                        }))
+                        router.push(`/signup?payment=${paymentData}`)
+                        return
+                    }
+                    
+                    // For authenticated users, verify payment normally
                     const verifyResponse = await fetch('/api/razorpay/verify-payment', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -178,8 +191,9 @@ export function CheckoutHandler() {
     const planDetails = PLAN_DETAILS[checkoutPlan]
     if (!planDetails) return null
 
-    // If user is not authenticated, show login/signup prompt first
-    if (isAuthenticated === false) {
+    // For lifetime plan, allow payment without authentication
+    // For other plans, require authentication first
+    if (isAuthenticated === false && checkoutPlan !== 'lifetime') {
         return (
             <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
                 <Card className="max-w-md w-full">
@@ -209,11 +223,11 @@ export function CheckoutHandler() {
                         <div className="space-y-2">
                             <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
                                 <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
-                                <span>Account will be created automatically after payment</span>
+                                <span>Account will be created after payment</span>
                             </div>
                             <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
                                 <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
-                                <span>Instant activation with {checkoutPlan === 'lifetime' ? 'lifetime access' : 'premium features'}</span>
+                                <span>Instant activation with premium features</span>
                             </div>
                         </div>
 

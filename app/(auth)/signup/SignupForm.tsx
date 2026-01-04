@@ -27,9 +27,10 @@ interface SignupFormProps {
     selectedPlan: string
     message?: string
     redirectAfter?: string
+    paymentData?: string | null
 }
 
-export function SignupForm({ selectedPlan, message, redirectAfter }: SignupFormProps) {
+export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }: SignupFormProps) {
     const router = useRouter()
     const [currentStep, setCurrentStep] = useState(1)
     const [isSubmitting, setIsSubmitting] = useState(false)
@@ -110,6 +111,50 @@ export function SignupForm({ selectedPlan, message, redirectAfter }: SignupFormP
         setIsSubmitting(true)
 
         try {
+            // If we have payment data, this is a guest purchase - verify payment and create account
+            if (paymentData) {
+                try {
+                    const payment = JSON.parse(atob(paymentData))
+                    
+                    const response = await fetch('/api/razorpay/verify-guest-payment', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            razorpay_order_id: payment.order_id,
+                            razorpay_payment_id: payment.payment_id,
+                            razorpay_signature: payment.signature,
+                            plan: payment.plan,
+                            email: formData.email,
+                            password: formData.password,
+                            fullName: formData.fullName,
+                            businessType: formData.businessType,
+                            businessName: formData.businessName,
+                            ownerName: formData.ownerName,
+                            businessAddress: formData.businessAddress,
+                            businessPhone: formData.businessPhone,
+                            businessEmail: formData.businessEmail,
+                            gstin: formData.gstin
+                        })
+                    })
+
+                    if (response.ok) {
+                        // Account created successfully with payment - redirect to dashboard
+                        router.push('/dashboard?payment=success&welcome=true')
+                    } else {
+                        const data = await response.json()
+                        alert(data.error || 'Failed to verify payment and create account')
+                        setIsSubmitting(false)
+                    }
+                    return
+                } catch (err) {
+                    console.error('Payment verification error:', err)
+                    alert('Failed to verify payment. Please contact support.')
+                    setIsSubmitting(false)
+                    return
+                }
+            }
+
+            // Normal signup flow (without payment)
             const formElement = new FormData()
             Object.entries(formData).forEach(([key, value]) => {
                 formElement.append(key, value)
@@ -148,7 +193,11 @@ export function SignupForm({ selectedPlan, message, redirectAfter }: SignupFormP
             <CardHeader className="space-y-1">
                 <CardTitle className="text-2xl font-bold">Create Your Account</CardTitle>
                 <CardDescription>
-                    {selectedPlan !== 'free' ? (
+                    {paymentData ? (
+                        <span className="text-emerald-600 font-semibold">
+                            ✓ Payment successful! Complete signup to access your lifetime plan
+                        </span>
+                    ) : selectedPlan !== 'free' ? (
                         <span className="text-emerald-600 font-semibold">
                             Creating account for {selectedPlan} plan
                         </span>

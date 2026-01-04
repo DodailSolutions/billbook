@@ -3,9 +3,10 @@ import { SignupForm } from "./SignupForm"
 import { CardFooter } from "@/components/ui/Card"
 import { ArrowLeft } from "lucide-react"
 
-export default function SignupPage({ searchParams }: { searchParams: { message?: string; plan?: string; redirect?: string } }) {
+export default function SignupPage({ searchParams }: { searchParams: { message?: string; plan?: string; redirect?: string; payment?: string } }) {
     const selectedPlan = searchParams.plan || 'free'
     const redirectAfter = searchParams.redirect
+    const paymentData = searchParams.payment
     
     return (
         <div className="space-y-4">
@@ -13,7 +14,7 @@ export default function SignupPage({ searchParams }: { searchParams: { message?:
                 <ArrowLeft className="h-4 w-4" />
                 Back to Home
             </Link>
-            <SignupForm selectedPlan={selectedPlan} message={searchParams.message} redirectAfter={redirectAfter} />
+            <SignupForm selectedPlan={selectedPlan} message={searchParams.message} redirectAfter={redirectAfter} paymentData={paymentData} />
             <div className="flex justify-center">
                 <p className="text-sm text-muted-foreground">
                     Already have an account?{" "}

@@ -9,13 +9,15 @@ export async function POST(request: NextRequest) {
     try {
         const supabase = await createClient()
         
-        // Check authentication
+        const { amount, currency = 'INR', notes } = await request.json()
+        
+        // Check authentication - allow unauthenticated requests for lifetime plan
         const { data: { user }, error: authError } = await supabase.auth.getUser()
-        if (authError || !user) {
+        const isLifetimePlan = notes?.plan === 'lifetime'
+        
+        if (!isLifetimePlan && (authError || !user)) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
-
-        const { amount, currency = 'INR', notes } = await request.json()
 
         if (!amount || amount <= 0) {
             return NextResponse.json({ error: 'Invalid amount' }, { status: 400 })
@@ -42,8 +44,8 @@ export async function POST(request: NextRequest) {
             currency,
             receipt: `subscription_${Date.now()}`,
             notes: {
-                user_id: user.id,
-                user_email: user.email || '',
+                user_id: user?.id || 'guest',
+                user_email: user?.email || notes?.guest_email || '',
                 ...notes
             }
         }
