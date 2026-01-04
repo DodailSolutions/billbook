@@ -55,6 +55,10 @@ export function ForgotPasswordForm({ message }: ForgotPasswordFormProps) {
         try {
             await resetPassword(formData)
         } catch (err) {
+            // NEXT_REDIRECT is expected - let it propagate to trigger the redirect
+            if (err && typeof err === 'object' && 'digest' in err) {
+                throw err
+            }
             console.error('Form submission error:', err)
             setIsSubmitting(false)
         }
