@@ -6,37 +6,31 @@ import { createClient } from '@/lib/supabase/server'
 import { sendWelcomeEmail } from '@/lib/email'
 
 export async function login(formData: FormData) {
-    try {
-        const supabase = await createClient()
+    const supabase = await createClient()
 
-        const email = formData.get('email') as string
-        const password = formData.get('password') as string
+    const email = formData.get('email') as string
+    const password = formData.get('password') as string
 
-        if (!email || !password) {
-            return redirect('/login?message=' + encodeURIComponent('Email and password are required'))
-        }
-
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-        })
-
-        if (error) {
-            console.error('Login error:', error.message, error)
-            return redirect('/login?message=' + encodeURIComponent(error.message || 'Could not authenticate user'))
-        }
-
-        if (!data.session) {
-            return redirect('/login?message=' + encodeURIComponent('Please check your email to confirm your account first'))
-        }
-
-        revalidatePath('/', 'layout')
-        return redirect('/dashboard')
-    } catch (error) {
-        console.error('Login exception:', error)
-        const errorMessage = error instanceof Error ? error.message : 'An error occurred during login'
-        return redirect('/login?message=' + encodeURIComponent(errorMessage))
+    if (!email || !password) {
+        redirect('/login?message=' + encodeURIComponent('Email and password are required'))
     }
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+    })
+
+    if (error) {
+        console.error('Login error:', error.message, error)
+        redirect('/login?message=' + encodeURIComponent(error.message || 'Could not authenticate user'))
+    }
+
+    if (!data.session) {
+        redirect('/login?message=' + encodeURIComponent('Please check your email to confirm your account first'))
+    }
+
+    revalidatePath('/', 'layout')
+    redirect('/dashboard')
 }
 
 export async function signup(formData: FormData) {
@@ -160,86 +154,73 @@ export async function signout() {
 export async function resetPassword(formData: FormData) {
     console.log('🔍 resetPassword action called')
     
-    try {
-        const email = formData.get('email') as string
-        console.log('📧 Processing email:', email ? 'provided' : 'missing')
+    const email = formData.get('email') as string
+    console.log('📧 Processing email:', email ? 'provided' : 'missing')
 
-        // Validation
-        if (!email || email.trim() === '') {
-            console.log('❌ Email validation failed: empty')
-            return redirect('/forgot-password?error=' + encodeURIComponent('Please enter your email address'))
-        }
-
-        // Basic email format validation
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-        if (!emailRegex.test(email)) {
-            console.log('❌ Email validation failed: invalid format')
-            return redirect('/forgot-password?error=' + encodeURIComponent('Please enter a valid email address'))
-        }
-
-        const supabase = await createClient()
-        const redirectUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://billbooky.dodail.com'}/reset-password`
-        
-        console.log('🚀 Calling Supabase resetPasswordForEmail')
-        console.log('📍 Redirect URL:', redirectUrl)
-
-        const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-            redirectTo: redirectUrl
-        })
-
-        if (error) {
-            console.error('❌ Supabase error:', error.message, error.status)
-            
-            // Handle specific error cases
-            if (error.message.includes('rate limit')) {
-                return redirect('/forgot-password?error=' + encodeURIComponent('Too many requests. Please try again in a few minutes.'))
-            }
-            
-            if (error.message.includes('Invalid email')) {
-                return redirect('/forgot-password?error=' + encodeURIComponent('Please enter a valid email address'))
-            }
-            
-            // Generic error
-            return redirect('/forgot-password?error=' + encodeURIComponent('Unable to send reset email. Please try again.'))
-        }
-
-        console.log('✅ Reset email sent successfully')
-        // Always show success even if email doesn't exist (security best practice)
-        return redirect('/forgot-password?success=true&email=' + encodeURIComponent(email))
-        
-    } catch (error) {
-        console.error('💥 Unexpected error in resetPassword:', error)
-        const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred'
-        return redirect('/forgot-password?error=' + encodeURIComponent(errorMessage))
+    // Validation
+    if (!email || email.trim() === '') {
+        console.log('❌ Email validation failed: empty')
+        redirect('/forgot-password?error=' + encodeURIComponent('Please enter your email address'))
     }
+
+    // Basic email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+        console.log('❌ Email validation failed: invalid format')
+        redirect('/forgot-password?error=' + encodeURIComponent('Please enter a valid email address'))
+    }
+
+    const supabase = await createClient()
+    const redirectUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://billbooky.dodail.com'}/reset-password`
+    
+    console.log('🚀 Calling Supabase resetPasswordForEmail')
+    console.log('📍 Redirect URL:', redirectUrl)
+
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: redirectUrl
+    })
+
+    if (error) {
+        console.error('❌ Supabase error:', error.message, error.status)
+        
+        // Handle specific error cases
+        if (error.message.includes('rate limit')) {
+            redirect('/forgot-password?error=' + encodeURIComponent('Too many requests. Please try again in a few minutes.'))
+        }
+        
+        if (error.message.includes('Invalid email')) {
+            redirect('/forgot-password?error=' + encodeURIComponent('Please enter a valid email address'))
+        }
+        
+        // Generic error
+        redirect('/forgot-password?error=' + encodeURIComponent('Unable to send reset email. Please try again.'))
+    }
+
+    console.log('✅ Reset email sent successfully')
+    // Always show success even if email doesn't exist (security best practice)
+    redirect('/forgot-password?success=true&email=' + encodeURIComponent(email))
 }
 
 export async function updatePassword(formData: FormData) {
-    try {
-        const supabase = await createClient()
-        const password = formData.get('password') as string
+    const supabase = await createClient()
+    const password = formData.get('password') as string
 
-        if (!password) {
-            return redirect('/reset-password?message=' + encodeURIComponent('Password is required'))
-        }
-
-        if (password.length < 6) {
-            return redirect('/reset-password?message=' + encodeURIComponent('Password must be at least 6 characters'))
-        }
-
-        const { error } = await supabase.auth.updateUser({
-            password: password
-        })
-
-        if (error) {
-            console.error('Password update error:', error)
-            return redirect('/reset-password?message=' + encodeURIComponent(error.message))
-        }
-
-        return redirect('/login?message=' + encodeURIComponent('Password updated successfully! Please login with your new password.'))
-    } catch (error) {
-        console.error('Password update exception:', error)
-        const errorMessage = error instanceof Error ? error.message : 'An error occurred'
-        return redirect('/reset-password?message=' + encodeURIComponent(errorMessage))
+    if (!password) {
+        redirect('/reset-password?message=' + encodeURIComponent('Password is required'))
     }
+
+    if (password.length < 6) {
+        redirect('/reset-password?message=' + encodeURIComponent('Password must be at least 6 characters'))
+    }
+
+    const { error } = await supabase.auth.updateUser({
+        password: password
+    })
+
+    if (error) {
+        console.error('Password update error:', error)
+        redirect('/reset-password?message=' + encodeURIComponent(error.message))
+    }
+
+    redirect('/login?message=' + encodeURIComponent('Password updated successfully! Please login with your new password.'))
 }

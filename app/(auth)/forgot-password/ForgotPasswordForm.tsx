@@ -31,32 +31,21 @@ export function ForgotPasswordForm({ message }: ForgotPasswordFormProps) {
         e.preventDefault()
         setIsSubmitting(true)
 
-        // Client-side validation (errors will be in URL after redirect)
+        // Client-side validation
         if (!email.trim()) {
             setIsSubmitting(false)
-            // Error will be shown via URL param after redirect
             return
         }
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
         if (!emailRegex.test(email)) {
             setIsSubmitting(false)
-            // Error will be shown via URL param after redirect
             return
         }
 
-        // Submit form - server action will handle redirect with error/success params
+        // Submit form - server action handles all logic and redirects
         const formData = new FormData(e.currentTarget)
-        try {
-            await resetPassword(formData)
-        } catch (err) {
-            // NEXT_REDIRECT is expected - let it propagate to trigger the redirect
-            if (err && typeof err === 'object' && 'digest' in err) {
-                throw err
-            }
-            console.error('Form submission error:', err)
-            setIsSubmitting(false)
-        }
+        await resetPassword(formData)
     }
 
     return (
