@@ -16,54 +16,46 @@ export function ForgotPasswordForm({ message }: ForgotPasswordFormProps) {
     const searchParams = useSearchParams()
     const [email, setEmail] = useState('')
     const [isSubmitting, setIsSubmitting] = useState(false)
-    const [error, setError] = useState<string | null>(null)
-    const [success, setSuccess] = useState(false)
-
+    
+    // Derive error and success from URL params directly (no useEffect needed)
     const errorParam = searchParams.get('error')
     const successParam = searchParams.get('success')
     const emailParam = searchParams.get('email')
-
+    
+    const error = errorParam ? decodeURIComponent(errorParam) : null
+    const success = successParam === 'true'
+    
+    // Set email from URL param on mount only
     useEffect(() => {
-        if (errorParam) {
-            setError(decodeURIComponent(errorParam))
-            setIsSubmitting(false)
+        if (emailParam && !email) {
+            setEmail(decodeURIComponent(emailParam))
         }
-        if (successParam === 'true') {
-            setSuccess(true)
-            setIsSubmitting(false)
-            if (emailParam) {
-                setEmail(decodeURIComponent(emailParam))
-            }
-        }
-    }, [errorParam, successParam, emailParam])
+    }, [emailParam]) // Only run when emailParam changes
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         setIsSubmitting(true)
-        setError(null)
-        setSuccess(false)
 
-        // Client-side validation
+        // Client-side validation (errors will be in URL after redirect)
         if (!email.trim()) {
-            setError('Please enter your email address')
             setIsSubmitting(false)
+            // Error will be shown via URL param after redirect
             return
         }
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
         if (!emailRegex.test(email)) {
-            setError('Please enter a valid email address')
             setIsSubmitting(false)
+            // Error will be shown via URL param after redirect
             return
         }
 
-        // Submit form
+        // Submit form - server action will handle redirect with error/success params
         const formData = new FormData(e.currentTarget)
         try {
             await resetPassword(formData)
         } catch (err) {
             console.error('Form submission error:', err)
-            setError('Something went wrong. Please try again.')
             setIsSubmitting(false)
         }
     }
