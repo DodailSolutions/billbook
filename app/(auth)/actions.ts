@@ -158,34 +158,59 @@ export async function signout() {
 }
 
 export async function resetPassword(formData: FormData) {
-    console.log('🔍 resetPassword called')
+    console.log('🔍 resetPassword action called')
+    
     try {
-        const supabase = await createClient()
         const email = formData.get('email') as string
+        console.log('📧 Processing email:', email ? 'provided' : 'missing')
 
-        console.log('📧 Email from form:', email)
-
-        if (!email) {
-            console.log('❌ No email provided')
-            return redirect('/forgot-password?message=' + encodeURIComponent('Email is required'))
+        // Validation
+        if (!email || email.trim() === '') {
+            console.log('❌ Email validation failed: empty')
+            return redirect('/forgot-password?error=' + encodeURIComponent('Please enter your email address'))
         }
 
-        console.log('🚀 Calling Supabase resetPasswordForEmail...')
-        const { error } = await supabase.auth.resetPasswordForEmail(email, {
-            redirectTo: `${process.env.NEXT_PUBLIC_APP_URL || 'https://billbooky.dodail.com'}/reset-password`
+        // Basic email format validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        if (!emailRegex.test(email)) {
+            console.log('❌ Email validation failed: invalid format')
+            return redirect('/forgot-password?error=' + encodeURIComponent('Please enter a valid email address'))
+        }
+
+        const supabase = await createClient()
+        const redirectUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://billbooky.dodail.com'}/reset-password`
+        
+        console.log('🚀 Calling Supabase resetPasswordForEmail')
+        console.log('📍 Redirect URL:', redirectUrl)
+
+        const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: redirectUrl
         })
 
         if (error) {
-            console.error('❌ Password reset error:', error)
-            return redirect('/forgot-password?message=' + encodeURIComponent(error.message))
+            console.error('❌ Supabase error:', error.message, error.status)
+            
+            // Handle specific error cases
+            if (error.message.includes('rate limit')) {
+                return redirect('/forgot-password?error=' + encodeURIComponent('Too many requests. Please try again in a few minutes.'))
+            }
+            
+            if (error.message.includes('Invalid email')) {
+                return redirect('/forgot-password?error=' + encodeURIComponent('Please enter a valid email address'))
+            }
+            
+            // Generic error
+            return redirect('/forgot-password?error=' + encodeURIComponent('Unable to send reset email. Please try again.'))
         }
 
-        console.log('✅ Password reset email sent successfully')
-        return redirect('/forgot-password?message=' + encodeURIComponent('Check your email for a password reset link'))
+        console.log('✅ Reset email sent successfully')
+        // Always show success even if email doesn't exist (security best practice)
+        return redirect('/forgot-password?success=true&email=' + encodeURIComponent(email))
+        
     } catch (error) {
-        console.error('💥 Password reset exception:', error)
-        const errorMessage = error instanceof Error ? error.message : 'An error occurred'
-        return redirect('/forgot-password?message=' + encodeURIComponent(errorMessage))
+        console.error('💥 Unexpected error in resetPassword:', error)
+        const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred'
+        return redirect('/forgot-password?error=' + encodeURIComponent(errorMessage))
     }
 }
 
