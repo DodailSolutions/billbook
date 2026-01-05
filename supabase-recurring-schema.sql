@@ -75,23 +75,28 @@ ALTER TABLE recurring_invoice_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE reminders ENABLE ROW LEVEL SECURITY;
 
 -- Recurring Invoices Policies
+DROP POLICY IF EXISTS "Users can view their own recurring invoices" ON recurring_invoices;
 CREATE POLICY "Users can view their own recurring invoices"
   ON recurring_invoices FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert their own recurring invoices" ON recurring_invoices;
 CREATE POLICY "Users can insert their own recurring invoices"
   ON recurring_invoices FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update their own recurring invoices" ON recurring_invoices;
 CREATE POLICY "Users can update their own recurring invoices"
   ON recurring_invoices FOR UPDATE
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can delete their own recurring invoices" ON recurring_invoices;
 CREATE POLICY "Users can delete their own recurring invoices"
   ON recurring_invoices FOR DELETE
   USING (auth.uid() = user_id);
 
 -- Recurring Invoice Items Policies
+DROP POLICY IF EXISTS "Users can view items for their recurring invoices" ON recurring_invoice_items;
 CREATE POLICY "Users can view items for their recurring invoices"
   ON recurring_invoice_items FOR SELECT
   USING (
@@ -102,6 +107,7 @@ CREATE POLICY "Users can view items for their recurring invoices"
     )
   );
 
+DROP POLICY IF EXISTS "Users can insert items for their recurring invoices" ON recurring_invoice_items;
 CREATE POLICY "Users can insert items for their recurring invoices"
   ON recurring_invoice_items FOR INSERT
   WITH CHECK (
@@ -112,6 +118,7 @@ CREATE POLICY "Users can insert items for their recurring invoices"
     )
   );
 
+DROP POLICY IF EXISTS "Users can update items for their recurring invoices" ON recurring_invoice_items;
 CREATE POLICY "Users can update items for their recurring invoices"
   ON recurring_invoice_items FOR UPDATE
   USING (
@@ -122,6 +129,7 @@ CREATE POLICY "Users can update items for their recurring invoices"
     )
   );
 
+DROP POLICY IF EXISTS "Users can delete items for their recurring invoices" ON recurring_invoice_items;
 CREATE POLICY "Users can delete items for their recurring invoices"
   ON recurring_invoice_items FOR DELETE
   USING (
@@ -133,23 +141,28 @@ CREATE POLICY "Users can delete items for their recurring invoices"
   );
 
 -- Reminders Policies
+DROP POLICY IF EXISTS "Users can view their own reminders" ON reminders;
 CREATE POLICY "Users can view their own reminders"
   ON reminders FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert their own reminders" ON reminders;
 CREATE POLICY "Users can insert their own reminders"
   ON reminders FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update their own reminders" ON reminders;
 CREATE POLICY "Users can update their own reminders"
   ON reminders FOR UPDATE
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can delete their own reminders" ON reminders;
 CREATE POLICY "Users can delete their own reminders"
   ON reminders FOR DELETE
   USING (auth.uid() = user_id);
 
 -- Triggers for updated_at
+DROP TRIGGER IF EXISTS update_recurring_invoices_updated_at ON recurring_invoices;
 CREATE TRIGGER update_recurring_invoices_updated_at
   BEFORE UPDATE ON recurring_invoices
   FOR EACH ROW
