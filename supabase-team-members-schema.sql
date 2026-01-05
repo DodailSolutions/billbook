@@ -114,6 +114,7 @@ CREATE POLICY "Users can view own team activity" ON team_activity_log
 -- ============================================
 
 -- Function to check team member limit based on subscription plan
+DROP FUNCTION IF EXISTS check_team_member_limit(UUID);
 CREATE OR REPLACE FUNCTION check_team_member_limit(p_owner_id UUID)
 RETURNS TABLE (
     allowed INTEGER,
@@ -178,11 +179,13 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS update_team_members_updated_at ON team_members;
 CREATE TRIGGER update_team_members_updated_at
     BEFORE UPDATE ON team_members
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_team_roles_updated_at ON team_roles;
 CREATE TRIGGER update_team_roles_updated_at
     BEFORE UPDATE ON team_roles
     FOR EACH ROW
