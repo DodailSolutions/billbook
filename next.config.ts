@@ -5,7 +5,6 @@ const nextConfig: NextConfig = {
      REACT COMPILER & PERFORMANCE OPTIMIZATIONS
      ==================================================================== */
   reactCompiler: true,
-  swcMinify: true,
   poweredByHeader: false,
   compress: true,
   
@@ -17,8 +16,6 @@ const nextConfig: NextConfig = {
     minimumCacheTTL: 60,
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    // Limit image optimization to improve build time
-    staticGenerationTimeout: 300,
   },
   
   /* ====================================================================
@@ -32,10 +29,6 @@ const nextConfig: NextConfig = {
       '@radix-ui/react-select',
       'date-fns',
     ],
-    // Enable optimized font loading
-    optimizeFonts: true,
-    // Preload static assets
-    preloadEntriesOnStart: true,
   },
   
   /* ====================================================================
@@ -155,32 +148,10 @@ const nextConfig: NextConfig = {
   },
 
   /* ====================================================================
-     ENV VALIDATION
-     ==================================================================== */
-  serverRuntimeConfig: {
-    // Only available on server side
-    apiSecret: process.env.API_SECRET,
-    jwtSecret: process.env.JWT_SECRET,
-  },
-  publicRuntimeConfig: {
-    // Available on both server and client
-    apiUrl: process.env.NEXT_PUBLIC_API_URL,
-  },
-
-  /* ====================================================================
      BUILD OPTIMIZATION
      ==================================================================== */
   productionBrowserSourceMaps: false, // Disable source maps in production
-  optimizeFonts: true,
   generateEtags: true,
-  
-  /* ====================================================================
-     TRACING & ANALYTICS (Optional)
-     ==================================================================== */
-  // onDemandEntries: {
-  //   maxInactiveAge: 60 * 1000,
-  //   pagesBufferLength: 5,
-  // },
 };
 
 export default nextConfig;
