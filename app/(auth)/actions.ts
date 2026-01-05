@@ -73,84 +73,84 @@ export async function signup(formData: FormData) {
             return redirect('/signup?message=' + encodeURIComponent('Missing required fields'))
         }
 
-    const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-            data: {
-                full_name: fullName,
-                business_type: businessType,
-                business_name: businessName,
-                owner_name: ownerName || fullName,
-                business_address: businessAddress,
-                business_phone: businessPhone,
-                business_email: businessEmail || email,
-                gstin: gstin,
-                selected_plan: selectedPlan || 'free',
-            },
-            emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://billbooky.dodail.com'}/auth/callback`
-        }
-    })
-
-    if (error) {
-        console.error('Supabase signup error:', error)
-        return redirect('/signup?message=' + encodeURIComponent(error.message))
-    }
-
-    // Check if email confirmation is required
-    if (data?.user?.identities?.length === 0) {
-        return redirect('/login?message=' + encodeURIComponent('User already exists. Please login.'))
-    }
-
-    // If user is created, store business profile in user_profiles table
-    if (data?.user) {
-        console.log('User created successfully:', data.user.id)
-        
-        try {
-            const { error: profileError } = await supabase
-                .from('user_profiles')
-                .insert({
-                    id: data.user.id,
-                    role: 'user',
-                    business_name: businessName || undefined,
-                    business_type: businessType || undefined,
-                    owner_name: ownerName || fullName || undefined,
-                    business_address: businessAddress || undefined,
-                    business_phone: businessPhone || undefined,
-                    business_email: businessEmail || email || undefined,
-                    gstin: gstin || undefined,
-                    status: 'active'
-                })
-
-            if (profileError) {
-                console.error('Profile creation error:', profileError)
-                // Continue anyway - user can complete profile later
-            } else {
-                console.log('Profile created successfully')
+        const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+                data: {
+                    full_name: fullName,
+                    business_type: businessType,
+                    business_name: businessName,
+                    owner_name: ownerName || fullName,
+                    business_address: businessAddress,
+                    business_phone: businessPhone,
+                    business_email: businessEmail || email,
+                    gstin: gstin,
+                    selected_plan: selectedPlan || 'free',
+                },
+                emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://billbooky.dodail.com'}/auth/callback`
             }
+        })
 
-            // Send welcome email (non-blocking - don't fail signup if email fails)
+        if (error) {
+            console.error('Supabase signup error:', error)
+            return redirect('/signup?message=' + encodeURIComponent(error.message))
+        }
+
+        // Check if email confirmation is required
+        if (data?.user?.identities?.length === 0) {
+            return redirect('/login?message=' + encodeURIComponent('User already exists. Please login.'))
+        }
+
+        // If user is created, store business profile in user_profiles table
+        if (data?.user) {
+            console.log('User created successfully:', data.user.id)
+            
             try {
-                console.log('📧 Attempting to send welcome email to:', email)
-                const emailResult = await sendWelcomeEmail({
-                    to: email,
-                    name: fullName || ownerName || email.split('@')[0]
-                })
-                
-                if (emailResult.success) {
-                    console.log('✅ Welcome email sent successfully')
+                const { error: profileError } = await supabase
+                    .from('user_profiles')
+                    .insert({
+                        id: data.user.id,
+                        role: 'user',
+                        business_name: businessName || undefined,
+                        business_type: businessType || undefined,
+                        owner_name: ownerName || fullName || undefined,
+                        business_address: businessAddress || undefined,
+                        business_phone: businessPhone || undefined,
+                        business_email: businessEmail || email || undefined,
+                        gstin: gstin || undefined,
+                        status: 'active'
+                    })
+
+                if (profileError) {
+                    console.error('Profile creation error:', profileError)
+                    // Continue anyway - user can complete profile later
                 } else {
-                    console.warn('⚠️ Welcome email failed to send, but signup continues:', emailResult.error)
+                    console.log('Profile created successfully')
                 }
-            } catch (emailError) {
-                console.error('⚠️ Error sending welcome email (non-blocking):', emailError)
-                // Continue anyway - don't fail signup if email fails
+
+                // Send welcome email (non-blocking - don't fail signup if email fails)
+                try {
+                    console.log('📧 Attempting to send welcome email to:', email)
+                    const emailResult = await sendWelcomeEmail({
+                        to: email,
+                        name: fullName || ownerName || email.split('@')[0]
+                    })
+                    
+                    if (emailResult.success) {
+                        console.log('✅ Welcome email sent successfully')
+                    } else {
+                        console.warn('⚠️ Welcome email failed to send, but signup continues:', emailResult.error)
+                    }
+                } catch (emailError) {
+                    console.error('⚠️ Error sending welcome email (non-blocking):', emailError)
+                    // Continue anyway - don't fail signup if email fails
+                }
+            } catch (err) {
+                console.error('Profile creation exception:', err)
+                // Continue anyway - profile can be created later
             }
-        } catch (err) {
-            console.error('Profile creation exception:', err)
-            // Continue anyway - profile can be created later
         }
-    }
 
         // If paid plan selected and session exists, redirect to payment
         // OR if redirectAfter is 'checkout', go to checkout even without session (for paid plans)

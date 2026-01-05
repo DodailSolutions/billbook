@@ -90,6 +90,11 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
             [name]: value
         }))
         
+        // Clear general validation error when user starts typing
+        if (validationError) {
+            setValidationError('')
+        }
+        
         // Real-time validation on change if field has been touched
         if (touched[name]) {
             validateField(name, value)
@@ -136,6 +141,14 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
                 isValid = addrResult.isValid
                 errorMsg = addrResult.error
                 break
+            case 'businessEmail':
+                // Optional field - only validate if not empty
+                if (value.trim()) {
+                    const bizEmailResult = validateEmail(value)
+                    isValid = bizEmailResult.isValid
+                    errorMsg = bizEmailResult.error
+                }
+                break
         }
 
         setFieldErrors(prev => ({
@@ -175,7 +188,13 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
                 const bizNameValid = validateField('businessName', formData.businessName)
                 const phoneValid = validateField('businessPhone', formData.businessPhone)
                 
-                isStepValid = bizNameValid && phoneValid
+                // Validate optional email if provided
+                let bizEmailValid = true
+                if (formData.businessEmail) {
+                    bizEmailValid = validateField('businessEmail', formData.businessEmail)
+                }
+                
+                isStepValid = bizNameValid && phoneValid && bizEmailValid
                 
                 if (!isStepValid) {
                     setValidationError('Please fix the errors above before proceeding')
@@ -311,6 +330,8 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
             // Call the server action - it will handle redirects
             try {
                 await signup(formElement)
+                // If we reach here without redirect, something unexpected happened
+                console.log('Signup completed without redirect')
             } catch (signupErr) {
                 // Redirects throw NEXT_REDIRECT error which is expected
                 // Only handle actual errors here
@@ -327,6 +348,7 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
         } catch (error) {
             console.error('Form submit error:', error)
             if (error && typeof error === 'object' && 'digest' in error) {
+                // This is a Next.js redirect - let it propagate
                 throw error
             }
             setValidationError('An unexpected error occurred. Please try again.')
@@ -697,7 +719,21 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
                                             placeholder="contact@business.com"
                                             value={formData.businessEmail}
                                             onChange={handleInputChange}
+                                            onBlur={() => handleBlur('businessEmail')}
+                                            className={`transition-colors ${getFieldBorderClass('businessEmail')}`}
                                         />
+                                        {touched.businessEmail && fieldErrors.businessEmail && (
+                                            <p className="text-xs font-medium text-red-600 dark:text-red-400 flex items-center gap-1">
+                                                <AlertCircle className="w-3 h-3" />
+                                                {fieldErrors.businessEmail}
+                                            </p>
+                                        )}
+                                        {touched.businessEmail && formData.businessEmail && getFieldState('businessEmail') === 'valid' && (
+                                            <p className="text-xs font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                                                <CheckCircle className="w-3 h-3" />
+                                                Email verified
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
 
@@ -827,7 +863,7 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
                             <Button
                                 type="button"
                                 onClick={handleNext}
-                                disabled={!validateStep(currentStep) || isSubmitting}
+                                disabled={isSubmitting}
                                 className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
                             >
                                 Next
