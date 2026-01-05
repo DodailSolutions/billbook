@@ -50,27 +50,28 @@ export async function login(formData: FormData) {
 }
 
 export async function signup(formData: FormData) {
-    const supabase = await createClient()
+    try {
+        const supabase = await createClient()
 
-    const email = formData.get('email') as string
-    const password = formData.get('password') as string
-    const fullName = formData.get('fullName') as string
-    const businessType = formData.get('businessType') as string
-    const businessName = formData.get('businessName') as string
-    const ownerName = formData.get('ownerName') as string
-    const businessAddress = formData.get('businessAddress') as string
-    const businessPhone = formData.get('businessPhone') as string
-    const businessEmail = formData.get('businessEmail') as string
-    const gstin = formData.get('gstin') as string
-    const selectedPlan = formData.get('selectedPlan') as string
-    const redirectAfter = formData.get('redirectAfter') as string
+        const email = formData.get('email') as string
+        const password = formData.get('password') as string
+        const fullName = formData.get('fullName') as string
+        const businessType = formData.get('businessType') as string
+        const businessName = formData.get('businessName') as string
+        const ownerName = formData.get('ownerName') as string
+        const businessAddress = formData.get('businessAddress') as string
+        const businessPhone = formData.get('businessPhone') as string
+        const businessEmail = formData.get('businessEmail') as string
+        const gstin = formData.get('gstin') as string
+        const selectedPlan = formData.get('selectedPlan') as string
+        const redirectAfter = formData.get('redirectAfter') as string
 
-    // Log for debugging
-    console.log('Signup attempt for:', email, 'with plan:', selectedPlan, 'redirect:', redirectAfter)
+        // Log for debugging
+        console.log('Signup attempt for:', email, 'with plan:', selectedPlan, 'redirect:', redirectAfter)
 
-    if (!email || !password || !fullName) {
-        return redirect('/signup?message=' + encodeURIComponent('Missing required fields'))
-    }
+        if (!email || !password || !fullName) {
+            return redirect('/signup?message=' + encodeURIComponent('Missing required fields'))
+        }
 
     const { data, error } = await supabase.auth.signUp({
         email,
@@ -151,20 +152,25 @@ export async function signup(formData: FormData) {
         }
     }
 
-    // If paid plan selected and session exists, redirect to payment
-    // OR if redirectAfter is 'checkout', go to checkout even without session (for paid plans)
-    if ((data?.session || redirectAfter === 'checkout') && selectedPlan && selectedPlan !== 'free') {
-        console.log('Redirecting to checkout for plan:', selectedPlan)
-        return redirect(`/pricing?checkout=${selectedPlan}`)
-    }
+        // If paid plan selected and session exists, redirect to payment
+        // OR if redirectAfter is 'checkout', go to checkout even without session (for paid plans)
+        if ((data?.session || redirectAfter === 'checkout') && selectedPlan && selectedPlan !== 'free') {
+            console.log('Redirecting to checkout for plan:', selectedPlan)
+            return redirect(`/pricing?checkout=${selectedPlan}`)
+        }
 
-    // If email confirmation is required, show message
-    if (data?.user && !data?.session) {
-        return redirect('/login?message=' + encodeURIComponent('Check your email to confirm your account before logging in.'))
-    }
+        // If email confirmation is required, show message
+        if (data?.user && !data?.session) {
+            return redirect('/login?message=' + encodeURIComponent('Check your email to confirm your account before logging in.'))
+        }
 
-    revalidatePath('/', 'layout')
-    return redirect('/dashboard')
+        revalidatePath('/', 'layout')
+        return redirect('/dashboard')
+    } catch (error) {
+        console.error('Signup exception:', error)
+        const errorMessage = error instanceof Error ? error.message : 'An error occurred during signup'
+        return redirect('/signup?message=' + encodeURIComponent(errorMessage))
+    }
 }
 
 export async function signout() {

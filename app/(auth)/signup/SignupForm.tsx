@@ -47,6 +47,7 @@ interface FieldErrors {
 
 export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }: SignupFormProps) {
     const router = useRouter()
+    const [isMounted, setIsMounted] = useState(false)
     const [currentStep, setCurrentStep] = useState(1)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [validationError, setValidationError] = useState<string>('')
@@ -66,6 +67,11 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
         selectedPlan: selectedPlan,
         redirectAfter: redirectAfter || ''
     })
+
+    // Prevent hydration mismatch
+    useEffect(() => {
+        setIsMounted(true)
+    }, [])
 
     // Reset submitting state if there's an error message (means we've been redirected back)
     useEffect(() => {
@@ -303,36 +309,58 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
             })
 
             // Call the server action - it will handle redirects
-            await signup(formElement)
+            try {
+                await signup(formElement)
+            } catch (signupErr) {
+                // Redirects throw NEXT_REDIRECT error which is expected
+                // Only handle actual errors here
+                if (signupErr && typeof signupErr === 'object' && 'digest' in signupErr) {
+                    // This is a Next.js redirect, let it propagate
+                    throw signupErr
+                }
+                // Handle other errors
+                console.error('Signup error:', signupErr)
+                const errorMsg = signupErr instanceof Error ? signupErr.message : 'An error occurred during signup. Please try again.'
+                setValidationError(errorMsg)
+                setIsSubmitting(false)
+            }
         } catch (error) {
-            // Redirects throw NEXT_REDIRECT error which is expected
-            // Only handle actual errors here
+            console.error('Form submit error:', error)
             if (error && typeof error === 'object' && 'digest' in error) {
-                // This is a Next.js redirect, let it propagate
                 throw error
             }
-            // Handle other errors
-            console.error('Signup error:', error)
-            setValidationError('An error occurred during signup. Please try again.')
+            setValidationError('An unexpected error occurred. Please try again.')
             setIsSubmitting(false)
         }
     }
 
     return (
         <Card className="max-w-2xl mx-auto relative">
-            {isSubmitting && (
-                <div className="absolute inset-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm z-50 flex items-center justify-center rounded-lg">
+            {!isMounted ? (
+                <CardContent className="pt-6">
                     <div className="text-center">
                         <svg className="animate-spin h-12 w-12 mx-auto mb-4 text-emerald-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
-                        <p className="text-lg font-semibold text-gray-900 dark:text-white">Creating your account...</p>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">Please wait, this may take a moment</p>
+                        <p className="text-lg font-semibold text-gray-900 dark:text-white">Loading...</p>
                     </div>
-                </div>
-            )}
-            <CardHeader className="space-y-1">
+                </CardContent>
+            ) : (
+                <>
+                    {isSubmitting && (
+                        <div className="absolute inset-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm z-50 flex items-center justify-center rounded-lg">
+                            <div className="text-center">
+                                <svg className="animate-spin h-12 w-12 mx-auto mb-4 text-emerald-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <p className="text-lg font-semibold text-gray-900 dark:text-white">Creating your account...</p>
+                                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">Please wait, this may take a moment</p>
+                            </div>
+                        </div>
+                    )}
+                    <CardHeader className="space-y-1">
                 <CardTitle className="text-2xl font-bold">Create Your Account</CardTitle>
                 <CardDescription>
                     {paymentData ? (
@@ -838,6 +866,8 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
                     </div>
                 </form>
             </CardContent>
+                </>
+            )}
         </Card>
     )
 }

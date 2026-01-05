@@ -72,7 +72,7 @@ async function getEmailTransporter() {
 // Helper function to safely send emails with error handling
 async function sendEmailSafely(emailParams: any) {
   try {
-    const transporter = getEmailTransporter()
+    const transporter = await getEmailTransporter()
     
     console.log('📧 Sending email to:', emailParams.to)
     console.log('📧 From:', emailParams.from)
@@ -201,11 +201,11 @@ export async function sendInvoiceEmail({
   pdfUrl: string
 }) {
   try {
-    const resend = getResendClient()
+    const settings = await getSMTPSettings()
     
-    const { data, error } = await resend.emails.send({
-      from: FROM_EMAIL,
+    const emailParams = {
       to,
+      from: `${settings.from_name} <${settings.from_email}>`,
       subject: `Invoice ${invoiceNumber} from BillBooky`,
       html: `
         <!DOCTYPE html>
@@ -270,20 +270,15 @@ export async function sendInvoiceEmail({
               </div>
               <div class="footer">
                 <p>This email was sent from BillBooky</p>
-                <p>For support, contact us at ${FROM_EMAIL}</p>
+                <p>For support, contact us at ${settings.from_email}</p>
               </div>
             </div>
           </body>
         </html>
       `,
-    })
-
-    if (error) {
-      console.error('Error sending invoice email:', error)
-      throw new Error('Failed to send invoice email')
     }
 
-    return { success: true, data }
+    return await sendEmailSafely(emailParams)
   } catch (error) {
     console.error('Error in sendInvoiceEmail:', error)
     throw error
@@ -411,7 +406,7 @@ export async function sendWelcomeEmail({
                 <p style="margin-top: 10px;"><strong>The BillBooky Team</strong></p>
               </div>
               <div class="footer">
-                <p>Questions? Contact us at ${FROM_EMAIL}</p>
+                <p>Questions? Contact us at ${settings.from_email}</p>
                 <p style="margin-top: 10px;">&copy; 2026 BillBooky. All rights reserved.</p>
               </div>
             </div>
