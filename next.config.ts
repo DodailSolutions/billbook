@@ -111,43 +111,6 @@ const nextConfig: NextConfig = {
   },
 
   /* ====================================================================
-     WEBPACK OPTIMIZATION
-     ==================================================================== */
-  webpack: (config, { isServer }) => {
-    // Optimize bundle size
-    if (!isServer) {
-      config.optimization = {
-        ...config.optimization,
-        runtimeChunk: 'single',
-        splitChunks: {
-          chunks: 'all',
-          cacheGroups: {
-            default: false,
-            vendors: false,
-            // Vendor code
-            vendor: {
-              filename: 'chunks/vendor.[contenthash].js',
-              test: /node_modules/,
-              priority: 10,
-              reuseExistingChunk: true,
-              enforce: true,
-            },
-            // Common code
-            common: {
-              minChunks: 2,
-              priority: 5,
-              reuseExistingChunk: true,
-              filename: 'chunks/common.[contenthash].js',
-            },
-          },
-        },
-      };
-    }
-    
-    return config;
-  },
-
-  /* ====================================================================
      BUILD OPTIMIZATION
      ==================================================================== */
   productionBrowserSourceMaps: false, // Disable source maps in production
