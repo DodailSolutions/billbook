@@ -334,11 +334,13 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
         }
     }
 
+    if (!isMounted) {
+        return null
+    }
+
     return (
-        <Card className="max-w-2xl mx-auto relative" suppressHydrationWarning>
-            {!isMounted ? null : (
-                <>
-                    {isSubmitting && (
+        <Card className="max-w-2xl mx-auto relative">
+            {isSubmitting && (
                         <div className="absolute inset-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm z-50 flex items-center justify-center rounded-lg">
                             <div className="text-center">
                                 <svg className="animate-spin h-12 w-12 mx-auto mb-4 text-emerald-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -856,8 +858,6 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
                     </div>
                 </form>
             </CardContent>
-                </>
-            )}
         </Card>
     )
 }
