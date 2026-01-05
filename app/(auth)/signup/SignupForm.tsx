@@ -349,19 +349,7 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
 
     return (
         <Card className="max-w-2xl mx-auto relative" suppressHydrationWarning>
-            {isSubmitting && (
-                        <div className="absolute inset-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm z-50 flex items-center justify-center rounded-lg">
-                            <div className="text-center">
-                                <svg className="animate-spin h-12 w-12 mx-auto mb-4 text-emerald-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                                <p className="text-lg font-semibold text-gray-900 dark:text-white">Creating your account...</p>
-                                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">Please wait, this may take a moment</p>
-                            </div>
-                        </div>
-                    )}
-                    <CardHeader className="space-y-1">
+            <CardHeader className="space-y-1">
                 <CardTitle className="text-2xl font-bold">Create Your Account</CardTitle>
                 <CardDescription>
                     {paymentData ? (
@@ -376,6 +364,30 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
                         'Get started with your free account'
                     )}
                 </CardDescription>
+                
+                {/* Error Messages - Show at top, always visible */}
+                {message && (
+                    <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                        <p className="text-sm font-semibold text-red-800 dark:text-red-200 mb-2">
+                            {message}
+                        </p>
+                        {message.toLowerCase().includes('already') && (
+                            <p className="text-xs text-red-700 dark:text-red-300">
+                                Already have an account? <a href="/login" className="underline font-semibold hover:text-red-900 dark:hover:text-red-100">Login here</a>
+                            </p>
+                        )}
+                        {message.toLowerCase().includes('registered') && (
+                            <p className="text-xs text-red-700 dark:text-red-300">
+                                This email is already registered. <a href="/login" className="underline font-semibold hover:text-red-900 dark:hover:text-red-100">Login instead</a>
+                            </p>
+                        )}
+                        {message.toLowerCase().includes('confirm') && (
+                            <p className="text-xs text-red-700 dark:text-red-300">
+                                Need to resend confirmation email? <a href="/resend-confirmation" className="underline font-semibold hover:text-red-900 dark:hover:text-red-100">Click here</a>
+                            </p>
+                        )}
+                    </div>
+                )}
                 
                 {/* Progress Bar */}
                 <div className="pt-4">
@@ -422,6 +434,20 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
             </CardHeader>
 
             <CardContent>
+                {/* Loading Overlay - only show when actually submitting and no error message */}
+                {isSubmitting && !message && (
+                    <div className="absolute inset-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm z-50 flex items-center justify-center rounded-lg">
+                        <div className="text-center">
+                            <svg className="animate-spin h-12 w-12 mx-auto mb-4 text-emerald-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <p className="text-lg font-semibold text-gray-900 dark:text-white">Creating your account...</p>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">Please wait, this may take a moment</p>
+                        </div>
+                    </div>
+                )}
+                
                 {validationError && (
                     <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
                         <p className="text-sm font-semibold text-red-800 dark:text-red-200">
@@ -431,18 +457,13 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
                 )}
 
                 {message && (
-                    <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                        <p className="text-sm font-semibold text-red-800 dark:text-red-200 mb-2">
-                            {message}
+                    <div className="mb-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+                        <p className="text-sm font-semibold text-amber-800 dark:text-amber-200 mb-2">
+                            ℹ️ {message}
                         </p>
-                        {message.toLowerCase().includes('already') && (
-                            <p className="text-xs text-red-700 dark:text-red-300">
-                                Already have an account? <a href="/login" className="underline font-semibold hover:text-red-900 dark:hover:text-red-100">Login here</a>
-                            </p>
-                        )}
-                        {message.toLowerCase().includes('confirm') && (
-                            <p className="text-xs text-red-700 dark:text-red-300">
-                                Need to resend confirmation email? <a href="/resend-confirmation" className="underline font-semibold hover:text-red-900 dark:hover:text-red-100">Click here</a>
+                        {message.toLowerCase().includes('registered') && (
+                            <p className="text-xs text-amber-700 dark:text-amber-300 mt-2">
+                                This email is already in use. <a href="/login" className="underline font-semibold hover:text-amber-900 dark:hover:text-amber-100">Please login instead</a>
                             </p>
                         )}
                     </div>
