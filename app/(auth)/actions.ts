@@ -167,6 +167,12 @@ export async function signup(formData: FormData) {
         revalidatePath('/', 'layout')
         return redirect('/dashboard')
     } catch (error) {
+        // Check if this is a Next.js redirect (they throw errors with digest property)
+        if (error && typeof error === 'object' && 'digest' in error && String(error).includes('NEXT_REDIRECT')) {
+            // This is an expected redirect, let it propagate
+            throw error
+        }
+        
         console.error('Signup exception:', error)
         const errorMessage = error instanceof Error ? error.message : 'An error occurred during signup'
         return redirect('/signup?message=' + encodeURIComponent(errorMessage))
