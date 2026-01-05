@@ -21,8 +21,24 @@ export async function login(formData: FormData) {
     })
 
     if (error) {
-        console.error('Login error:', error.message, error)
-        redirect('/login?message=' + encodeURIComponent(error.message || 'Could not authenticate user'))
+        console.error('Login error:', error.message, error.status)
+        
+        // Provide specific error messages based on error type
+        let errorMessage = 'Could not authenticate user'
+        
+        if (error.message.includes('Invalid login credentials')) {
+            errorMessage = 'Invalid email or password. Please check and try again.'
+        } else if (error.message.includes('Email not confirmed')) {
+            errorMessage = 'Please check your email to confirm your account before logging in.'
+        } else if (error.message.includes('User not found')) {
+            errorMessage = 'No account found with this email. Please sign up first.'
+        } else if (error.message.includes('too many')) {
+            errorMessage = 'Too many login attempts. Please try again later.'
+        } else {
+            errorMessage = error.message || 'Could not authenticate user'
+        }
+        
+        redirect('/login?message=' + encodeURIComponent(errorMessage))
     }
 
     if (!data.session) {
@@ -171,9 +187,10 @@ export async function resetPassword(formData: FormData) {
     }
 
     const supabase = await createClient()
+    
     // Supabase requires the redirect URL to go through /auth/callback
     // The callback will then redirect to /reset-password
-    const redirectUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://billbooky.dodail.com'}/auth/callback?next=/reset-password`
+    const redirectUrl = `${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://billbooky.dodail.com'}/auth/callback?next=/reset-password`
     
     console.log('🚀 Calling Supabase resetPasswordForEmail')
     console.log('📍 Redirect URL:', redirectUrl)
@@ -200,6 +217,12 @@ export async function resetPassword(formData: FormData) {
         
         if (error.message.includes('Invalid email')) {
             redirect('/forgot-password?error=' + encodeURIComponent('Please enter a valid email address'))
+        }
+        
+        // For user not found, show success anyway (security best practice)
+        if (error.message.includes('User not found') || error.status === 400) {
+            console.log('✅ User not found - showing success for security')
+            return redirect('/forgot-password?success=true&email=' + encodeURIComponent(email))
         }
         
         // Generic error with actual error message for debugging

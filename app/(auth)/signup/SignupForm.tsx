@@ -35,6 +35,7 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
     const router = useRouter()
     const [currentStep, setCurrentStep] = useState(1)
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const [validationError, setValidationError] = useState<string>('')
     const [formData, setFormData] = useState({
         fullName: '',
         email: '',
@@ -68,11 +69,45 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
     }
 
     const validateStep = (step: number): boolean => {
+        setValidationError('')
         switch (step) {
             case 1:
-                return !!(formData.fullName && formData.email && formData.password.length >= 6)
+                if (!formData.fullName) {
+                    setValidationError('Please enter your full name')
+                    return false
+                }
+                if (!formData.email) {
+                    setValidationError('Please enter your email address')
+                    return false
+                }
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+                if (!emailRegex.test(formData.email)) {
+                    setValidationError('Please enter a valid email address')
+                    return false
+                }
+                if (!formData.password) {
+                    setValidationError('Please enter a password')
+                    return false
+                }
+                if (formData.password.length < 6) {
+                    setValidationError('Password must be at least 6 characters long')
+                    return false
+                }
+                return true
             case 2:
-                return !!(formData.businessType && formData.businessName && formData.businessPhone)
+                if (!formData.businessType) {
+                    setValidationError('Please select a business type')
+                    return false
+                }
+                if (!formData.businessName) {
+                    setValidationError('Please enter your business name')
+                    return false
+                }
+                if (!formData.businessPhone) {
+                    setValidationError('Please enter your business phone number')
+                    return false
+                }
+                return true
             case 3:
                 return true // Review step, always valid
             default:
@@ -92,20 +127,27 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+        setValidationError('')
         
         // Validate all required fields before submission
         if (!formData.fullName || !formData.email || !formData.password) {
-            alert('Please fill in all required fields')
+            setValidationError('Please fill in all required fields')
             return
         }
 
         if (formData.password.length < 6) {
-            alert('Password must be at least 6 characters long')
+            setValidationError('Password must be at least 6 characters long')
+            return
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        if (!emailRegex.test(formData.email)) {
+            setValidationError('Please enter a valid email address')
             return
         }
 
         if (!formData.businessType || !formData.businessName || !formData.businessPhone) {
-            alert('Please fill in all required business information')
+            setValidationError('Please fill in all required business information')
             return
         }
 
@@ -143,13 +185,13 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
                         router.push('/dashboard?payment=success&welcome=true')
                     } else {
                         const data = await response.json()
-                        alert(data.error || 'Failed to verify payment and create account')
+                        setValidationError(data.error || 'Failed to verify payment and create account')
                         setIsSubmitting(false)
                     }
                     return
                 } catch (err) {
                     console.error('Payment verification error:', err)
-                    alert('Failed to verify payment. Please contact support.')
+                    setValidationError('Failed to verify payment. Please contact support.')
                     setIsSubmitting(false)
                     return
                 }
@@ -172,7 +214,7 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
             }
             // Handle other errors
             console.error('Signup error:', error)
-            alert('An error occurred during signup. Please try again.')
+            setValidationError('An error occurred during signup. Please try again.')
             setIsSubmitting(false)
         }
     }
@@ -252,6 +294,14 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
             </CardHeader>
 
             <CardContent>
+                {validationError && (
+                    <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                        <p className="text-sm font-semibold text-red-800 dark:text-red-200">
+                            {validationError}
+                        </p>
+                    </div>
+                )}
+
                 {message && (
                     <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
                         <p className="text-sm font-semibold text-red-800 dark:text-red-200 mb-2">
