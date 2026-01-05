@@ -328,30 +328,17 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
             })
 
             // Call the server action - it will handle redirects
-            try {
-                await signup(formElement)
-                // If we reach here without redirect, something unexpected happened
-                console.log('Signup completed without redirect')
-            } catch (signupErr) {
-                // Redirects throw NEXT_REDIRECT error which is expected
-                // Only handle actual errors here
-                if (signupErr && typeof signupErr === 'object' && 'digest' in signupErr) {
-                    // This is a Next.js redirect, let it propagate
-                    throw signupErr
-                }
-                // Handle other errors
-                console.error('Signup error:', signupErr)
-                const errorMsg = signupErr instanceof Error ? signupErr.message : 'An error occurred during signup. Please try again.'
-                setValidationError(errorMsg)
-                setIsSubmitting(false)
-            }
+            await signup(formElement)
         } catch (error) {
-            console.error('Form submit error:', error)
+            // Check if this is a Next.js redirect (expected behavior)
             if (error && typeof error === 'object' && 'digest' in error) {
-                // This is a Next.js redirect - let it propagate
+                // This is a Next.js redirect - let it propagate silently
                 throw error
             }
-            setValidationError('An unexpected error occurred. Please try again.')
+            // Handle actual errors
+            console.error('Signup error:', error)
+            const errorMsg = error instanceof Error ? error.message : 'An error occurred during signup. Please try again.'
+            setValidationError(errorMsg)
             setIsSubmitting(false)
         }
     }
