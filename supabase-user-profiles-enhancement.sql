@@ -35,17 +35,20 @@ ORDER BY total_users DESC;
 ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
 
 -- Policy for users to read their own profile
-CREATE POLICY IF NOT EXISTS "Users can view own profile" 
+DROP POLICY IF EXISTS "Users can view own profile" ON user_profiles;
+CREATE POLICY "Users can view own profile" 
 ON user_profiles FOR SELECT 
 USING (auth.uid() = id);
 
 -- Policy for users to update their own profile
-CREATE POLICY IF NOT EXISTS "Users can update own profile" 
+DROP POLICY IF EXISTS "Users can update own profile" ON user_profiles;
+CREATE POLICY "Users can update own profile" 
 ON user_profiles FOR UPDATE 
 USING (auth.uid() = id);
 
 -- Policy for inserting during signup
-CREATE POLICY IF NOT EXISTS "Users can insert own profile" 
+DROP POLICY IF EXISTS "Users can insert own profile" ON user_profiles;
+CREATE POLICY "Users can insert own profile" 
 ON user_profiles FOR INSERT 
 WITH CHECK (auth.uid() = id);
 
