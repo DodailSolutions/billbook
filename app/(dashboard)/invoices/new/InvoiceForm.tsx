@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Plus, Trash2, Info, X } from "lucide-react"
 import { Button } from "@/components/ui/Button"
@@ -48,7 +48,7 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
     const [itemName, setItemName] = useState('')
 
     // Load saved items from localStorage
-    useState(() => {
+    useEffect(() => {
         const saved = localStorage.getItem('savedInvoiceItems')
         if (saved) {
             setSavedItems(JSON.parse(saved))
