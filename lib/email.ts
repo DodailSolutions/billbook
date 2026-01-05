@@ -1,28 +1,70 @@
 'use server'
 
 import nodemailer from 'nodemailer'
+import { createClient } from '@/lib/supabase/server'
 
-const SMTP_HOST = process.env.SMTP_HOST || 'smtp-mail.outlook.com'
-const SMTP_PORT = parseInt(process.env.SMTP_PORT || '587')
-const SMTP_USER = process.env.SMTP_USER
-const SMTP_PASSWORD = process.env.SMTP_PASSWORD
-const FROM_EMAIL = process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER || 'support@dodail.com'
-const FROM_NAME = process.env.SMTP_FROM_NAME || 'BillBooky Support'
+const FALLBACK_SMTP_HOST = process.env.SMTP_HOST || 'smtp-mail.outlook.com'
+const FALLBACK_SMTP_PORT = parseInt(process.env.SMTP_PORT || '587')
+const FALLBACK_SMTP_USER = process.env.SMTP_USER
+const FALLBACK_SMTP_PASSWORD = process.env.SMTP_PASSWORD
+const FALLBACK_FROM_EMAIL = process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER || 'support@dodail.com'
+const FALLBACK_FROM_NAME = process.env.SMTP_FROM_NAME || 'BillBooky Support'
 
-// Create transporter for Outlook/Office365
-function getEmailTransporter() {
-  if (!SMTP_USER || !SMTP_PASSWORD) {
-    console.error('❌ SMTP credentials are not configured')
-    throw new Error('SMTP_USER and SMTP_PASSWORD must be configured in environment variables.')
+// Get SMTP settings from database or fallback to environment variables
+async function getSMTPSettings() {
+  try {
+    const supabase = await createClient()
+    const { data } = await supabase
+      .from('smtp_settings')
+      .select('*')
+      .eq('is_active', true)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single()
+
+    if (data) {
+      return {
+        host: data.smtp_host,
+        port: data.smtp_port,
+        user: data.smtp_user,
+        pass: data.smtp_password,
+        from_email: data.smtp_from_email,
+        from_name: data.smtp_from_name,
+      }
+    }
+  } catch (err) {
+    console.warn('⚠️ Failed to fetch SMTP settings from database, using environment variables')
   }
 
+  // Fallback to environment variables
+  if (!FALLBACK_SMTP_USER || !FALLBACK_SMTP_PASSWORD) {
+    console.error('❌ SMTP credentials are not configured')
+    throw new Error(
+      'SMTP settings not configured. Please configure SMTP settings in Admin > Email Configuration.'
+    )
+  }
+
+  return {
+    host: FALLBACK_SMTP_HOST,
+    port: FALLBACK_SMTP_PORT,
+    user: FALLBACK_SMTP_USER,
+    pass: FALLBACK_SMTP_PASSWORD,
+    from_email: FALLBACK_FROM_EMAIL,
+    from_name: FALLBACK_FROM_NAME,
+  }
+}
+
+// Create transporter using database or environment settings
+async function getEmailTransporter() {
+  const settings = await getSMTPSettings()
+
   return nodemailer.createTransport({
-    host: SMTP_HOST,
-    port: SMTP_PORT,
-    secure: false, // Use TLS (STARTTLS)
+    host: settings.host,
+    port: settings.port,
+    secure: settings.port === 465, // Use secure for port 465
     auth: {
-      user: SMTP_USER,
-      pass: SMTP_PASSWORD,
+      user: settings.user,
+      pass: settings.pass,
     },
   })
 }
@@ -57,11 +99,12 @@ export async function sendContactEmail({
   message: string
 }) {
   try {
-    const transporter = getEmailTransporter()
+    const transporter = await getEmailTransporter()
+    const settings = await getSMTPSettings()
     
     await transporter.sendMail({
-      from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
-      to: FROM_EMAIL, // Send to support email
+      from: `"${settings.from_name}" <${settings.from_email}>`,
+      to: settings.from_email, // Send to support email
       replyTo: email, // Allow replying to the customer
       subject: `Contact Form: ${subject}`,
       html: `
@@ -262,10 +305,11 @@ export async function sendWelcomeEmail({
       throw new Error('Missing required parameters: to and name')
     }
 
-    const transporter = getEmailTransporter()
+    const transporter = await getEmailTransporter()
+    const settings = await getSMTPSettings()
 
     await transporter.sendMail({
-      from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
+      from: `"${settings.from_name}" <${settings.from_email}>`,
       to,
       subject: 'Welcome to BillBooky! 🎉',
       html: `
@@ -399,13 +443,14 @@ export async function sendPurchaseConfirmationEmail({
   paymentId: string
 }) {
   try {
-    const resend = getResendClient()
+    const transporter = await getEmailTransporter()
+    const settings = await getSMTPSettings()
     
     const planName = plan === 'lifetime' ? 'Lifetime Professional' : plan.charAt(0).toUpperCase() + plan.slice(1)
     const isLifetime = plan === 'lifetime'
     
-    const { data, error } = await resend.emails.send({
-      from: FROM_EMAIL,
+    await transporter.sendMail({
+      from: `"${settings.from_name}" <${settings.from_email}>`,
       to,
       subject: `Payment Successful - ${planName} Plan 🎉`,
       html: `
@@ -537,7 +582,7 @@ export async function sendPurchaseConfirmationEmail({
                 <p style="margin-top: 20px;"><strong>Thank you for choosing BillBooky!</strong></p>
               </div>
               <div class="footer">
-                <p>Need help? Contact us at ${FROM_EMAIL}</p>
+                <p>Need help? Contact us at ${settings.from_email}</p>
                 <p style="margin-top: 10px;">&copy; 2026 BillBooky. All rights reserved.</p>
               </div>
             </div>
@@ -546,12 +591,7 @@ export async function sendPurchaseConfirmationEmail({
       `,
     })
 
-    if (error) {
-      console.error('Error sending purchase confirmation email:', error)
-      throw new Error('Failed to send purchase confirmation email')
-    }
-
-    return { success: true, data }
+    return { success: true }
   } catch (error) {
     console.error('Error in sendPurchaseConfirmationEmail:', error)
     throw error
