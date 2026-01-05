@@ -3,6 +3,9 @@ import { SignupForm } from "./SignupForm"
 import { CardFooter } from "@/components/ui/Card"
 import { ArrowLeft } from "lucide-react"
 
+export const revalidate = 0
+export const dynamic = 'force-dynamic'
+
 export default function SignupPage({ searchParams }: { searchParams: { message?: string; plan?: string; redirect?: string; payment?: string } }) {
     const selectedPlan = searchParams.plan || 'free'
     const redirectAfter = searchParams.redirect
