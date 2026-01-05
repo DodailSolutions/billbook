@@ -51,9 +51,9 @@ export default function LoginForm({ message }: { message?: string }) {
 
         try {
             await login(formData)
-        } catch (err: any) {
+        } catch (err: Error | unknown) {
             // Handle redirect errors (which are expected)
-            if (err?.digest?.includes('NEXT_REDIRECT')) {
+            if (err instanceof Error && err.message?.includes('NEXT_REDIRECT')) {
                 return
             }
             setClientError('An unexpected error occurred. Please try again.')
@@ -133,7 +133,7 @@ export default function LoginForm({ message }: { message?: string }) {
                 </CardContent>
                 <CardFooter className="flex justify-center">
                     <p className="text-sm text-muted-foreground">
-                        Don't have an account?{" "}
+                        Don&apos;t have an account?{" "}
                         <Link href="/signup" className="text-primary hover:underline">
                             Sign up
                         </Link>
