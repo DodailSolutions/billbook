@@ -71,40 +71,49 @@ ALTER TABLE invoice_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE invoice_sequences ENABLE ROW LEVEL SECURITY;
 
 -- Customers Policies
+DROP POLICY IF EXISTS "Users can view their own customers" ON customers;
 CREATE POLICY "Users can view their own customers"
   ON customers FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert their own customers" ON customers;
 CREATE POLICY "Users can insert their own customers"
   ON customers FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update their own customers" ON customers;
 CREATE POLICY "Users can update their own customers"
   ON customers FOR UPDATE
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can delete their own customers" ON customers;
 CREATE POLICY "Users can delete their own customers"
   ON customers FOR DELETE
   USING (auth.uid() = user_id);
 
 -- Invoices Policies
+DROP POLICY IF EXISTS "Users can view their own invoices" ON invoices;
 CREATE POLICY "Users can view their own invoices"
   ON invoices FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert their own invoices" ON invoices;
 CREATE POLICY "Users can insert their own invoices"
   ON invoices FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update their own invoices" ON invoices;
 CREATE POLICY "Users can update their own invoices"
   ON invoices FOR UPDATE
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can delete their own invoices" ON invoices;
 CREATE POLICY "Users can delete their own invoices"
   ON invoices FOR DELETE
   USING (auth.uid() = user_id);
 
 -- Invoice Items Policies
+DROP POLICY IF EXISTS "Users can view invoice items for their invoices" ON invoice_items;
 CREATE POLICY "Users can view invoice items for their invoices"
   ON invoice_items FOR SELECT
   USING (
@@ -115,6 +124,7 @@ CREATE POLICY "Users can view invoice items for their invoices"
     )
   );
 
+DROP POLICY IF EXISTS "Users can insert invoice items for their invoices" ON invoice_items;
 CREATE POLICY "Users can insert invoice items for their invoices"
   ON invoice_items FOR INSERT
   WITH CHECK (
@@ -125,6 +135,7 @@ CREATE POLICY "Users can insert invoice items for their invoices"
     )
   );
 
+DROP POLICY IF EXISTS "Users can update invoice items for their invoices" ON invoice_items;
 CREATE POLICY "Users can update invoice items for their invoices"
   ON invoice_items FOR UPDATE
   USING (
@@ -135,6 +146,7 @@ CREATE POLICY "Users can update invoice items for their invoices"
     )
   );
 
+DROP POLICY IF EXISTS "Users can delete invoice items for their invoices" ON invoice_items;
 CREATE POLICY "Users can delete invoice items for their invoices"
   ON invoice_items FOR DELETE
   USING (
@@ -146,14 +158,17 @@ CREATE POLICY "Users can delete invoice items for their invoices"
   );
 
 -- Invoice Sequences Policies
+DROP POLICY IF EXISTS "Users can view their own invoice sequence" ON invoice_sequences;
 CREATE POLICY "Users can view their own invoice sequence"
   ON invoice_sequences FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert their own invoice sequence" ON invoice_sequences;
 CREATE POLICY "Users can insert their own invoice sequence"
   ON invoice_sequences FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update their own invoice sequence" ON invoice_sequences;
 CREATE POLICY "Users can update their own invoice sequence"
   ON invoice_sequences FOR UPDATE
   USING (auth.uid() = user_id);
@@ -168,16 +183,19 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Triggers for updated_at
+DROP TRIGGER IF EXISTS update_customers_updated_at ON customers;
 CREATE TRIGGER update_customers_updated_at
   BEFORE UPDATE ON customers
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_invoices_updated_at ON invoices;
 CREATE TRIGGER update_invoices_updated_at
   BEFORE UPDATE ON invoices
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_invoice_sequences_updated_at ON invoice_sequences;
 CREATE TRIGGER update_invoice_sequences_updated_at
   BEFORE UPDATE ON invoice_sequences
   FOR EACH ROW
