@@ -1,35 +1,58 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* Performance optimizations */
+  /* ====================================================================
+     REACT COMPILER & PERFORMANCE OPTIMIZATIONS
+     ==================================================================== */
   reactCompiler: true,
-  
-  // Optimize output for production
+  swcMinify: true,
   poweredByHeader: false,
   compress: true,
   
-  // Optimize images
+  /* ====================================================================
+     IMAGE OPTIMIZATION
+     ==================================================================== */
   images: {
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 60,
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    // Limit image optimization to improve build time
+    staticGenerationTimeout: 300,
   },
   
-  // Enable experimental features for better performance
+  /* ====================================================================
+     EXPERIMENTAL OPTIMIZATIONS
+     ==================================================================== */
   experimental: {
-    optimizePackageImports: ['lucide-react', '@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
+    optimizePackageImports: [
+      'lucide-react',
+      '@radix-ui/react-dialog',
+      '@radix-ui/react-dropdown-menu',
+      '@radix-ui/react-select',
+      'date-fns',
+    ],
+    // Enable optimized font loading
+    optimizeFonts: true,
+    // Preload static assets
+    preloadEntriesOnStart: true,
   },
   
-  // Headers for caching and security
+  /* ====================================================================
+     SECURITY HEADERS
+     ==================================================================== */
   async headers() {
     return [
       {
-        source: '/:all*(svg|jpg|png|webp|avif)',
+        source: '/:all*(svg|jpg|png|webp|avif|gif)',
         headers: [
           {
             key: 'Cache-Control',
             value: 'public, max-age=31536000, immutable',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
           },
         ],
       },
@@ -42,8 +65,122 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      {
+        source: '/:path*',
+        headers: [
+          // Content Security Policy
+          {
+            key: 'Content-Security-Policy',
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com; frame-src https://checkout.razorpay.com; connect-src 'self' https: wss:; font-src 'self' data:; img-src 'self' data: https:; style-src 'self' 'unsafe-inline';",
+          },
+          // Security headers
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=()',
+          },
+          // HSTS (HTTP Strict Transport Security)
+          {
+            key: 'Strict-Transport-Security',
+            value: 'max-age=63072000; includeSubDomains; preload',
+          },
+        ],
+      },
     ];
   },
+  
+  /* ====================================================================
+     REDIRECT RULES - Remove trailing slashes
+     ==================================================================== */
+  async redirects() {
+    return [
+      {
+        source: '/:path+/',
+        destination: '/:path+',
+        permanent: true,
+      },
+    ];
+  },
+
+  /* ====================================================================
+     WEBPACK OPTIMIZATION
+     ==================================================================== */
+  webpack: (config, { isServer }) => {
+    // Optimize bundle size
+    if (!isServer) {
+      config.optimization = {
+        ...config.optimization,
+        runtimeChunk: 'single',
+        splitChunks: {
+          chunks: 'all',
+          cacheGroups: {
+            default: false,
+            vendors: false,
+            // Vendor code
+            vendor: {
+              filename: 'chunks/vendor.[contenthash].js',
+              test: /node_modules/,
+              priority: 10,
+              reuseExistingChunk: true,
+              enforce: true,
+            },
+            // Common code
+            common: {
+              minChunks: 2,
+              priority: 5,
+              reuseExistingChunk: true,
+              filename: 'chunks/common.[contenthash].js',
+            },
+          },
+        },
+      };
+    }
+    
+    return config;
+  },
+
+  /* ====================================================================
+     ENV VALIDATION
+     ==================================================================== */
+  serverRuntimeConfig: {
+    // Only available on server side
+    apiSecret: process.env.API_SECRET,
+    jwtSecret: process.env.JWT_SECRET,
+  },
+  publicRuntimeConfig: {
+    // Available on both server and client
+    apiUrl: process.env.NEXT_PUBLIC_API_URL,
+  },
+
+  /* ====================================================================
+     BUILD OPTIMIZATION
+     ==================================================================== */
+  productionBrowserSourceMaps: false, // Disable source maps in production
+  optimizeFonts: true,
+  generateEtags: true,
+  
+  /* ====================================================================
+     TRACING & ANALYTICS (Optional)
+     ==================================================================== */
+  // onDemandEntries: {
+  //   maxInactiveAge: 60 * 1000,
+  //   pagesBufferLength: 5,
+  // },
 };
 
 export default nextConfig;

@@ -6,8 +6,18 @@ import { Button } from '@/components/ui/Button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Input } from '@/components/ui/Input'
 import { Progress } from '@/components/ui/Progress'
-import { ChevronLeft, ChevronRight, Check } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Check, AlertCircle, CheckCircle } from 'lucide-react'
 import { signup } from '../actions'
+import { PasswordStrengthIndicator } from '@/components/auth/PasswordStrengthIndicator'
+import { 
+    validateEmail, 
+    validatePassword, 
+    validateFullName, 
+    validateBusinessName, 
+    validatePhoneNumber, 
+    validateGSTIN,
+    validateAddress
+} from '@/lib/validation/auth'
 
 const BUSINESS_TYPES = [
     { value: 'dental', label: 'Dental Clinic' },
@@ -31,11 +41,17 @@ interface SignupFormProps {
     paymentData?: string | null
 }
 
+interface FieldErrors {
+    [key: string]: string | undefined
+}
+
 export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }: SignupFormProps) {
     const router = useRouter()
     const [currentStep, setCurrentStep] = useState(1)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [validationError, setValidationError] = useState<string>('')
+    const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
+    const [touched, setTouched] = useState<Record<string, boolean>>({})
     const [formData, setFormData] = useState({
         fullName: '',
         email: '',
@@ -62,60 +78,124 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
     const progress = (currentStep / totalSteps) * 100
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value } = e.target
         setFormData(prev => ({
             ...prev,
-            [e.target.name]: e.target.value
+            [name]: value
         }))
+        
+        // Real-time validation on change if field has been touched
+        if (touched[name]) {
+            validateField(name, value)
+        }
+    }
+
+    const validateField = (field: string, value: string): boolean => {
+        let isValid = true
+        let errorMsg: string | undefined
+
+        switch (field) {
+            case 'fullName':
+                const fullNameResult = validateFullName(value)
+                isValid = fullNameResult.isValid
+                errorMsg = fullNameResult.error
+                break
+            case 'email':
+                const emailResult = validateEmail(value)
+                isValid = emailResult.isValid
+                errorMsg = emailResult.error
+                break
+            case 'password':
+                const passwordResult = validatePassword(value)
+                isValid = passwordResult.isValid
+                errorMsg = passwordResult.error
+                break
+            case 'businessName':
+                const bizNameResult = validateBusinessName(value)
+                isValid = bizNameResult.isValid
+                errorMsg = bizNameResult.error
+                break
+            case 'businessPhone':
+                const phoneResult = validatePhoneNumber(value)
+                isValid = phoneResult.isValid
+                errorMsg = phoneResult.error
+                break
+            case 'gstin':
+                const gstinResult = validateGSTIN(value)
+                isValid = gstinResult.isValid
+                errorMsg = gstinResult.error
+                break
+            case 'businessAddress':
+                const addrResult = validateAddress(value)
+                isValid = addrResult.isValid
+                errorMsg = addrResult.error
+                break
+        }
+
+        setFieldErrors(prev => ({
+            ...prev,
+            [field]: errorMsg
+        }))
+
+        return isValid
+    }
+
+    const handleBlur = (field: string) => {
+        setTouched(prev => ({ ...prev, [field]: true }))
+        validateField(field, formData[field as keyof typeof formData] as string)
     }
 
     const validateStep = (step: number): boolean => {
         setValidationError('')
+        let isStepValid = true
+
         switch (step) {
             case 1:
-                if (!formData.fullName) {
-                    setValidationError('Please enter your full name')
-                    return false
+                const fullNameValid = validateField('fullName', formData.fullName)
+                const emailValid = validateField('email', formData.email)
+                const passwordValid = validateField('password', formData.password)
+                
+                isStepValid = fullNameValid && emailValid && passwordValid
+                
+                if (!isStepValid) {
+                    setValidationError('Please fix the errors above before proceeding')
                 }
-                if (!formData.email) {
-                    setValidationError('Please enter your email address')
-                    return false
-                }
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-                if (!emailRegex.test(formData.email)) {
-                    setValidationError('Please enter a valid email address')
-                    return false
-                }
-                if (!formData.password) {
-                    setValidationError('Please enter a password')
-                    return false
-                }
-                if (formData.password.length < 6) {
-                    setValidationError('Password must be at least 6 characters long')
-                    return false
-                }
-                return true
+                break
             case 2:
                 if (!formData.businessType) {
                     setValidationError('Please select a business type')
                     return false
                 }
-                if (!formData.businessName) {
-                    setValidationError('Please enter your business name')
-                    return false
+                const bizNameValid = validateField('businessName', formData.businessName)
+                const phoneValid = validateField('businessPhone', formData.businessPhone)
+                
+                isStepValid = bizNameValid && phoneValid
+                
+                if (!isStepValid) {
+                    setValidationError('Please fix the errors above before proceeding')
                 }
-                if (!formData.businessPhone) {
-                    setValidationError('Please enter your business phone number')
-                    return false
-                }
-                return true
+                break
             case 3:
                 return true // Review step, always valid
             default:
                 return false
         }
+
+        return isStepValid
     }
 
     const handleNext = () => {
+        // Mark all fields in this step as touched
+        const fieldsInStep = currentStep === 1 
+            ? ['fullName', 'email', 'password']
+            : currentStep === 2
+            ? ['businessType', 'businessName', 'businessPhone']
+            : []
+        
+        fieldsInStep.forEach(field => {
+            setTouched(prev => ({ ...prev, [field]: true }))
+        })
+
         if (validateStep(currentStep)) {
             setCurrentStep(prev => Math.min(prev + 1, totalSteps))
         }
@@ -123,6 +203,25 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
 
     const handlePrevious = () => {
         setCurrentStep(prev => Math.max(prev - 1, 1))
+    }
+
+    const getFieldState = (field: string): 'error' | 'valid' | 'default' => {
+        if (!touched[field]) return 'default'
+        if (fieldErrors[field]) return 'error'
+        if (formData[field as keyof typeof formData]) return 'valid'
+        return 'default'
+    }
+
+    const getFieldBorderClass = (field: string): string => {
+        const state = getFieldState(field)
+        switch (state) {
+            case 'error':
+                return 'border-red-500 focus:ring-red-500'
+            case 'valid':
+                return 'border-emerald-500 focus:ring-emerald-500'
+            default:
+                return 'border-gray-300'
+        }
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -328,6 +427,7 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
                                 Personal Information
                             </h3>
                             <div className="space-y-4">
+                                {/* Full Name */}
                                 <div className="space-y-2">
                                     <label htmlFor="fullName" className="text-sm font-medium leading-none">
                                         Full Name <span className="text-red-500">*</span>
@@ -339,12 +439,29 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
                                         placeholder="John Doe" 
                                         value={formData.fullName}
                                         onChange={handleInputChange}
+                                        onBlur={() => handleBlur('fullName')}
+                                        className={`transition-colors ${getFieldBorderClass('fullName')}`}
                                         required 
+                                        autoComplete="name"
                                     />
+                                    {touched.fullName && fieldErrors.fullName && (
+                                        <p className="text-xs font-medium text-red-600 dark:text-red-400 flex items-center gap-1 mt-1">
+                                            <AlertCircle className="w-3 h-3" />
+                                            {fieldErrors.fullName}
+                                        </p>
+                                    )}
+                                    {touched.fullName && getFieldState('fullName') === 'valid' && (
+                                        <p className="text-xs font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                                            <CheckCircle className="w-3 h-3" />
+                                            Name looks good
+                                        </p>
+                                    )}
                                 </div>
+
+                                {/* Email */}
                                 <div className="space-y-2">
                                     <label htmlFor="email" className="text-sm font-medium leading-none">
-                                        Email <span className="text-red-500">*</span>
+                                        Email Address <span className="text-red-500">*</span>
                                     </label>
                                     <Input 
                                         id="email" 
@@ -353,13 +470,26 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
                                         placeholder="your.email@example.com"
                                         value={formData.email}
                                         onChange={handleInputChange}
+                                        onBlur={() => handleBlur('email')}
+                                        className={`transition-colors ${getFieldBorderClass('email')}`}
                                         required
-                                        className={formData.email && !formData.email.includes('@') ? 'border-red-500' : ''}
+                                        autoComplete="email"
                                     />
-                                    {formData.email && !formData.email.includes('@') && formData.email.length > 0 && (
-                                        <p className="text-xs text-red-500">Please enter a valid email address</p>
+                                    {touched.email && fieldErrors.email && (
+                                        <p className="text-xs font-medium text-red-600 dark:text-red-400 flex items-center gap-1 mt-1">
+                                            <AlertCircle className="w-3 h-3" />
+                                            {fieldErrors.email}
+                                        </p>
+                                    )}
+                                    {touched.email && getFieldState('email') === 'valid' && (
+                                        <p className="text-xs font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                                            <CheckCircle className="w-3 h-3" />
+                                            Email verified
+                                        </p>
                                     )}
                                 </div>
+
+                                {/* Password */}
                                 <div className="space-y-2">
                                     <label htmlFor="password" className="text-sm font-medium leading-none">
                                         Password <span className="text-red-500">*</span>
@@ -371,17 +501,21 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
                                         placeholder="Create a strong password"
                                         value={formData.password}
                                         onChange={handleInputChange}
+                                        onBlur={() => handleBlur('password')}
+                                        className={`transition-colors ${getFieldBorderClass('password')}`}
                                         minLength={6} 
                                         required
-                                        className={formData.password && formData.password.length < 6 ? 'border-red-500' : ''}
+                                        autoComplete="new-password"
                                     />
-                                    <p className="text-xs text-gray-500">
-                                        {formData.password && formData.password.length > 0 && formData.password.length < 6 ? (
-                                            <span className="text-red-500">Password must be at least 6 characters</span>
-                                        ) : (
-                                            'Minimum 6 characters'
-                                        )}
-                                    </p>
+                                    {touched.password && fieldErrors.password && (
+                                        <p className="text-xs font-medium text-red-600 dark:text-red-400 flex items-center gap-1 mt-1">
+                                            <AlertCircle className="w-3 h-3" />
+                                            {fieldErrors.password}
+                                        </p>
+                                    )}
+                                    {formData.password && (
+                                        <PasswordStrengthIndicator password={formData.password} />
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -394,6 +528,7 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
                                 Business Information
                             </h3>
                             <div className="space-y-4">
+                                {/* Business Type */}
                                 <div className="space-y-2">
                                     <label htmlFor="businessType" className="text-sm font-medium leading-none">
                                         Business Type <span className="text-red-500">*</span>
@@ -403,7 +538,10 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
                                         name="businessType"
                                         value={formData.businessType}
                                         onChange={handleInputChange}
-                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                        onBlur={() => handleBlur('businessType')}
+                                        className={`flex h-10 w-full rounded-md border bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors ${
+                                            !formData.businessType && touched.businessType ? 'border-red-500' : 'border-gray-300'
+                                        }`}
                                         required
                                     >
                                         <option value="">Select your business type</option>
@@ -411,9 +549,22 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
                                             <option key={type.value} value={type.value}>{type.label}</option>
                                         ))}
                                     </select>
+                                    {!formData.businessType && touched.businessType && (
+                                        <p className="text-xs font-medium text-red-600 dark:text-red-400 flex items-center gap-1">
+                                            <AlertCircle className="w-3 h-3" />
+                                            Please select a business type
+                                        </p>
+                                    )}
+                                    {formData.businessType && (
+                                        <p className="text-xs font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                                            <CheckCircle className="w-3 h-3" />
+                                            {BUSINESS_TYPES.find(t => t.value === formData.businessType)?.label}
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div className="grid md:grid-cols-2 gap-4">
+                                    {/* Business Name */}
                                     <div className="space-y-2">
                                         <label htmlFor="businessName" className="text-sm font-medium leading-none">
                                             Business Name <span className="text-red-500">*</span>
@@ -425,12 +576,28 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
                                             placeholder="ABC Dental Clinic"
                                             value={formData.businessName}
                                             onChange={handleInputChange}
+                                            onBlur={() => handleBlur('businessName')}
+                                            className={`transition-colors ${getFieldBorderClass('businessName')}`}
                                             required 
                                         />
+                                        {touched.businessName && fieldErrors.businessName && (
+                                            <p className="text-xs font-medium text-red-600 dark:text-red-400 flex items-center gap-1">
+                                                <AlertCircle className="w-3 h-3" />
+                                                {fieldErrors.businessName}
+                                            </p>
+                                        )}
+                                        {touched.businessName && getFieldState('businessName') === 'valid' && (
+                                            <p className="text-xs font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                                                <CheckCircle className="w-3 h-3" />
+                                                Business name valid
+                                            </p>
+                                        )}
                                     </div>
+
+                                    {/* Owner Name */}
                                     <div className="space-y-2">
                                         <label htmlFor="ownerName" className="text-sm font-medium leading-none">
-                                            Owner Name
+                                            Owner Name <span className="text-gray-500">(Optional)</span>
                                         </label>
                                         <Input 
                                             id="ownerName" 
@@ -443,9 +610,10 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
                                     </div>
                                 </div>
 
+                                {/* Business Address */}
                                 <div className="space-y-2">
                                     <label htmlFor="businessAddress" className="text-sm font-medium leading-none">
-                                        Business Address
+                                        Business Address <span className="text-gray-500">(Optional)</span>
                                     </label>
                                     <Input 
                                         id="businessAddress" 
@@ -454,10 +622,19 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
                                         placeholder="123 Main Street, City, State"
                                         value={formData.businessAddress}
                                         onChange={handleInputChange}
+                                        onBlur={() => handleBlur('businessAddress')}
+                                        className={`transition-colors ${getFieldBorderClass('businessAddress')}`}
                                     />
+                                    {touched.businessAddress && fieldErrors.businessAddress && (
+                                        <p className="text-xs font-medium text-red-600 dark:text-red-400 flex items-center gap-1">
+                                            <AlertCircle className="w-3 h-3" />
+                                            {fieldErrors.businessAddress}
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div className="grid md:grid-cols-2 gap-4">
+                                    {/* Business Phone */}
                                     <div className="space-y-2">
                                         <label htmlFor="businessPhone" className="text-sm font-medium leading-none">
                                             Business Phone <span className="text-red-500">*</span>
@@ -469,12 +646,29 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
                                             placeholder="+91 9876543210"
                                             value={formData.businessPhone}
                                             onChange={handleInputChange}
+                                            onBlur={() => handleBlur('businessPhone')}
+                                            className={`transition-colors ${getFieldBorderClass('businessPhone')}`}
                                             required 
+                                            autoComplete="tel"
                                         />
+                                        {touched.businessPhone && fieldErrors.businessPhone && (
+                                            <p className="text-xs font-medium text-red-600 dark:text-red-400 flex items-center gap-1">
+                                                <AlertCircle className="w-3 h-3" />
+                                                {fieldErrors.businessPhone}
+                                            </p>
+                                        )}
+                                        {touched.businessPhone && getFieldState('businessPhone') === 'valid' && (
+                                            <p className="text-xs font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                                                <CheckCircle className="w-3 h-3" />
+                                                Phone number valid
+                                            </p>
+                                        )}
                                     </div>
+
+                                    {/* Business Email */}
                                     <div className="space-y-2">
                                         <label htmlFor="businessEmail" className="text-sm font-medium leading-none">
-                                            Business Email
+                                            Business Email <span className="text-gray-500">(Optional)</span>
                                         </label>
                                         <Input 
                                             id="businessEmail" 
@@ -487,9 +681,10 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
                                     </div>
                                 </div>
 
+                                {/* GSTIN */}
                                 <div className="space-y-2">
                                     <label htmlFor="gstin" className="text-sm font-medium leading-none">
-                                        GSTIN (Optional)
+                                        GSTIN <span className="text-gray-500">(Optional)</span>
                                     </label>
                                     <Input 
                                         id="gstin" 
@@ -498,9 +693,17 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
                                         placeholder="22AAAAA0000A1Z5"
                                         value={formData.gstin}
                                         onChange={handleInputChange}
-                                        maxLength={15} 
+                                        onBlur={() => handleBlur('gstin')}
+                                        className={`transition-colors ${getFieldBorderClass('gstin')}`}
+                                        maxLength={15}
                                     />
-                                    <p className="text-xs text-gray-500">Leave blank if not applicable</p>
+                                    {touched.gstin && fieldErrors.gstin && (
+                                        <p className="text-xs font-medium text-red-600 dark:text-red-400 flex items-center gap-1">
+                                            <AlertCircle className="w-3 h-3" />
+                                            {fieldErrors.gstin}
+                                        </p>
+                                    )}
+                                    <p className="text-xs text-gray-500">15-character GSTIN format. Leave blank if not applicable</p>
                                 </div>
                             </div>
                         </div>
