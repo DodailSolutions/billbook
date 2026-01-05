@@ -1,41 +1,46 @@
 'use server'
 
-import { Resend } from 'resend'
+import nodemailer from 'nodemailer'
 
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'support@dodail.com'
+const SMTP_HOST = process.env.SMTP_HOST || 'smtp-mail.outlook.com'
+const SMTP_PORT = parseInt(process.env.SMTP_PORT || '587')
+const SMTP_USER = process.env.SMTP_USER
+const SMTP_PASSWORD = process.env.SMTP_PASSWORD
+const FROM_EMAIL = process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER || 'support@dodail.com'
+const FROM_NAME = process.env.SMTP_FROM_NAME || 'BillBooky Support'
 
-function getResendClient() {
-  const apiKey = process.env.RESEND_API_KEY
-  if (!apiKey) {
-    console.error('❌ RESEND_API_KEY is not configured')
-    throw new Error('RESEND_API_KEY is not configured. Please add it to your environment variables.')
+// Create transporter for Outlook/Office365
+function getEmailTransporter() {
+  if (!SMTP_USER || !SMTP_PASSWORD) {
+    console.error('❌ SMTP credentials are not configured')
+    throw new Error('SMTP_USER and SMTP_PASSWORD must be configured in environment variables.')
   }
-  return new Resend(apiKey)
+
+  return nodemailer.createTransport({
+    host: SMTP_HOST,
+    port: SMTP_PORT,
+    secure: false, // Use TLS (STARTTLS)
+    auth: {
+      user: SMTP_USER,
+      pass: SMTP_PASSWORD,
+    },
+  })
 }
 
 // Helper function to safely send emails with error handling
 async function sendEmailSafely(emailParams: any) {
   try {
-    const resend = getResendClient()
+    const transporter = getEmailTransporter()
     
     console.log('📧 Sending email to:', emailParams.to)
     console.log('📧 From:', emailParams.from)
     
-    const { data, error } = await resend.emails.send(emailParams)
+    const info = await transporter.sendMail(emailParams)
 
-    if (error) {
-      console.error('❌ Resend API error:', {
-        message: error.message,
-        status: (error as any).status,
-        code: (error as any).code
-      })
-      return { success: false, error }
-    }
-
-    console.log('✅ Email sent successfully:', data?.id)
-    return { success: true, data }
+    console.log('✅ Email sent successfully:', info.messageId)
+    return { success: true, data: { id: info.messageId } }
   } catch (err) {
-    console.error('❌ Error in sendEmailSafely:', err)
+    console.error('❌ Error sending email:', err)
     return { success: false, error: err }
   }
 }
@@ -52,10 +57,10 @@ export async function sendContactEmail({
   message: string
 }) {
   try {
-    const resend = getResendClient()
+    const transporter = getEmailTransporter()
     
-    const { data, error } = await resend.emails.send({
-      from: FROM_EMAIL,
+    await transporter.sendMail({
+      from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
       to: FROM_EMAIL, // Send to support email
       replyTo: email, // Allow replying to the customer
       subject: `Contact Form: ${subject}`,
@@ -136,12 +141,7 @@ export async function sendContactEmail({
       `,
     })
 
-    if (error) {
-      console.error('Error sending email:', error)
-      throw new Error('Failed to send email')
-    }
-
-    return { success: true, data }
+    return { success: true, data: { id: 'sent' } }
   } catch (error) {
     console.error('Error in sendContactEmail:', error)
     throw error
@@ -262,8 +262,10 @@ export async function sendWelcomeEmail({
       throw new Error('Missing required parameters: to and name')
     }
 
-    const result = await sendEmailSafely({
-      from: FROM_EMAIL,
+    const transporter = getEmailTransporter()
+
+    await transporter.sendMail({
+      from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
       to,
       subject: 'Welcome to BillBooky! 🎉',
       html: `
@@ -374,14 +376,8 @@ export async function sendWelcomeEmail({
       `,
     })
 
-    if (!result.success) {
-      console.error('❌ Failed to send welcome email:', result.error)
-      // Don't throw - email failures should not block signup
-      return { success: false, error: result.error }
-    }
-
-    console.log('✅ Welcome email sent successfully')
-    return result
+    console.log('✅ Welcome email sent successfully to:', to)
+    return { success: true }
   } catch (error) {
     console.error('❌ Error in sendWelcomeEmail:', error)
     // Don't throw - email failures should not block signup

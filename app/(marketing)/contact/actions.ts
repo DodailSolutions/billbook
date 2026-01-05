@@ -43,7 +43,7 @@ export async function submitContactForm(formData: FormData) {
     
     // Check if it's a configuration error
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-    if (errorMessage.includes('RESEND_API_KEY')) {
+    if (errorMessage.includes('SMTP')) {
       return {
         success: false,
         message: 'Email service is not configured yet. Please email us directly at support@dodail.com',
