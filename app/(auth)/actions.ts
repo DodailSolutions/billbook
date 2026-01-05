@@ -128,16 +128,22 @@ export async function signup(formData: FormData) {
                 console.log('Profile created successfully')
             }
 
-            // Send welcome email (non-blocking)
+            // Send welcome email (non-blocking - don't fail signup if email fails)
             try {
-                await sendWelcomeEmail({
+                console.log('📧 Attempting to send welcome email to:', email)
+                const emailResult = await sendWelcomeEmail({
                     to: email,
                     name: fullName || ownerName || email.split('@')[0]
                 })
-                console.log('Welcome email sent successfully')
+                
+                if (emailResult.success) {
+                    console.log('✅ Welcome email sent successfully')
+                } else {
+                    console.warn('⚠️ Welcome email failed to send, but signup continues:', emailResult.error)
+                }
             } catch (emailError) {
-                console.error('Error sending welcome email:', emailError)
-                // Don't fail signup if email fails
+                console.error('⚠️ Error sending welcome email (non-blocking):', emailError)
+                // Continue anyway - don't fail signup if email fails
             }
         } catch (err) {
             console.error('Profile creation exception:', err)
@@ -256,4 +262,35 @@ export async function updatePassword(formData: FormData) {
     }
 
     redirect('/login?message=' + encodeURIComponent('Password updated successfully! Please login with your new password.'))
+}
+
+export async function resendConfirmationEmail(formData: FormData) {
+    const email = formData.get('email') as string
+
+    if (!email || email.trim() === '') {
+        redirect('/signup?message=' + encodeURIComponent('Please enter your email address'))
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+        redirect('/signup?message=' + encodeURIComponent('Please enter a valid email address'))
+    }
+
+    const supabase = await createClient()
+    const redirectUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://billbooky.dodail.com'}/auth/callback`
+
+    const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email,
+        options: {
+            emailRedirectTo: redirectUrl
+        }
+    })
+
+    if (error) {
+        console.error('Resend confirmation error:', error)
+        redirect('/login?message=' + encodeURIComponent('Could not resend confirmation email. Please try again.'))
+    }
+
+    redirect('/login?message=' + encodeURIComponent('Confirmation email sent! Check your inbox to verify your email.'))
 }

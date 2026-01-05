@@ -312,6 +312,11 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
                                 Already have an account? <a href="/login" className="underline font-semibold hover:text-red-900 dark:hover:text-red-100">Login here</a>
                             </p>
                         )}
+                        {message.toLowerCase().includes('confirm') && (
+                            <p className="text-xs text-red-700 dark:text-red-300">
+                                Need to resend confirmation email? <a href="/resend-confirmation" className="underline font-semibold hover:text-red-900 dark:hover:text-red-100">Click here</a>
+                            </p>
+                        )}
                     </div>
                 )}
 

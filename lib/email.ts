@@ -2,14 +2,42 @@
 
 import { Resend } from 'resend'
 
-const FROM_EMAIL = 'support@dodail.com'
+const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'support@dodail.com'
 
 function getResendClient() {
   const apiKey = process.env.RESEND_API_KEY
   if (!apiKey) {
+    console.error('❌ RESEND_API_KEY is not configured')
     throw new Error('RESEND_API_KEY is not configured. Please add it to your environment variables.')
   }
   return new Resend(apiKey)
+}
+
+// Helper function to safely send emails with error handling
+async function sendEmailSafely(emailParams: any) {
+  try {
+    const resend = getResendClient()
+    
+    console.log('📧 Sending email to:', emailParams.to)
+    console.log('📧 From:', emailParams.from)
+    
+    const { data, error } = await resend.emails.send(emailParams)
+
+    if (error) {
+      console.error('❌ Resend API error:', {
+        message: error.message,
+        status: (error as any).status,
+        code: (error as any).code
+      })
+      return { success: false, error }
+    }
+
+    console.log('✅ Email sent successfully:', data?.id)
+    return { success: true, data }
+  } catch (err) {
+    console.error('❌ Error in sendEmailSafely:', err)
+    return { success: false, error: err }
+  }
 }
 
 export async function sendContactEmail({
@@ -226,10 +254,15 @@ export async function sendWelcomeEmail({
   to: string
   name: string
 }) {
+  console.log('🔍 sendWelcomeEmail called for:', to)
+  
   try {
-    const resend = getResendClient()
-    
-    const { data, error } = await resend.emails.send({
+    if (!to || !name) {
+      console.error('❌ Missing required parameters:', { to, name })
+      throw new Error('Missing required parameters: to and name')
+    }
+
+    const result = await sendEmailSafely({
       from: FROM_EMAIL,
       to,
       subject: 'Welcome to BillBooky! 🎉',
@@ -300,7 +333,7 @@ export async function sendWelcomeEmail({
               </div>
               <div class="content">
                 <p style="font-size: 18px;">Hi ${name},</p>
-                <p>Thank you for joining <strong>BillBooky</strong>! We're excited to help you streamline your invoicing and business management.</p>
+                <p>Thank you for joining <strong>BillBooky</strong>! We&apos;re excited to help you streamline your invoicing and business management.</p>
                 
                 <div class="feature-list">
                   <h3 style="margin-top: 0; color: #10b981;">✨ What you can do now:</h3>
@@ -323,7 +356,7 @@ export async function sendWelcomeEmail({
                 </div>
                 
                 <div style="text-align: center; margin: 30px 0;">
-                  <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://billbooky.dodail.com'}/dashboard" class="button">Go to Dashboard</a>
+                  <a href="${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://billbooky.dodail.com'}/dashboard" class="button">Go to Dashboard</a>
                 </div>
                 
                 <p style="margin-top: 30px;">Need help getting started? Reply to this email anytime.</p>
@@ -341,15 +374,18 @@ export async function sendWelcomeEmail({
       `,
     })
 
-    if (error) {
-      console.error('Error sending welcome email:', error)
-      throw new Error('Failed to send welcome email')
+    if (!result.success) {
+      console.error('❌ Failed to send welcome email:', result.error)
+      // Don't throw - email failures should not block signup
+      return { success: false, error: result.error }
     }
 
-    return { success: true, data }
+    console.log('✅ Welcome email sent successfully')
+    return result
   } catch (error) {
-    console.error('Error in sendWelcomeEmail:', error)
-    throw error
+    console.error('❌ Error in sendWelcomeEmail:', error)
+    // Don't throw - email failures should not block signup
+    return { success: false, error }
   }
 }
 
