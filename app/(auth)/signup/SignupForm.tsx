@@ -339,7 +339,7 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
     }
 
     return (
-        <Card className="max-w-2xl mx-auto relative">
+        <Card className="max-w-2xl mx-auto relative" suppressHydrationWarning>
             {isSubmitting && (
                         <div className="absolute inset-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm z-50 flex items-center justify-center rounded-lg">
                             <div className="text-center">
