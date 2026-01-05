@@ -30,7 +30,7 @@ CREATE POLICY "Admins can manage testimonials"
     EXISTS (
       SELECT 1 FROM public.user_profiles
       WHERE user_profiles.id = auth.uid()
-      AND user_profiles.is_super_admin = true
+      AND user_profiles.role = 'super_admin'
     )
   );
 
