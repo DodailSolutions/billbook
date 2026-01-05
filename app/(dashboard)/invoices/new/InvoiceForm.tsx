@@ -6,7 +6,6 @@ import { Plus, Trash2, Info, X } from "lucide-react"
 import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
 import { createInvoice, updateInvoice } from "../actions"
-import { createCustomer } from "../../customers/actions"
 import type { Customer, InvoiceWithDetails } from "@/lib/types"
 
 interface InvoiceFormProps {
@@ -107,13 +106,29 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
         const formData = new FormData(e.currentTarget)
         
         try {
-            const result = await createCustomer(formData)
-            if (result.success && result.customer) {
-                setCustomers([...customers, result.customer])
+            const response = await fetch('/api/customers/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: formData.get('name'),
+                    email: formData.get('email'),
+                    phone: formData.get('phone'),
+                    address: formData.get('address'),
+                    gstin: formData.get('gstin'),
+                })
+            })
+
+            const data = await response.json()
+            
+            if (response.ok && data.customer) {
+                setCustomers([...customers, data.customer])
                 setShowAddCustomerModal(false)
                 e.currentTarget.reset()
+            } else {
+                alert(data.error || 'Failed to create customer')
             }
         } catch (error) {
+            console.error('Error:', error)
             alert('Failed to create customer')
         }
     }
