@@ -371,7 +371,7 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                                     <label className="text-xs text-gray-600 dark:text-gray-400">HSN/SAC</label>
                                     <Input
                                         placeholder="HSN/SAC Code"
-                                        maxLength="6"
+                                        maxLength={6}
                                         value={item.hsn_sac_code || ''}
                                         onChange={(e) => updateItem(index, 'hsn_sac_code', e.target.value)}
                                     />
