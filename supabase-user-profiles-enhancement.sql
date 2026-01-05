@@ -14,6 +14,7 @@ ADD COLUMN IF NOT EXISTS gstin VARCHAR(15);
 CREATE INDEX IF NOT EXISTS idx_user_profiles_business_type ON user_profiles(business_type);
 
 -- Create a view for super admin analytics
+DROP VIEW IF EXISTS business_type_analytics;
 CREATE OR REPLACE VIEW business_type_analytics AS
 SELECT 
     business_type,
@@ -77,6 +78,7 @@ CREATE INDEX IF NOT EXISTS idx_business_analytics_type ON business_analytics(bus
 CREATE INDEX IF NOT EXISTS idx_business_analytics_date ON business_analytics(recorded_at);
 
 -- Function to update business analytics
+DROP FUNCTION IF EXISTS update_business_analytics();
 CREATE OR REPLACE FUNCTION update_business_analytics()
 RETURNS void AS $$
 BEGIN
