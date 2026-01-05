@@ -59,23 +59,28 @@ ALTER TABLE hsn_sac_master ENABLE ROW LEVEL SECURITY;
 ALTER TABLE reverse_charge_settings ENABLE ROW LEVEL SECURITY;
 
 -- HSN/SAC Master - Allow public read (it's reference data), only admins can insert/update
+DROP POLICY IF EXISTS "Anyone can view hsn_sac_master" ON hsn_sac_master;
 CREATE POLICY "Anyone can view hsn_sac_master"
   ON hsn_sac_master FOR SELECT
   USING (is_active = TRUE);
 
+DROP POLICY IF EXISTS "No one can insert hsn_sac_master directly" ON hsn_sac_master;
 CREATE POLICY "No one can insert hsn_sac_master directly"
   ON hsn_sac_master FOR INSERT
   WITH CHECK (FALSE);
 
 -- Reverse Charge Settings
+DROP POLICY IF EXISTS "Users can view their own reverse charge settings" ON reverse_charge_settings;
 CREATE POLICY "Users can view their own reverse charge settings"
   ON reverse_charge_settings FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert their own reverse charge settings" ON reverse_charge_settings;
 CREATE POLICY "Users can insert their own reverse charge settings"
   ON reverse_charge_settings FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update their own reverse charge settings" ON reverse_charge_settings;
 CREATE POLICY "Users can update their own reverse charge settings"
   ON reverse_charge_settings FOR UPDATE
   USING (auth.uid() = user_id);
