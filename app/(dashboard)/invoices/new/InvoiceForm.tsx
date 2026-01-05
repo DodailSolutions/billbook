@@ -287,7 +287,9 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                     />
                     <label htmlFor="reverse_charge" className="text-sm font-medium flex items-center gap-1">
                         Reverse Charge Applicable
-                        <Info className="h-4 w-4 text-gray-500" title="Check if RCM applies (unregistered supplier, specific services, etc.)" />
+                        <div title="Check if RCM applies (unregistered supplier, specific services, etc.)">
+                            <Info className="h-4 w-4 text-gray-500" />
+                        </div>
                     </label>
                 </div>
             </div>
