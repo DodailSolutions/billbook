@@ -946,27 +946,13 @@ export default async function Home() {
                 <li><Link href="/refund" className="hover:text-emerald-600 transition-colors">Refund Policy</Link></li>
               </ul>
             </div>
-            
-            <div className="flex flex-col items-center gap-2">
-              <h5 className="font-bold text-gray-900">Recognized By</h5>
-              <div className="bg-white p-2 rounded border border-gray-200">
-                <Image
-                  src="/startup-india-qr.svg"
-                  alt="Startup INDIA Recognition QR Code"
-                  width={100}
-                  height={100}
-                  className="w-24 h-24"
-                />
-              </div>
-              <p className="text-xs text-gray-600 text-center font-semibold">Startup INDIA</p>
-            </div>
           </div>
           
           <div className="pt-8 border-t border-gray-200 flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-sm text-gray-600">© 2026 BillBooky. A product of <span className="font-semibold">Dodail Solutions Private Limited</span>. Proudly serving Indian businesses with ❤️</p>
             <div className="flex items-center gap-4 text-sm text-gray-600">
               <span className="font-semibold">Made in India 🇮🇳</span>
-              <span className="text-emerald-600">Startup India Recognized • GST Compliant • 100% Free</span>
+              <span className="text-emerald-600">GST Compliant • 100% Free</span>
             </div>
           </div>
         </div>
