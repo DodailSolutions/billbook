@@ -20,6 +20,7 @@ const BUSINESS_TYPES = [
     { value: 'restaurant', label: 'Restaurant/Cafe' },
     { value: 'retail', label: 'Retail Store' },
     { value: 'consulting', label: 'Consulting Services' },
+    { value: 'freelancer', label: 'Freelancer' },
     { value: 'other', label: 'Other' }
 ]
 

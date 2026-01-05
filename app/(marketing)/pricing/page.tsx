@@ -12,7 +12,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Pricing - Affordable Plans Starting Free | BillBooky Invoice Generator',
-  description: '100% Free plan with 300 invoices. Upgrade to Premium (₹299/month) or Lifetime (₹9,999 one-time) for unlimited invoices. 14-day trial on monthly plans. No hidden charges. GST-compliant invoice software for Indian businesses.',
+  description: '100% Free plan with 50 invoices. Upgrade to Premium (₹299/month) or Lifetime (₹9,999 one-time) for unlimited invoices. 14-day trial on monthly plans. No hidden charges. GST-compliant invoice software for Indian businesses.',
   keywords: [
     'invoice generator pricing',
     'free invoice software',
@@ -117,7 +117,7 @@ export default async function PricingPage() {
             }
             description="Perfect for getting started"
             features={[
-              "Up to 300 invoices total",
+              "Up to 50 invoices total",
               "Customer management",
               "GST compliant invoices",
               "PDF downloads",

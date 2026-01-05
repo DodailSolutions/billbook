@@ -65,7 +65,7 @@ export default function TermsPage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-4">4. Subscription Plans</h2>
             <h3 className="text-xl font-semibold text-gray-900 mb-2">Free Plan</h3>
             <ul className="list-disc list-inside text-gray-600 space-y-2 mb-4">
-              <li>Up to 300 invoices total</li>
+              <li>Up to 50 invoices total</li>
               <li>Basic features as described on our website</li>
               <li>We reserve the right to modify or discontinue the free plan</li>
             </ul>

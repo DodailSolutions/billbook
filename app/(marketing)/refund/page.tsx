@@ -150,8 +150,8 @@ export default function RefundPage() {
               If you receive a refund:
             </p>
             <ul className="list-disc list-inside text-gray-600 space-y-2">
-              <li>Your account will be downgraded to Free plan (if under 300 invoices)</li>
-              <li>or account will be closed (if over 300 invoices)</li>
+              <li>Your account will be downgraded to Free plan (if under 50 invoices)</li>
+              <li>or account will be closed (if over 50 invoices)</li>
               <li>You have 30 days to export your data before deletion</li>
               <li>All data is permanently deleted after 90 days</li>
             </ul>
@@ -192,7 +192,7 @@ export default function RefundPage() {
           <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-6 mt-8">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">💡 Try Before You Buy</h3>
             <p className="text-gray-600">
-              Start with our Free plan (up to 300 invoices) to test BillBooky risk-free before committing to a paid plan. 
+              Start with our Free plan (up to 50 invoices) to test BillBooky risk-free before committing to a paid plan. 
               This way, you can ensure it meets your needs before making a payment.
             </p>
           </div>

@@ -346,7 +346,7 @@ export default async function Home() {
               <ul className="space-y-4 mb-8">
                 <li className="flex items-start gap-3">
                   <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Up to 300 invoices total</span>
+                  <span className="text-gray-700">Up to 50 invoices total</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
@@ -584,7 +584,7 @@ export default async function Home() {
             <Link href="/pricing?checkout=lifetime">
               <Button 
                 size="lg"
-                className="w-full md:w-auto bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold text-lg px-12 py-6 shadow-xl"
+                className="w-full md:w-auto bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold text-lg px-12 py-6 shadow-xl"
               >
                 Get Lifetime Access Now →
               </Button>
@@ -753,7 +753,7 @@ export default async function Home() {
                 100% Free Forever
               </h3>
               <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                No hidden charges, no credit card required. Create up to 300 invoices absolutely free. Premium plans start at just ₹299/month for unlimited invoices.
+                No hidden charges, no credit card required. Create up to 50 invoices absolutely free. Premium plans start at just ₹299/month for unlimited invoices.
               </p>
             </div>
 
@@ -949,7 +949,7 @@ export default async function Home() {
           </div>
           
           <div className="pt-8 border-t border-gray-200 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-gray-600">© 2026 BillBooky. Proudly serving Indian businesses with ❤️</p>
+            <p className="text-sm text-gray-600">© 2026 BillBooky. A product of <span className="font-semibold">Dodail Solutions Private Limited</span>. Proudly serving Indian businesses with ❤️</p>
             <div className="flex items-center gap-4 text-sm text-gray-600">
               <span className="font-semibold">Made in India 🇮🇳</span>
               <span className="text-emerald-600">GST Compliant • 100% Free</span>

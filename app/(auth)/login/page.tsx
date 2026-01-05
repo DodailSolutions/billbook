@@ -21,7 +21,7 @@ export default function LoginPage({ searchParams }: { searchParams: { message?: 
             </CardHeader>
             <CardContent>
                 {searchParams.message && (
-                    <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg text-sm text-blue-800 dark:text-blue-200">
+                    <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-800 dark:text-red-200">
                         {searchParams.message}
                     </div>
                 )}

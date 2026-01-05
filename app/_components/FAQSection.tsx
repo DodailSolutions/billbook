@@ -7,7 +7,7 @@ import { ChevronDown } from 'lucide-react'
 const faqs = [
   {
     question: 'Is BillBooky really free?',
-    answer: 'Yes! Our Free plan allows you to create up to 300 invoices with all basic features including GST calculation, customer management, and PDF downloads. No credit card required.'
+    answer: 'Yes! Our Free plan allows you to create up to 50 invoices with all basic features including GST calculation, customer management, and PDF downloads. No credit card required.'
   },
   {
     question: 'Is BillBooky GST compliant?',
@@ -26,7 +26,7 @@ const faqs = [
     answer: 'Yes! You can track payment status for all your invoices, send automated reminders for due payments, and maintain complete payment history.'
   },
   {
-    question: 'What happens when I reach 300 invoices?',
+    question: 'What happens when I reach 50 invoices?',
     answer: 'You can upgrade to a paid plan starting at ₹299/month to continue creating invoices. All your existing data will be preserved.'
   },
   {

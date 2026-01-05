@@ -50,7 +50,7 @@ export function PlanBanner() {
                         <Zap className="h-4 w-4 text-white" />
                         <p className="text-xs font-bold text-white">FREE PLAN</p>
                     </div>
-                    <p className="text-xs text-white/90 mb-2">Up to 300 invoices</p>
+                    <p className="text-xs text-white/90 mb-2">Up to 50 invoices</p>
                     <div className="bg-white/20 rounded px-2 py-1">
                         <p className="text-xs text-white font-semibold">Upgrade →</p>
                     </div>

@@ -91,18 +91,32 @@ export default async function InvoiceDetailPage({
                             <thead className="bg-muted">
                                 <tr>
                                     <th className="text-left p-3 font-semibold">Description</th>
+                                    {invoice.invoice_items.some(item => item.hsn_sac_code) && (
+                                        <th className="text-left p-3 font-semibold">HSN/SAC</th>
+                                    )}
                                     <th className="text-right p-3 font-semibold">Qty</th>
                                     <th className="text-right p-3 font-semibold">Price</th>
                                     <th className="text-right p-3 font-semibold">Amount</th>
+                                    {invoice.invoice_items.some(item => item.gst_rate) && (
+                                        <th className="text-right p-3 font-semibold">GST</th>
+                                    )}
                                 </tr>
                             </thead>
                             <tbody>
                                 {invoice.invoice_items.map((item) => (
                                     <tr key={item.id} className="border-t">
                                         <td className="p-3">{item.description}</td>
+                                        {invoice.invoice_items.some(i => i.hsn_sac_code) && (
+                                            <td className="p-3 text-sm text-muted-foreground">{item.hsn_sac_code || '-'}</td>
+                                        )}
                                         <td className="text-right p-3">{item.quantity}</td>
                                         <td className="text-right p-3">₹{item.unit_price.toFixed(2)}</td>
                                         <td className="text-right p-3">₹{item.amount.toFixed(2)}</td>
+                                        {invoice.invoice_items.some(i => i.gst_rate) && (
+                                            <td className="text-right p-3 text-sm">
+                                                {item.gst_rate ? `${item.gst_rate}%` : `${invoice.gst_percentage}%`}
+                                            </td>
+                                        )}
                                     </tr>
                                 ))}
                             </tbody>
@@ -110,15 +124,35 @@ export default async function InvoiceDetailPage({
                     </div>
 
                     <div className="flex justify-end">
-                        <div className="w-64 space-y-2">
+                        <div className="w-80 space-y-2">
                             <div className="flex justify-between text-sm">
                                 <span>Subtotal:</span>
                                 <span className="font-medium">₹{invoice.subtotal.toFixed(2)}</span>
                             </div>
                             {invoice.gst_percentage > 0 && (
-                                <div className="flex justify-between text-sm">
-                                    <span>GST ({invoice.gst_percentage}%):</span>
-                                    <span className="font-medium">₹{invoice.gst_amount.toFixed(2)}</span>
+                                <>
+                                    {invoice.supply_type === 'intra-state' ? (
+                                        <>
+                                            <div className="flex justify-between text-sm">
+                                                <span>CGST ({(invoice.gst_percentage / 2).toFixed(2)}%):</span>
+                                                <span className="font-medium">₹{(invoice.cgst_amount || 0).toFixed(2)}</span>
+                                            </div>
+                                            <div className="flex justify-between text-sm">
+                                                <span>SGST ({(invoice.gst_percentage / 2).toFixed(2)}%):</span>
+                                                <span className="font-medium">₹{(invoice.sgst_amount || 0).toFixed(2)}</span>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className="flex justify-between text-sm">
+                                            <span>IGST ({invoice.gst_percentage}%):</span>
+                                            <span className="font-medium">₹{(invoice.igst_amount || 0).toFixed(2)}</span>
+                                        </div>
+                                    )}
+                                </>
+                            )}
+                            {invoice.reverse_charge_applicable && (
+                                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded p-2 text-xs text-red-600 dark:text-red-400 font-medium">
+                                    ⚠️ Reverse Charge Applicable
                                 </div>
                             )}
                             <div className="flex justify-between text-lg font-bold border-t pt-2">

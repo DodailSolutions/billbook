@@ -30,7 +30,7 @@ const FAQS = [
       },
       {
         q: 'Is BillBooky really free?',
-        a: 'Yes! Our Free plan allows you to create up to 300 invoices with all basic features including GST calculation, customer management, and PDF downloads. After 300 invoices, you can upgrade to a paid plan.'
+        a: 'Yes! Our Free plan allows you to create up to 50 invoices with all basic features including GST calculation, customer management, and PDF downloads. After 50 invoices, you can upgrade to a paid plan.'
       },
       {
         q: 'Do I need to install any software?',
@@ -46,7 +46,7 @@ const FAQS = [
         a: 'Yes, you can cancel your subscription at any time. There are no long-term contracts or cancellation fees. Your account will remain active until the end of your current billing period.'
       },
       {
-        q: 'What happens when I reach 300 invoices on the free plan?',
+        q: 'What happens when I reach 50 invoices on the free plan?',
         a: 'You\'ll need to upgrade to a paid plan (starting at ₹299/month) to continue creating invoices. All your existing data will be preserved.'
       },
       {

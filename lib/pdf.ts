@@ -268,18 +268,22 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
             <thead>
                 <tr>
                     <th>Description</th>
+                    ${invoice.invoice_items.some(item => item.hsn_sac_code) ? '<th>HSN/SAC</th>' : ''}
                     <th class="text-right">Qty</th>
                     <th class="text-right">Price</th>
                     <th class="text-right">Amount</th>
+                    ${invoice.invoice_items.some(item => item.gst_rate) ? '<th class="text-right">GST Rate</th><th class="text-right">GST Amount</th>' : ''}
                 </tr>
             </thead>
             <tbody>
                 ${invoice.invoice_items.map(item => `
                 <tr>
                     <td>${item.description}</td>
+                    ${invoice.invoice_items.some(i => i.hsn_sac_code) ? `<td>${item.hsn_sac_code || '-'}</td>` : ''}
                     <td class="text-right">${item.quantity}</td>
                     <td class="text-right">₹${item.unit_price.toFixed(2)}</td>
                     <td class="text-right">₹${item.amount.toFixed(2)}</td>
+                    ${invoice.invoice_items.some(i => i.gst_rate) ? `<td class="text-right">${item.gst_rate || invoice.gst_percentage}%</td><td class="text-right">₹${(item.item_tax_amount || 0).toFixed(2)}</td>` : ''}
                 </tr>
                 `).join('')}
             </tbody>
@@ -292,9 +296,26 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
                     <span>₹${invoice.subtotal.toFixed(2)}</span>
                 </div>
                 ${invoice.gst_percentage > 0 ? `
-                <div class="total-row">
-                    <span>GST (${invoice.gst_percentage}%):</span>
-                    <span>₹${invoice.gst_amount.toFixed(2)}</span>
+                    ${invoice.supply_type === 'intra-state' ? `
+                    <div class="total-row">
+                        <span>CGST (${(invoice.gst_percentage / 2).toFixed(2)}%):</span>
+                        <span>₹${((invoice.cgst_amount || 0)).toFixed(2)}</span>
+                    </div>
+                    <div class="total-row">
+                        <span>SGST (${(invoice.gst_percentage / 2).toFixed(2)}%):</span>
+                        <span>₹${((invoice.sgst_amount || 0)).toFixed(2)}</span>
+                    </div>
+                    ` : `
+                    <div class="total-row">
+                        <span>IGST (${invoice.gst_percentage}%):</span>
+                        <span>₹${((invoice.igst_amount || 0)).toFixed(2)}</span>
+                    </div>
+                    `}
+                ` : ''}
+                ${invoice.reverse_charge_applicable ? `
+                <div class="total-row" style="color: #dc2626; font-weight: bold;">
+                    <span>Reverse Charge Applicable</span>
+                    <span>-</span>
                 </div>
                 ` : ''}
                 <div class="total-row grand-total">

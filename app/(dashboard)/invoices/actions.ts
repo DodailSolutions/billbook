@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { calculateGSTComponents, validateGSTIN } from '@/lib/gst-utils'
 import type { Invoice, InvoiceWithDetails, InvoiceItem } from '@/lib/types'
 
 export async function getInvoices(): Promise<InvoiceWithDetails[]> {
@@ -91,11 +92,16 @@ interface CreateInvoiceData {
     invoice_date: string
     due_date?: string
     gst_percentage: number
+    supply_type?: 'intra-state' | 'inter-state'
+    reverse_charge_applicable?: boolean
     notes?: string
     items: Array<{
         description: string
         quantity: number
         unit_price: number
+        hsn_sac_code?: string
+        hsn_sac_type?: 'HSN' | 'SAC'
+        gst_rate?: number
     }>
 }
 
@@ -107,18 +113,21 @@ export async function createInvoice(data: CreateInvoiceData) {
         return redirect('/login')
     }
 
-    // Calculate totals
+    const supplyType = data.supply_type || 'intra-state'
+    const reverseChargeApplicable = data.reverse_charge_applicable || false
+
+    // Calculate totals with proper GST breakdown
     const subtotal = data.items.reduce((sum, item) => {
         return sum + (item.quantity * item.unit_price)
     }, 0)
 
-    const gst_amount = (subtotal * data.gst_percentage) / 100
-    const total = subtotal + gst_amount
+    // Calculate GST components based on supply type
+    const gstComponents = calculateGSTComponents(subtotal, data.gst_percentage, supplyType)
 
     // Generate invoice number
     const invoice_number = await generateInvoiceNumber()
 
-    // Create invoice
+    // Create invoice with full GST breakdown
     const { data: invoice, error: invoiceError } = await supabase
         .from('invoices')
         .insert([{
@@ -129,8 +138,13 @@ export async function createInvoice(data: CreateInvoiceData) {
             due_date: data.due_date || null,
             subtotal,
             gst_percentage: data.gst_percentage,
-            gst_amount,
-            total,
+            gst_amount: gstComponents.totalTax,
+            cgst_amount: gstComponents.cgst,
+            sgst_amount: gstComponents.sgst,
+            igst_amount: gstComponents.igst,
+            supply_type: supplyType,
+            reverse_charge_applicable: reverseChargeApplicable,
+            total: gstComponents.totalAmount,
             notes: data.notes || null,
             status: 'draft'
         }])
@@ -142,14 +156,27 @@ export async function createInvoice(data: CreateInvoiceData) {
         throw new Error('Failed to create invoice')
     }
 
-    // Create invoice items
-    const items = data.items.map(item => ({
-        invoice_id: invoice.id,
-        description: item.description,
-        quantity: item.quantity,
-        unit_price: item.unit_price,
-        amount: item.quantity * item.unit_price
-    }))
+    // Create invoice items with HSN/SAC and individual tax rates
+    const items = data.items.map(item => {
+        const itemAmount = item.quantity * item.unit_price
+        const itemGSTRate = item.gst_rate || data.gst_percentage
+        const itemGSTComponents = calculateGSTComponents(itemAmount, itemGSTRate, supplyType)
+
+        return {
+            invoice_id: invoice.id,
+            description: item.description,
+            quantity: item.quantity,
+            unit_price: item.unit_price,
+            amount: itemAmount,
+            hsn_sac_code: item.hsn_sac_code || null,
+            hsn_sac_type: item.hsn_sac_type || null,
+            gst_rate: itemGSTRate,
+            item_cgst: itemGSTComponents.cgst,
+            item_sgst: itemGSTComponents.sgst,
+            item_igst: itemGSTComponents.igst,
+            item_tax_amount: itemGSTComponents.totalTax
+        }
+    })
 
     const { error: itemsError } = await supabase
         .from('invoice_items')
@@ -169,11 +196,16 @@ interface UpdateInvoiceData {
     invoice_date: string
     due_date?: string
     gst_percentage: number
+    supply_type?: 'intra-state' | 'inter-state'
+    reverse_charge_applicable?: boolean
     notes?: string
     items: Array<{
         description: string
         quantity: number
         unit_price: number
+        hsn_sac_code?: string
+        hsn_sac_type?: 'HSN' | 'SAC'
+        gst_rate?: number
     }>
 }
 
@@ -185,15 +217,18 @@ export async function updateInvoice(id: string, data: UpdateInvoiceData) {
         return redirect('/login')
     }
 
-    // Calculate totals
+    const supplyType = data.supply_type || 'intra-state'
+    const reverseChargeApplicable = data.reverse_charge_applicable || false
+
+    // Calculate totals with proper GST breakdown
     const subtotal = data.items.reduce((sum, item) => {
         return sum + (item.quantity * item.unit_price)
     }, 0)
 
-    const gst_amount = (subtotal * data.gst_percentage) / 100
-    const total = subtotal + gst_amount
+    // Calculate GST components based on supply type
+    const gstComponents = calculateGSTComponents(subtotal, data.gst_percentage, supplyType)
 
-    // Update invoice
+    // Update invoice with full GST breakdown
     const { error: invoiceError } = await supabase
         .from('invoices')
         .update({
@@ -202,8 +237,13 @@ export async function updateInvoice(id: string, data: UpdateInvoiceData) {
             due_date: data.due_date || null,
             subtotal,
             gst_percentage: data.gst_percentage,
-            gst_amount,
-            total,
+            gst_amount: gstComponents.totalTax,
+            cgst_amount: gstComponents.cgst,
+            sgst_amount: gstComponents.sgst,
+            igst_amount: gstComponents.igst,
+            supply_type: supplyType,
+            reverse_charge_applicable: reverseChargeApplicable,
+            total: gstComponents.totalAmount,
             notes: data.notes || null,
         })
         .eq('id', id)
@@ -225,14 +265,27 @@ export async function updateInvoice(id: string, data: UpdateInvoiceData) {
         throw new Error('Failed to update invoice items')
     }
 
-    // Create new invoice items
-    const items = data.items.map(item => ({
-        invoice_id: id,
-        description: item.description,
-        quantity: item.quantity,
-        unit_price: item.unit_price,
-        amount: item.quantity * item.unit_price
-    }))
+    // Create new invoice items with HSN/SAC and individual tax rates
+    const items = data.items.map(item => {
+        const itemAmount = item.quantity * item.unit_price
+        const itemGSTRate = item.gst_rate || data.gst_percentage
+        const itemGSTComponents = calculateGSTComponents(itemAmount, itemGSTRate, supplyType)
+
+        return {
+            invoice_id: id,
+            description: item.description,
+            quantity: item.quantity,
+            unit_price: item.unit_price,
+            amount: itemAmount,
+            hsn_sac_code: item.hsn_sac_code || null,
+            hsn_sac_type: item.hsn_sac_type || null,
+            gst_rate: itemGSTRate,
+            item_cgst: itemGSTComponents.cgst,
+            item_sgst: itemGSTComponents.sgst,
+            item_igst: itemGSTComponents.igst,
+            item_tax_amount: itemGSTComponents.totalTax
+        }
+    })
 
     const { error: itemsError } = await supabase
         .from('invoice_items')

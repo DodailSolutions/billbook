@@ -100,7 +100,7 @@ export async function checkInvoiceLimit(): Promise<{ canCreate: boolean; count: 
             return { canCreate: true, count: 0, limit: -1 } // -1 means unlimited
         }
 
-        // For free plan, check the 300 invoice limit
+        // For free plan, check the 50 invoice limit
         const { count, error: countError } = await supabase
             .from('invoices')
             .select('*', { count: 'exact', head: true })
@@ -108,11 +108,11 @@ export async function checkInvoiceLimit(): Promise<{ canCreate: boolean; count: 
 
         if (countError) {
             console.error('Error counting invoices:', countError)
-            return { canCreate: false, count: 0, limit: 300 }
+            return { canCreate: false, count: 0, limit: 50 }
         }
 
         const invoiceCount = count || 0
-        const limit = 300
+        const limit = 50
         
         return {
             canCreate: invoiceCount < limit,
@@ -121,7 +121,7 @@ export async function checkInvoiceLimit(): Promise<{ canCreate: boolean; count: 
         }
     } catch (error) {
         console.error('Error checking invoice limit:', error)
-        return { canCreate: false, count: 0, limit: 300 }
+        return { canCreate: false, count: 0, limit: 50 }
     }
 }
 
