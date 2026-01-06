@@ -63,7 +63,7 @@ const routes = [
     {
         label: 'Support',
         icon: HelpCircle,
-        href: '/support',
+        href: '/help',
         color: "text-cyan-500",
     },
     {
