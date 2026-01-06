@@ -4,7 +4,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { LayoutDashboard, FileText, Users, RefreshCw, Bell, Settings, User, Bot, UserCog } from "lucide-react"
+import { LayoutDashboard, FileText, Users, RefreshCw, Bell, Settings, User, Bot, UserCog, FileBarChart, HelpCircle } from "lucide-react"
 import { SignOutButton } from "./SignOutButton"
 import { PlanBanner } from "./PlanBanner"
 import { ThemeToggle } from "./ThemeToggle"
@@ -48,11 +48,23 @@ const routes = [
         badge: 'PRO'
     },
     {
+        label: 'Reports',
+        icon: FileBarChart,
+        href: '/reports',
+        color: "text-orange-500",
+    },
+    {
         label: 'Team',
         icon: UserCog,
         href: '/team',
         color: "text-blue-500",
         badge: 'PRO'
+    },
+    {
+        label: 'Support',
+        icon: HelpCircle,
+        href: '/support',
+        color: "text-cyan-500",
     },
     {
         label: 'Account',
