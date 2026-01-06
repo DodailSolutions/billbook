@@ -34,6 +34,8 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
     const showCompanyDetails = settings?.show_company_details ?? true
     const showGstin = settings?.show_gstin ?? true
     const showLogo = settings?.show_logo ?? true
+    const paymentQrCodeUrl = settings?.payment_qr_code_url || ''
+    const showQrCode = settings?.show_qr_code ?? true
     
     // Generate HTML for PDF
     const html = `
@@ -336,6 +338,18 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
         <div class="notes-section">
             <div class="notes-title">Payment Instructions:</div>
             <div class="notes-content">${paymentInstructions}</div>
+        </div>
+        ` : ''}
+        
+        ${showQrCode && paymentQrCodeUrl && paymentQrCodeUrl.trim() && paymentQrCodeUrl.startsWith('data:image') ? `
+        <div class="notes-section" style="text-align: center;">
+            <div class="notes-title" style="text-align: center; margin-bottom: 12px;">Scan to Pay</div>
+            <div style="display: flex; justify-content: center; margin-bottom: 8px;">
+                <img src="${paymentQrCodeUrl}" alt="Payment QR Code" style="height: 128px; width: 128px; object-fit: contain; border: 2px solid ${primaryColor}; border-radius: 8px;" onerror="this.style.display='none'" />
+            </div>
+            <div style="color: #6b7280; font-size: 12px;">
+                GPay | PhonePe | Paytm | UPI
+            </div>
         </div>
         ` : ''}
         

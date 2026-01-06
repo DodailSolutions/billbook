@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/Button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card"
 import { getInvoice } from "../actions"
 import { DownloadPDFButton } from "./DownloadPDFButton"
+import { ShareInvoiceButton } from "./ShareInvoiceButton"
 import { MarkAsPaidButton } from "./MarkAsPaidButton"
 import { formatDate } from "@/lib/utils"
 
@@ -38,6 +39,12 @@ export default async function InvoiceDetailPage({
                             <span>Make Recurring</span>
                         </Button>
                     </Link>
+                    <ShareInvoiceButton 
+                        invoiceId={id}
+                        invoiceNumber={invoice.invoice_number}
+                        customerName={invoice.customer.name}
+                        total={invoice.total}
+                    />
                     <Link href={`/invoices/${id}/edit`}>
                         <Button variant="outline" className="gap-2">
                             <Pencil className="h-4 w-4" />

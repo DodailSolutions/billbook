@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
 import { createInvoice, updateInvoice } from "../actions"
 import type { Customer, InvoiceWithDetails } from "@/lib/types"
+import { InvoicePreviewPanel } from "./InvoicePreviewPanel"
 
 interface InvoiceFormProps {
     customers: Customer[]
@@ -26,6 +27,10 @@ interface InvoiceItem {
 export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'create' }: InvoiceFormProps) {
     const router = useRouter()
     const [customers, setCustomers] = useState<Customer[]>(initialCustomers)
+    const [selectedCustomerId, setSelectedCustomerId] = useState(invoice?.customer_id || '')
+    const [invoiceDate, setInvoiceDate] = useState(invoice?.invoice_date || new Date().toISOString().split('T')[0])
+    const [dueDate, setDueDate] = useState(invoice?.due_date || '')
+    const [notes, setNotes] = useState(invoice?.notes || '')
     const [items, setItems] = useState<InvoiceItem[]>(
         invoice?.invoice_items.map(item => ({
             description: item.description,
@@ -189,7 +194,10 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
 
     return (
         <>
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid lg:grid-cols-3 gap-6">
+                {/* Form Section - Takes 2 columns */}
+                <div className="lg:col-span-2">
+                    <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid gap-4 md:grid-cols-2">
                     <div className="space-y-2">
                         <label htmlFor="customer_id" className="text-sm font-medium">
@@ -200,7 +208,8 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                                 id="customer_id"
                                 name="customer_id"
                                 required
-                                defaultValue={invoice?.customer_id || ''}
+                                value={selectedCustomerId}
+                                onChange={(e) => setSelectedCustomerId(e.target.value)}
                                 className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                             >
                                 <option value="">Select a customer</option>
@@ -231,7 +240,8 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                         id="invoice_date"
                         name="invoice_date"
                         type="date"
-                        defaultValue={invoice?.invoice_date || new Date().toISOString().split('T')[0]}
+                        value={invoiceDate}
+                        onChange={(e) => setInvoiceDate(e.target.value)}
                         required
                     />
                 </div>
@@ -244,7 +254,8 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                         id="due_date"
                         name="due_date"
                         type="date"
-                        defaultValue={invoice?.due_date || ''}
+                        value={dueDate}
+                        onChange={(e) => setDueDate(e.target.value)}
                     />
                 </div>
 
@@ -468,7 +479,8 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                     name="notes"
                     rows={3}
                     placeholder="Additional notes or terms..."
-                    defaultValue={invoice?.notes || ''}
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
                     className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 />
             </div>
@@ -482,6 +494,23 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                 </Button>
             </div>
         </form>
+                </div>
+
+                {/* Preview Section - Takes 1 column */}
+                <div className="lg:col-span-1">
+                    <InvoicePreviewPanel
+                        selectedCustomerId={selectedCustomerId}
+                        customers={customers}
+                        items={items}
+                        gstPercentage={gstPercentage}
+                        supplyType={supplyType}
+                        reverseCharge={reverseCharge}
+                        invoiceDate={invoiceDate}
+                        dueDate={dueDate}
+                        notes={notes}
+                    />
+                </div>
+            </div>
 
         {/* Add Customer Modal */}
         {showAddCustomerModal && (
