@@ -402,8 +402,11 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                                         min="0"
                                         max="100"
                                         step="0.01"
-                                        value={item.gst_rate || gstPercentage}
-                                        onChange={(e) => updateItem(index, 'gst_rate', parseFloat(e.target.value) || gstPercentage)}
+                                        value={item.gst_rate !== undefined ? item.gst_rate : gstPercentage}
+                                        onChange={(e) => {
+                                            const value = e.target.value === '' ? gstPercentage : parseFloat(e.target.value)
+                                            updateItem(index, 'gst_rate', value)
+                                        }}
                                     />
                                 </div>
                                 <div className="space-y-2">

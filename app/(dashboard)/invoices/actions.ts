@@ -159,7 +159,7 @@ export async function createInvoice(data: CreateInvoiceData) {
     // Create invoice items with HSN/SAC and individual tax rates
     const items = data.items.map(item => {
         const itemAmount = item.quantity * item.unit_price
-        const itemGSTRate = item.gst_rate || data.gst_percentage
+        const itemGSTRate = item.gst_rate !== undefined ? item.gst_rate : data.gst_percentage
         const itemGSTComponents = calculateGSTComponents(itemAmount, itemGSTRate, supplyType)
 
         return {
@@ -268,7 +268,7 @@ export async function updateInvoice(id: string, data: UpdateInvoiceData) {
     // Create new invoice items with HSN/SAC and individual tax rates
     const items = data.items.map(item => {
         const itemAmount = item.quantity * item.unit_price
-        const itemGSTRate = item.gst_rate || data.gst_percentage
+        const itemGSTRate = item.gst_rate !== undefined ? item.gst_rate : data.gst_percentage
         const itemGSTComponents = calculateGSTComponents(itemAmount, itemGSTRate, supplyType)
 
         return {
