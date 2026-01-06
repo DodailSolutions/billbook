@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Share2, MessageCircle, Mail, Copy, Download, Check } from 'lucide-react'
+import { Share2, MessageCircle, Mail, Copy, Download, Check, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 
 interface ShareInvoiceButtonProps {
@@ -19,23 +19,88 @@ export function ShareInvoiceButton({
 }: ShareInvoiceButtonProps) {
     const [showMenu, setShowMenu] = useState(false)
     const [copied, setCopied] = useState(false)
+    const [isLoadingPDF, setIsLoadingPDF] = useState(false)
 
     const invoiceUrl = `${window.location.origin}/invoices/${invoiceId}`
     const pdfUrl = `${window.location.origin}/api/invoices/${invoiceId}/pdf`
     
-    const shareMessage = `Invoice ${invoiceNumber} for ${customerName}\nAmount: ₹${total.toFixed(2)}\n\nView invoice: ${invoiceUrl}\nDownload PDF: ${pdfUrl}`
+    const shareMessage = `Invoice ${invoiceNumber} for ${customerName}\nAmount: ₹${total.toFixed(2)}\n\nView invoice: ${invoiceUrl}`
 
-    const handleWhatsAppShare = () => {
-        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareMessage)}`
-        window.open(whatsappUrl, '_blank')
-        setShowMenu(false)
+    const fetchPDFBlob = async () => {
+        const response = await fetch(pdfUrl)
+        if (!response.ok) throw new Error('Failed to fetch PDF')
+        return await response.blob()
     }
 
-    const handleEmailShare = () => {
-        const subject = encodeURIComponent(`Invoice ${invoiceNumber}`)
-        const body = encodeURIComponent(shareMessage)
-        window.location.href = `mailto:?subject=${subject}&body=${body}`
-        setShowMenu(false)
+    const handleWhatsAppShare = async () => {
+        setIsLoadingPDF(true)
+        try {
+            // Try to fetch PDF and share via native share if supported
+            if (navigator.share && navigator.canShare) {
+                const blob = await fetchPDFBlob()
+                const file = new File([blob], `Invoice-${invoiceNumber}.pdf`, { type: 'application/pdf' })
+                
+                if (navigator.canShare({ files: [file] })) {
+                    await navigator.share({
+                        title: `Invoice ${invoiceNumber}`,
+                        text: shareMessage,
+                        files: [file]
+                    })
+                    setShowMenu(false)
+                    setIsLoadingPDF(false)
+                    return
+                }
+            }
+            
+            // Fallback to WhatsApp link with message
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareMessage + '\n\nDownload PDF: ' + pdfUrl)}`
+            window.open(whatsappUrl, '_blank')
+            setShowMenu(false)
+        } catch (error) {
+            console.error('Error sharing via WhatsApp:', error)
+            // Fallback to link share
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareMessage + '\n\nDownload PDF: ' + pdfUrl)}`
+            window.open(whatsappUrl, '_blank')
+            setShowMenu(false)
+        } finally {
+            setIsLoadingPDF(false)
+        }
+    }
+
+    const handleEmailShare = async () => {
+        setIsLoadingPDF(true)
+        try {
+            // Try native share with PDF file
+            if (navigator.share && navigator.canShare) {
+                const blob = await fetchPDFBlob()
+                const file = new File([blob], `Invoice-${invoiceNumber}.pdf`, { type: 'application/pdf' })
+                
+                if (navigator.canShare({ files: [file] })) {
+                    await navigator.share({
+                        title: `Invoice ${invoiceNumber}`,
+                        text: shareMessage,
+                        files: [file]
+                    })
+                    setShowMenu(false)
+                    setIsLoadingPDF(false)
+                    return
+                }
+            }
+            
+            // Fallback to mailto (without attachment - browser limitation)
+            const subject = encodeURIComponent(`Invoice ${invoiceNumber}`)
+            const body = encodeURIComponent(shareMessage + '\n\nDownload PDF: ' + pdfUrl)
+            window.location.href = `mailto:?subject=${subject}&body=${body}`
+            setShowMenu(false)
+        } catch (error) {
+            console.error('Error sharing via email:', error)
+            const subject = encodeURIComponent(`Invoice ${invoiceNumber}`)
+            const body = encodeURIComponent(shareMessage + '\n\nDownload PDF: ' + pdfUrl)
+            window.location.href = `mailto:?subject=${subject}&body=${body}`
+            setShowMenu(false)
+        } finally {
+            setIsLoadingPDF(false)
+        }
     }
 
     const handleCopyLink = async () => {
@@ -54,17 +119,33 @@ export function ShareInvoiceButton({
     }
 
     const handleNativeShare = async () => {
-        if (navigator.share) {
-            try {
-                await navigator.share({
-                    title: `Invoice ${invoiceNumber}`,
-                    text: shareMessage,
-                    url: invoiceUrl,
-                })
+        setIsLoadingPDF(true)
+        try {
+            const blob = await fetchPDFBlob()
+            const file = new File([blob], `Invoice-${invoiceNumber}.pdf`, { type: 'application/pdf' })
+            
+            if (navigator.share) {
+                // Check if we can share files
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    await navigator.share({
+                        title: `Invoice ${invoiceNumber}`,
+                        text: shareMessage,
+                        files: [file]
+                    })
+                } else {
+                    // Share without file if not supported
+                    await navigator.share({
+                        title: `Invoice ${invoiceNumber}`,
+                        text: shareMessage + '\n\nDownload PDF: ' + pdfUrl,
+                        url: invoiceUrl,
+                    })
+                }
                 setShowMenu(false)
-            } catch (error) {
-                console.error('Error sharing:', error)
             }
+        } catch (error) {
+            console.error('Error sharing:', error)
+        } finally {
+            setIsLoadingPDF(false)
         }
     }
 
@@ -97,28 +178,42 @@ export function ShareInvoiceButton({
                             {/* WhatsApp */}
                             <button
                                 onClick={handleWhatsAppShare}
-                                className="w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                disabled={isLoadingPDF}
+                                className="w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 <div className="h-8 w-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                                    <MessageCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                                    {isLoadingPDF ? (
+                                        <Loader2 className="h-4 w-4 text-green-600 dark:text-green-400 animate-spin" />
+                                    ) : (
+                                        <MessageCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                                    )}
                                 </div>
                                 <div className="flex-1 text-left">
                                     <div className="font-medium">WhatsApp</div>
-                                    <div className="text-xs text-gray-500 dark:text-gray-400">Share via WhatsApp</div>
+                                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                                        {isLoadingPDF ? 'Preparing PDF...' : 'Share with PDF attached'}
+                                    </div>
                                 </div>
                             </button>
 
                             {/* Email */}
                             <button
                                 onClick={handleEmailShare}
-                                className="w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                disabled={isLoadingPDF}
+                                className="w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 <div className="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                                    <Mail className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                                    {isLoadingPDF ? (
+                                        <Loader2 className="h-4 w-4 text-blue-600 dark:text-blue-400 animate-spin" />
+                                    ) : (
+                                        <Mail className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                                    )}
                                 </div>
                                 <div className="flex-1 text-left">
                                     <div className="font-medium">Email</div>
-                                    <div className="text-xs text-gray-500 dark:text-gray-400">Send via email</div>
+                                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                                        {isLoadingPDF ? 'Preparing PDF...' : 'Send with PDF attached'}
+                                    </div>
                                 </div>
                             </button>
 
@@ -164,14 +259,21 @@ export function ShareInvoiceButton({
                                     <div className="border-t border-gray-200 dark:border-gray-700 my-2" />
                                     <button
                                         onClick={handleNativeShare}
-                                        className="w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                        disabled={isLoadingPDF}
+                                        className="w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         <div className="h-8 w-8 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
-                                            <Share2 className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+                                            {isLoadingPDF ? (
+                                                <Loader2 className="h-4 w-4 text-orange-600 dark:text-orange-400 animate-spin" />
+                                            ) : (
+                                                <Share2 className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+                                            )}
                                         </div>
                                         <div className="flex-1 text-left">
                                             <div className="font-medium">More Options</div>
-                                            <div className="text-xs text-gray-500 dark:text-gray-400">Share using other apps</div>
+                                            <div className="text-xs text-gray-500 dark:text-gray-400">
+                                                {isLoadingPDF ? 'Preparing PDF...' : 'Share with PDF to other apps'}
+                                            </div>
                                         </div>
                                     </button>
                                 </>
