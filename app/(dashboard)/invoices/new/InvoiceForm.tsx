@@ -123,7 +123,11 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
             if (response.ok && data.customer) {
                 setCustomers([...customers, data.customer])
                 setShowAddCustomerModal(false)
-                e.currentTarget.reset()
+                // Reset form safely
+                const form = e.currentTarget
+                if (form) {
+                    form.reset()
+                }
             } else {
                 alert(data.error || 'Failed to create customer')
             }
