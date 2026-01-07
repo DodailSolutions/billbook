@@ -4,6 +4,13 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { calculateGSTComponents, validateGSTIN } from '@/lib/gst-utils'
+import { 
+  autoClassifyGSTType, 
+  calculateRoundOff, 
+  performComplianceChecks,
+  checkApprovalRequired,
+  getCurrentFinancialYear
+} from '@/lib/advanced-gst-utils'
 import type { Invoice, InvoiceWithDetails, InvoiceItem } from '@/lib/types'
 
 export async function getInvoices(): Promise<InvoiceWithDetails[]> {
@@ -65,7 +72,7 @@ export async function getInvoice(id: string): Promise<InvoiceWithDetails | null>
     return data as InvoiceWithDetails
 }
 
-export async function generateInvoiceNumber(): Promise<string> {
+export async function generateInvoiceNumber(seriesId?: string): Promise<string> {
     const supabase = await createClient()
 
     const { data: { user } } = await supabase.auth.getUser()
@@ -73,15 +80,27 @@ export async function generateInvoiceNumber(): Promise<string> {
         throw new Error('Not authenticated')
     }
 
+    // Try new advanced function first (with series support)
+    const { data: advancedNumber, error: advError } = await supabase.rpc('get_next_invoice_number_with_series', {
+        p_user_id: user.id,
+        p_series_id: seriesId || null
+    })
+
+    if (!advError && advancedNumber) {
+        return advancedNumber as string
+    }
+
+    // Fallback to original function for backward compatibility
     const { data, error } = await supabase.rpc('get_next_invoice_number', {
         p_user_id: user.id
     })
 
     if (error) {
         console.error('Error generating invoice number:', error)
-        // Fallback to simple generation
+        // Final fallback to simple generation
+        const fy = getCurrentFinancialYear()
         const timestamp = Date.now()
-        return `INV-${new Date().getFullYear()}-${timestamp.toString().slice(-4)}`
+        return `INV-${fy}-${timestamp.toString().slice(-4)}`
     }
 
     return data as string
@@ -95,6 +114,7 @@ interface CreateInvoiceData {
     supply_type?: 'intra-state' | 'inter-state'
     reverse_charge_applicable?: boolean
     notes?: string
+    invoice_series_id?: string
     items: Array<{
         description: string
         quantity: number
@@ -113,7 +133,31 @@ export async function createInvoice(data: CreateInvoiceData) {
         return redirect('/login')
     }
 
-    const supplyType = data.supply_type || 'intra-state'
+    // Get customer for auto GST classification
+    const { data: customer } = await supabase
+        .from('customers')
+        .select('state_code, gstin')
+        .eq('id', data.customer_id)
+        .single()
+
+    // Get company GST settings for auto-classification
+    const { data: companySettings } = await supabase
+        .from('company_gst_settings')
+        .select('company_state_code')
+        .eq('user_id', user.id)
+        .single()
+
+    // Auto-classify supply type if not provided
+    let supplyType = data.supply_type || 'intra-state'
+    if (companySettings && customer?.state_code) {
+        const classification = autoClassifyGSTType(
+            companySettings.company_state_code,
+            customer.state_code
+        )
+        supplyType = classification.supplyType
+        console.log('Auto-classified GST:', classification.reason)
+    }
+
     const reverseChargeApplicable = data.reverse_charge_applicable || false
 
     // Calculate totals with proper GST breakdown
@@ -124,16 +168,46 @@ export async function createInvoice(data: CreateInvoiceData) {
     // Calculate GST components based on supply type
     const gstComponents = calculateGSTComponents(subtotal, data.gst_percentage, supplyType)
 
-    // Generate invoice number
-    const invoice_number = await generateInvoiceNumber()
+    // Calculate round-off
+    const roundOff = calculateRoundOff(gstComponents.totalAmount)
 
-    // Create invoice with full GST breakdown
+    // Generate invoice number with series support
+    const invoice_number = await generateInvoiceNumber(data.invoice_series_id)
+
+    // Get financial year
+    const financialYear = getCurrentFinancialYear()
+
+    // Perform compliance checks
+    const complianceWarnings = performComplianceChecks({
+        invoice_number,
+        customer_gstin: customer?.gstin,
+        company_gstin: companySettings?.company_gstin,
+        subtotal,
+        gst_amount: gstComponents.totalTax,
+        total: roundOff.roundedAmount,
+        supply_type: supplyType,
+        cgst_amount: gstComponents.cgst,
+        sgst_amount: gstComponents.sgst,
+        igst_amount: gstComponents.igst,
+        invoice_date: data.invoice_date,
+        items: data.items,
+        reverse_charge_applicable: reverseChargeApplicable
+    })
+
+    // Check if approval required
+    const approvalCheck = checkApprovalRequired(roundOff.roundedAmount)
+
+    // Create invoice with full GST breakdown and new fields
     const { data: invoice, error: invoiceError } = await supabase
         .from('invoices')
         .insert([{
             user_id: user.id,
             customer_id: data.customer_id,
             invoice_number,
+            invoice_series_id: data.invoice_series_id || null,
+            financial_year: financialYear,
+            invoice_type: 'standard',
+            lifecycle_stage: 'draft',
             invoice_date: data.invoice_date,
             due_date: data.due_date || null,
             subtotal,
@@ -144,7 +218,13 @@ export async function createInvoice(data: CreateInvoiceData) {
             igst_amount: gstComponents.igst,
             supply_type: supplyType,
             reverse_charge_applicable: reverseChargeApplicable,
-            total: gstComponents.totalAmount,
+            total_before_round_off: gstComponents.totalAmount,
+            round_off_amount: roundOff.roundOffAmount,
+            total: roundOff.roundedAmount,
+            compliance_checked: true,
+            compliance_warnings: complianceWarnings,
+            requires_approval: approvalCheck.required,
+            auto_calculated: true,
             notes: data.notes || null,
             status: 'draft'
         }])
