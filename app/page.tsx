@@ -8,16 +8,16 @@ import { FAQSection } from './_components/FAQSection'
 import { TestimonialCarousel } from './_components/TestimonialCarousel'
 
 const FEATURES = [
-  { icon: FileText, title: 'Quick Invoice Creation', desc: 'Create professional invoices in under 60 seconds with AI assistance', color: 'emerald', badge: 'Popular' },
-  { icon: IndianRupee, title: 'GST Compliant', desc: 'Auto IGST/CGST/SGST classification, e-Invoice, e-Way bill generation', color: 'blue', badge: 'Essential' },
-  { icon: Users, title: 'Smart Customer Management', desc: 'Credit limits, aging analysis, risk scoring & auto-blacklist', color: 'purple', badge: 'New' },
-  { icon: CheckCircle, title: 'Custom Branding', desc: 'Add logo, fonts, colors, and templates to match your brand', color: 'orange' },
-  { icon: RefreshCw, title: 'Recurring & Milestone Billing', desc: 'Automated invoices, proforma, credit notes & phased payments', color: 'teal', badge: 'Pro' },
-  { icon: Clock, title: 'Payment Intelligence', desc: 'UPI, WhatsApp Pay, auto-reconciliation, BNPL & late fee automation', color: 'rose', badge: 'New' },
-  { icon: Zap, title: 'Voice & WhatsApp Invoicing', desc: 'Create invoices via voice or WhatsApp in English + Indian languages', color: 'amber', badge: 'AI' },
-  { icon: TrendingUp, title: 'Smart Pricing Suggestions', desc: 'AI-powered pricing based on history, trends & customer segments', color: 'indigo', badge: 'AI' },
-  { icon: Building2, title: 'Multi-Currency Support', desc: 'INR-first accounting with 10+ currencies, auto exchange rates', color: 'sky', badge: 'New' },
-] as const
+  { icon: FileText, title: 'Quick Invoice Creation', desc: 'Create professional invoices in under 60 seconds with AI assistance', color: 'emerald', badge: 'Popular' as const },
+  { icon: IndianRupee, title: 'GST Compliant', desc: 'Auto IGST/CGST/SGST classification, e-Invoice, e-Way bill generation', color: 'blue', badge: 'Essential' as const },
+  { icon: Users, title: 'Smart Customer Management', desc: 'Credit limits, aging analysis, risk scoring & auto-blacklist', color: 'purple', badge: 'New' as const },
+  { icon: CheckCircle, title: 'Custom Branding', desc: 'Add logo, fonts, colors, and templates to match your brand', color: 'orange', badge: undefined },
+  { icon: RefreshCw, title: 'Recurring & Milestone Billing', desc: 'Automated invoices, proforma, credit notes & phased payments', color: 'teal', badge: 'Pro' as const },
+  { icon: Clock, title: 'Payment Intelligence', desc: 'UPI, WhatsApp Pay, auto-reconciliation, BNPL & late fee automation', color: 'rose', badge: 'New' as const },
+  { icon: Zap, title: 'Voice & WhatsApp Invoicing', desc: 'Create invoices via voice or WhatsApp in English + Indian languages', color: 'amber', badge: 'AI' as const },
+  { icon: TrendingUp, title: 'Smart Pricing Suggestions', desc: 'AI-powered pricing based on history, trends & customer segments', color: 'indigo', badge: 'AI' as const },
+  { icon: Building2, title: 'Multi-Currency Support', desc: 'INR-first accounting with 10+ currencies, auto exchange rates', color: 'sky', badge: 'New' as const },
+]
 
 const BENEFITS = [
   'No credit card required',
@@ -318,7 +318,7 @@ export default async function Home() {
                       </span>
                     </div>
                   )}
-                  <div className={`inline-flex p-3 ${iconColorClasses[feature.color]} rounded-xl mb-4 group-hover:scale-105 transition-transform`}>
+                  <div className={`inline-flex p-3 ${iconColorClasses[feature.color as keyof typeof iconColorClasses]} rounded-xl mb-4 group-hover:scale-105 transition-transform`}>
                     <Icon className="h-6 w-6" />
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{feature.title}</h3>
