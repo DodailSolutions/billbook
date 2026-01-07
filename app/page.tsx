@@ -173,7 +173,7 @@ export default async function Home() {
 
               {/* CA Call-to-Action */}
               {!isAuthenticated && (
-                <div className="mt-6 p-4 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-100 dark:border-blue-800">
+                <div className="mt-6 p-4 rounded-xl bg-linear-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-100 dark:border-blue-800">
                   <div className="flex items-center justify-between flex-wrap gap-4">
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-blue-600 rounded-lg">
@@ -359,7 +359,7 @@ export default async function Home() {
       </section>
 
       {/* CA Marketplace Section */}
-      <section className="px-6 py-20 md:py-32 bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-950">
+      <section className="px-6 py-20 md:py-32 bg-linear-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-950">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16 space-y-4">
             <div className="inline-block">
@@ -427,7 +427,7 @@ export default async function Home() {
             </div>
 
             {/* For CAs */}
-            <div className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl p-8 text-white shadow-lg hover:shadow-xl transition-all">
+            <div className="bg-linear-to-br from-blue-600 to-indigo-600 rounded-2xl p-8 text-white shadow-lg hover:shadow-xl transition-all">
               <div className="flex items-start gap-4 mb-6">
                 <div className="p-3 bg-white/10 rounded-xl backdrop-blur-sm">
                   <Award className="h-8 w-8 text-white" />
