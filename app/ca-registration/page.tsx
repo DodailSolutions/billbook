@@ -108,25 +108,25 @@ export default function CARegistrationPage() {
 
   if (submitted) {
     return (
-      <div className="container max-w-2xl mx-auto py-8 px-4">
-        <Card className="p-8 text-center">
-          <div className="flex justify-center mb-4">
-            <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
-              <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center px-4">
+        <Card className="max-w-2xl w-full p-8 text-center">
+          <div className="flex justify-center mb-6">
+            <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+              <CheckCircle className="w-10 h-10 text-green-600 dark:text-green-400" />
             </div>
           </div>
-          <h2 className="text-2xl font-bold mb-2">Registration Submitted Successfully!</h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
+          <h2 className="text-3xl font-bold mb-3">Registration Submitted Successfully!</h2>
+          <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
             Your CA profile has been submitted for verification. Our team will review your ICAI
             membership details and activate your profile within 24-48 hours. You&apos;ll receive an email
             once verified.
           </p>
-          <div className="flex gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button variant="outline" onClick={() => router.push('/')}>
-              Back to Dashboard
+              Back to Home
             </Button>
-            <Button onClick={() => router.push('/ca-dashboard')}>
-              View CA Dashboard
+            <Button onClick={() => router.push('/login')}>
+              Sign In to Your Account
             </Button>
           </div>
         </Card>
@@ -135,18 +135,38 @@ export default function CARegistrationPage() {
   }
 
   return (
-    <div className="container max-w-4xl mx-auto py-8 px-4">
-      <Button variant="ghost" onClick={() => router.back()} className="mb-6">
-        <ArrowLeft className="w-4 h-4 mr-2" />
-        Back
-      </Button>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      {/* Header */}
+      <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50">
+        <div className="container max-w-7xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button variant="ghost" onClick={() => router.push('/')} className="gap-2">
+                <ArrowLeft className="w-4 h-4" />
+                Back to Home
+              </Button>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-gray-600 dark:text-gray-400">Already registered?</span>
+              <Button variant="outline" onClick={() => router.push('/login')}>
+                Sign In
+              </Button>
+            </div>
+          </div>
+        </div>
+      </header>
 
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Register as a Chartered Accountant</h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          Join our network and connect with businesses looking for your expertise
-        </p>
-      </div>
+      <div className="container max-w-4xl mx-auto py-12 px-4">
+        <div className="mb-12 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 mb-4">
+            <Award className="h-4 w-4 text-blue-600" />
+            <span className="text-sm font-medium text-blue-600">CA Registration</span>
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold mb-3">Register as a Chartered Accountant</h1>
+          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            Join our network and connect with businesses looking for your expertise
+          </p>
+        </div>
 
       {/* Progress Indicator */}
       <div className="flex items-center justify-center mb-8">
@@ -552,6 +572,29 @@ export default function CARegistrationPage() {
           </div>
         </Card>
       )}
+      </div>
+
+      {/* Footer */}
+      <footer className="border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 mt-16">
+        <div className="container max-w-7xl mx-auto px-4 py-8">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              © 2026 BillBooky. All rights reserved.
+            </p>
+            <div className="flex gap-6 text-sm">
+              <a href="/privacy" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
+                Privacy Policy
+              </a>
+              <a href="/terms" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
+                Terms of Service
+              </a>
+              <a href="/contact" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
+                Contact
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
