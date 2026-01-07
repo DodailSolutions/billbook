@@ -42,7 +42,12 @@ import type {
   CreateClientPortalUserRequest,
   CreateDisputeRequest,
   CreateWhatsAppTemplateRequest,
-  SendWhatsAppMessageRequest
+  SendWhatsAppMessageRequest,
+  GSTLiabilityTracker,
+  BusinessHealthIndex,
+  MISReport,
+  AIInsight,
+  ProfitabilityReport
 } from './enterprise-types'
 
 // =====================================================
@@ -770,6 +775,459 @@ export async function getCollectionEfficiency() {
     .single()
 
   return data
+}
+
+export async function getGSTLiabilityTracker() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  
+  if (!user) return null
+
+  // Calculate GST liability from invoices
+  const { data: invoices } = await supabase
+    .from('invoices')
+    .select('cgst_amount, sgst_amount, igst_amount, invoice_date, status')
+    .eq('user_id', user.id)
+    .gte('invoice_date', new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString())
+    .eq('status', 'paid')
+
+  if (!invoices) return null
+
+  const totalCGST = invoices.reduce((sum, inv) => sum + (inv.cgst_amount || 0), 0)
+  const totalSGST = invoices.reduce((sum, inv) => sum + (inv.sgst_amount || 0), 0)
+  const totalIGST = invoices.reduce((sum, inv) => sum + (inv.igst_amount || 0), 0)
+  const totalGSTCollected = totalCGST + totalSGST + totalIGST
+
+  // Get expenses with input GST (if available from expenses table)
+  const { data: expenses } = await supabase
+    .from('expenses')
+    .select('gst_amount')
+    .eq('user_id', user.id)
+    .gte('expense_date', new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString())
+
+  const totalGSTPaid = expenses?.reduce((sum, exp) => sum + (exp.gst_amount || 0), 0) || 0
+  const itcAvailable = totalGSTPaid * 0.9 // Assuming 90% ITC available
+  const netGSTPayable = totalGSTCollected - itcAvailable
+
+  return {
+    user_id: user.id,
+    period: new Date().toISOString().slice(0, 7),
+    total_gst_collected: totalGSTCollected,
+    total_gst_paid: totalGSTPaid,
+    net_gst_payable: Math.max(netGSTPayable, 0),
+    itc_available: itcAvailable,
+    gst_liability: Math.max(netGSTPayable, 0),
+    output_gst_breakdown: {
+      cgst: totalCGST,
+      sgst: totalSGST,
+      igst: totalIGST
+    },
+    input_gst_breakdown: {
+      cgst: totalGSTPaid * 0.45,
+      sgst: totalGSTPaid * 0.45,
+      igst: totalGSTPaid * 0.10
+    },
+    filing_status: 'pending' as const,
+    due_date: new Date(new Date().setDate(20)).toISOString()
+  }
+}
+
+export async function getBusinessHealthIndex() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  
+  if (!user) return null
+
+  // Get invoices for calculations
+  const { data: invoices } = await supabase
+    .from('invoices')
+    .select('total_amount, invoice_date, status, paid_date')
+    .eq('user_id', user.id)
+    .gte('invoice_date', new Date(new Date().setMonth(new Date().getMonth() - 3)).toISOString())
+
+  if (!invoices || invoices.length === 0) return null
+
+  const totalRevenue = invoices.reduce((sum, inv) => sum + (inv.total_amount || 0), 0)
+  const paidInvoices = invoices.filter(inv => inv.status === 'paid')
+  const totalPaid = paidInvoices.reduce((sum, inv) => sum + (inv.total_amount || 0), 0)
+  
+  // Calculate collection days
+  const collectionDays = paidInvoices.reduce((sum, inv) => {
+    if (inv.paid_date && inv.invoice_date) {
+      const days = (new Date(inv.paid_date).getTime() - new Date(inv.invoice_date).getTime()) / (1000 * 60 * 60 * 24)
+      return sum + days
+    }
+    return sum
+  }, 0) / (paidInvoices.length || 1)
+
+  // Get expenses
+  const { data: expenses } = await supabase
+    .from('expenses')
+    .select('amount')
+    .eq('user_id', user.id)
+    .gte('expense_date', new Date(new Date().setMonth(new Date().getMonth() - 3)).toISOString())
+
+  const totalExpenses = expenses?.reduce((sum, exp) => sum + (exp.amount || 0), 0) || 0
+  const grossProfit = totalRevenue - totalExpenses
+  const grossProfitMargin = totalRevenue > 0 ? (grossProfit / totalRevenue) * 100 : 0
+  const netProfitMargin = grossProfitMargin * 0.8 // Simplified
+
+  // Calculate scores (0-100)
+  const liquidityScore = Math.min(100, (totalPaid / totalRevenue) * 100)
+  const profitabilityScore = Math.min(100, Math.max(0, grossProfitMargin * 2))
+  const efficiencyScore = Math.min(100, Math.max(0, 100 - collectionDays))
+  const growthScore = 75 // Placeholder - would need historical data
+  const complianceScore = 85 // Placeholder - would check GST filing status
+
+  const overallScore = (liquidityScore + profitabilityScore + efficiencyScore + growthScore + complianceScore) / 5
+
+  const getCategory = (score: number) => {
+    if (score >= 80) return 'excellent' as const
+    if (score >= 60) return 'good' as const
+    if (score >= 40) return 'fair' as const
+    if (score >= 20) return 'needs_attention' as const
+    return 'critical' as const
+  }
+
+  const recommendations: Array<{ category: string; priority: 'high' | 'medium' | 'low'; message: string; action: string }> = []
+  const riskFactors: string[] = []
+
+  if (collectionDays > 30) {
+    recommendations.push({
+      category: 'collections',
+      priority: 'high',
+      message: 'Average collection period is too high',
+      action: 'Enable automated payment reminders'
+    })
+    riskFactors.push('Slow collections affecting cash flow')
+  }
+
+  if (grossProfitMargin < 20) {
+    recommendations.push({
+      category: 'profitability',
+      priority: 'high',
+      message: 'Gross profit margin is below healthy levels',
+      action: 'Review pricing strategy and reduce expenses'
+    })
+    riskFactors.push('Low profitability margins')
+  }
+
+  return {
+    user_id: user.id,
+    calculated_at: new Date().toISOString(),
+    overall_score: Math.round(overallScore),
+    category: getCategory(overallScore),
+    scores: {
+      liquidity_score: Math.round(liquidityScore),
+      profitability_score: Math.round(profitabilityScore),
+      efficiency_score: Math.round(efficiencyScore),
+      growth_score: growthScore,
+      compliance_score: complianceScore
+    },
+    indicators: {
+      current_ratio: totalPaid / (totalRevenue - totalPaid || 1),
+      quick_ratio: totalPaid / (totalRevenue - totalPaid || 1),
+      gross_profit_margin: grossProfitMargin,
+      net_profit_margin: netProfitMargin,
+      collection_days: Math.round(collectionDays),
+      inventory_turnover: 12, // Placeholder
+      revenue_growth: 15, // Placeholder
+      gst_compliance_rate: 95 // Placeholder
+    },
+    recommendations,
+    risk_factors: riskFactors
+  }
+}
+
+export async function generateMISReport(config: { report_type: string; period_start: string; period_end: string }) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  
+  if (!user) return { success: false, error: 'Unauthorized' }
+
+  try {
+    let reportData: any = {}
+
+    switch (config.report_type) {
+      case 'profit_loss':
+        const { data: invoices } = await supabase
+          .from('invoices')
+          .select('total_amount, gst_amount, subtotal')
+          .eq('user_id', user.id)
+          .gte('invoice_date', config.period_start)
+          .lte('invoice_date', config.period_end)
+
+        const { data: expenses } = await supabase
+          .from('expenses')
+          .select('amount, category')
+          .eq('user_id', user.id)
+          .gte('expense_date', config.period_start)
+          .lte('expense_date', config.period_end)
+
+        const totalRevenue = invoices?.reduce((sum, inv) => sum + (inv.total_amount || 0), 0) || 0
+        const totalExpenses = expenses?.reduce((sum, exp) => sum + (exp.amount || 0), 0) || 0
+        const grossProfit = totalRevenue - totalExpenses
+
+        reportData = {
+          revenue: totalRevenue,
+          expenses: totalExpenses,
+          gross_profit: grossProfit,
+          gross_margin: totalRevenue > 0 ? (grossProfit / totalRevenue) * 100 : 0,
+          expense_breakdown: expenses?.reduce((acc: any, exp) => {
+            acc[exp.category || 'Other'] = (acc[exp.category || 'Other'] || 0) + exp.amount
+            return acc
+          }, {})
+        }
+        break
+
+      case 'cash_flow':
+        const cashFlow = await getCashFlowRealtime()
+        reportData = cashFlow || {}
+        break
+
+      case 'gst_summary':
+        const gstData = await getGSTLiabilityTracker()
+        reportData = gstData || {}
+        break
+
+      default:
+        reportData = { message: 'Report type not implemented' }
+    }
+
+    return {
+      success: true,
+      data: {
+        id: crypto.randomUUID(),
+        user_id: user.id,
+        report_name: `${config.report_type.replace('_', ' ')} Report`,
+        report_type: config.report_type,
+        period_start: config.period_start,
+        period_end: config.period_end,
+        generated_at: new Date().toISOString(),
+        data: reportData,
+        format: 'json' as const
+      }
+    }
+  } catch (error) {
+    return { success: false, error: (error as Error).message }
+  }
+}
+
+export async function buildCustomReport(config: {
+  report_name: string
+  data_sources: string[]
+  filters?: Array<{ field: string; operator: string; value: any }>
+  date_range?: { start: string; end: string }
+}) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  
+  if (!user) return { success: false, error: 'Unauthorized' }
+
+  try {
+    const results: any[] = []
+
+    for (const source of config.data_sources) {
+      let query = supabase.from(source).select('*').eq('user_id', user.id)
+
+      // Apply date range filter
+      if (config.date_range) {
+        const dateField = source === 'invoices' ? 'invoice_date' : 
+                         source === 'expenses' ? 'expense_date' : 'created_at'
+        query = query.gte(dateField, config.date_range.start).lte(dateField, config.date_range.end)
+      }
+
+      const { data } = await query
+      if (data) results.push(...data)
+    }
+
+    // Apply filters
+    let filteredData = results
+    if (config.filters) {
+      filteredData = results.filter(row => {
+        return config.filters!.every(filter => {
+          const value = row[filter.field]
+          switch (filter.operator) {
+            case 'equals': return value === filter.value
+            case 'greater_than': return value > filter.value
+            case 'less_than': return value < filter.value
+            case 'contains': return String(value).includes(String(filter.value))
+            default: return true
+          }
+        })
+      })
+    }
+
+    return {
+      success: true,
+      data: {
+        report_name: config.report_name,
+        generated_at: new Date().toISOString(),
+        total_rows: filteredData.length,
+        data: filteredData,
+        summary: {
+          total_records: filteredData.length
+        }
+      }
+    }
+  } catch (error) {
+    return { success: false, error: (error as Error).message }
+  }
+}
+
+export async function getAIInsights() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  
+  if (!user) return []
+
+  const insights: any[] = []
+
+  // Get recent business metrics
+  const healthIndex = await getBusinessHealthIndex()
+  const cashFlow = await getCashFlowRealtime()
+  const collectionEfficiency = await getCollectionEfficiency()
+
+  // Generate insights based on data
+  if (healthIndex) {
+    if (healthIndex.overall_score < 40) {
+      insights.push({
+        id: crypto.randomUUID(),
+        user_id: user.id,
+        insight_date: new Date().toISOString(),
+        category: 'general' as const,
+        priority: 'critical' as const,
+        title: 'Business Health Needs Attention',
+        description: `Your overall business health score is ${healthIndex.overall_score}/100, which is below healthy levels.`,
+        impact: 'May affect business sustainability and growth',
+        recommendation: 'Focus on improving profitability and collection efficiency',
+        data_points: { score: healthIndex.overall_score },
+        created_at: new Date().toISOString()
+      })
+    }
+
+    if (healthIndex.indicators.collection_days > 45) {
+      insights.push({
+        id: crypto.randomUUID(),
+        user_id: user.id,
+        insight_date: new Date().toISOString(),
+        category: 'collections' as const,
+        priority: 'high' as const,
+        title: 'Slow Payment Collections',
+        description: `Average collection period is ${healthIndex.indicators.collection_days} days, which is affecting cash flow.`,
+        impact: `₹${((healthIndex.indicators.collection_days - 30) * 1000).toLocaleString('en-IN')} tied up in receivables`,
+        recommendation: 'Enable automated payment reminders and offer early payment discounts',
+        data_points: { collection_days: healthIndex.indicators.collection_days },
+        created_at: new Date().toISOString()
+      })
+    }
+  }
+
+  if (cashFlow && cashFlow.closing_cash_balance < 50000) {
+    insights.push({
+      id: crypto.randomUUID(),
+      user_id: user.id,
+      insight_date: new Date().toISOString(),
+      category: 'cash_flow' as const,
+      priority: 'critical' as const,
+      title: 'Low Cash Balance',
+      description: `Current cash balance is ₹${cashFlow.closing_cash_balance.toLocaleString('en-IN')}, which is below recommended levels.`,
+      impact: 'Risk of cash crunch in next 15 days',
+      recommendation: 'Follow up on pending receivables and delay non-critical expenses',
+      data_points: { cash_balance: cashFlow.closing_cash_balance },
+      created_at: new Date().toISOString()
+    })
+  }
+
+  return insights
+}
+
+export async function getProfitabilityReport(breakdown_by: 'city' | 'state' | 'gst_type' = 'city') {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  
+  if (!user) return null
+
+  // Get invoices with customer details
+  const { data: invoices } = await supabase
+    .from('invoices')
+    .select(`
+      total_amount,
+      subtotal,
+      supply_type,
+      invoice_date,
+      customer:customers (
+        name,
+        city,
+        state_code,
+        gstin
+      )
+    `)
+    .eq('user_id', user.id)
+    .gte('invoice_date', new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString())
+
+  if (!invoices) return null
+
+  // Group by dimension
+  const groupedData = new Map<string, any>()
+
+  invoices.forEach((inv: any) => {
+    let dimension = ''
+    
+    switch (breakdown_by) {
+      case 'city':
+        dimension = inv.customer?.city || 'Unknown'
+        break
+      case 'state':
+        dimension = inv.customer?.state_code || 'Unknown'
+        break
+      case 'gst_type':
+        dimension = inv.supply_type || 'Unknown'
+        break
+    }
+
+    if (!groupedData.has(dimension)) {
+      groupedData.set(dimension, {
+        dimension,
+        revenue: 0,
+        expenses: 0,
+        gross_profit: 0,
+        gross_margin: 0,
+        invoice_count: 0,
+        customer_count: new Set(),
+        average_invoice_value: 0
+      })
+    }
+
+    const group = groupedData.get(dimension)
+    group.revenue += inv.total_amount || 0
+    group.expenses += (inv.total_amount - inv.subtotal) || 0 // GST as expense for simplification
+    group.invoice_count++
+    if (inv.customer?.name) group.customer_count.add(inv.customer.name)
+  })
+
+  // Calculate derived metrics
+  const data = Array.from(groupedData.values()).map(item => {
+    item.gross_profit = item.revenue - item.expenses
+    item.gross_margin = item.revenue > 0 ? (item.gross_profit / item.revenue) * 100 : 0
+    item.average_invoice_value = item.revenue / item.invoice_count
+    item.customer_count = item.customer_count.size
+    return item
+  })
+
+  const total_revenue = data.reduce((sum, item) => sum + item.revenue, 0)
+  const total_profit = data.reduce((sum, item) => sum + item.gross_profit, 0)
+  const overall_margin = total_revenue > 0 ? (total_profit / total_revenue) * 100 : 0
+
+  return {
+    user_id: user.id,
+    report_period: new Date().toISOString().slice(0, 7),
+    breakdown_by,
+    data: data.sort((a, b) => b.revenue - a.revenue),
+    total_revenue,
+    total_profit,
+    overall_margin
+  }
 }
 
 // =====================================================

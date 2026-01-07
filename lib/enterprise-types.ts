@@ -314,7 +314,7 @@ export interface AssetDepreciationLog {
 // DASHBOARD & REPORTING TYPES
 // =====================================================
 
-export type ReportType = 'cash_flow' | 'profitability' | 'gst_analysis' | 'collection_efficiency' | 'expense_analysis' | 'inventory_analysis' | 'custom'
+export type ReportType = 'cash_flow' | 'profitability' | 'gst_analysis' | 'collection_efficiency' | 'expense_analysis' | 'inventory_analysis' | 'profit_loss' | 'balance_sheet' | 'receivables' | 'payables' | 'gst_summary' | 'custom'
 export type ExportFormat = 'excel' | 'pdf' | 'csv'
 export type MetricPeriod = 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'yearly'
 
@@ -403,6 +403,151 @@ export interface BusinessMetrics {
   recommendations?: string[]
   
   created_at: string
+}
+
+// GST Liability Tracker
+export interface GSTLiabilityTracker {
+  user_id: string
+  period: string
+  total_gst_collected: number
+  total_gst_paid: number
+  net_gst_payable: number
+  itc_available: number
+  gst_liability: number
+  output_gst_breakdown: {
+    cgst: number
+    sgst: number
+    igst: number
+  }
+  input_gst_breakdown: {
+    cgst: number
+    sgst: number
+    igst: number
+  }
+  filing_status: 'pending' | 'filed' | 'overdue'
+  due_date: string
+}
+
+// Business Health Index
+export interface BusinessHealthIndex {
+  user_id: string
+  calculated_at: string
+  overall_score: number // 0-100
+  category: 'excellent' | 'good' | 'fair' | 'needs_attention' | 'critical'
+  scores: {
+    liquidity_score: number
+    profitability_score: number
+    efficiency_score: number
+    growth_score: number
+    compliance_score: number
+  }
+  indicators: {
+    current_ratio: number
+    quick_ratio: number
+    gross_profit_margin: number
+    net_profit_margin: number
+    collection_days: number
+    inventory_turnover: number
+    revenue_growth: number
+    gst_compliance_rate: number
+  }
+  recommendations: Array<{
+    category: string
+    priority: 'high' | 'medium' | 'low'
+    message: string
+    action: string
+  }>
+  risk_factors: string[]
+}
+
+// MIS Report Types
+export interface MISReport {
+  id: string
+  user_id: string
+  report_name: string
+  report_type: ReportType
+  period_start: string
+  period_end: string
+  generated_at: string
+  data: Record<string, any>
+  format: 'pdf' | 'excel' | 'csv'
+  file_url?: string
+}
+
+export interface MISReportConfig {
+  report_type: string
+  period_start: string
+  period_end: string
+  include_charts?: boolean
+  include_comparisons?: boolean
+  breakdown_by?: string[]
+}
+
+// Custom Report Builder
+export interface CustomReportConfig {
+  report_name: string
+  description?: string
+  data_sources: string[]
+  columns: Array<{
+    field: string
+    label: string
+    type: 'text' | 'number' | 'currency' | 'date' | 'percentage'
+    aggregation?: 'sum' | 'avg' | 'count' | 'min' | 'max'
+  }>
+  filters: Array<{
+    field: string
+    operator: 'equals' | 'not_equals' | 'greater_than' | 'less_than' | 'contains' | 'between'
+    value: any
+  }>
+  group_by?: string[]
+  sort_by?: Array<{ field: string; direction: 'asc' | 'desc' }>
+  date_range?: {
+    start: string
+    end: string
+  }
+}
+
+export interface CustomReportResult {
+  report_name: string
+  generated_at: string
+  total_rows: number
+  data: Record<string, any>[]
+  summary: Record<string, number>
+}
+
+// AI Insights
+export interface AIInsight {
+  id: string
+  user_id: string
+  insight_date: string
+  category: 'cash_flow' | 'revenue' | 'expenses' | 'gst' | 'collections' | 'inventory' | 'general'
+  priority: 'critical' | 'high' | 'medium' | 'low'
+  title: string
+  description: string
+  impact: string
+  recommendation: string
+  data_points: Record<string, any>
+  created_at: string
+}
+
+// City-wise, GST-wise Profitability
+export interface ProfitabilityReport {
+  user_id: string
+  report_period: string
+  breakdown_by: 'city' | 'state' | 'gst_type' | 'customer_segment'
+  data: Array<{
+    dimension: string // city name, state code, or gst type
+    revenue: number
+    expenses: number
+    gross_profit: number
+    gross_margin: number
+    invoice_count: number
+    customer_count: number
+    average_invoice_value: number
+  }>
+  total_revenue: number
+  total_profit: number
+  overall_margin: number
 }
 
 export interface CashFlowRealtime {
