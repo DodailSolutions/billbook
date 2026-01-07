@@ -334,10 +334,10 @@ export default async function Home() {
       <section id="pricing" className="px-6 py-16 md:py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h3 className="text-3xl md:text-5xl font-bold text-gray-900 mb-4">
+            <h3 className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
               Simple, Transparent Pricing
             </h3>
-            <p className="text-lg text-gray-600">Choose the plan that fits your business needs</p>
+            <p className="text-lg text-gray-600 dark:text-gray-300">Choose the plan that fits your business needs</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
@@ -355,34 +355,34 @@ export default async function Home() {
                 </div>
               )}
               <div className="mb-6">
-                <h4 className="text-2xl font-bold text-gray-900 mb-2">Free</h4>
+                <h4 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Free</h4>
                 <div className="flex items-baseline gap-1 mb-4">
-                  <span className="text-5xl font-bold text-gray-900">₹0</span>
-                  <span className="text-gray-600">/month</span>
+                  <span className="text-5xl font-bold text-gray-900 dark:text-white">₹0</span>
+                  <span className="text-gray-600 dark:text-gray-400">/month</span>
                 </div>
-                <p className="text-gray-600">Perfect for getting started</p>
+                <p className="text-gray-600 dark:text-gray-300">Perfect for getting started</p>
               </div>
               
               <ul className="space-y-4 mb-8">
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Up to 50 invoices total</span>
+                  <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <span className="text-gray-700 dark:text-gray-200">Up to 50 invoices total</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Customer management</span>
+                  <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <span className="text-gray-700 dark:text-gray-200">Customer management</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                  <span className="text-gray-700">GST compliant invoices</span>
+                  <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <span className="text-gray-700 dark:text-gray-200">GST compliant invoices</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                  <span className="text-gray-700">PDF downloads</span>
+                  <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <span className="text-gray-700 dark:text-gray-200">PDF downloads</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Custom branding</span>
+                  <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <span className="text-gray-700 dark:text-gray-200">Custom branding</span>
                 </li>
               </ul>
               
@@ -400,10 +400,10 @@ export default async function Home() {
             </div>
 
             {/* Starter Plan */}
-            <div className={`bg-white border-2 rounded-2xl p-8 hover:shadow-lg transition-all relative ${
+            <div className={`bg-white dark:bg-gray-800 border-2 rounded-2xl p-8 hover:shadow-lg transition-all relative ${
               currentPlan === 'starter' 
-                ? 'border-emerald-500 shadow-lg ring-2 ring-emerald-200' 
-                : 'border-emerald-600'
+                ? 'border-emerald-500 shadow-lg ring-2 ring-emerald-200 dark:ring-emerald-800' 
+                : 'border-emerald-600 dark:border-emerald-500'
             }`}>
               {currentPlan === 'starter' ? (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2">
@@ -420,34 +420,34 @@ export default async function Home() {
               )}
               
               <div className="mb-6">
-                <h4 className="text-2xl font-bold text-gray-900 mb-2">Starter</h4>
+                <h4 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Starter</h4>
                 <div className="flex items-baseline gap-1 mb-4">
-                  <span className="text-5xl font-bold text-gray-900">₹299</span>
-                  <span className="text-gray-600">/month</span>
+                  <span className="text-5xl font-bold text-gray-900 dark:text-white">₹299</span>
+                  <span className="text-gray-600 dark:text-gray-400">/month</span>
                 </div>
-                <p className="text-gray-600">For growing businesses</p>
+                <p className="text-gray-600 dark:text-gray-300">For growing businesses</p>
               </div>
               
               <ul className="space-y-4 mb-8">
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                  <span className="text-gray-700"><strong>Unlimited</strong> invoices</span>
+                  <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <span className="text-gray-700 dark:text-gray-200"><strong>Unlimited</strong> invoices</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Everything in Free</span>
+                  <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <span className="text-gray-700 dark:text-gray-200">Everything in Free</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Recurring invoices</span>
+                  <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <span className="text-gray-700 dark:text-gray-200">Recurring invoices</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Payment reminders</span>
+                  <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <span className="text-gray-700 dark:text-gray-200">Payment reminders</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Priority support</span>
+                  <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <span className="text-gray-700 dark:text-gray-200">Priority support</span>
                 </li>
               </ul>
               
@@ -465,7 +465,7 @@ export default async function Home() {
             </div>
 
             {/* Professional Plan */}
-            <div className={`bg-white border-2 rounded-2xl p-8 hover:shadow-xl transition-all ${
+            <div className={`bg-white dark:bg-gray-800 border-2 rounded-2xl p-8 hover:shadow-lg transition-all ${
               currentPlan === 'professional' 
                 ? 'border-emerald-500 bg-linear-to-br from-emerald-50 to-teal-50 shadow-xl ring-2 ring-emerald-400/50 relative' 
                 : 'border-gray-200'
@@ -478,34 +478,34 @@ export default async function Home() {
                 </div>
               )}
               <div className="mb-6">
-                <h4 className="text-2xl font-bold text-gray-900 mb-2">Professional</h4>
+                <h4 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Professional</h4>
                 <div className="flex items-baseline gap-1 mb-4">
-                  <span className="text-5xl font-bold text-gray-900">₹599</span>
-                  <span className="text-gray-600">/month</span>
+                  <span className="text-5xl font-bold text-gray-900 dark:text-white">₹599</span>
+                  <span className="text-gray-600 dark:text-gray-400">/month</span>
                 </div>
-                <p className="text-gray-600">For established teams</p>
+                <p className="text-gray-600 dark:text-gray-300">For established teams</p>
               </div>
               
               <ul className="space-y-4 mb-8">
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Everything in Starter</span>
+                  <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <span className="text-gray-700 dark:text-gray-200">Everything in Starter</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                  <span className="text-gray-700"><strong>AI Accountant</strong> assistant</span>
+                  <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <span className="text-gray-700 dark:text-gray-200"><strong>AI Accountant</strong> assistant</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                  <span className="text-gray-700"><strong>2 team members</strong></span>
+                  <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <span className="text-gray-700 dark:text-gray-200"><strong>2 team members</strong></span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Advanced analytics</span>
+                  <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <span className="text-gray-700 dark:text-gray-200">Advanced analytics</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                  <span className="text-gray-700">Custom reports</span>
+                  <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <span className="text-gray-700 dark:text-gray-200">Custom reports</span>
                 </li>
               </ul>
               
@@ -524,7 +524,7 @@ export default async function Home() {
           </div>
 
           <div className="text-center mt-12">
-            <p className="text-gray-600 mb-8">All plans include 14-day free trial • Cancel anytime</p>
+            <p className="text-gray-600 dark:text-gray-300 mb-8">All plans include 14-day free trial • Cancel anytime</p>
           </div>
         </div>
       </section>
@@ -533,7 +533,7 @@ export default async function Home() {
       <section className="px-6 py-16 md:py-24 bg-amber-50 dark:bg-amber-900/20">
         <div className="max-w-5xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-100 dark:bg-amber-900/50 border border-amber-200 dark:border-amber-800 rounded-full text-amber-900 dark:text-amber-100 text-sm font-semibold mb-6">
-            <Zap className="h-4 w-4" />
+            <Zap className="h-4 w-4 text-amber-600 dark:text-amber-300" />
             Limited Time Offer
           </div>
           
@@ -546,57 +546,57 @@ export default async function Home() {
 
           <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 md:p-12 shadow-lg border border-gray-200 dark:border-gray-700 max-w-3xl mx-auto">
             <div className="mb-6">
-              <div className="text-gray-500 text-lg mb-2">
+              <div className="text-gray-500 dark:text-gray-400 text-lg mb-2">
                 <span className="line-through">₹15,999</span>
                 <span className="ml-2 bg-red-500 text-white text-sm px-2 py-1 rounded">38% OFF</span>
               </div>
               <div className="flex items-baseline justify-center gap-2 mb-3">
-                <span className="text-6xl md:text-7xl font-bold text-gray-900">₹9,999</span>
+                <span className="text-6xl md:text-7xl font-bold text-gray-900 dark:text-white">₹9,999</span>
               </div>
-              <p className="text-lg font-semibold text-amber-600">One-time payment • Lifetime access</p>
+              <p className="text-lg font-semibold text-amber-600 dark:text-amber-400">One-time payment • Lifetime access</p>
             </div>
 
             <div className="grid md:grid-cols-2 gap-4 my-8 text-left">
               <div className="flex items-start gap-3">
-                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-1" />
+                <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-1" />
                 <div>
-                  <p className="font-semibold text-gray-900">Unlimited Invoices</p>
-                  <p className="text-sm text-gray-600">No monthly limits, ever</p>
+                  <p className="font-semibold text-gray-900 dark:text-white">Unlimited Invoices</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">No monthly limits, ever</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-1" />
+                <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-1" />
                 <div>
-                  <p className="font-semibold text-gray-900">All Premium Features</p>
-                  <p className="text-sm text-gray-600">Everything in Professional plan</p>
+                  <p className="font-semibold text-gray-900 dark:text-white">All Premium Features</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">Everything in Professional plan</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-1" />
+                <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-1" />
                 <div>
-                  <p className="font-semibold text-gray-900">Free Updates</p>
-                  <p className="text-sm text-gray-600">All future features included</p>
+                  <p className="font-semibold text-gray-900 dark:text-white">Free Updates</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">All future features included</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-1" />
+                <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-1" />
                 <div>
-                  <p className="font-semibold text-gray-900">Priority Support</p>
-                  <p className="text-sm text-gray-600">Lifetime priority assistance</p>
+                  <p className="font-semibold text-gray-900 dark:text-white">Priority Support</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">Lifetime priority assistance</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-1" />
+                <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-1" />
                 <div>
-                  <p className="font-semibold text-gray-900">Recurring Billing</p>
-                  <p className="text-sm text-gray-600">Automated invoices & reminders</p>
+                  <p className="font-semibold text-gray-900 dark:text-white">Recurring Billing</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">Automated invoices & reminders</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-1" />
+                <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-1" />
                 <div>
-                  <p className="font-semibold text-gray-900">Custom Branding</p>
-                  <p className="text-sm text-gray-600">Logo, colors, fonts</p>
+                  <p className="font-semibold text-gray-900 dark:text-white">Custom Branding</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">Logo, colors, fonts</p>
                 </div>
               </div>
             </div>

@@ -103,12 +103,12 @@ export default async function AuditTrailPage() {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
+            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">
               Critical Actions
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">
+            <div className="text-2xl font-bold text-red-600 dark:text-red-400">
               {auditLogs.filter(log => log.is_critical_action).length}
             </div>
           </CardContent>
@@ -116,12 +116,12 @@ export default async function AuditTrailPage() {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
+            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">
               Today
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">
+            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
               {auditLogs.filter(log => {
                 const logDate = new Date(log.performed_at)
                 const today = new Date()
@@ -133,12 +133,12 @@ export default async function AuditTrailPage() {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
+            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">
               Last 7 Days
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">
+            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
               {auditLogs.filter(log => {
                 const logDate = new Date(log.performed_at)
                 const weekAgo = new Date()
@@ -212,11 +212,14 @@ export default async function AuditTrailPage() {
                             </Badge>
                           )}
                           {log.geolocation && (
-                            <span>📍 {log.geolocation.city}, {log.geolocation.country}</span>
+                            <span className="flex items-center gap-1">
+                              <span className="text-gray-500 dark:text-gray-400">📍</span>
+                              {log.geolocation.city}, {log.geolocation.country}
+                            </span>
                           )}
                         </div>
                         {log.user_agent && (
-                          <p className="text-xs text-gray-500 mt-1 truncate">
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">
                             {log.user_agent}
                           </p>
                         )}

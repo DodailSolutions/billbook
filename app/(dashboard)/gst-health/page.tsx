@@ -166,8 +166,8 @@ export default async function GSTHealthScorePage() {
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-5 w-5 text-green-600" />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
                   On Time Filings
                 </span>
               </div>
@@ -178,8 +178,8 @@ export default async function GSTHealthScorePage() {
 
             <div className="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
               <div className="flex items-center gap-2">
-                <Clock className="h-5 w-5 text-red-600" />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <Clock className="h-5 w-5 text-red-600 dark:text-red-400" />
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
                   Late Filings
                 </span>
               </div>
@@ -190,8 +190,8 @@ export default async function GSTHealthScorePage() {
 
             <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
               <div className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-blue-600" />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
                   Total Returns
                 </span>
               </div>
