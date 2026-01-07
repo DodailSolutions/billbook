@@ -1,7 +1,9 @@
-import { FileBarChart } from "lucide-react"
+import { FileBarChart, UserPlus, Briefcase } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card"
+import { Button } from "@/components/ui/Button"
 import { GSTReportGenerator } from "./GSTReportGenerator"
 import { AccountingReportGenerator } from "./AccountingReportGenerator"
+import Link from 'next/link'
 
 export default function ReportsPage() {
     return (
@@ -53,6 +55,41 @@ export default function ReportsPage() {
                     </CardContent>
                 </Card>
             </div>
+
+            {/* Hire a CA Card */}
+            <Card className="bg-linear-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border-emerald-200 dark:border-emerald-800">
+                <CardContent className="pt-6">
+                    <div className="flex flex-col md:flex-row gap-6 items-center">
+                        <div className="shrink-0">
+                            <div className="h-16 w-16 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                                <Briefcase className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
+                            </div>
+                        </div>
+                        <div className="flex-1 text-center md:text-left">
+                            <h3 className="text-xl font-bold text-emerald-900 dark:text-emerald-100 mb-2 flex items-center gap-2 justify-center md:justify-start">
+                                <UserPlus className="h-5 w-5" />
+                                Need Professional Help?
+                            </h3>
+                            <p className="text-sm text-emerald-700 dark:text-emerald-300 mb-4">
+                                Hire a Chartered Accountant for GST filing, tax compliance, financial planning, and expert accounting services. Get matched with verified CAs in your area.
+                            </p>
+                            <div className="flex flex-wrap gap-3 justify-center md:justify-start">
+                                <Link href="/reports/hire-ca">
+                                    <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                                        <UserPlus className="h-4 w-4 mr-2" />
+                                        Hire a CA Now
+                                    </Button>
+                                </Link>
+                                <Link href="/reports/ca-marketplace">
+                                    <Button variant="outline" className="border-emerald-600 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20">
+                                        Browse CA Marketplace
+                                    </Button>
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
 
             <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
                 <CardContent className="pt-6">
