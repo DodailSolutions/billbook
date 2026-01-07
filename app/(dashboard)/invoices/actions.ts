@@ -190,7 +190,11 @@ export async function createInvoice(data: CreateInvoiceData) {
         sgst_amount: gstComponents.sgst,
         igst_amount: gstComponents.igst,
         invoice_date: data.invoice_date,
-        items: data.items,
+        items: data.items.map(item => ({
+            hsn_sac_code: item.hsn_sac_code,
+            gst_rate: item.gst_rate,
+            amount: item.quantity * item.unit_price
+        })),
         reverse_charge_applicable: reverseChargeApplicable
     })
 
