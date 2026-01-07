@@ -827,7 +827,7 @@ export async function getGSTLiabilityTracker() {
       sgst: totalGSTPaid * 0.45,
       igst: totalGSTPaid * 0.10
     },
-    filing_status: 'pending' as const,
+    filing_status: 'pending' as 'pending' | 'filed' | 'overdue',
     due_date: new Date(new Date().setDate(20)).toISOString()
   }
 }
