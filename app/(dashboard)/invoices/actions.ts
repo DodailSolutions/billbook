@@ -143,7 +143,7 @@ export async function createInvoice(data: CreateInvoiceData) {
     // Get company GST settings for auto-classification
     const { data: companySettings } = await supabase
         .from('company_gst_settings')
-        .select('company_state_code')
+        .select('company_state_code, company_gstin')
         .eq('user_id', user.id)
         .single()
 
