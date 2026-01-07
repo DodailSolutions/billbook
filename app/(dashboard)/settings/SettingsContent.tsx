@@ -118,8 +118,8 @@ export default function SettingsContent({ initialProfile }: SettingsContentProps
             {message && (
                 <div className={`p-4 rounded-lg flex items-center gap-3 shadow-sm animate-in slide-in-from-top-4 duration-300 ${
                     message.type === 'success' 
-                        ? 'bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 text-green-800 dark:text-green-300 border border-green-200 dark:border-green-800' 
-                        : 'bg-gradient-to-r from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20 text-red-800 dark:text-red-300 border border-red-200 dark:border-red-800'
+                        ? 'bg-linear-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 text-green-800 dark:text-green-300 border border-green-200 dark:border-green-800' 
+                        : 'bg-linear-to-r from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20 text-red-800 dark:text-red-300 border border-red-200 dark:border-red-800'
                 }`}>
                     <div className={`p-2 rounded-full ${message.type === 'success' ? 'bg-green-100 dark:bg-green-900/40' : 'bg-red-100 dark:bg-red-900/40'}`}>
                         {message.type === 'success' ? (
@@ -143,7 +143,7 @@ export default function SettingsContent({ initialProfile }: SettingsContentProps
                                 onClick={() => setActiveTab(tab.id as TabType)}
                                 className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 font-medium transition-all duration-200 rounded-md ${
                                     activeTab === tab.id
-                                        ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg scale-[1.02]'
+                                        ? 'bg-linear-to-r from-blue-600 to-purple-600 text-white shadow-lg scale-[1.02]'
                                         : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-200'
                                 }`}
                             >
@@ -163,7 +163,7 @@ export default function SettingsContent({ initialProfile }: SettingsContentProps
                         <div className="flex flex-col items-center text-center space-y-4">
                             {/* Avatar */}
                             <div className="relative">
-                                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-3xl font-bold shadow-lg">
+                                <div className="w-24 h-24 rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-3xl font-bold shadow-lg">
                                     {(fullName || 'U')[0].toUpperCase()}
                                 </div>
                                 <button 
@@ -329,7 +329,7 @@ export default function SettingsContent({ initialProfile }: SettingsContentProps
                                 <Button
                                     type="submit"
                                     disabled={loading}
-                                    className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                                    className="flex items-center gap-2 bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                                 >
                                     <Save className="h-4 w-4" />
                                     {loading ? 'Saving...' : 'Save Changes'}
@@ -345,7 +345,7 @@ export default function SettingsContent({ initialProfile }: SettingsContentProps
                 <div className="space-y-6">
                     {/* Security Overview */}
                     <div className="grid gap-4 md:grid-cols-3">
-                        <Card className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-800">
+                        <Card className="bg-linear-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-800">
                             <div className="flex items-center gap-3">
                                 <div className="p-3 bg-green-100 dark:bg-green-900/40 rounded-full">
                                     <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
@@ -356,7 +356,7 @@ export default function SettingsContent({ initialProfile }: SettingsContentProps
                                 </div>
                             </div>
                         </Card>
-                        <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-800">
+                        <Card className="bg-linear-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-800">
                             <div className="flex items-center gap-3">
                                 <div className="p-3 bg-blue-100 dark:bg-blue-900/40 rounded-full">
                                     <Shield className="h-6 w-6 text-blue-600 dark:text-blue-400" />
@@ -367,7 +367,7 @@ export default function SettingsContent({ initialProfile }: SettingsContentProps
                                 </div>
                             </div>
                         </Card>
-                        <Card className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-purple-200 dark:border-purple-800">
+                        <Card className="bg-linear-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-purple-200 dark:border-purple-800">
                             <div className="flex items-center gap-3">
                                 <div className="p-3 bg-purple-100 dark:bg-purple-900/40 rounded-full">
                                     <Key className="h-6 w-6 text-purple-600 dark:text-purple-400" />
@@ -482,7 +482,7 @@ export default function SettingsContent({ initialProfile }: SettingsContentProps
                                 <Button
                                     type="submit"
                                     disabled={loading || newPassword !== confirmPassword}
-                                    className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                                    className="flex items-center gap-2 bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                                 >
                                     <Key className="h-4 w-4" />
                                     {loading ? 'Changing...' : 'Change Password'}
@@ -566,7 +566,7 @@ export default function SettingsContent({ initialProfile }: SettingsContentProps
                                 <Button
                                     type="submit"
                                     disabled={loading}
-                                    className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                                    className="flex items-center gap-2 bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
                                 >
                                     <Mail className="h-4 w-4" />
                                     {loading ? 'Updating...' : 'Update Email'}
@@ -634,7 +634,7 @@ export default function SettingsContent({ initialProfile }: SettingsContentProps
                                     className="group flex items-center justify-between p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-all duration-200 border border-transparent hover:border-gray-200 dark:hover:border-gray-700"
                                 >
                                     <div className="flex items-center gap-4">
-                                        <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${notification.color} flex items-center justify-center text-white shadow-sm group-hover:shadow-md transition-shadow`}>
+                                        <div className={`w-10 h-10 rounded-lg bg-linear-to-br ${notification.color} flex items-center justify-center text-white shadow-sm group-hover:shadow-md transition-shadow`}>
                                             <span className="text-lg">{notification.icon}</span>
                                         </div>
                                         <div className="flex-1">
@@ -648,7 +648,7 @@ export default function SettingsContent({ initialProfile }: SettingsContentProps
                                     </div>
                                     <label className="relative inline-flex items-center cursor-pointer">
                                         <input type="checkbox" className="sr-only peer" defaultChecked />
-                                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-gradient-to-r peer-checked:from-blue-600 peer-checked:to-purple-600"></div>
+                                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-linear-to-r peer-checked:from-blue-600 peer-checked:to-purple-600"></div>
                                     </label>
                                 </div>
                             ))}
@@ -666,7 +666,7 @@ export default function SettingsContent({ initialProfile }: SettingsContentProps
                             </Button>
                             <Button
                                 type="button"
-                                className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                                className="flex items-center gap-2 bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                             >
                                 <Save className="h-4 w-4" />
                                 Save Preferences
