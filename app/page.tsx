@@ -468,7 +468,7 @@ export default async function Home() {
                   </Button>
                 </Link>
                 <Link href="/login" className="flex-1">
-                  <Button variant="outline" className="w-full border-white text-white hover:bg-white/10">
+                  <Button variant="outline" className="w-full border-2 border-white text-white hover:bg-white hover:text-blue-600">
                     Sign In
                   </Button>
                 </Link>
