@@ -20,15 +20,15 @@ export default async function CAAccessPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
-        return 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300'
+        return 'bg-green-100 text-green-700 dark:bg-green-900/80 dark:text-green-200'
       case 'pending':
-        return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-300'
+        return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/80 dark:text-yellow-200'
       case 'revoked':
-        return 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300'
+        return 'bg-red-100 text-red-700 dark:bg-red-900/80 dark:text-red-200'
       case 'expired':
-        return 'bg-gray-100 text-gray-700 dark:bg-gray-900/50 dark:text-gray-300'
+        return 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200'
       default:
-        return 'bg-gray-100 text-gray-700 dark:bg-gray-900/50 dark:text-gray-300'
+        return 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200'
     }
   }
 
@@ -90,7 +90,7 @@ export default async function CAAccessPage() {
                 .map((access) => (
                   <div
                     key={access.id}
-                    className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg"
+                    className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-600 rounded-lg"
                   >
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
@@ -167,7 +167,7 @@ export default async function CAAccessPage() {
                 .map((access) => (
                   <div
                     key={access.id}
-                    className="flex items-center justify-between p-4 border border-yellow-200 dark:border-yellow-700 bg-yellow-50 dark:bg-yellow-900/10 rounded-lg"
+                    className="flex items-center justify-between p-4 border border-yellow-200 dark:border-yellow-600 bg-yellow-50 dark:bg-yellow-900/30 rounded-lg"
                   >
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
@@ -208,7 +208,7 @@ export default async function CAAccessPage() {
                 .map((access) => (
                   <div
                     key={access.id}
-                    className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg opacity-60"
+                    className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-600 rounded-lg opacity-70 dark:opacity-60"
                   >
                     <div className="flex-1">
                       <div className="flex items-center gap-2">

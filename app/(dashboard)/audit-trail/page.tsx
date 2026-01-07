@@ -19,40 +19,40 @@ export default async function AuditTrailPage() {
   const getActionIcon = (action: string) => {
     switch (action) {
       case 'create':
-        return <CheckCircle2 className="h-4 w-4 text-green-600" />
+        return <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
       case 'update':
-        return <Edit className="h-4 w-4 text-blue-600" />
+        return <Edit className="h-4 w-4 text-blue-600 dark:text-blue-400" />
       case 'delete':
-        return <Trash2 className="h-4 w-4 text-red-600" />
+        return <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
       case 'view':
-        return <Eye className="h-4 w-4 text-gray-600" />
+        return <Eye className="h-4 w-4 text-gray-600 dark:text-gray-400" />
       case 'export':
-        return <Download className="h-4 w-4 text-purple-600" />
+        return <Download className="h-4 w-4 text-purple-600 dark:text-purple-400" />
       case 'file':
-        return <FileUp className="h-4 w-4 text-orange-600" />
+        return <FileUp className="h-4 w-4 text-orange-600 dark:text-orange-400" />
       case 'cancel':
-        return <XCircle className="h-4 w-4 text-red-600" />
+        return <XCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
       default:
-        return <Clock className="h-4 w-4 text-gray-600" />
+        return <Clock className="h-4 w-4 text-gray-600 dark:text-gray-400" />
     }
   }
 
   const getActionColor = (action: string) => {
     switch (action) {
       case 'create':
-        return 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300'
+        return 'bg-green-100 text-green-700 dark:bg-green-900/80 dark:text-green-200'
       case 'update':
-        return 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300'
+        return 'bg-blue-100 text-blue-700 dark:bg-blue-900/80 dark:text-blue-200'
       case 'delete':
-        return 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300'
+        return 'bg-red-100 text-red-700 dark:bg-red-900/80 dark:text-red-200'
       case 'view':
-        return 'bg-gray-100 text-gray-700 dark:bg-gray-900/50 dark:text-gray-300'
+        return 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200'
       case 'export':
-        return 'bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300'
+        return 'bg-purple-100 text-purple-700 dark:bg-purple-900/80 dark:text-purple-200'
       case 'file':
-        return 'bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-300'
+        return 'bg-orange-100 text-orange-700 dark:bg-orange-900/80 dark:text-orange-200'
       default:
-        return 'bg-gray-100 text-gray-700 dark:bg-gray-900/50 dark:text-gray-300'
+        return 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200'
     }
   }
 
@@ -174,8 +174,8 @@ export default async function AuditTrailPage() {
                   key={log.id}
                   className={`p-4 border rounded-lg ${
                     log.is_critical_action
-                      ? 'border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/10'
-                      : 'border-gray-200 dark:border-gray-700'
+                      ? 'border-red-300 dark:border-red-600 bg-red-50 dark:bg-red-900/30'
+                      : 'border-gray-200 dark:border-gray-600'
                   }`}
                 >
                   <div className="flex items-start justify-between">

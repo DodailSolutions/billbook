@@ -59,17 +59,17 @@ export default async function GSTHealthScorePage() {
   const history = await getHealthScoreHistory()
 
   const getGradeColor = (grade: string) => {
-    if (grade.startsWith('A')) return 'text-green-600 bg-green-100 dark:bg-green-900/50'
-    if (grade.startsWith('B')) return 'text-blue-600 bg-blue-100 dark:bg-blue-900/50'
-    if (grade.startsWith('C')) return 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900/50'
-    if (grade.startsWith('D')) return 'text-orange-600 bg-orange-100 dark:bg-orange-900/50'
-    return 'text-red-600 bg-red-100 dark:bg-red-900/50'
+    if (grade.startsWith('A')) return 'text-green-700 bg-green-100 dark:bg-green-900/80 dark:text-green-200'
+    if (grade.startsWith('B')) return 'text-blue-700 bg-blue-100 dark:bg-blue-900/80 dark:text-blue-200'
+    if (grade.startsWith('C')) return 'text-yellow-700 bg-yellow-100 dark:bg-yellow-900/80 dark:text-yellow-200'
+    if (grade.startsWith('D')) return 'text-orange-700 bg-orange-100 dark:bg-orange-900/80 dark:text-orange-200'
+    return 'text-red-700 bg-red-100 dark:bg-red-900/80 dark:text-red-200'
   }
 
   const getRiskColor = (risk: string) => {
-    if (risk === 'low') return 'text-green-600 bg-green-100 dark:bg-green-900/50'
-    if (risk === 'medium') return 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900/50'
-    return 'text-red-600 bg-red-100 dark:bg-red-900/50'
+    if (risk === 'low') return 'text-green-700 bg-green-100 dark:bg-green-900/80 dark:text-green-200'
+    if (risk === 'medium') return 'text-yellow-700 bg-yellow-100 dark:bg-yellow-900/80 dark:text-yellow-200'
+    return 'text-red-700 bg-red-100 dark:bg-red-900/80 dark:text-red-200'
   }
 
   if (!healthScore) {
@@ -96,7 +96,7 @@ export default async function GSTHealthScorePage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-            <Target className="h-8 w-8 text-emerald-600" />
+            <Target className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
             GST Health Score
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">

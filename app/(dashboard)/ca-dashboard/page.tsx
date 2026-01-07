@@ -86,10 +86,10 @@ export default async function CADashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
+            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">
               Total Clients
             </CardTitle>
-            <Users className="h-4 w-4 text-blue-600" />
+            <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -179,7 +179,7 @@ export default async function CADashboardPage() {
                     href={`/ca-dashboard/clients/${client.client_user_id}`}
                     className="block"
                   >
-                    <div className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-emerald-300 dark:hover:border-emerald-600 transition-colors">
+                    className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-600 rounded-lg hover:border-emerald-300 dark:hover:border-emerald-500 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
                       <div className="flex items-center gap-4">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
