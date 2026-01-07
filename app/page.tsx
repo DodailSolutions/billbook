@@ -8,12 +8,15 @@ import { FAQSection } from './_components/FAQSection'
 import { TestimonialCarousel } from './_components/TestimonialCarousel'
 
 const FEATURES = [
-  { icon: FileText, title: 'Quick Invoice Creation', desc: 'Create professional invoices in under 60 seconds', color: 'emerald' },
-  { icon: IndianRupee, title: 'GST Compliant', desc: 'Automatic GST calculations with GSTIN support', color: 'blue' },
-  { icon: Users, title: 'Customer Management', desc: 'Store and organize all customer details securely', color: 'purple' },
-  { icon: CheckCircle, title: 'Custom Branding', desc: 'Add logo, fonts, and colors to match your brand', color: 'orange' },
-  { icon: RefreshCw, title: 'Recurring Billing', desc: 'Set up automatic invoices for repeat clients', color: 'teal' },
-  { icon: Clock, title: 'Payment Reminders', desc: 'Automated reminders for due and overdue payments', color: 'rose' },
+  { icon: FileText, title: 'Quick Invoice Creation', desc: 'Create professional invoices in under 60 seconds with AI assistance', color: 'emerald', badge: 'Popular' },
+  { icon: IndianRupee, title: 'GST Compliant', desc: 'Auto IGST/CGST/SGST classification, e-Invoice, e-Way bill generation', color: 'blue', badge: 'Essential' },
+  { icon: Users, title: 'Smart Customer Management', desc: 'Credit limits, aging analysis, risk scoring & auto-blacklist', color: 'purple', badge: 'New' },
+  { icon: CheckCircle, title: 'Custom Branding', desc: 'Add logo, fonts, colors, and templates to match your brand', color: 'orange' },
+  { icon: RefreshCw, title: 'Recurring & Milestone Billing', desc: 'Automated invoices, proforma, credit notes & phased payments', color: 'teal', badge: 'Pro' },
+  { icon: Clock, title: 'Payment Intelligence', desc: 'UPI, WhatsApp Pay, auto-reconciliation, BNPL & late fee automation', color: 'rose', badge: 'New' },
+  { icon: Zap, title: 'Voice & WhatsApp Invoicing', desc: 'Create invoices via voice or WhatsApp in English + Indian languages', color: 'amber', badge: 'AI' },
+  { icon: TrendingUp, title: 'Smart Pricing Suggestions', desc: 'AI-powered pricing based on history, trends & customer segments', color: 'indigo', badge: 'AI' },
+  { icon: Building2, title: 'Multi-Currency Support', desc: 'INR-first accounting with 10+ currencies, auto exchange rates', color: 'sky', badge: 'New' },
 ] as const
 
 const BENEFITS = [
@@ -291,6 +294,16 @@ export default async function Home() {
               orange: 'bg-orange-100 dark:bg-orange-500/10 text-orange-600',
               teal: 'bg-teal-100 dark:bg-teal-500/10 text-teal-600',
               rose: 'bg-rose-100 dark:bg-rose-500/10 text-rose-600',
+              amber: 'bg-amber-100 dark:bg-amber-500/10 text-amber-600',
+              indigo: 'bg-indigo-100 dark:bg-indigo-500/10 text-indigo-600',
+              sky: 'bg-sky-100 dark:bg-sky-500/10 text-sky-600',
+            }
+            const badgeColorClasses = {
+              'Popular': 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300',
+              'Essential': 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300',
+              'New': 'bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300',
+              'Pro': 'bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-300',
+              'AI': 'bg-gradient-to-r from-violet-100 to-fuchsia-100 text-violet-700 dark:from-violet-900/50 dark:to-fuchsia-900/50 dark:text-violet-300',
             }
             return (
               <div 
@@ -298,6 +311,13 @@ export default async function Home() {
                 className="group bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md hover:border-emerald-200 dark:hover:border-emerald-700 transition-all duration-200"
               >
                 <div>
+                  {feature.badge && (
+                    <div className="mb-3">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${badgeColorClasses[feature.badge as keyof typeof badgeColorClasses]}`}>
+                        {feature.badge}
+                      </span>
+                    </div>
+                  )}
                   <div className={`inline-flex p-3 ${iconColorClasses[feature.color]} rounded-xl mb-4 group-hover:scale-105 transition-transform`}>
                     <Icon className="h-6 w-6" />
                   </div>
