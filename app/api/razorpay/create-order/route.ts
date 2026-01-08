@@ -11,6 +11,10 @@ export async function POST(request: NextRequest) {
         
         const { amount, currency = 'INR', notes } = await request.json()
         
+        // Validate currency
+        const supportedCurrencies = ['INR', 'AED', 'USD', 'EUR', 'GBP']
+        const finalCurrency = supportedCurrencies.includes(currency) ? currency : 'INR'
+        
         // Check authentication - allow unauthenticated requests for lifetime plan
         const { data: { user }, error: authError } = await supabase.auth.getUser()
         const isLifetimePlan = notes?.plan === 'lifetime'
@@ -40,8 +44,8 @@ export async function POST(request: NextRequest) {
         
         const razorpay = getRazorpayInstance()
         const orderOptions = {
-            amount: amount * 100, // Razorpay expects amount in paise
-            currency,
+            amount: amount * 100, // Razorpay expects amount in paise/fils
+            currency: finalCurrency,
             receipt: `subscription_${Date.now()}`,
             notes: {
                 user_id: user?.id || 'guest',

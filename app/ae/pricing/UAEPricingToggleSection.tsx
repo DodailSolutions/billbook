@@ -12,6 +12,7 @@ export function UAEPricingToggleSection() {
   const plans = [
     {
       name: 'Starter',
+      slug: 'starter-ae',
       monthlyPrice: 49,
       yearlyPrice: 490,
       description: 'Perfect for freelancers',
@@ -26,6 +27,7 @@ export function UAEPricingToggleSection() {
     },
     {
       name: 'Growth',
+      slug: 'growth-ae',
       monthlyPrice: 99,
       yearlyPrice: 990,
       description: 'For small businesses',
@@ -40,6 +42,7 @@ export function UAEPricingToggleSection() {
     },
     {
       name: 'Pro',
+      slug: 'pro-ae',
       monthlyPrice: 199,
       yearlyPrice: 1990,
       description: 'For growing companies',
@@ -54,6 +57,7 @@ export function UAEPricingToggleSection() {
     },
     {
       name: 'Enterprise',
+      slug: 'enterprise-ae',
       monthlyPrice: 299,
       yearlyPrice: 2990,
       description: 'For large teams',
@@ -76,6 +80,7 @@ export function UAEPricingToggleSection() {
         {plans.map((plan) => {
           const price = isYearly ? plan.yearlyPrice : plan.monthlyPrice
           const savings = (plan.monthlyPrice * 12) - plan.yearlyPrice
+          const planId = isYearly ? `${plan.slug}-yearly` : plan.slug
           
           return (
             <div 
@@ -131,7 +136,7 @@ export function UAEPricingToggleSection() {
                   </li>
                 ))}
               </ul>
-              
+              {`/pricing?checkout=${planId}`}
               <Link href="/signup">
                 <Button 
                   className={`w-full ${

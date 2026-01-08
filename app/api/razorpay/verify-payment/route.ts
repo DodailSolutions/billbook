@@ -46,32 +46,46 @@ export async function POST(request: NextRequest) {
         let expiryDate: Date
         let planType = plan
         let amount = 0
+        let currency = 'INR'
+        let region = 'IN'
 
-        switch (plan) {
-            case 'starter':
-                amount = 299
-                expiryDate = new Date()
-                expiryDate.setMonth(expiryDate.getMonth() + 1)
-                break
-            case 'professional':
-                amount = 599
-                expiryDate = new Date()
-                expiryDate.setMonth(expiryDate.getMonth() + 1)
-                break
-            case 'enterprise':
-                amount = 999
-                expiryDate = new Date()
-                expiryDate.setMonth(expiryDate.getMonth() + 1)
-                break
-            case 'lifetime':
-                amount = 9999
-                expiryDate = new Date()
-                expiryDate.setFullYear(expiryDate.getFullYear() + 100) // Lifetime = 100 years
-                planType = 'professional' // Lifetime is professional features
-                break
-            default:
-                return NextResponse.json({ error: 'Invalid plan' }, { status: 400 })
+        // Handle plan mapping and pricing
+        const planMapping: Record<string, { type: string; amount: number; currency: string; region: string; months: number }> = {
+            // India plans
+            'starter': { type: 'starter', amount: 299, currency: 'INR', region: 'IN', months: 1 },
+            'starter-yearly': { type: 'starter', amount: 2988, currency: 'INR', region: 'IN', months: 12 },
+            'professional': { type: 'professional', amount: 599, currency: 'INR', region: 'IN', months: 1 },
+            'professional-yearly': { type: 'professional', amount: 5988, currency: 'INR', region: 'IN', months: 12 },
+            'enterprise': { type: 'enterprise', amount: 999, currency: 'INR', region: 'IN', months: 1 },
+            'lifetime': { type: 'professional', amount: 9999, currency: 'INR', region: 'IN', months: 1200 },
+            
+            // UAE plans
+            'starter-ae': { type: 'starter', amount: 49, currency: 'AED', region: 'AE', months: 1 },
+            'starter-ae-yearly': { type: 'starter', amount: 490, currency: 'AED', region: 'AE', months: 12 },
+            'growth-ae': { type: 'growth', amount: 99, currency: 'AED', region: 'AE', months: 1 },
+            'growth-ae-yearly': { type: 'growth', amount: 990, currency: 'AED', region: 'AE', months: 12 },
+            'pro-ae': { type: 'pro', amount: 199, currency: 'AED', region: 'AE', months: 1 },
+            'pro-ae-yearly': { type: 'pro', amount: 1990, currency: 'AED', region: 'AE', months: 12 },
+            'enterprise-ae': { type: 'enterprise', amount: 299, currency: 'AED', region: 'AE', months: 1 },
+            'enterprise-ae-yearly': { type: 'enterprise', amount: 2990, currency: 'AED', region: 'AE', months: 12 },
+            'lifetime-ae': { type: 'starter', amount: 499, currency: 'AED', region: 'AE', months: 1200 },
+            'lifetime-growth-ae': { type: 'growth', amount: 1299, currency: 'AED', region: 'AE', months: 1200 },
+            'lifetime-pro-ae': { type: 'pro', amount: 1999, currency: 'AED', region: 'AE', months: 1200 },
+            'lifetime-enterprise-ae': { type: 'enterprise', amount: 2499, currency: 'AED', region: 'AE', months: 1200 }
         }
+
+        const planConfig = planMapping[plan]
+        if (!planConfig) {
+            return NextResponse.json({ error: 'Invalid plan' }, { status: 400 })
+        }
+
+        planType = planConfig.type
+        amount = planConfig.amount
+        currency = planConfig.currency
+        region = planConfig.region
+        
+        expiryDate = new Date()
+        expiryDate.setMonth(expiryDate.getMonth() + planConfig.months)
 
         // Insert into user_subscriptions table
         const { error: subError } = await supabase
@@ -97,10 +111,16 @@ export async function POST(request: NextRequest) {
             )
         }
 
+        // Update user profile region
+        await supabase
+            .from('user_profiles')
+            .update({ region })
+            .eq('id', user.id)
+
         // Record payment in payments table if it exists
         try {
-            await supabase
-                .from('payments')
+            await supabase/fils
+                    currency
                 .insert({
                     user_id: user.id,
                     razorpay_order_id,

@@ -29,10 +29,27 @@ interface RazorpayOptions {
 }
 
 const PLAN_DETAILS: Record<string, { name: string; amount: number; currency: string }> = {
+    // India plans (INR)
     starter: { name: 'Starter Plan', amount: 299, currency: 'INR' },
+    'starter-yearly': { name: 'Starter Plan (Yearly)', amount: 2988, currency: 'INR' },
     professional: { name: 'Professional Plan', amount: 599, currency: 'INR' },
+    'professional-yearly': { name: 'Professional Plan (Yearly)', amount: 5988, currency: 'INR' },
     enterprise: { name: 'Enterprise Plan', amount: 999, currency: 'INR' },
-    lifetime: { name: 'Lifetime Professional', amount: 9999, currency: 'INR' }
+    lifetime: { name: 'Lifetime Professional', amount: 9999, currency: 'INR' },
+    
+    // UAE plans (AED)
+    'starter-ae': { name: 'Starter Plan', amount: 49, currency: 'AED' },
+    'starter-ae-yearly': { name: 'Starter Plan (Yearly)', amount: 490, currency: 'AED' },
+    'growth-ae': { name: 'Growth Plan', amount: 99, currency: 'AED' },
+    'growth-ae-yearly': { name: 'Growth Plan (Yearly)', amount: 990, currency: 'AED' },
+    'pro-ae': { name: 'Pro Plan', amount: 199, currency: 'AED' },
+    'pro-ae-yearly': { name: 'Pro Plan (Yearly)', amount: 1990, currency: 'AED' },
+    'enterprise-ae': { name: 'Enterprise Plan', amount: 299, currency: 'AED' },
+    'enterprise-ae-yearly': { name: 'Enterprise Plan (Yearly)', amount: 2990, currency: 'AED' },
+    'lifetime-ae': { name: 'Lifetime Starter', amount: 499, currency: 'AED' },
+    'lifetime-growth-ae': { name: 'Lifetime Growth', amount: 1299, currency: 'AED' },
+    'lifetime-pro-ae': { name: 'Lifetime Pro', amount: 1999, currency: 'AED' },
+    'lifetime-enterprise-ae': { name: 'Lifetime Enterprise', amount: 2499, currency: 'AED' }
 }
 
 export function CheckoutHandler() {
@@ -215,7 +232,7 @@ export function CheckoutHandler() {
                             <div className="flex justify-between items-baseline">
                                 <span className="text-gray-600 dark:text-gray-400">Amount</span>
                                 <span className="text-2xl font-bold text-emerald-600">
-                                    ₹{planDetails.amount.toLocaleString('en-IN')}
+                                    {planDetails.currency === 'AED' ? 'AED' : '₹'} {planDetails.amount.toLocaleString(planDetails.currency === 'AED' ? 'en-AE' : 'en-IN')}
                                 </span>
                             </div>
                         </div>
@@ -279,7 +296,7 @@ export function CheckoutHandler() {
                         <div className="flex justify-between items-baseline">
                             <span className="text-gray-600 dark:text-gray-400">Amount</span>
                             <span className="text-2xl font-bold text-emerald-600">
-                                ₹{planDetails.amount.toLocaleString('en-IN')}
+                                {planDetails.currency === 'AED' ? 'AED' : '₹'} {planDetails.amount.toLocaleString(planDetails.currency === 'AED' ? 'en-AE' : 'en-IN')}
                             </span>
                         </div>
                     </div>
