@@ -303,7 +303,7 @@ export default async function Home() {
               'Essential': 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300',
               'New': 'bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300',
               'Pro': 'bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-300',
-              'AI': 'bg-gradient-to-r from-violet-100 to-fuchsia-100 text-violet-700 dark:from-violet-900/50 dark:to-fuchsia-900/50 dark:text-violet-300',
+              'AI': 'bg-linear-to-r from-violet-100 to-fuchsia-100 text-violet-700 dark:from-violet-900/50 dark:to-fuchsia-900/50 dark:text-violet-300',
             }
             return (
               <div 
@@ -330,147 +330,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* CA Marketplace Section */}
-      <section className="px-6 py-20 md:py-32 bg-linear-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-950">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16 space-y-4">
-            <div className="inline-block">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 mb-4">
-                <Award className="h-4 w-4 text-blue-600" />
-                <span className="text-sm font-medium text-blue-600">CA Marketplace</span>
-              </div>
-            </div>
-            <h2 className="text-4xl md:text-6xl font-bold tracking-tight text-gray-900 dark:text-white">
-              Need Expert CA Services?
-            </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              Connect with verified Chartered Accountants for GST filing, tax returns, audits, and more
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-8 mb-12">
-            {/* For Businesses */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-lg transition-all">
-              <div className="flex items-start gap-4 mb-6">
-                <div className="p-3 bg-emerald-100 dark:bg-emerald-500/10 rounded-xl">
-                  <Briefcase className="h-8 w-8 text-emerald-600" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                    For Businesses
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-400">
-                    Find the perfect CA for your business needs
-                  </p>
-                </div>
-              </div>
-              
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0" />
-                  <span className="text-gray-700 dark:text-gray-300">Browse verified CA profiles</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0" />
-                  <span className="text-gray-700 dark:text-gray-300">Compare rates and specializations</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0" />
-                  <span className="text-gray-700 dark:text-gray-300">Read reviews from other businesses</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0" />
-                  <span className="text-gray-700 dark:text-gray-300">Get proposals within 24-48 hours</span>
-                </li>
-              </ul>
-
-              <div className="flex gap-3">
-                <Link href="/reports/ca-marketplace" className="flex-1">
-                  <Button className="w-full bg-emerald-600 hover:bg-emerald-700">
-                    Browse CAs
-                  </Button>
-                </Link>
-                <Link href="/reports/hire-ca" className="flex-1">
-                  <Button variant="outline" className="w-full">
-                    Post Request
-                  </Button>
-                </Link>
-              </div>
-            </div>
-
-            {/* For CAs */}
-            <div className="bg-linear-to-br from-blue-600 to-indigo-600 rounded-2xl p-8 text-white shadow-lg hover:shadow-xl transition-all">
-              <div className="flex items-start gap-4 mb-6">
-                <div className="p-3 bg-white/10 rounded-xl backdrop-blur-sm">
-                  <Award className="h-8 w-8 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold mb-2">
-                    For Chartered Accountants
-                  </h3>
-                  <p className="text-blue-100">
-                    Grow your practice by connecting with clients
-                  </p>
-                </div>
-              </div>
-              
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-white shrink-0" />
-                  <span className="text-blue-50">Create your professional profile</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-white shrink-0" />
-                  <span className="text-blue-50">Showcase your expertise and credentials</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-white shrink-0" />
-                  <span className="text-blue-50">Receive client requests directly</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-white shrink-0" />
-                  <span className="text-blue-50">Build your reputation with reviews</span>
-                </li>
-              </ul>
-
-              <div className="flex gap-3">
-                <Link href="/ca-registration" className="flex-1">
-                  <Button className="w-full bg-white text-blue-600 hover:bg-blue-50">
-                    Register as CA
-                  </Button>
-                </Link>
-                <Link href="/login" className="flex-1">
-                  <Button variant="outline" className="w-full border-2 border-white text-white hover:bg-white hover:text-blue-600">
-                    Sign In
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </div>
-
-          {/* Trust Indicators */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-blue-600 mb-1">ICAI</div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Verified Members</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-emerald-600 mb-1">Fast</div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">24-48h Response</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-purple-600 mb-1">Secure</div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Safe Payments</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-orange-600 mb-1">Rated</div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Client Reviews</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing Section */}
+      {/* Pricing Section */
       <section id="pricing" className="px-6 py-16 md:py-24 bg-gray-50 dark:bg-gray-900/50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
@@ -482,7 +342,7 @@ export default async function Home() {
 
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {/* Free Plan */}
-            <div className={`bg-white border-2 rounded-2xl p-8 hover:shadow-lg transition-all ${
+            <div className={`bg-white dark:bg-gray-800 border-2 rounded-2xl p-8 hover:shadow-lg transition-all ${
               currentPlan === 'free' 
                 ? 'border-emerald-500 shadow-lg ring-2 ring-emerald-200 relative' 
                 : 'border-gray-200'
@@ -607,7 +467,7 @@ export default async function Home() {
             {/* Professional Plan */}
             <div className={`bg-white dark:bg-gray-800 border-2 rounded-2xl p-8 hover:shadow-lg transition-all ${
               currentPlan === 'professional' 
-                ? 'border-emerald-500 bg-linear-to-br from-emerald-50 to-teal-50 shadow-xl ring-2 ring-emerald-400/50 relative' 
+                ? 'border-emerald-500 shadow-xl ring-2 ring-emerald-400/50 relative' 
                 : 'border-gray-200'
             }`}>
               {currentPlan === 'professional' && (
@@ -1060,7 +920,7 @@ export default async function Home() {
       {/* Footer */}
       <footer className="border-t border-gray-200 bg-gray-50">
         <div className="max-w-7xl mx-auto px-6 py-12">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <div className="relative w-8 h-8 shrink-0">
