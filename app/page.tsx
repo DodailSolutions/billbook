@@ -303,7 +303,7 @@ export default async function Home() {
               'Essential': 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300',
               'New': 'bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300',
               'Pro': 'bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-300',
-              'AI': 'bg-gradient-to-r from-violet-100 to-fuchsia-100 text-violet-700 dark:from-violet-900/50 dark:to-fuchsia-900/50 dark:text-violet-300',
+              'AI': 'bg-linear-to-r from-violet-100 to-fuchsia-100 text-violet-700 dark:from-violet-900/50 dark:to-fuchsia-900/50 dark:text-violet-300',
             }
             return (
               <div 
