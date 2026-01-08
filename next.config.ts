@@ -98,7 +98,7 @@ const nextConfig: NextConfig = {
   },
   
   /* ====================================================================
-     REDIRECT RULES - Remove trailing slashes
+     REDIRECT RULES - Remove trailing slashes & Force HTTPS
      ==================================================================== */
   async redirects() {
     return [
@@ -107,6 +107,23 @@ const nextConfig: NextConfig = {
         destination: '/:path+',
         permanent: true,
       },
+      // Force HTTPS in production
+      ...(process.env.NODE_ENV === 'production'
+        ? [
+            {
+              source: '/:path*',
+              has: [
+                {
+                  type: 'header',
+                  key: 'x-forwarded-proto',
+                  value: 'http',
+                },
+              ],
+              destination: 'https://:host/:path*',
+              permanent: true,
+            },
+          ]
+        : []),
     ];
   },
 
