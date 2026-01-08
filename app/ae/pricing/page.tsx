@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/Button'
 import { CheckCircle, X, Zap, Shield } from 'lucide-react'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { createClient } from '@/lib/supabase/server'
+import { UAEPricingToggleSection } from './UAEPricingToggleSection'
 
 export default async function UAEPricingPage() {
   const supabase = await createClient()
@@ -71,204 +72,14 @@ export default async function UAEPricingPage() {
       <section className="px-6 py-16 max-w-7xl mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-            Monthly SaaS Plans
+            Subscription Plans
           </h2>
           <p className="text-lg text-gray-600 dark:text-gray-300">
-            Flexible subscription pricing with no long-term commitment
+            Choose monthly or yearly billing with up to 17% savings on annual plans
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Starter */}
-          <div className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-2xl p-6 hover:shadow-lg transition-all">
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Starter</h3>
-            <div className="flex items-baseline gap-1 mb-4">
-              <span className="text-4xl font-bold text-gray-900 dark:text-white">AED 49</span>
-              <span className="text-gray-600 dark:text-gray-400">/month</span>
-            </div>
-            <p className="text-gray-600 dark:text-gray-300 mb-6">Perfect for freelancers</p>
-            
-            <ul className="space-y-3 mb-6">
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                <span className="text-sm text-gray-700 dark:text-gray-200">1 user</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                <span className="text-sm text-gray-700 dark:text-gray-200">Unlimited invoices</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                <span className="text-sm text-gray-700 dark:text-gray-200">VAT-compliant invoicing</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                <span className="text-sm text-gray-700 dark:text-gray-200">Client management</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                <span className="text-sm text-gray-700 dark:text-gray-200">Email support</span>
-              </li>
-            </ul>
-            
-            <Link href="/signup">
-              <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white">
-                Get Started
-              </Button>
-            </Link>
-            
-            <p className="text-xs text-center text-gray-500 mt-4">
-              <Link href="#annual" className="hover:text-emerald-600">Annual: AED 490/year</Link>
-            </p>
-          </div>
-
-          {/* Growth - Most Popular */}
-          <div className="bg-white dark:bg-gray-800 border-2 border-emerald-600 rounded-2xl p-6 hover:shadow-lg transition-all relative">
-            <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-              <span className="bg-emerald-600 text-white px-4 py-1 rounded-full text-sm font-semibold">
-                Most Popular
-              </span>
-            </div>
-            
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Growth</h3>
-            <div className="flex items-baseline gap-1 mb-4">
-              <span className="text-4xl font-bold text-gray-900 dark:text-white">AED 99</span>
-              <span className="text-gray-600 dark:text-gray-400">/month</span>
-            </div>
-            <p className="text-gray-600 dark:text-gray-300 mb-6">For small businesses</p>
-            
-            <ul className="space-y-3 mb-6">
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                <span className="text-sm text-gray-700 dark:text-gray-200"><strong>Up to 3 users</strong></span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                <span className="text-sm text-gray-700 dark:text-gray-200">Everything in Starter</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                <span className="text-sm text-gray-700 dark:text-gray-200">Recurring invoices</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                <span className="text-sm text-gray-700 dark:text-gray-200">Payment reminders</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                <span className="text-sm text-gray-700 dark:text-gray-200">VAT summary reports</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                <span className="text-sm text-gray-700 dark:text-gray-200">Priority support</span>
-              </li>
-            </ul>
-            
-            <Link href="/signup">
-              <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">
-                Get Started
-              </Button>
-            </Link>
-            
-            <p className="text-xs text-center text-gray-500 mt-4">
-              <Link href="#annual" className="hover:text-emerald-600">Annual: AED 990/year</Link>
-            </p>
-          </div>
-
-          {/* Pro */}
-          <div className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-2xl p-6 hover:shadow-lg transition-all">
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Pro</h3>
-            <div className="flex items-baseline gap-1 mb-4">
-              <span className="text-4xl font-bold text-gray-900 dark:text-white">AED 199</span>
-              <span className="text-gray-600 dark:text-gray-400">/month</span>
-            </div>
-            <p className="text-gray-600 dark:text-gray-300 mb-6">For growing companies</p>
-            
-            <ul className="space-y-3 mb-6">
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                <span className="text-sm text-gray-700 dark:text-gray-200"><strong>Up to 5 users</strong></span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                <span className="text-sm text-gray-700 dark:text-gray-200">Everything in Growth</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                <span className="text-sm text-gray-700 dark:text-gray-200">Advanced VAT reports</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                <span className="text-sm text-gray-700 dark:text-gray-200">Multi-currency</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                <span className="text-sm text-gray-700 dark:text-gray-200">Custom templates</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                <span className="text-sm text-gray-700 dark:text-gray-200">API access</span>
-              </li>
-            </ul>
-            
-            <Link href="/signup">
-              <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white">
-                Get Started
-              </Button>
-            </Link>
-            
-            <p className="text-xs text-center text-gray-500 mt-4">
-              <Link href="#annual" className="hover:text-emerald-600">Annual: AED 1,990/year</Link>
-            </p>
-          </div>
-
-          {/* Business+ */}
-          <div className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-2xl p-6 hover:shadow-lg transition-all">
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Business+</h3>
-            <div className="flex items-baseline gap-1 mb-4">
-              <span className="text-4xl font-bold text-gray-900 dark:text-white">AED 299</span>
-              <span className="text-gray-600 dark:text-gray-400">/month</span>
-            </div>
-            <p className="text-gray-600 dark:text-gray-300 mb-6">For enterprises</p>
-            
-            <ul className="space-y-3 mb-6">
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                <span className="text-sm text-gray-700 dark:text-gray-200"><strong>Up to 10 users</strong></span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                <span className="text-sm text-gray-700 dark:text-gray-200">Everything in Pro</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                <span className="text-sm text-gray-700 dark:text-gray-200">White-label invoices</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                <span className="text-sm text-gray-700 dark:text-gray-200">Client portal</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                <span className="text-sm text-gray-700 dark:text-gray-200">Advanced analytics</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
-                <span className="text-sm text-gray-700 dark:text-gray-200">Dedicated support</span>
-              </li>
-            </ul>
-            
-            <Link href="/signup">
-              <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white">
-                Get Started
-              </Button>
-            </Link>
-            
-            <p className="text-xs text-center text-gray-500 mt-4">
-              <Link href="#annual" className="hover:text-emerald-600">Annual: AED 2,990/year</Link>
-            </p>
-          </div>
-        </div>
+        <UAEPricingToggleSection />
       </section>
 
       {/* Lifetime Plans */}

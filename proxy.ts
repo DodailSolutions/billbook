@@ -39,9 +39,14 @@ export async function proxy(request: NextRequest) {
         
         const response = NextResponse.redirect(url)
         
-        // Set a cookie to remember they were redirected (can be overridden)
+        // Set cookies to remember region
         response.cookies.set('auto-redirected', 'true', {
             maxAge: 60 * 60 * 24 * 30, // 30 days
+            path: '/'
+        })
+        
+        response.cookies.set('region-preference', 'ae', {
+            maxAge: 60 * 60 * 24 * 365, // 1 year
             path: '/'
         })
         
@@ -52,7 +57,15 @@ export async function proxy(request: NextRequest) {
     if (isUAEUser && (pathname === '/pricing' || pathname === '/features')) {
         const url = request.nextUrl.clone()
         url.pathname = `/ae${pathname}`
-        return NextResponse.redirect(url)
+        
+        const response = NextResponse.redirect(url)
+        
+        response.cookies.set('region-preference', 'ae', {
+            maxAge: 60 * 60 * 24 * 365, // 1 year
+            path: '/'
+        })
+        
+        return response
     }
 
     return await updateSession(request)
