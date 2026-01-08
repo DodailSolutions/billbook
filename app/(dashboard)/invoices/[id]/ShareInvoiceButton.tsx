@@ -96,41 +96,29 @@ export function ShareInvoiceButton({
                             {/* WhatsApp */}
                             <button
                                 onClick={handleWhatsAppShare}
-                                disabled={isLoadingPDF}
-                                className="w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                             >
                                 <div className="h-8 w-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                                    {isLoadingPDF ? (
-                                        <Loader2 className="h-4 w-4 text-green-600 dark:text-green-400 animate-spin" />
-                                    ) : (
-                                        <MessageCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
-                                    )}
+                                    <MessageCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
                                 </div>
                                 <div className="flex-1 text-left">
                                     <div className="font-medium">WhatsApp</div>
-                                    <div className="text-xs text-gray-500 dark:text-gray-400">
-                                        {isLoadingPDF ? 'Preparing PDF...' : 'Share with PDF attached'}
-                                    </div>
+                                    <div className="text-xs text-gray-500 dark:text-gray-400">Share invoice with PDF link</div>
                                 </div>
                             </button>
 
                             {/* Email */}
                             <button
                                 onClick={handleEmailShare}
-                                disabled={isLoadingPDF}
-                                className="w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                             >
                                 <div className="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                                    {isLoadingPDF ? (
-                                        <Loader2 className="h-4 w-4 text-blue-600 dark:text-blue-400 animate-spin" />
-                                    ) : (
-                                        <Mail className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                                    )}
+                                    <Mail className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                                 </div>
                                 <div className="flex-1 text-left">
                                     <div className="font-medium">Email</div>
                                     <div className="text-xs text-gray-500 dark:text-gray-400">
-                                        {isLoadingPDF ? 'Preparing PDF...' : 'Send with PDF attached'}
+                                        Send with PDF attached
                                     </div>
                                 </div>
                             </button>
