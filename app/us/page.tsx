@@ -210,6 +210,70 @@ export default async function InternationalPage() {
           </div>
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
+        <div className="max-w-7xl mx-auto px-6 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            <div className="col-span-1">
+              <Link href="/us" className="flex items-center gap-2 mb-4">
+                <div className="relative w-8 h-8">
+                  <Image 
+                    src="/logo-icon.svg" 
+                    alt="BillBooky" 
+                    width={32} 
+                    height={32}
+                  />
+                </div>
+                <span className="text-xl font-bold text-gray-900 dark:text-white">BillBooky</span>
+              </Link>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                Professional invoicing software for businesses worldwide. Create custom invoices with flexible tax rules in USD.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Product</h3>
+              <ul className="space-y-2 text-sm">
+                <li><Link href="/us/pricing" className="text-gray-600 dark:text-gray-400 hover:text-blue-600">Pricing</Link></li>
+                <li><Link href="/features" className="text-gray-600 dark:text-gray-400 hover:text-blue-600">Features</Link></li>
+                <li><Link href="/signup" className="text-gray-600 dark:text-gray-400 hover:text-blue-600">Sign Up</Link></li>
+                <li><Link href="/login" className="text-gray-600 dark:text-gray-400 hover:text-blue-600">Login</Link></li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Resources</h3>
+              <ul className="space-y-2 text-sm">
+                <li><Link href="/docs" className="text-gray-600 dark:text-gray-400 hover:text-blue-600">Documentation</Link></li>
+                <li><Link href="/blog" className="text-gray-600 dark:text-gray-400 hover:text-blue-600">Blog</Link></li>
+                <li><Link href="/support" className="text-gray-600 dark:text-gray-400 hover:text-blue-600">Support</Link></li>
+                <li><Link href="/contact" className="text-gray-600 dark:text-gray-400 hover:text-blue-600">Contact</Link></li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Legal</h3>
+              <ul className="space-y-2 text-sm">
+                <li><Link href="/privacy" className="text-gray-600 dark:text-gray-400 hover:text-blue-600">Privacy Policy</Link></li>
+                <li><Link href="/terms" className="text-gray-600 dark:text-gray-400 hover:text-blue-600">Terms of Service</Link></li>
+                <li><Link href="/refunds" className="text-gray-600 dark:text-gray-400 hover:text-blue-600">Refund Policy</Link></li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-200 dark:border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              © {new Date().getFullYear()} BillBooky. All rights reserved.
+            </p>
+            <div className="flex items-center gap-4">
+              <Link href="/" className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600">🇮🇳 India</Link>
+              <Link href="/ae" className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600">🇦🇪 UAE</Link>
+              <Link href="/us" className="text-sm text-blue-600 font-medium">🌍 International</Link>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
