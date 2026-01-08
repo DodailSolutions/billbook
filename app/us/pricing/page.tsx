@@ -299,6 +299,82 @@ export default async function USPricingPage() {
         </div>
       </section>
 
+      {/* Testimonials */}
+      <section className="px-6 py-16">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+              What Our Customers Say
+            </h2>
+            <p className="text-lg text-gray-600 dark:text-gray-300">
+              Join thousands of satisfied users worldwide
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+              <div className="flex items-center gap-1 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <span key={i} className="text-amber-400">★</span>
+                ))}
+              </div>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
+                &ldquo;The lifetime plan is incredible value. I&apos;ve been using BillBooky for 8 months and it&apos;s paid for itself already. No regrets!&rdquo;
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+                  MR
+                </div>
+                <div>
+                  <div className="font-semibold text-gray-900 dark:text-white">Michael Rodriguez</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Business Owner, USA</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+              <div className="flex items-center gap-1 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <span key={i} className="text-amber-400">★</span>
+                ))}
+              </div>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
+                &ldquo;Simple, affordable, and works perfectly for my needs. The custom tax rules saved me hours of manual calculations.&rdquo;
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white font-bold">
+                  LT
+                </div>
+                <div>
+                  <div className="font-semibold text-gray-900 dark:text-white">Lisa Thompson</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Consultant, Singapore</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+              <div className="flex items-center gap-1 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <span key={i} className="text-amber-400">★</span>
+                ))}
+              </div>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
+                &ldquo;Best invoicing software I&apos;ve used. Clean interface, professional invoices, and the pricing is unbeatable. Highly recommend!&rdquo;
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold">
+                  DW
+                </div>
+                <div>
+                  <div className="font-semibold text-gray-900 dark:text-white">David Wilson</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Software Developer, UK</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Trust Indicators */}
       <section className="px-6 py-16 bg-gray-50 dark:bg-gray-900/50">
         <div className="max-w-4xl mx-auto">
@@ -338,6 +414,9 @@ export default async function USPricingPage() {
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                 Professional invoicing software for businesses worldwide. Create custom invoices with flexible tax rules in USD.
               </p>
+              <p className="text-xs text-gray-500 dark:text-gray-500">
+                A product of Dodail Solutions Private Limited
+              </p>
             </div>
 
             <div>
@@ -372,7 +451,7 @@ export default async function USPricingPage() {
 
           <div className="border-t border-gray-200 dark:border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              © {new Date().getFullYear()} BillBooky. All rights reserved.
+              © {new Date().getFullYear()} BillBooky by Dodail Solutions Private Limited. All rights reserved.
             </p>
             <div className="flex items-center gap-4">
               <Link href="/" className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600">🇮🇳 India</Link>

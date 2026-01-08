@@ -167,6 +167,82 @@ export default async function InternationalPage() {
         </div>
       </section>
 
+      {/* Testimonials */}
+      <section className="px-6 py-16 bg-white dark:bg-gray-950">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+              Loved by Businesses Worldwide
+            </h2>
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+              See what entrepreneurs and business owners are saying about BillBooky
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+              <div className="flex items-center gap-1 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <span key={i} className="text-amber-400">★</span>
+                ))}
+              </div>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
+                &ldquo;BillBooky made it so easy to handle multi-state sales tax. The custom tax rules feature is exactly what I needed for my consulting business.&rdquo;
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+                  SM
+                </div>
+                <div>
+                  <div className="font-semibold text-gray-900 dark:text-white">Sarah Mitchell</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Marketing Consultant, USA</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+              <div className="flex items-center gap-1 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <span key={i} className="text-amber-400">★</span>
+                ))}
+              </div>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
+                &ldquo;Switched from an expensive invoicing tool. BillBooky&apos;s USD pricing is transparent and affordable. Plus, the lifetime plan is a steal!&rdquo;
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white font-bold">
+                  JC
+                </div>
+                <div>
+                  <div className="font-semibold text-gray-900 dark:text-white">James Cooper</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Freelance Developer, Canada</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+              <div className="flex items-center gap-1 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <span key={i} className="text-amber-400">★</span>
+                ))}
+              </div>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
+                &ldquo;Perfect for my design agency. Clean invoices, easy client management, and the team collaboration features are fantastic. Highly recommend!&rdquo;
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold">
+                  EP
+                </div>
+                <div>
+                  <div className="font-semibold text-gray-900 dark:text-white">Emma Peterson</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Design Agency Owner, Australia</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Countries Supported */}
       <section className="px-6 py-16 bg-gray-50 dark:bg-gray-900/50">
         <div className="max-w-7xl mx-auto text-center">
@@ -230,6 +306,9 @@ export default async function InternationalPage() {
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                 Professional invoicing software for businesses worldwide. Create custom invoices with flexible tax rules in USD.
               </p>
+              <p className="text-xs text-gray-500 dark:text-gray-500">
+                A product of Dodail Solutions Private Limited
+              </p>
             </div>
 
             <div>
@@ -264,7 +343,7 @@ export default async function InternationalPage() {
 
           <div className="border-t border-gray-200 dark:border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              © {new Date().getFullYear()} BillBooky. All rights reserved.
+              © {new Date().getFullYear()} BillBooky by Dodail Solutions Private Limited. All rights reserved.
             </p>
             <div className="flex items-center gap-4">
               <Link href="/" className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600">🇮🇳 India</Link>
