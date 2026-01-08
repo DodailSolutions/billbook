@@ -71,7 +71,21 @@ export async function POST(request: NextRequest) {
             'lifetime-ae': { type: 'starter', amount: 499, currency: 'AED', region: 'AE', months: 1200 },
             'lifetime-growth-ae': { type: 'growth', amount: 1299, currency: 'AED', region: 'AE', months: 1200 },
             'lifetime-pro-ae': { type: 'pro', amount: 1999, currency: 'AED', region: 'AE', months: 1200 },
-            'lifetime-enterprise-ae': { type: 'enterprise', amount: 2499, currency: 'AED', region: 'AE', months: 1200 }
+            'lifetime-enterprise-ae': { type: 'enterprise', amount: 2499, currency: 'AED', region: 'AE', months: 1200 },
+            
+            // US/International plans
+            'starter-us': { type: 'starter', amount: 9, currency: 'USD', region: 'US', months: 1 },
+            'starter-us-yearly': { type: 'starter', amount: 49, currency: 'USD', region: 'US', months: 12 },
+            'growth-us': { type: 'growth', amount: 19, currency: 'USD', region: 'US', months: 1 },
+            'growth-us-yearly': { type: 'growth', amount: 99, currency: 'USD', region: 'US', months: 12 },
+            'pro-us': { type: 'pro', amount: 29, currency: 'USD', region: 'US', months: 1 },
+            'pro-us-yearly': { type: 'pro', amount: 179, currency: 'USD', region: 'US', months: 12 },
+            'business-us': { type: 'business', amount: 49, currency: 'USD', region: 'US', months: 1 },
+            'business-us-yearly': { type: 'business', amount: 299, currency: 'USD', region: 'US', months: 12 },
+            'lifetime-starter-us': { type: 'starter', amount: 149, currency: 'USD', region: 'US', months: 1200 },
+            'lifetime-growth-us': { type: 'growth', amount: 249, currency: 'USD', region: 'US', months: 1200 },
+            'lifetime-pro-us': { type: 'pro', amount: 399, currency: 'USD', region: 'US', months: 1200 },
+            'lifetime-business-us': { type: 'business', amount: 599, currency: 'USD', region: 'US', months: 1200 }
         }
 
         const planConfig = planMapping[plan]

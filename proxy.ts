@@ -4,19 +4,14 @@ import { updateSession } from '@/lib/supabase/middleware'
 export async function proxy(request: NextRequest) {
     const { pathname, search } = request.nextUrl
     
-    // Skip geo-detection for static files, API routes, and already on /ae routes
+    // Skip geo-detection for static files, API routes, and already on regional routes
     if (
         pathname.startsWith('/_next') ||
         pathname.startsWith('/api') ||
         pathname.startsWith('/ae') ||
+        pathname.startsWith('/us') ||
         pathname.includes('.') // Skip files with extensions
     ) {
-        return await updateSession(request)
-    }
-
-    // Check if user has manually set a region preference
-    const regionPreference = request.cookies.get('region-preference')?.value
-    if (regionPreference === 'in') {
         return await updateSession(request)
     }
 
@@ -28,24 +23,37 @@ export async function proxy(request: NextRequest) {
     const isInvoiceSearch = searchQuery.includes('invoice') || 
                             searchQuery.includes('billing') ||
                             searchQuery.includes('vat') ||
+                            searchQuery.includes('tax') ||
                             searchQuery.includes('فاتورة') // Arabic for invoice
 
-    // Redirect UAE users or invoice searchers to /ae
-    const isUAEUser = country === 'AE'
-    
-    if ((isUAEUser || isInvoiceSearch) && pathname === '/') {
+    // Region mapping - automatically redirect based on country
+    const regionRouting: Record<string, string> = {
+        'AE': '/ae',  // UAE
+        'US': '/us',  // United States
+        'CA': '/us',  // Canada
+        'AU': '/us',  // Australia
+        'NZ': '/us',  // New Zealand
+        'GB': '/us',  // United Kingdom
+        'SG': '/us',  // Singapore
+        'ZA': '/us',  // South Africa
+        'IE': '/us',  // Ireland
+        'MX': '/us',  // Mexico
+        'BR': '/us',  // Brazil
+        'JP': '/us',  // Japan
+        'KR': '/us',  // South Korea
+        // Add more countries as needed
+    }
+
+    // Auto-redirect to regional page (NO manual switching)
+    if (country && regionRouting[country] && pathname === '/') {
+        const targetPath = regionRouting[country]
         const url = request.nextUrl.clone()
-        url.pathname = '/ae'
+        url.pathname = targetPath
         
         const response = NextResponse.redirect(url)
         
-        // Set cookies to remember region
-        response.cookies.set('auto-redirected', 'true', {
-            maxAge: 60 * 60 * 24 * 30, // 30 days
-            path: '/'
-        })
-        
-        response.cookies.set('region-preference', 'ae', {
+        // Set region cookie
+        response.cookies.set('region-auto', country, {
             maxAge: 60 * 60 * 24 * 365, // 1 year
             path: '/'
         })
@@ -53,15 +61,16 @@ export async function proxy(request: NextRequest) {
         return response
     }
 
-    // Redirect other UAE traffic to /ae for pricing and features pages
-    if (isUAEUser && (pathname === '/pricing' || pathname === '/features')) {
+    // Redirect pricing/features to regional pages
+    if (country && regionRouting[country] && (pathname === '/pricing' || pathname === '/features')) {
+        const targetPath = regionRouting[country]
         const url = request.nextUrl.clone()
-        url.pathname = `/ae${pathname}`
+        url.pathname = `${targetPath}${pathname}`
         
         const response = NextResponse.redirect(url)
         
-        response.cookies.set('region-preference', 'ae', {
-            maxAge: 60 * 60 * 24 * 365, // 1 year
+        response.cookies.set('region-auto', country, {
+            maxAge: 60 * 60 * 24 * 365,
             path: '/'
         })
         

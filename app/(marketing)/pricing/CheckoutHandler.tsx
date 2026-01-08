@@ -49,7 +49,21 @@ const PLAN_DETAILS: Record<string, { name: string; amount: number; currency: str
     'lifetime-ae': { name: 'Lifetime Starter', amount: 499, currency: 'AED' },
     'lifetime-growth-ae': { name: 'Lifetime Growth', amount: 1299, currency: 'AED' },
     'lifetime-pro-ae': { name: 'Lifetime Pro', amount: 1999, currency: 'AED' },
-    'lifetime-enterprise-ae': { name: 'Lifetime Enterprise', amount: 2499, currency: 'AED' }
+    'lifetime-enterprise-ae': { name: 'Lifetime Enterprise', amount: 2499, currency: 'AED' },
+    
+    // US/International plans (USD)
+    'starter-us': { name: 'Starter Plan', amount: 9, currency: 'USD' },
+    'starter-us-yearly': { name: 'Starter Plan (Yearly)', amount: 49, currency: 'USD' },
+    'growth-us': { name: 'Growth Plan', amount: 19, currency: 'USD' },
+    'growth-us-yearly': { name: 'Growth Plan (Yearly)', amount: 99, currency: 'USD' },
+    'pro-us': { name: 'Pro Plan', amount: 29, currency: 'USD' },
+    'pro-us-yearly': { name: 'Pro Plan (Yearly)', amount: 179, currency: 'USD' },
+    'business-us': { name: 'Business Plan', amount: 49, currency: 'USD' },
+    'business-us-yearly': { name: 'Business Plan (Yearly)', amount: 299, currency: 'USD' },
+    'lifetime-starter-us': { name: 'Lifetime Starter', amount: 149, currency: 'USD' },
+    'lifetime-growth-us': { name: 'Lifetime Growth', amount: 249, currency: 'USD' },
+    'lifetime-pro-us': { name: 'Lifetime Pro', amount: 399, currency: 'USD' },
+    'lifetime-business-us': { name: 'Lifetime Business', amount: 599, currency: 'USD' }
 }
 
 export function CheckoutHandler() {
@@ -232,7 +246,7 @@ export function CheckoutHandler() {
                             <div className="flex justify-between items-baseline">
                                 <span className="text-gray-600 dark:text-gray-400">Amount</span>
                                 <span className="text-2xl font-bold text-emerald-600">
-                                    {planDetails.currency === 'AED' ? 'AED' : '₹'} {planDetails.amount.toLocaleString(planDetails.currency === 'AED' ? 'en-AE' : 'en-IN')}
+                                    {planDetails.currency === 'AED' ? 'AED' : planDetails.currency === 'USD' ? '$' : '₹'} {planDetails.amount.toLocaleString(planDetails.currency === 'AED' ? 'en-AE' : planDetails.currency === 'USD' ? 'en-US' : 'en-IN')}
                                 </span>
                             </div>
                         </div>
@@ -296,7 +310,7 @@ export function CheckoutHandler() {
                         <div className="flex justify-between items-baseline">
                             <span className="text-gray-600 dark:text-gray-400">Amount</span>
                             <span className="text-2xl font-bold text-emerald-600">
-                                {planDetails.currency === 'AED' ? 'AED' : '₹'} {planDetails.amount.toLocaleString(planDetails.currency === 'AED' ? 'en-AE' : 'en-IN')}
+                                {planDetails.currency === 'AED' ? 'AED' : planDetails.currency === 'USD' ? '$' : '₹'} {planDetails.amount.toLocaleString(planDetails.currency === 'AED' ? 'en-AE' : planDetails.currency === 'USD' ? 'en-US' : 'en-IN')}
                             </span>
                         </div>
                     </div>

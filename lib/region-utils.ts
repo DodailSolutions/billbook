@@ -3,12 +3,12 @@
 import { createClient } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
 
-export type Region = 'IN' | 'AE'
+export type Region = 'IN' | 'AE' | 'US'
 
 export interface RegionalSettings {
     region: Region
     currency: string
-    taxType: 'GST' | 'VAT'
+    taxType: 'GST' | 'VAT' | 'SALES_TAX'
     taxLabel: string
     taxIdLabel: string
     taxRate: number
@@ -45,6 +45,19 @@ const REGIONAL_DEFAULTS: Record<Region, RegionalSettings> = {
         showArabic: true,
         dateFormat: 'DD/MM/YYYY',
         numberFormat: 'en-AE'
+    },
+    US: {
+        region: 'US',
+        currency: 'USD',
+        taxType: 'SALES_TAX',
+        taxLabel: 'Sales Tax',
+        taxIdLabel: 'Tax ID',
+        taxRate: 0, // User-defined
+        showHsnSac: false,
+        showGstBreakdown: false,
+        showArabic: false,
+        dateFormat: 'MM/DD/YYYY',
+        numberFormat: 'en-US'
     }
 }
 
@@ -89,9 +102,14 @@ async function getRegionFromCookie(): Promise<Region> {
     try {
         const cookieStore = await cookies()
         const regionCookie = cookieStore.get('region-preference')
+        const regionAuto = cookieStore.get('region-auto')
         
         if (regionCookie?.value === 'ae') {
             return 'AE'
+        }
+        
+        if (regionCookie?.value === 'us' || regionAuto?.value) {
+            return 'US'
         }
         
         return 'IN'
@@ -134,7 +152,8 @@ export async function updateUserRegion(region: Region): Promise<{ success: boole
 
         // Also set cookie for immediate effect
         const cookieStore = await cookies()
-        cookieStore.set('region-preference', region === 'AE' ? 'ae' : 'in', {
+        const regionValue = region === 'AE' ? 'ae' : region === 'US' ? 'us' : 'in'
+        cookieStore.set('region-preference', regionValue, {
             maxAge: 60 * 60 * 24 * 365, // 1 year
             path: '/'
         })
