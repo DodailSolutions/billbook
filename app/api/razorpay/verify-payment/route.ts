@@ -133,14 +133,14 @@ export async function POST(request: NextRequest) {
 
         // Record payment in payments table if it exists
         try {
-            await supabase/fils
-                    currency
+            await supabase
+                .from('payments')
                 .insert({
                     user_id: user.id,
                     razorpay_order_id,
                     razorpay_payment_id,
-                    amount: amount * 100, // Store in paise
-                    currency: 'INR',
+                    amount: amount * 100, // Store in paise/fils/cents
+                    currency: currency,
                     status: 'success',
                     plan_type: plan,
                     created_at: new Date().toISOString()
