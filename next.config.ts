@@ -114,7 +114,7 @@ const nextConfig: NextConfig = {
               source: '/:path*',
               has: [
                 {
-                  type: 'header',
+                  type: 'header' as const,
                   key: 'x-forwarded-proto',
                   value: 'http',
                 },
