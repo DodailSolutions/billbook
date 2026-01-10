@@ -2,14 +2,17 @@ import { type NextRequest, NextResponse } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
 
 export async function proxy(request: NextRequest) {
-    const { pathname, search } = request.nextUrl
+    const { pathname } = request.nextUrl
     
-    // Skip geo-detection for static files, API routes, and already on regional routes
+    // Skip middleware for static files, API routes, and already on regional routes
     if (
         pathname.startsWith('/_next') ||
         pathname.startsWith('/api') ||
         pathname.startsWith('/ae') ||
         pathname.startsWith('/us') ||
+        pathname.startsWith('/login') ||
+        pathname.startsWith('/signup') ||
+        pathname.startsWith('/dashboard') ||
         pathname.includes('.') // Skip files with extensions
     ) {
         return await updateSession(request)
@@ -18,13 +21,13 @@ export async function proxy(request: NextRequest) {
     // Get country from Vercel's geo-location headers
     const country = request.headers.get('x-vercel-ip-country')
     
-    // Check if user searched for invoice-related terms
-    const searchQuery = search.toLowerCase()
-    const isInvoiceSearch = searchQuery.includes('invoice') || 
-                            searchQuery.includes('billing') ||
-                            searchQuery.includes('vat') ||
-                            searchQuery.includes('tax') ||
-                            searchQuery.includes('فاتورة') // Arabic for invoice
+    // Check if user has manually set a preference cookie
+    const regionPreference = request.cookies.get('region-preference')?.value
+    
+    // Don't auto-redirect if user has set a manual preference
+    if (regionPreference) {
+        return await updateSession(request)
+    }
 
     // Region mapping - automatically redirect based on country
     const regionRouting: Record<string, string> = {
@@ -41,21 +44,78 @@ export async function proxy(request: NextRequest) {
         'BR': '/us',  // Brazil
         'JP': '/us',  // Japan
         'KR': '/us',  // South Korea
-        // Add more countries as needed
+        'DE': '/us',  // Germany
+        'FR': '/us',  // France
+        'ES': '/us',  // Spain
+        'IT': '/us',  // Italy
+        'NL': '/us',  // Netherlands
+        'SE': '/us',  // Sweden
+        'NO': '/us',  // Norway
+        'DK': '/us',  // Denmark
+        'FI': '/us',  // Finland
+        'CH': '/us',  // Switzerland
+        'AT': '/us',  // Austria
+        'BE': '/us',  // Belgium
+        'PL': '/us',  // Poland
+        'PT': '/us',  // Portugal
+        'GR': '/us',  // Greece
+        'CZ': '/us',  // Czech Republic
+        'HU': '/us',  // Hungary
+        'RO': '/us',  // Romania
+        'BG': '/us',  // Bulgaria
+        'HR': '/us',  // Croatia
+        'SK': '/us',  // Slovakia
+        'SI': '/us',  // Slovenia
+        'LT': '/us',  // Lithuania
+        'LV': '/us',  // Latvia
+        'EE': '/us',  // Estonia
+        'MY': '/us',  // Malaysia
+        'TH': '/us',  // Thailand
+        'PH': '/us',  // Philippines
+        'ID': '/us',  // Indonesia
+        'VN': '/us',  // Vietnam
+        'HK': '/us',  // Hong Kong
+        'TW': '/us',  // Taiwan
+        'IL': '/us',  // Israel
+        'TR': '/us',  // Turkey
+        'SA': '/us',  // Saudi Arabia
+        'QA': '/us',  // Qatar
+        'KW': '/us',  // Kuwait
+        'BH': '/us',  // Bahrain
+        'OM': '/us',  // Oman
+        'EG': '/us',  // Egypt
+        'NG': '/us',  // Nigeria
+        'KE': '/us',  // Kenya
+        'GH': '/us',  // Ghana
+        'UG': '/us',  // Uganda
+        'TZ': '/us',  // Tanzania
+        'AR': '/us',  // Argentina
+        'CL': '/us',  // Chile
+        'CO': '/us',  // Colombia
+        'PE': '/us',  // Peru
+        'VE': '/us',  // Venezuela
+        'UY': '/us',  // Uruguay
+        'EC': '/us',  // Ecuador
+        'BO': '/us',  // Bolivia
+        'CR': '/us',  // Costa Rica
+        'PA': '/us',  // Panama
+        'DO': '/us',  // Dominican Republic
+        // India and unlisted countries default to India (/)
     }
 
-    // Auto-redirect to regional page (NO manual switching)
+    // Auto-redirect to regional page for root path
     if (country && regionRouting[country] && pathname === '/') {
         const targetPath = regionRouting[country]
         const url = request.nextUrl.clone()
         url.pathname = targetPath
         
-        const response = NextResponse.redirect(url)
+        const response = NextResponse.redirect(url, 307) // Temporary redirect
         
-        // Set region cookie
+        // Set region cookie to track auto-detection
         response.cookies.set('region-auto', country, {
-            maxAge: 60 * 60 * 24 * 365, // 1 year
-            path: '/'
+            maxAge: 60 * 60 * 24 * 30, // 30 days
+            path: '/',
+            sameSite: 'lax'
         })
         
         return response
@@ -67,11 +127,12 @@ export async function proxy(request: NextRequest) {
         const url = request.nextUrl.clone()
         url.pathname = `${targetPath}${pathname}`
         
-        const response = NextResponse.redirect(url)
+        const response = NextResponse.redirect(url, 307)
         
         response.cookies.set('region-auto', country, {
-            maxAge: 60 * 60 * 24 * 365,
-            path: '/'
+            maxAge: 60 * 60 * 24 * 30,
+            path: '/',
+            sameSite: 'lax'
         })
         
         return response
