@@ -50,14 +50,31 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
     const [savedItemToSave, setSavedItemToSave] = useState<InvoiceItem | null>(null)
     const [savedItems, setSavedItems] = useState<Array<InvoiceItem & { id: string; name: string }>>([])
     const [itemName, setItemName] = useState('')
-
-    // Load saved items from localStorage
+    
+    // Recurring invoice settings
+    const [isRecurring, setIsRecurring] = useState(false)
+    const [recurringFrequency, setRecurringFrequency] = useState<'monthly' | 'yearly'>('monthly')
+    const [recurringStartDate, setRecurringStartDate] = useState(new Date().toISOString().split('T')[0])
+    const [recurringEndDate, setRecurringEndDate] = useState('')
+    const [nextBillingDate, setNextBillingDate] = useState('')
+    
+    // Calculate next billing date when recurring settings change
     useEffect(() => {
-        const saved = localStorage.getItem('savedInvoiceItems')
-        if (saved) {
-            setSavedItems(JSON.parse(saved))
+        if (isRecurring && recurringStartDate) {
+            const startDate = new Date(recurringStartDate)
+            const nextDate = new Date(startDate)
+            
+            if (recurringFrequency === 'monthly') {
+                nextDate.setMonth(nextDate.getMonth() + 1)
+            } else {
+                nextDate.setFullYear(nextDate.getFullYear() + 1)
+            }
+            
+            setNextBillingDate(nextDate.toISOString().split('T')[0])
+        } else {
+            setNextBillingDate('')
         }
-    }, [])
+    }, [isRecurring, recurringStartDate, recurringFrequency])
 
     const addItem = () => {
         setItems([...items, { description: '', quantity: 1, unit_price: 0 }])
@@ -169,7 +186,12 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                 supply_type: supplyType,
                 reverse_charge_applicable: reverseCharge,
                 notes: formData.get('notes') as string || undefined,
-                items: items.filter(item => item.description && item.quantity > 0 && item.unit_price > 0)
+                items: items.filter(item => item.description && item.quantity > 0 && item.unit_price > 0),
+                // Recurring invoice data
+                is_recurring: isRecurring,
+                recurring_frequency: isRecurring ? recurringFrequency : undefined,
+                recurring_start_date: isRecurring ? recurringStartDate : undefined,
+                recurring_end_date: isRecurring && recurringEndDate ? recurringEndDate : undefined
             }
 
             if (mode === 'edit' && invoice) {
@@ -483,6 +505,93 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                     onChange={(e) => setNotes(e.target.value)}
                     className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 />
+            </div>
+
+            {/* Recurring Invoice Section */}
+            <div className="border-t pt-6 space-y-4">
+                <div className="flex items-center gap-3">
+                    <input
+                        id="is_recurring"
+                        type="checkbox"
+                        checked={isRecurring}
+                        onChange={(e) => setIsRecurring(e.target.checked)}
+                        className="w-4 h-4 rounded border-gray-300"
+                    />
+                    <label htmlFor="is_recurring" className="text-sm font-medium flex items-center gap-2">
+                        🔄 Make this a Recurring Invoice
+                        <span className="text-xs text-gray-500 font-normal">(Auto-generate invoices on schedule)</span>
+                    </label>
+                </div>
+
+                {isRecurring && (
+                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 space-y-4">
+                        <div className="grid gap-4 md:grid-cols-2">
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                                    Billing Frequency *
+                                </label>
+                                <select
+                                    value={recurringFrequency}
+                                    onChange={(e) => setRecurringFrequency(e.target.value as 'monthly' | 'yearly')}
+                                    className="flex h-9 w-full rounded-md border border-input bg-white dark:bg-gray-900 px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                                >
+                                    <option value="monthly">📅 Monthly</option>
+                                    <option value="yearly">📆 Yearly</option>
+                                </select>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                                    Start Date *
+                                </label>
+                                <Input
+                                    type="date"
+                                    value={recurringStartDate}
+                                    onChange={(e) => setRecurringStartDate(e.target.value)}
+                                    required={isRecurring}
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                                    End Date (Optional)
+                                </label>
+                                <Input
+                                    type="date"
+                                    value={recurringEndDate}
+                                    onChange={(e) => setRecurringEndDate(e.target.value)}
+                                    min={recurringStartDate}
+                                />
+                                <p className="text-xs text-blue-700 dark:text-blue-300">
+                                    Leave empty for indefinite billing
+                                </p>
+                            </div>
+
+                            {nextBillingDate && (
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                                        📊 Next Billing Date
+                                    </label>
+                                    <div className="flex h-9 items-center rounded-md border border-blue-300 dark:border-blue-700 bg-blue-100 dark:bg-blue-900/40 px-3">
+                                        <span className="text-sm font-semibold text-blue-900 dark:text-blue-100">
+                                            {new Date(nextBillingDate).toLocaleDateString('en-US', { 
+                                                year: 'numeric', 
+                                                month: 'long', 
+                                                day: 'numeric' 
+                                            })}
+                                        </span>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="bg-blue-100 dark:bg-blue-900/40 border border-blue-300 dark:border-blue-700 rounded p-3">
+                            <p className="text-sm text-blue-900 dark:text-blue-100">
+                                <strong>ℹ️ How it works:</strong> This invoice will be automatically generated {recurringFrequency === 'monthly' ? 'every month' : 'every year'} starting from {new Date(recurringStartDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}. You'll receive reminders before each billing date.
+                            </p>
+                        </div>
+                    </div>
+                )}
             </div>
 
             <div className="flex gap-2 pt-4">

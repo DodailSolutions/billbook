@@ -28,7 +28,13 @@ export async function getInvoices(): Promise<InvoiceWithDetails[]> {
             .select(`
       *,
       customer:customers(*),
-      invoice_items(*)
+      invoice_items(*),
+      recurring_invoices!recurring_invoices_template_invoice_id_fkey(
+        id,
+        frequency,
+        next_invoice_date,
+        is_active
+      )
     `)
             .eq('user_id', user.id)
             .order('created_at', { ascending: false })
@@ -123,6 +129,16 @@ interface CreateInvoiceData {
         hsn_sac_type?: 'HSN' | 'SAC'
         gst_rate?: number
     }>
+    // Recurring invoice data
+    is_recurring?: boolean
+    recurring_frequency?: 'monthly' | 'yearly'
+    recurring_start_date?: string
+    recurring_end_date?: string
+    // Recurring invoice fields
+    is_recurring?: boolean
+    recurring_frequency?: 'monthly' | 'yearly'
+    recurring_start_date?: string
+    recurring_end_date?: string
 }
 
 export async function createInvoice(data: CreateInvoiceData) {
@@ -269,6 +285,29 @@ export async function createInvoice(data: CreateInvoiceData) {
     if (itemsError) {
         console.error('Error creating invoice items:', itemsError)
         throw new Error('Failed to create invoice items')
+    }
+    
+    // If this is a recurring invoice, create the recurring template
+    if ((data as any).is_recurring) {
+        const recurringData = data as CreateInvoiceData & {
+            is_recurring: boolean
+            recurring_frequency?: 'monthly' | 'yearly'
+            recurring_start_date?: string
+            recurring_end_date?: string
+        }
+        
+        if (recurringData.is_recurring && recurringData.recurring_frequency && recurringData.recurring_start_date) {
+            await createRecurringFromInvoice(
+                invoice.id,
+                data.customer_id,
+                recurringData.recurring_frequency,
+                recurringData.recurring_start_date,
+                recurringData.recurring_end_date,
+                data.gst_percentage,
+                data.notes,
+                data.items
+            )
+        }
     }
 
     revalidatePath('/invoices')
@@ -426,4 +465,96 @@ export async function deleteInvoice(id: string) {
     }
 
     revalidatePath('/invoices')
+}
+
+// Helper function to create recurring invoice template from regular invoice
+async function createRecurringFromInvoice(
+    invoiceId: string,
+    customerId: string,
+    frequency: 'monthly' | 'yearly',
+    startDate: string,
+    endDate: string | undefined,
+    gstPercentage: number,
+    notes: string | undefined,
+    items: Array<{
+        description: string
+        quantity: number
+        unit_price: number
+    }>
+) {
+    const supabase = await createClient()
+
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+        return
+    }
+
+    // Calculate next invoice date
+    const start = new Date(startDate)
+    const nextDate = new Date(start)
+    
+    if (frequency === 'monthly') {
+        nextDate.setMonth(nextDate.getMonth() + 1)
+    } else {
+        nextDate.setFullYear(nextDate.getFullYear() + 1)
+    }
+
+    // Create recurring invoice template
+    const { data: recurringInvoice, error: recurringError } = await supabase
+        .from('recurring_invoices')
+        .insert([{
+            user_id: user.id,
+            customer_id: customerId,
+            template_invoice_id: invoiceId,
+            frequency,
+            start_date: startDate,
+            end_date: endDate || null,
+            next_invoice_date: nextDate.toISOString().split('T')[0],
+            gst_percentage: gstPercentage,
+            notes: notes || null,
+            is_active: true
+        }])
+        .select()
+        .single()
+
+    if (recurringError) {
+        console.error('Error creating recurring invoice:', recurringError)
+        throw new Error('Failed to create recurring invoice template')
+    }
+
+    // Create recurring invoice items
+    const recurringItems = items.map(item => ({
+        recurring_invoice_id: recurringInvoice.id,
+        description: item.description,
+        quantity: item.quantity,
+        unit_price: item.unit_price
+    }))
+
+    const { error: itemsError } = await supabase
+        .from('recurring_invoice_items')
+        .insert(recurringItems)
+
+    if (itemsError) {
+        console.error('Error creating recurring invoice items:', itemsError)
+        throw new Error('Failed to create recurring invoice items')
+    }
+
+    // Create reminder for next billing date (7 days before)
+    const reminderDate = new Date(nextDate)
+    reminderDate.setDate(reminderDate.getDate() - 7)
+
+    await supabase
+        .from('reminders')
+        .insert([{
+            user_id: user.id,
+            recurring_invoice_id: recurringInvoice.id,
+            reminder_type: 'recurring_upcoming',
+            reminder_date: reminderDate.toISOString().split('T')[0],
+            days_before: 7,
+            message: `Recurring invoice will be generated on ${nextDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`,
+            is_sent: false
+        }])
+
+    revalidatePath('/invoices/recurring')
+    revalidatePath('/reminders')
 }

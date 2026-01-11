@@ -58,12 +58,19 @@ export function InvoicesList({ invoices }: InvoicesListProps) {
                             <div className="flex items-start justify-between">
                                 <div className="flex-1">
                                     <h3 className="text-base font-semibold mb-1">{invoice.invoice_number}</h3>
-                                    <span className={cn(
-                                        "inline-block px-2 py-1 rounded-full text-xs font-medium",
-                                        statusColors[invoice.status]
-                                    )}>
-                                        {invoice.status.toUpperCase()}
-                                    </span>
+                                    <div className="flex gap-2 flex-wrap">
+                                        <span className={cn(
+                                            "inline-block px-2 py-1 rounded-full text-xs font-medium",
+                                            statusColors[invoice.status]
+                                        )}>
+                                            {invoice.status.toUpperCase()}
+                                        </span>
+                                        {(invoice as any).recurring_invoices && (invoice as any).recurring_invoices.length > 0 && (
+                                            <span className="inline-block px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200">
+                                                🔄 RECURRING
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
                                 <p className="text-lg font-bold">₹{invoice.total.toFixed(2)}</p>
                             </div>
@@ -75,6 +82,11 @@ export function InvoicesList({ invoices }: InvoicesListProps) {
                                 <p className="text-muted-foreground">
                                     Date: {formatDate(invoice.invoice_date)}
                                 </p>
+                                {(invoice as any).recurring_invoices && (invoice as any).recurring_invoices.length > 0 && (invoice as any).recurring_invoices[0].is_active && (
+                                    <p className="text-sm font-medium text-purple-700 dark:text-purple-300">
+                                        📊 Next billing: {formatDate((invoice as any).recurring_invoices[0].next_invoice_date)}
+                                    </p>
+                                )}
                                 {invoice.gst_percentage > 0 && (
                                     <p className="text-xs text-muted-foreground">
                                         (incl. {invoice.gst_percentage}% GST)
@@ -128,6 +140,11 @@ export function InvoicesList({ invoices }: InvoicesListProps) {
                                     )}>
                                         {invoice.status.toUpperCase()}
                                     </span>
+                                    {(invoice as any).recurring_invoices && (invoice as any).recurring_invoices.length > 0 && (
+                                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200">
+                                            🔄 RECURRING
+                                        </span>
+                                    )}
                                 </div>
                                 <p className="text-sm text-muted-foreground mb-1">
                                     Customer: <span className="font-medium text-foreground">{invoice.customer.name}</span>
@@ -135,6 +152,11 @@ export function InvoicesList({ invoices }: InvoicesListProps) {
                                 <p className="text-sm text-muted-foreground">
                                     Date: {formatDate(invoice.invoice_date)}
                                 </p>
+                                {(invoice as any).recurring_invoices && (invoice as any).recurring_invoices.length > 0 && (invoice as any).recurring_invoices[0].is_active && (
+                                    <p className="text-sm font-medium text-purple-700 dark:text-purple-300 mt-1">
+                                        📊 Next billing: {formatDate((invoice as any).recurring_invoices[0].next_invoice_date)} ({(invoice as any).recurring_invoices[0].frequency})
+                                    </p>
+                                )}
                             </div>
 
                             <div className="flex items-center gap-4">
