@@ -134,11 +134,6 @@ interface CreateInvoiceData {
     recurring_frequency?: 'monthly' | 'yearly'
     recurring_start_date?: string
     recurring_end_date?: string
-    // Recurring invoice fields
-    is_recurring?: boolean
-    recurring_frequency?: 'monthly' | 'yearly'
-    recurring_start_date?: string
-    recurring_end_date?: string
 }
 
 export async function createInvoice(data: CreateInvoiceData) {
