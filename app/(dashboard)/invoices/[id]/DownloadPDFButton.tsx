@@ -14,23 +14,16 @@ export function DownloadPDFButton({ invoiceId }: DownloadPDFButtonProps) {
     const handleDownload = async () => {
         setIsLoading(true)
         try {
-            // Open PDF HTML in new window and trigger print
+            // Open PDF HTML in new window
             const pdfWindow = window.open(`/api/invoices/${invoiceId}/pdf`, '_blank')
             
-            if (pdfWindow) {
-                // Wait for content to load, then trigger print
-                pdfWindow.onload = () => {
-                    setTimeout(() => {
-                        pdfWindow.focus()
-                        pdfWindow.print()
-                    }, 500)
-                }
-            } else {
-                throw new Error('Failed to open print window. Please allow popups.')
+            if (!pdfWindow) {
+                throw new Error('Failed to open window. Please allow popups for this site.')
             }
+            
         } catch (error) {
             console.error('Error generating PDF:', error)
-            alert(error instanceof Error ? error.message : 'Failed to generate PDF. Please allow popups and try again.')
+            alert(error instanceof Error ? error.message : 'Failed to open print window. Please allow popups.')
         } finally {
             setIsLoading(false)
         }
@@ -41,6 +34,7 @@ export function DownloadPDFButton({ invoiceId }: DownloadPDFButtonProps) {
             onClick={handleDownload} 
             disabled={isLoading}
             className="gap-2"
+            title="Opens print dialog where you can save as PDF"
         >
             <Download className="h-4 w-4" />
             {isLoading ? 'Generating...' : 'Download PDF'}
