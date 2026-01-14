@@ -22,14 +22,21 @@ export default function WhatsAppConnectPage() {
   useEffect(() => {
     // Check user region first
     fetch('/api/user/region')
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) {
+          throw new Error('Failed to fetch region')
+        }
+        return res.json()
+      })
       .then(data => {
+        console.log('User region:', data.region)
         setUserRegion(data.region)
         setRegionLoading(false)
       })
-      .catch(() => {
+      .catch((error) => {
+        console.error('Error fetching region:', error)
         setRegionLoading(false)
-        setUserRegion('IN')
+        setUserRegion('IN') // Default to India on error
       })
   }, [])
 
@@ -198,7 +205,7 @@ export default function WhatsAppConnectPage() {
           <CardTitle>🚀 Quick Actions</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-3">
             <Link href="/invoices">
               <Button className="w-full bg-green-600 hover:bg-green-700 text-white justify-start">
                 <FileText className="h-4 w-4 mr-2" />
@@ -211,6 +218,17 @@ export default function WhatsAppConnectPage() {
                 Manage Customers
               </Button>
             </Link>
+            <Button 
+              onClick={() => {
+                const testMessage = 'Hi! This is a test message from BillBooky to verify WhatsApp integration is working correctly. ✅'
+                window.open(`https://wa.me/?text=${encodeURIComponent(testMessage)}`, '_blank')
+              }}
+              variant="outline" 
+              className="w-full justify-start border-green-600 text-green-600 hover:bg-green-50"
+            >
+              <MessageCircle className="h-4 w-4 mr-2" />
+              Test WhatsApp
+            </Button>
           </div>
         </CardContent>
       </Card>
