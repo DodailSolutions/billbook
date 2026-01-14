@@ -157,29 +157,6 @@ export default function WhatsAppCRMPage() {
     }
   }
 
-  const _sendInvoice = async (invoiceId: string) => {
-    if (!selectedContact) return
-
-    try {
-      const response = await fetch('/api/whatsapp/send-invoice', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contact_id: selectedContact.id,
-          phone: selectedContact.phone,
-          invoice_id: invoiceId
-        })
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        setMessages([...messages, data.message])
-      }
-    } catch (error) {
-      console.error('Error sending invoice:', error)
-    }
-  }
-
   const filteredContacts = contacts.filter(contact => 
     contact.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     contact.phone.includes(searchQuery)
