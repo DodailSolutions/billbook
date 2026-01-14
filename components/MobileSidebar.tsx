@@ -40,8 +40,14 @@ const routes = [
         href: '/customers',
         color: "text-pink-700",
     },
-    {
-        label: 'WhatsApp CRM',
+    {        label: 'WhatsApp Connect',
+        icon: MessageCircle,
+        href: '/whatsapp-connect',
+        color: "text-green-600",
+        badge: 'NEW',
+        regionOnly: 'IN' // Only available for India users
+    },
+    {        label: 'WhatsApp CRM',
         icon: MessageCircle,
         href: '/whatsapp-crm',
         color: "text-green-500",
