@@ -4,16 +4,21 @@ import { generateInvoicePDF } from '@/lib/pdf'
 
 export async function GET(
     request: Request,
-    { params }: { params: Promise<{ id: string }> }
+    context: { params: Promise<{ id: string }> }
 ) {
-    const { id } = await params
-    const invoice = await getInvoice(id)
+    try {
+        const { id } = await context.params
+        
+        console.log('PDF Route - Invoice ID:', id)
+        
+        const invoice = await getInvoice(id)
 
-    if (!invoice) {
-        return new NextResponse('Invoice not found', { status: 404 })
-    }
+        if (!invoice) {
+            console.error('Invoice not found:', id)
+            return new NextResponse('Invoice not found', { status: 404 })
+        }
 
-    const html = await generateInvoicePDF(invoice)
+        const html = await generateInvoicePDF(invoice)
     
     // Add print-optimized wrapper
     const pdfHtml = `
@@ -78,4 +83,11 @@ export async function GET(
             'Content-Disposition': `inline; filename="Invoice-${invoice.invoice_number}.html"`,
         },
     })
+    } catch (error) {
+        console.error('Error in PDF route:', error)
+        return new NextResponse(
+            `Error generating PDF: ${error instanceof Error ? error.message : 'Unknown error'}`,
+            { status: 500 }
+        )
+    }
 }

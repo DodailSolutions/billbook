@@ -1,11 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { LayoutDashboard, FileText, Users, RefreshCw, Bell, Settings, User, Menu, X, Bot, UserCog } from "lucide-react"
+import { LayoutDashboard, FileText, Users, RefreshCw, Bell, Settings, User, Menu, X, Bot, UserCog, MessageCircle } from "lucide-react"
 import { SignOutButton } from "./SignOutButton"
 import { PlanBanner } from "./PlanBanner"
 
@@ -41,6 +41,14 @@ const routes = [
         color: "text-pink-700",
     },
     {
+        label: 'WhatsApp CRM',
+        icon: MessageCircle,
+        href: '/whatsapp-crm',
+        color: "text-green-500",
+        badge: 'NEW',
+        regionOnly: 'IN'
+    },
+    {
         label: 'AI Accountant',
         icon: Bot,
         href: '/ai-accountant',
@@ -71,6 +79,21 @@ const routes = [
 export function MobileSidebar() {
     const [isOpen, setIsOpen] = useState(false)
     const pathname = usePathname()
+    const [userRegion, setUserRegion] = useState<string | null>(null)
+
+    useEffect(() => {
+        // Fetch user region
+        fetch('/api/user/region')
+            .then(res => res.json())
+            .then(data => setUserRegion(data.region))
+            .catch(() => setUserRegion('IN'))
+    }, [])
+
+    // Filter routes based on region
+    const filteredRoutes = routes.filter(route => {
+        if (!route.regionOnly) return true
+        return userRegion === route.regionOnly
+    })
 
     const closeSidebar = () => setIsOpen(false)
 
@@ -138,7 +161,7 @@ export function MobileSidebar() {
                     {/* Navigation */}
                     <div className="flex-1 overflow-y-auto px-3 py-4">
                         <div className="space-y-2">
-                            {routes.map((route) => (
+                            {filteredRoutes.map((route) => (
                                 <Link
                                     key={route.href}
                                     href={route.href}

@@ -1,10 +1,11 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { LayoutDashboard, FileText, Users, RefreshCw, Bell, Settings, User, Bot, UserCog, FileBarChart, HelpCircle } from "lucide-react"
+import { LayoutDashboard, FileText, Users, RefreshCw, Bell, Settings, User, Bot, UserCog, FileBarChart, HelpCircle, MessageCircle } from "lucide-react"
 import { SignOutButton } from "./SignOutButton"
 import { PlanBanner } from "./PlanBanner"
 import { ThemeToggle } from "./ThemeToggle"
@@ -39,6 +40,14 @@ const routes = [
         icon: Users,
         href: '/customers',
         color: "text-pink-700",
+    },
+    {
+        label: 'WhatsApp CRM',
+        icon: MessageCircle,
+        href: '/whatsapp-crm',
+        color: "text-green-500",
+        badge: 'NEW',
+        regionOnly: 'IN' // Only available for India users
     },
     {
         label: 'AI Accountant',
@@ -82,6 +91,21 @@ const routes = [
 
 export function Sidebar() {
     const pathname = usePathname()
+    const [userRegion, setUserRegion] = useState<string | null>(null)
+
+    useEffect(() => {
+        // Fetch user region
+        fetch('/api/user/region')
+            .then(res => res.json())
+            .then(data => setUserRegion(data.region))
+            .catch(() => setUserRegion('IN')) // Default to IN
+    }, [])
+
+    // Filter routes based on region
+    const filteredRoutes = routes.filter(route => {
+        if (!route.regionOnly) return true
+        return userRegion === route.regionOnly
+    })
 
     return (
         <div className="space-y-4 py-4 flex flex-col h-full bg-linear-to-b from-slate-900 to-slate-800 text-white border-r border-slate-700">
@@ -101,7 +125,7 @@ export function Sidebar() {
                     </h1>
                 </Link>
                 <div className="space-y-2">
-                    {routes.map((route) => (
+                    {filteredRoutes.map((route) => (
                         <Link
                             key={route.href}
                             href={route.href}
