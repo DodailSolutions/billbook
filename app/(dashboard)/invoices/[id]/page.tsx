@@ -43,6 +43,7 @@ export default async function InvoiceDetailPage({
                         invoiceId={id}
                         invoiceNumber={invoice.invoice_number}
                         customerName={invoice.customer.name}
+                        customerPhone={invoice.customer.phone || ''}
                         total={invoice.total}
                     />
                     <Link href={`/invoices/${id}/edit`}>

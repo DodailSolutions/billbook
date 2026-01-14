@@ -8,6 +8,7 @@ interface ShareInvoiceButtonProps {
     invoiceId: string
     invoiceNumber: string
     customerName: string
+    customerPhone?: string
     total: number
 }
 
@@ -15,6 +16,7 @@ export function ShareInvoiceButton({
     invoiceId, 
     invoiceNumber, 
     customerName,
+    customerPhone,
     total 
 }: ShareInvoiceButtonProps) {
     const [showMenu, setShowMenu] = useState(false)
@@ -26,8 +28,30 @@ export function ShareInvoiceButton({
     const shareMessage = `Invoice ${invoiceNumber} for ${customerName}\nAmount: ₹${total.toFixed(2)}\n\nView invoice: ${invoiceUrl}`
 
     const handleWhatsAppShare = () => {
+        // Format phone number - remove spaces, dashes, and add country code if needed
+        let phoneNumber = customerPhone?.replace(/[\s-]/g, '') || ''
+        
+        // If phone number exists and doesn't start with country code, assume India (+91)
+        if (phoneNumber && !phoneNumber.startsWith('+')) {
+            // Remove leading 0 if present
+            if (phoneNumber.startsWith('0')) {
+                phoneNumber = phoneNumber.substring(1)
+            }
+            // Add India country code
+            phoneNumber = '91' + phoneNumber
+        } else if (phoneNumber.startsWith('+')) {
+            // Remove + if present
+            phoneNumber = phoneNumber.substring(1)
+        }
+        
         // Share invoice link via WhatsApp with PDF link
-        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareMessage + '\n\nPrint/Download PDF: ' + pdfUrl)}`
+        const message = `Hi ${customerName},\n\nYour Invoice ${invoiceNumber}\nAmount: ₹${total.toFixed(2)}\n\nView Invoice: ${invoiceUrl}\n\nDownload PDF: ${pdfUrl}\n\nThank you for your business!`
+        
+        // If phone number exists, send to specific number; otherwise open general WhatsApp share
+        const whatsappUrl = phoneNumber 
+            ? `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
+            : `https://wa.me/?text=${encodeURIComponent(message)}`
+        
         window.open(whatsappUrl, '_blank')
         setShowMenu(false)
     }
