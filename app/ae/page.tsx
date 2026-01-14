@@ -350,16 +350,6 @@ export default async function UAELandingPage() {
         </div>
       </section>
 
-      {/* Region Switcher */}
-      <div className="fixed bottom-6 left-6 z-50">
-        <Link 
-          href="/?region=in"
-          className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 rounded-full shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all"
-        >
-          <span className="text-sm text-gray-700 dark:text-gray-300">🇮🇳 Switch to India</span>
-        </Link>
-      </div>
-
       {/* Footer */}
       <footer className="border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50">
         <div className="max-w-7xl mx-auto px-6 py-12">

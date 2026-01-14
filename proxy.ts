@@ -20,14 +20,6 @@ export async function proxy(request: NextRequest) {
 
     // Get country from Vercel's geo-location headers
     const country = request.headers.get('x-vercel-ip-country')
-    
-    // Check if user has manually set a preference cookie
-    const regionPreference = request.cookies.get('region-preference')?.value
-    
-    // Don't auto-redirect if user has set a manual preference
-    if (regionPreference) {
-        return await updateSession(request)
-    }
 
     // Region mapping - automatically redirect based on country
     const regionRouting: Record<string, string> = {
