@@ -1,8 +1,12 @@
 -- WHATSAPP WEB CONNECT MIGRATION
 -- Enables WhatsApp Web integration for sending invoices directly from the app
 
--- 1. CREATE WHATSAPP CONNECTIONS TABLE
-CREATE TABLE IF NOT EXISTS whatsapp_connections (
+-- 1. DROP EXISTING TABLES IF NEEDED (for clean migration)
+DROP TABLE IF EXISTS whatsapp_messages CASCADE;
+DROP TABLE IF EXISTS whatsapp_connections CASCADE;
+
+-- 2. CREATE WHATSAPP CONNECTIONS TABLE
+CREATE TABLE whatsapp_connections (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
     session_id TEXT UNIQUE NOT NULL,
@@ -18,9 +22,9 @@ CREATE TABLE IF NOT EXISTS whatsapp_connections (
 );
 
 -- Add indexes
-CREATE INDEX idx_whatsapp_connections_user_id ON whatsapp_connections(user_id);
-CREATE INDEX idx_whatsapp_connections_session_id ON whatsapp_connections(session_id);
-CREATE INDEX idx_whatsapp_connections_status ON whatsapp_connections(status);
+CREATE INDEX IF NOT EXISTS idx_whatsapp_connections_user_id ON whatsapp_connections(user_id);
+CREATE INDEX IF NOT EXISTS idx_whatsapp_connections_session_id ON whatsapp_connections(session_id);
+CREATE INDEX IF NOT EXISTS idx_whatsapp_connections_status ON whatsapp_connections(status);
 
 -- Add RLS policies
 ALTER TABLE whatsapp_connections ENABLE ROW LEVEL SECURITY;
@@ -41,8 +45,8 @@ CREATE POLICY "Users can delete their own WhatsApp connections"
     ON whatsapp_connections FOR DELETE
     USING (auth.uid() = user_id);
 
--- 2. CREATE WHATSAPP MESSAGES TABLE
-CREATE TABLE IF NOT EXISTS whatsapp_messages (
+-- 3. CREATE WHATSAPP MESSAGES TABLE
+CREATE TABLE whatsapp_messages (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
     connection_id UUID REFERENCES whatsapp_connections(id) ON DELETE CASCADE,
@@ -68,12 +72,12 @@ CREATE TABLE IF NOT EXISTS whatsapp_messages (
 );
 
 -- Add indexes
-CREATE INDEX idx_whatsapp_messages_user_id ON whatsapp_messages(user_id);
-CREATE INDEX idx_whatsapp_messages_connection_id ON whatsapp_messages(connection_id);
-CREATE INDEX idx_whatsapp_messages_contact_id ON whatsapp_messages(contact_id);
-CREATE INDEX idx_whatsapp_messages_invoice_id ON whatsapp_messages(invoice_id);
-CREATE INDEX idx_whatsapp_messages_status ON whatsapp_messages(status);
-CREATE INDEX idx_whatsapp_messages_created_at ON whatsapp_messages(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_whatsapp_messages_user_id ON whatsapp_messages(user_id);
+CREATE INDEX IF NOT EXISTS idx_whatsapp_messages_connection_id ON whatsapp_messages(connection_id);
+CREATE INDEX IF NOT EXISTS idx_whatsapp_messages_contact_id ON whatsapp_messages(contact_id);
+CREATE INDEX IF NOT EXISTS idx_whatsapp_messages_invoice_id ON whatsapp_messages(invoice_id);
+CREATE INDEX IF NOT EXISTS idx_whatsapp_messages_status ON whatsapp_messages(status);
+CREATE INDEX IF NOT EXISTS idx_whatsapp_messages_created_at ON whatsapp_messages(created_at DESC);
 
 -- Add RLS policies
 ALTER TABLE whatsapp_messages ENABLE ROW LEVEL SECURITY;
@@ -90,7 +94,7 @@ CREATE POLICY "Users can update their own WhatsApp messages"
     ON whatsapp_messages FOR UPDATE
     USING (auth.uid() = user_id);
 
--- 3. ADD WHATSAPP PHONE TO CUSTOMERS TABLE
+-- 4. ADD WHATSAPP PHONE TO CUSTOMERS TABLE
 DO $$ 
 BEGIN
     IF NOT EXISTS (
@@ -101,7 +105,7 @@ BEGIN
     END IF;
 END $$;
 
--- 4. CREATE FUNCTION TO AUTO-UPDATE TIMESTAMPS
+-- 5. CREATE FUNCTION TO AUTO-UPDATE TIMESTAMPS
 CREATE OR REPLACE FUNCTION update_whatsapp_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
