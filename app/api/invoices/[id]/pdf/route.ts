@@ -8,8 +8,10 @@ export async function GET(
 ) {
     try {
         const { id } = await context.params
+        const url = new URL(request.url)
+        const mode = url.searchParams.get('mode') || 'download'
         
-        console.log('PDF Route - Invoice ID:', id)
+        console.log('PDF Route - Invoice ID:', id, 'Mode:', mode)
         
         const invoice = await getInvoice(id)
 
@@ -20,7 +22,7 @@ export async function GET(
 
         const html = await generateInvoicePDF(invoice)
     
-    // Add print-optimized wrapper
+    // Add enhanced print-optimized wrapper
     const pdfHtml = `
 <!DOCTYPE html>
 <html>
@@ -40,38 +42,146 @@ export async function GET(
             .no-print {
                 display: none !important;
             }
+            .toolbar {
+                display: none !important;
+            }
         }
         body {
             margin: 0;
-            padding: 20px;
+            padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f3f4f6;
         }
-        .print-button {
+        .toolbar {
             position: fixed;
-            top: 10px;
-            right: 10px;
-            padding: 10px 20px;
-            background: #3b82f6;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to right, #3b82f6, #8b5cf6);
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+        .toolbar-title {
             color: white;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .toolbar-actions {
+            display: flex;
+            gap: 12px;
+        }
+        .btn {
+            padding: 8px 16px;
             border: none;
             border-radius: 6px;
             cursor: pointer;
             font-size: 14px;
-            z-index: 1000;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
         }
-        .print-button:hover {
-            background: #2563eb;
+        .btn-primary {
+            background: white;
+            color: #3b82f6;
+        }
+        .btn-primary:hover {
+            background: #f9fafb;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        .content-wrapper {
+            margin-top: 70px;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .invoice-preview {
+            background: white;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            max-width: 900px;
+            width: 100%;
+        }
+        @media (max-width: 768px) {
+            .toolbar {
+                flex-direction: column;
+                gap: 12px;
+                padding: 16px;
+            }
+            .toolbar-actions {
+                width: 100%;
+                justify-content: center;
+            }
+            .content-wrapper {
+                margin-top: 140px;
+                padding: 10px;
+            }
         }
     </style>
 </head>
 <body>
-    <button class="print-button no-print" onclick="window.print()">🖨️ Save as PDF</button>
-    ${html}
+    <div class="toolbar no-print">
+        <div class="toolbar-title">
+            📄 Invoice ${invoice.invoice_number}
+        </div>
+        <div class="toolbar-actions">
+            <button class="btn btn-secondary" onclick="window.close()" title="Close preview">
+                ✕ Close
+            </button>
+            <button class="btn btn-primary" onclick="window.print()" title="Save as PDF or Print">
+                🖨️ Download PDF
+            </button>
+        </div>
+    </div>
+    <div class="content-wrapper">
+        <div class="invoice-preview">
+            ${html}
+        </div>
+    </div>
     <script>
-        // Auto-trigger print dialog after a short delay
-        setTimeout(() => {
-            window.print();
-        }, 500);
+        // Auto-trigger print dialog in download mode
+        const urlParams = new URLSearchParams(window.location.search);
+        const mode = urlParams.get('mode');
+        
+        if (mode === 'download') {
+            setTimeout(() => {
+                window.print();
+            }, 800);
+        }
+        
+        // Handle keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Ctrl/Cmd + P for print
+            if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+                e.preventDefault();
+                window.print();
+            }
+            // Escape to close
+            if (e.key === 'Escape') {
+                window.close();
+            }
+        });
+        
+        // Show helpful message after print dialog closes
+        window.addEventListener('afterprint', () => {
+            console.log('PDF generated successfully!');
+        });
     </script>
 </body>
 </html>
@@ -81,6 +191,7 @@ export async function GET(
         headers: {
             'Content-Type': 'text/html; charset=utf-8',
             'Content-Disposition': `inline; filename="Invoice-${invoice.invoice_number}.html"`,
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
         },
     })
     } catch (error) {
