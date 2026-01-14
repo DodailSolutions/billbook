@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { Card, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -18,7 +19,8 @@ import {
   CheckCheck,
   Check,
   Clock,
-  AlertCircle
+  AlertCircle,
+  Users
 } from 'lucide-react'
 
 interface WhatsAppContact {
@@ -219,35 +221,94 @@ export default function WhatsAppCRMPage() {
 
   if (!connected) {
     return (
-      <div className="p-6 max-w-4xl mx-auto">
-        <Card>
+      <div className="p-6 max-w-4xl mx-auto space-y-6">
+        <Card className="border-green-200 dark:border-green-700">
           <CardContent className="pt-6 text-center py-12">
-            <MessageCircle className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+            <div className="mb-6">
+              <MessageCircle className="h-20 w-20 text-green-600 mx-auto mb-4" />
+              <div className="inline-block px-3 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 text-sm font-medium rounded-full mb-4">
+                Setup Required
+              </div>
+            </div>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-              WhatsApp Not Connected
+              Welcome to WhatsApp CRM
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
-              Connect your WhatsApp account to start using the CRM
+            <p className="text-gray-600 dark:text-gray-400 mb-2 max-w-md mx-auto">
+              Manage all your customer conversations in one place. Send invoices, track payments, and provide support - all through WhatsApp.
             </p>
-            <Button 
-              onClick={() => window.location.href = '/whatsapp-connect'}
-              className="bg-green-600 hover:bg-green-700 text-white"
-            >
-              Connect WhatsApp
-            </Button>
+            <p className="text-sm text-gray-500 dark:text-gray-500 mb-8">
+              Quick setup • No phone number needed • Works instantly
+            </p>
+            <div className="flex gap-3 justify-center flex-wrap">
+              <Link href="/whatsapp-connect">
+                <Button className="bg-green-600 hover:bg-green-700 text-white gap-2 shadow-lg">
+                  <Check className="h-4 w-4\" />
+                  Get Started
+                </Button>
+              </Link>
+              <Link href="/invoices">
+                <Button variant="outline" className="gap-2">
+                  <FileText className="h-4 w-4" />
+                  View Invoices
+                </Button>
+              </Link>
+            </div>
           </CardContent>
         </Card>
+
+        {/* Feature Highlights */}
+        <div className="grid md:grid-cols-3 gap-4\">
+          <Card>
+            <CardContent className="pt-6 text-center">
+              <div className="h-12 w-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-3\">
+                <MessageCircle className="h-6 w-6 text-green-600" />
+              </div>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Instant Messaging</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Send invoices and updates directly to customers</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6 text-center">
+              <div className="h-12 w-12 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Users className="h-6 w-6 text-blue-600" />
+              </div>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Contact Management</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">All your customer chats in one organized place</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6 text-center">
+              <div className="h-12 w-12 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+                <FileText className="h-4 w-4 text-purple-600" />
+              </div>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Invoice Sharing</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Share invoices with one click via WhatsApp</p>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     )
   }
 
   return (
     <div className="h-[calc(100vh-4rem)] flex flex-col">
-      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-          <MessageCircle className="h-6 w-6 text-green-600" />
-          WhatsApp CRM
-        </h1>
+      {/* Header */}
+      <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <MessageCircle className="h-6 w-6 text-green-600" />
+            WhatsApp CRM
+            <span className="inline-block px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs font-medium rounded-full ml-2">
+              Connected
+            </span>
+          </h1>
+          <Link href="/whatsapp-connect">
+            <Button variant="outline" size="sm" className="gap-2">
+              <AlertCircle className="h-4 w-4" />
+              Setup Guide
+            </Button>
+          </Link>
+        </div>
       </div>
 
       <div className="flex-1 flex overflow-hidden">

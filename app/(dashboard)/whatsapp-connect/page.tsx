@@ -83,14 +83,22 @@ export default function WhatsAppConnectPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          WhatsApp Integration
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-1">
-          Send invoices and messages to your customers via WhatsApp
-        </p>
+      {/* Header with CTA */}
+      <div className="flex items-start justify-between flex-wrap gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            WhatsApp Integration
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">
+            Send invoices and messages to your customers via WhatsApp
+          </p>
+        </div>
+        <Link href="/whatsapp-crm">
+          <Button className="bg-green-600 hover:bg-green-700 text-white gap-2">
+            <MessageCircle className="h-4 w-4" />
+            Open WhatsApp CRM
+          </Button>
+        </Link>
       </div>
 
       {/* Status Banner */}
@@ -200,35 +208,41 @@ export default function WhatsAppConnectPage() {
       </Card>
 
       {/* Quick Actions */}
-      <Card>
+      <Card className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-700">
         <CardHeader>
-          <CardTitle>🚀 Quick Actions</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            🚀 Quick Actions
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-3">
-            <Link href="/invoices">
-              <Button className="w-full bg-green-600 hover:bg-green-700 text-white justify-start">
-                <FileText className="h-4 w-4 mr-2" />
-                Go to Invoices
-              </Button>
+            <Link href="/invoices" className="block">
+              <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all hover:-translate-y-1 cursor-pointer">
+                <FileText className="h-8 w-8 text-green-600 mb-3" />
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Send Invoice</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">View invoices and share via WhatsApp</p>
+              </div>
             </Link>
-            <Link href="/customers">
-              <Button variant="outline" className="w-full justify-start">
-                <Users className="h-4 w-4 mr-2" />
-                Manage Customers
-              </Button>
+            <Link href="/customers" className="block">
+              <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all hover:-translate-y-1 cursor-pointer">
+                <Users className="h-8 w-8 text-blue-600 mb-3" />
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Manage Customers</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Add phone numbers to contacts</p>
+              </div>
             </Link>
-            <Button 
+            <button 
               onClick={() => {
                 const testMessage = 'Hi! This is a test message from BillBooky to verify WhatsApp integration is working correctly. ✅'
                 window.open(`https://wa.me/?text=${encodeURIComponent(testMessage)}`, '_blank')
               }}
-              variant="outline" 
-              className="w-full justify-start border-green-600 text-green-600 hover:bg-green-50"
+              className="w-full text-left"
             >
-              <MessageCircle className="h-4 w-4 mr-2" />
-              Test WhatsApp
-            </Button>
+              <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-green-200 dark:border-green-700 hover:shadow-lg transition-all hover:-translate-y-1 cursor-pointer">
+                <MessageCircle className="h-8 w-8 text-green-600 mb-3" />
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Test WhatsApp</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Verify integration is working</p>
+              </div>
+            </button>
           </div>
         </CardContent>
       </Card>
