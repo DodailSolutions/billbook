@@ -33,18 +33,39 @@ export function DownloadPDFButton({ invoiceId }: DownloadPDFButtonProps) {
     const handleDownload = async () => {
         setIsDownloading(true)
         try {
-            // Open PDF in download mode (auto-triggers print dialog)
-            const pdfWindow = window.open(`/api/invoices/${invoiceId}/pdf?mode=download`, '_blank')
+            // Fetch the HTML and convert to PDF using browser's print functionality
+            const response = await fetch(`/api/invoices/${invoiceId}/pdf?mode=download`)
+            const html = await response.text()
             
-            if (!pdfWindow) {
-                throw new Error('Failed to open window. Please allow popups for this site.')
+            // Create a hidden iframe
+            const iframe = document.createElement('iframe')
+            iframe.style.display = 'none'
+            document.body.appendChild(iframe)
+            
+            // Write HTML to iframe
+            const iframeDoc = iframe.contentWindow?.document
+            if (iframeDoc) {
+                iframeDoc.open()
+                iframeDoc.write(html)
+                iframeDoc.close()
+                
+                // Wait for content to load then trigger print
+                iframe.onload = () => {
+                    setTimeout(() => {
+                        iframe.contentWindow?.print()
+                        // Clean up after printing
+                        setTimeout(() => {
+                            document.body.removeChild(iframe)
+                        }, 100)
+                    }, 250)
+                }
             }
             
         } catch (error) {
             console.error('Error generating PDF:', error)
-            alert(error instanceof Error ? error.message : 'Failed to open print window. Please allow popups.')
+            alert(error instanceof Error ? error.message : 'Failed to generate PDF. Please try again.')
         } finally {
-            setTimeout(() => setIsDownloading(false), 500)
+            setTimeout(() => setIsDownloading(false), 1000)
         }
     }
 
