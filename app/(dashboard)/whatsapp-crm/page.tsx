@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
+import { Card, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { 
@@ -18,8 +18,7 @@ import {
   CheckCheck,
   Check,
   Clock,
-  AlertCircle,
-  X
+  AlertCircle
 } from 'lucide-react'
 
 interface WhatsAppContact {
@@ -158,7 +157,7 @@ export default function WhatsAppCRMPage() {
     }
   }
 
-  const sendInvoice = async (invoiceId: string) => {
+  const _sendInvoice = async (invoiceId: string) => {
     if (!selectedContact) return
 
     try {

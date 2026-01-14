@@ -66,8 +66,11 @@ export default function WhatsAppConnectPage() {
   }, [])
 
   useEffect(() => {
+    // Poll for connection status while QR is displayed
+    let interval: NodeJS.Timeout | null = null
+    if (sessionId && !connectionStatus.connected) {
       interval = setInterval(() => {
-        checkConnectionStatus(sessionId)
+        checkConnectionStatus(sessionId || undefined)
       }, 3000) // Check every 3 seconds
     }
 
@@ -89,7 +92,6 @@ export default function WhatsAppConnectPage() {
 
   const checkConnectionStatus = async (session?: string) => {
     try {
-      setCheckingStatus(true)
       const url = session 
         ? `/api/whatsapp/status?session_id=${session}`
         : '/api/whatsapp/status'
@@ -105,8 +107,6 @@ export default function WhatsAppConnectPage() {
       }
     } catch (error) {
       console.error('Error checking status:', error)
-    } finally {
-      setCheckingStatus(false)
     }
   }
 
