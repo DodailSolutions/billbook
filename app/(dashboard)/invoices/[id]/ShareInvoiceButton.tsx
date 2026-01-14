@@ -28,32 +28,51 @@ export function ShareInvoiceButton({
     const shareMessage = `Invoice ${invoiceNumber} for ${customerName}\nAmount: ₹${total.toFixed(2)}\n\nView invoice: ${invoiceUrl}`
 
     const handleWhatsAppShare = () => {
-        // Format phone number - remove spaces, dashes, and add country code if needed
-        let phoneNumber = customerPhone?.replace(/[\s-]/g, '') || ''
-        
-        // If phone number exists and doesn't start with country code, assume India (+91)
-        if (phoneNumber && !phoneNumber.startsWith('+')) {
-            // Remove leading 0 if present
-            if (phoneNumber.startsWith('0')) {
+        try {
+            console.log('WhatsApp share clicked')
+            console.log('Customer phone:', customerPhone)
+            
+            // Format phone number - remove spaces, dashes, and add country code if needed
+            let phoneNumber = customerPhone?.replace(/[\s-]/g, '') || ''
+            
+            // If phone number exists and doesn't start with country code, assume India (+91)
+            if (phoneNumber && !phoneNumber.startsWith('+')) {
+                // Remove leading 0 if present
+                if (phoneNumber.startsWith('0')) {
+                    phoneNumber = phoneNumber.substring(1)
+                }
+                // Add India country code
+                phoneNumber = '91' + phoneNumber
+            } else if (phoneNumber.startsWith('+')) {
+                // Remove + if present
                 phoneNumber = phoneNumber.substring(1)
             }
-            // Add India country code
-            phoneNumber = '91' + phoneNumber
-        } else if (phoneNumber.startsWith('+')) {
-            // Remove + if present
-            phoneNumber = phoneNumber.substring(1)
+            
+            console.log('Formatted phone number:', phoneNumber)
+            
+            // Share invoice link via WhatsApp with PDF link
+            const message = `Hi ${customerName},\n\nYour Invoice ${invoiceNumber}\nAmount: ₹${total.toFixed(2)}\n\nView Invoice: ${invoiceUrl}\n\nDownload PDF: ${pdfUrl}\n\nThank you for your business!`
+            
+            // If phone number exists, send to specific number; otherwise open general WhatsApp share
+            const whatsappUrl = phoneNumber 
+                ? `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
+                : `https://wa.me/?text=${encodeURIComponent(message)}`
+            
+            console.log('Opening WhatsApp URL:', whatsappUrl)
+            
+            const whatsappWindow = window.open(whatsappUrl, '_blank')
+            
+            if (!whatsappWindow) {
+                alert('Please allow popups to share via WhatsApp. Check your browser settings.')
+            } else {
+                console.log('WhatsApp opened successfully')
+            }
+            
+            setShowMenu(false)
+        } catch (error) {
+            console.error('Error sharing via WhatsApp:', error)
+            alert('Failed to open WhatsApp. Please try again or check your browser settings.')
         }
-        
-        // Share invoice link via WhatsApp with PDF link
-        const message = `Hi ${customerName},\n\nYour Invoice ${invoiceNumber}\nAmount: ₹${total.toFixed(2)}\n\nView Invoice: ${invoiceUrl}\n\nDownload PDF: ${pdfUrl}\n\nThank you for your business!`
-        
-        // If phone number exists, send to specific number; otherwise open general WhatsApp share
-        const whatsappUrl = phoneNumber 
-            ? `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
-            : `https://wa.me/?text=${encodeURIComponent(message)}`
-        
-        window.open(whatsappUrl, '_blank')
-        setShowMenu(false)
     }
 
     const handleEmailShare = () => {
