@@ -112,7 +112,7 @@ export function InvoicesList({ invoices }: InvoicesListProps) {
                                     </Button>
                                 </Link>
 
-                                <a href={`/invoices/${invoice.id}/pdf`} target="_blank" rel="noopener noreferrer">
+                                <a href={`/api/invoices/${invoice.id}/pdf?mode=preview`} target="_blank" rel="noopener noreferrer">
                                     <Button variant="outline" size="sm">
                                         <Download className="h-4 w-4" />
                                     </Button>
@@ -187,7 +187,7 @@ export function InvoicesList({ invoices }: InvoicesListProps) {
                                         </Button>
                                     </Link>
 
-                                    <a href={`/invoices/${invoice.id}/pdf`} target="_blank" rel="noopener noreferrer">
+                                    <a href={`/api/invoices/${invoice.id}/pdf?mode=preview`} target="_blank" rel="noopener noreferrer">
                                         <Button variant="outline" size="icon">
                                             <Download className="h-4 w-4" />
                                         </Button>
