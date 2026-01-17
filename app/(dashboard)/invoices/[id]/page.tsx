@@ -8,6 +8,7 @@ import { DownloadPDFButton } from "./DownloadPDFButton"
 import { ShareInvoiceButton } from "./ShareInvoiceButton"
 import { MarkAsPaidButton } from "./MarkAsPaidButton"
 import { PartialPaymentButton } from "./PartialPaymentButton"
+import { PaymentHistory } from "./PaymentHistory"
 import { formatDate } from "@/lib/utils"
 
 export default async function InvoiceDetailPage({
@@ -274,6 +275,11 @@ export default async function InvoiceDetailPage({
                     </div>
                 </CardContent>
             </Card>
+
+            {/* Payment History */}
+            {(hasPartialPayment || isPaid) && (
+                <PaymentHistory invoiceId={invoice.id} />
+            )}
         </div>
     )
 }

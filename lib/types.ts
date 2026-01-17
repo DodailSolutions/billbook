@@ -31,7 +31,7 @@ export interface Invoice {
     reverse_charge_applicable?: boolean
     reverse_charge_notes?: string
     notes?: string
-    status: 'draft' | 'sent' | 'paid' | 'cancelled'
+    status: 'draft' | 'sent' | 'paid' | 'partial' | 'cancelled'
     payment_method?: string
     payment_notes?: string
     paid_at?: string
@@ -139,7 +139,7 @@ export interface InvoiceForReminder {
     invoice_number: string
     total: number
     due_date?: string
-    status: 'draft' | 'sent' | 'paid' | 'cancelled'
+    status: 'draft' | 'sent' | 'paid' | 'partial' | 'cancelled'
     customer: Customer
 }
 
