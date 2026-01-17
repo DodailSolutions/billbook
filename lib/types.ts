@@ -35,8 +35,22 @@ export interface Invoice {
     payment_method?: string
     payment_notes?: string
     paid_at?: string
+    amount_paid?: number
+    amount_remaining?: number
+    is_partial_payment?: boolean
     created_at: string
     updated_at: string
+}
+
+export interface InvoicePayment {
+    id: string
+    invoice_id: string
+    user_id: string
+    amount: number
+    payment_method?: string
+    payment_notes?: string
+    payment_date: string
+    created_at: string
 }
 
 export interface InvoiceItem {
