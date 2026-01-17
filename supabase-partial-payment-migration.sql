@@ -1,6 +1,14 @@
 -- Migration to add partial payment support to invoices
 -- Run this in your Supabase SQL Editor
 
+-- First, drop the old status check constraint if it exists
+ALTER TABLE invoices DROP CONSTRAINT IF EXISTS invoices_status_check;
+
+-- Update the status check constraint to include 'partial'
+ALTER TABLE invoices
+ADD CONSTRAINT invoices_status_check 
+CHECK (status IN ('draft', 'sent', 'paid', 'partial', 'cancelled'));
+
 -- Add columns for partial payment tracking
 ALTER TABLE invoices
 ADD COLUMN IF NOT EXISTS amount_paid DECIMAL(10, 2) DEFAULT 0,
