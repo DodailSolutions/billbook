@@ -55,19 +55,23 @@ CREATE INDEX IF NOT EXISTS idx_invoice_payments_date ON invoice_payments(payment
 -- Enable RLS on invoice_payments
 ALTER TABLE invoice_payments ENABLE ROW LEVEL SECURITY;
 
--- RLS Policies for invoice_payments
+-- RLS Policies for invoice_payments (drop first if they exist)
+DROP POLICY IF EXISTS "Users can view their own invoice payments" ON invoice_payments;
 CREATE POLICY "Users can view their own invoice payments"
   ON invoice_payments FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert their own invoice payments" ON invoice_payments;
 CREATE POLICY "Users can insert their own invoice payments"
   ON invoice_payments FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update their own invoice payments" ON invoice_payments;
 CREATE POLICY "Users can update their own invoice payments"
   ON invoice_payments FOR UPDATE
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can delete their own invoice payments" ON invoice_payments;
 CREATE POLICY "Users can delete their own invoice payments"
   ON invoice_payments FOR DELETE
   USING (auth.uid() = user_id);
