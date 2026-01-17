@@ -17,7 +17,9 @@ import {
   Shield,
   Smartphone,
   TrendingUp,
-  Clock
+  Clock,
+  QrCode,
+  X
 } from 'lucide-react'
 
 interface QuickStat {
@@ -25,6 +27,12 @@ interface QuickStat {
   value: number
   icon: React.ElementType
   color: string
+}
+
+interface ConnectionStatus {
+  connected: boolean
+  phone_number?: string
+  status?: string
 }
 
 export default function WhatsAppConnectPage() {
@@ -36,6 +44,10 @@ export default function WhatsAppConnectPage() {
     { label: 'Active Today', value: 0, icon: TrendingUp, color: 'purple' },
   ])
   const [loading, setLoading] = useState(true)
+  const [qrCode, setQrCode] = useState<string | null>(null)
+  const [sessionId, setSessionId] = useState<string | null>(null)
+  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>({ connected: false })
+  const [qrLoading, setQrLoading] = useState(false)
 
   useEffect(() => {
     // Check user region first
@@ -50,16 +62,96 @@ export default function WhatsAppConnectPage() {
         console.log('User region:', data.region)
         setUserRegion(data.region)
         setRegionLoading(false)
+        
+        // Load connection status and stats for India users
+        if (data.region === 'IN') {
+          checkConnectionStatus()
+          loadStats()
+        }
       })
       .catch((error) => {
         console.error('Error fetching region:', error)
         setRegionLoading(false)
         setUserRegion('IN') // Default to India on error
       })
-    
-    // Load stats
-    loadStats()
   }, [])
+
+  useEffect(() => {
+    // Poll for connection status while QR is displayed
+    let interval: NodeJS.Timeout | null = null
+    if (sessionId && !connectionStatus.connected) {
+      interval = setInterval(() => {
+        checkConnectionStatus(sessionId)
+      }, 3000) // Check every 3 seconds
+    }
+
+    return () => {
+      if (interval) clearInterval(interval)
+    }
+  }, [sessionId, connectionStatus.connected])
+
+  const checkConnectionStatus = async (session?: string) => {
+    try {
+      const url = session 
+        ? `/api/whatsapp/status?session_id=${session}`
+        : '/api/whatsapp/status'
+      
+      const response = await fetch(url)
+      const data = await response.json()
+      
+      setConnectionStatus(data)
+      
+      if (data.connected) {
+        setQrCode(null)
+        setSessionId(null)
+      }
+    } catch (error) {
+      console.error('Error checking status:', error)
+    }
+  }
+
+  const generateQRCode = async () => {
+    try {
+      setQrLoading(true)
+      const response = await fetch('/api/whatsapp/qr')
+      const data = await response.json()
+      
+      if (data.error) {
+        alert('Error generating QR code: ' + data.error)
+        return
+      }
+
+      setQrCode(data.qr_code)
+      setSessionId(data.session_id)
+    } catch (error) {
+      console.error('Error generating QR code:', error)
+      alert('Failed to generate QR code')
+    } finally {
+      setQrLoading(false)
+    }
+  }
+
+  const disconnect = async () => {
+    if (!confirm('Are you sure you want to disconnect WhatsApp?')) return
+
+    try {
+      setLoading(true)
+      const response = await fetch('/api/whatsapp/disconnect', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      })
+      
+      if (response.ok) {
+        setConnectionStatus({ connected: false })
+        setQrCode(null)
+        setSessionId(null)
+      }
+    } catch (error) {
+      console.error('Error disconnecting:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
   
   const loadStats = async () => {
     try {
@@ -186,18 +278,132 @@ export default function WhatsAppConnectPage() {
 
       {/* Status Banner */}
       <Card className="border-green-200 dark:border-green-500/20 bg-green-50 dark:bg-green-500/10">
-        <CardContent className="pt-6">
-          <div className="flex items-start gap-3">
-            <Check className="h-6 w-6 text-green-600 shrink-0 mt-0.5" />
-            <div className="flex-1">
-              <h3 className="font-semibold text-green-900 dark:text-green-100 text-lg">
-                WhatsApp Integration Ready ✓
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <MessageCircle className="h-5 w-5 text-green-600" />
+            WhatsApp Connection
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {!connectionStatus.connected && !qrCode && (
+            <div className="text-center py-8">
+              <div className="mx-auto w-20 h-20 bg-green-100 dark:bg-green-500/10 rounded-full flex items-center justify-center mb-4">
+                <Smartphone className="h-10 w-10 text-green-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                Connect Your WhatsApp
               </h3>
-              <p className="text-sm text-green-700 dark:text-green-200 mt-1">
-                You can now send invoices to customers via WhatsApp. No setup required!
+              <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
+                Scan QR code with your phone to connect WhatsApp and send invoices directly to your customers
               </p>
+              <Button 
+                onClick={generateQRCode} 
+                disabled={qrLoading}
+                className="bg-green-600 hover:bg-green-700 gap-2"
+              >
+                {qrLoading ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <QrCode className="h-4 w-4" />
+                    Connect WhatsApp
+                  </>
+                )}
+              </Button>
             </div>
-          </div>
+          )}
+
+          {qrCode && !connectionStatus.connected && (
+            <div className="text-center py-8">
+              <div className="inline-block bg-white p-6 rounded-2xl shadow-lg mb-6">
+                <Image 
+                  src={qrCode} 
+                  alt="WhatsApp QR Code" 
+                  width={256}
+                  height={256}
+                  className="w-64 h-64"
+                />
+              </div>
+              
+              <div className="max-w-md mx-auto space-y-4">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Scan this QR code
+                </h3>
+                
+                <div className="text-left bg-gray-50 dark:bg-gray-800 rounded-lg p-4 space-y-3">
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold shrink-0">
+                      1
+                    </div>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                      Open WhatsApp on your mobile, click the <strong>⋮</strong> icon and select "Linked devices"
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold shrink-0">
+                      2
+                    </div>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                      Tap "Link a device" and scan this QR code
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold shrink-0">
+                      3
+                    </div>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                      Your WhatsApp will be connected automatically
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+                  <RefreshCw className="h-4 w-4 animate-spin" />
+                  <span>Waiting for connection...</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {connectionStatus.connected && (
+            <div className="text-center py-8">
+              <div className="mx-auto w-20 h-20 bg-green-100 dark:bg-green-500/10 rounded-full flex items-center justify-center mb-4">
+                <Check className="h-10 w-10 text-green-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                WhatsApp Connected ✓
+              </h3>
+              {connectionStatus.phone_number && (
+                <p className="text-gray-600 dark:text-gray-400 mb-6">
+                  {connectionStatus.phone_number}
+                </p>
+              )}
+              <p className="text-sm text-green-700 dark:text-green-200 mb-6">
+                You can now send invoices to customers via WhatsApp!
+              </p>
+              <Button 
+                variant="destructive" 
+                onClick={disconnect}
+                disabled={loading}
+                className="gap-2"
+              >
+                {loading ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                    Disconnecting...
+                  </>
+                ) : (
+                  <>
+                    <X className="h-4 w-4" />
+                    Disconnect
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
 
