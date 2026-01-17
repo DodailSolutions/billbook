@@ -25,7 +25,8 @@ ALTER TABLE invoices
 ALTER COLUMN amount_remaining SET DEFAULT 0,
 ALTER COLUMN amount_remaining SET NOT NULL;
 
--- Add check constraint to ensure amounts are valid
+-- Add check constraint to ensure amounts are valid (drop first if exists)
+ALTER TABLE invoices DROP CONSTRAINT IF EXISTS check_payment_amounts;
 ALTER TABLE invoices
 ADD CONSTRAINT check_payment_amounts 
 CHECK (amount_paid >= 0 AND amount_paid <= total AND amount_remaining >= 0);
