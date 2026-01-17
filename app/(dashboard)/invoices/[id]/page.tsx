@@ -7,6 +7,7 @@ import { getInvoice } from "../actions"
 import { DownloadPDFButton } from "./DownloadPDFButton"
 import { ShareInvoiceButton } from "./ShareInvoiceButton"
 import { MarkAsPaidButton } from "./MarkAsPaidButton"
+import { PartialPaymentButton } from "./PartialPaymentButton"
 import { formatDate } from "@/lib/utils"
 
 export default async function InvoiceDetailPage({
@@ -22,6 +23,9 @@ export default async function InvoiceDetailPage({
     }
 
     const isPaid = invoice.status === 'paid'
+    const hasPartialPayment = invoice.is_partial_payment || (invoice.amount_paid && invoice.amount_paid > 0 && invoice.amount_paid < invoice.total)
+    const amountPaid = invoice.amount_paid || 0
+    const amountRemaining = invoice.amount_remaining || (invoice.total - amountPaid)
 
     return (
         <div className="space-y-4 max-w-4xl mx-auto">
@@ -43,7 +47,7 @@ export default async function InvoiceDetailPage({
                         invoiceId={id}
                         invoiceNumber={invoice.invoice_number}
                         customerName={invoice.customer.name}
-                        customerPhone={invoice.customer.phone || ''}
+                        customerPhone={invoice.customer.phone}
                         total={invoice.total}
                     />
                     <Link href={`/invoices/${id}/edit`}>
@@ -190,6 +194,7 @@ export default async function InvoiceDetailPage({
                                     <div className="flex-1">
                                         <p className="font-semibold text-green-800 dark:text-green-300">Payment Received</p>
                                         <p className="text-sm text-green-600 dark:text-green-400">
+                                            {hasPartialPayment && `Received in ${invoice.amount_paid && invoice.total ? Math.ceil(amountPaid / (invoice.total / 10)) : 'multiple'} payment(s) - `}
                                             {invoice.payment_method && `Via ${invoice.payment_method.replace('_', ' ')}`}
                                             {invoice.paid_at && ` on ${formatDate(invoice.paid_at)}`}
                                         </p>
@@ -199,6 +204,47 @@ export default async function InvoiceDetailPage({
                                             </p>
                                         )}
                                     </div>
+                                </div>
+                            </div>
+                        ) : hasPartialPayment ? (
+                            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                                <div className="flex items-center justify-between mb-3">
+                                    <div>
+                                        <p className="font-semibold text-blue-800 dark:text-blue-300">Partial Payment Received</p>
+                                        <p className="text-sm text-blue-600 dark:text-blue-400">
+                                            {((amountPaid / invoice.total) * 100).toFixed(1)}% paid
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="space-y-2 mb-4">
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-gray-600 dark:text-gray-400">Total Amount:</span>
+                                        <span className="font-semibold">₹{invoice.total.toFixed(2)}</span>
+                                    </div>
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-gray-600 dark:text-gray-400">Amount Paid:</span>
+                                        <span className="font-semibold text-green-600">₹{amountPaid.toFixed(2)}</span>
+                                    </div>
+                                    <div className="flex justify-between text-sm pt-2 border-t border-blue-200 dark:border-blue-800">
+                                        <span className="text-gray-600 dark:text-gray-400 font-medium">Amount Remaining:</span>
+                                        <span className="font-bold text-blue-600">₹{amountRemaining.toFixed(2)}</span>
+                                    </div>
+                                </div>
+                                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-4">
+                                    <div 
+                                        className="bg-blue-600 h-2 rounded-full transition-all"
+                                        style={{ width: `${(amountPaid / invoice.total) * 100}%` }}
+                                    ></div>
+                                </div>
+                                <div className="flex gap-2">
+                                    <PartialPaymentButton 
+                                        invoiceId={invoice.id} 
+                                        invoiceNumber={invoice.invoice_number}
+                                        totalAmount={invoice.total}
+                                        amountPaid={amountPaid}
+                                        amountRemaining={amountRemaining}
+                                    />
+                                    <MarkAsPaidButton invoiceId={invoice.id} invoiceNumber={invoice.invoice_number} />
                                 </div>
                             </div>
                         ) : invoice.status === 'cancelled' ? (
@@ -212,7 +258,16 @@ export default async function InvoiceDetailPage({
                                         <p className="font-semibold text-yellow-800 dark:text-yellow-300">Payment Pending</p>
                                         <p className="text-sm text-yellow-600 dark:text-yellow-400">Customer can pay via cash or QR code</p>
                                     </div>
-                                    <MarkAsPaidButton invoiceId={invoice.id} invoiceNumber={invoice.invoice_number} />
+                                    <div className="flex gap-2">
+                                        <PartialPaymentButton 
+                                            invoiceId={invoice.id} 
+                                            invoiceNumber={invoice.invoice_number}
+                                            totalAmount={invoice.total}
+                                            amountPaid={amountPaid}
+                                            amountRemaining={amountRemaining}
+                                        />
+                                        <MarkAsPaidButton invoiceId={invoice.id} invoiceNumber={invoice.invoice_number} />
+                                    </div>
                                 </div>
                             </div>
                         )}

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Share2, MessageCircle, Mail, Copy, Download, Check } from 'lucide-react'
+import { Share2, Mail, Copy, Check, Printer, MessageCircle } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 
 interface ShareInvoiceButtonProps {
@@ -23,62 +23,47 @@ export function ShareInvoiceButton({
     const [copied, setCopied] = useState(false)
 
     const invoiceUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/invoices/${invoiceId}`
-    const pdfUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/api/invoices/${invoiceId}/pdf`
-    
-    const shareMessage = `Invoice ${invoiceNumber} for ${customerName}\nAmount: ₹${total.toFixed(2)}\n\nView invoice: ${invoiceUrl}`
+    const pdfUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/api/invoices/${invoiceId}/pdf?mode=preview`
 
     const handleWhatsAppShare = () => {
-        try {
-            console.log('WhatsApp share clicked')
-            console.log('Customer phone:', customerPhone)
-            
-            // Format phone number - remove spaces, dashes, and add country code if needed
-            let phoneNumber = customerPhone?.replace(/[\s-]/g, '') || ''
-            
-            // If phone number exists and doesn't start with country code, assume India (+91)
-            if (phoneNumber && !phoneNumber.startsWith('+')) {
-                // Remove leading 0 if present
-                if (phoneNumber.startsWith('0')) {
-                    phoneNumber = phoneNumber.substring(1)
-                }
-                // Add India country code
-                phoneNumber = '91' + phoneNumber
-            } else if (phoneNumber.startsWith('+')) {
-                // Remove + if present
-                phoneNumber = phoneNumber.substring(1)
-            }
-            
-            console.log('Formatted phone number:', phoneNumber)
-            
-            // Share invoice link via WhatsApp with PDF link
-            const message = `Hi ${customerName},\n\nYour Invoice ${invoiceNumber}\nAmount: ₹${total.toFixed(2)}\n\nView Invoice: ${invoiceUrl}\n\nDownload PDF: ${pdfUrl}\n\nThank you for your business!`
-            
-            // If phone number exists, send to specific number; otherwise open general WhatsApp share
-            const whatsappUrl = phoneNumber 
-                ? `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
-                : `https://wa.me/?text=${encodeURIComponent(message)}`
-            
-            console.log('Opening WhatsApp URL:', whatsappUrl)
-            
-            const whatsappWindow = window.open(whatsappUrl, '_blank')
-            
-            if (!whatsappWindow) {
-                alert('Please allow popups to share via WhatsApp. Check your browser settings.')
-            } else {
-                console.log('WhatsApp opened successfully')
-            }
-            
-            setShowMenu(false)
-        } catch (error) {
-            console.error('Error sharing via WhatsApp:', error)
-            alert('Failed to open WhatsApp. Please try again or check your browser settings.')
+        const message = encodeURIComponent(
+            `Hi ${customerName}! 👋\n\n` +
+            `Here's your invoice from BillBooky:\n\n` +
+            `📄 Invoice: ${invoiceNumber}\n` +
+            `💰 Amount: ₹${total.toFixed(2)}\n\n` +
+            `🔗 View Invoice: ${invoiceUrl}\n` +
+            `📥 Download PDF: ${pdfUrl}\n\n` +
+            `Thank you for your business! 🙏`
+        )
+        
+        // If customer phone is provided, open directly to that chat
+        const whatsappUrl = customerPhone 
+            ? `https://wa.me/${customerPhone.replace(/[^0-9]/g, '')}?text=${message}`
+            : `https://wa.me/?text=${message}`
+        
+        window.open(whatsappUrl, '_blank')
+        setShowMenu(false)
+    }
+
+    const handlePrintInvoice = () => {
+        const printWindow = window.open(pdfUrl, '_blank')
+        if (!printWindow) {
+            alert('Please allow popups to print the invoice')
         }
+        setShowMenu(false)
     }
 
     const handleEmailShare = () => {
-        // Share via email with PDF link
         const subject = encodeURIComponent(`Invoice ${invoiceNumber}`)
-        const body = encodeURIComponent(shareMessage + '\n\nPrint/Download PDF: ' + pdfUrl)
+        const body = encodeURIComponent(
+            `Hi ${customerName},\n\n` +
+            `Please find your invoice details:\n\n` +
+            `Invoice: ${invoiceNumber}\n` +
+            `Amount: ₹${total.toFixed(2)}\n\n` +
+            `View Invoice: ${invoiceUrl}\n` +
+            `Download PDF: ${pdfUrl}\n\n` +
+            `Thank you for your business!`
+        )
         window.location.href = `mailto:?subject=${subject}&body=${body}`
         setShowMenu(false)
     }
@@ -92,22 +77,6 @@ export function ShareInvoiceButton({
             console.error('Failed to copy link:', error)
             alert('Failed to copy link to clipboard')
         }
-    }
-
-    const handleDownloadPDF = () => {
-        // Open PDF in new window and trigger print dialog
-        const pdfWindow = window.open(pdfUrl, '_blank')
-        if (pdfWindow) {
-            pdfWindow.onload = () => {
-                setTimeout(() => {
-                    pdfWindow.focus()
-                    pdfWindow.print()
-                }, 500)
-            }
-        } else {
-            alert('Please allow popups to download the PDF')
-        }
-        setShowMenu(false)
     }
 
     return (
@@ -133,20 +102,36 @@ export function ShareInvoiceButton({
                     <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50 overflow-hidden">
                         <div className="p-2">
                             <div className="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                                Share Invoice
+                                Share Options
                             </div>
                             
-                            {/* WhatsApp */}
+                            {/* WhatsApp - Prominent placement at top */}
                             <button
                                 onClick={handleWhatsAppShare}
-                                className="w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                className="w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors border border-transparent hover:border-green-200 dark:hover:border-green-800"
                             >
                                 <div className="h-8 w-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
                                     <MessageCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
                                 </div>
                                 <div className="flex-1 text-left">
-                                    <div className="font-medium">WhatsApp</div>
-                                    <div className="text-xs text-gray-500 dark:text-gray-400">Share invoice with PDF link</div>
+                                    <div className="font-medium text-green-900 dark:text-green-100">WhatsApp</div>
+                                    <div className="text-xs text-green-700 dark:text-green-400">
+                                        {customerPhone ? 'Send to customer' : 'Share via WhatsApp'}
+                                    </div>
+                                </div>
+                            </button>
+                            
+                            {/* Print PDF */}
+                            <button
+                                onClick={handlePrintInvoice}
+                                className="w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                            >
+                                <div className="h-8 w-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                                    <Printer className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                                </div>
+                                <div className="flex-1 text-left">
+                                    <div className="font-medium">Print / Download</div>
+                                    <div className="text-xs text-gray-500 dark:text-gray-400">Save as PDF or print</div>
                                 </div>
                             </button>
 
@@ -161,7 +146,7 @@ export function ShareInvoiceButton({
                                 <div className="flex-1 text-left">
                                     <div className="font-medium">Email</div>
                                     <div className="text-xs text-gray-500 dark:text-gray-400">
-                                        Send with PDF attached
+                                        Send via email
                                     </div>
                                 </div>
                             </button>
@@ -185,20 +170,6 @@ export function ShareInvoiceButton({
                                     <div className="text-xs text-gray-500 dark:text-gray-400">
                                         Copy invoice URL
                                     </div>
-                                </div>
-                            </button>
-
-                            {/* Download PDF */}
-                            <button
-                                onClick={handleDownloadPDF}
-                                className="w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                            >
-                                <div className="h-8 w-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                                    <Download className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                                </div>
-                                <div className="flex-1 text-left">
-                                    <div className="font-medium">Download PDF</div>
-                                    <div className="text-xs text-gray-500 dark:text-gray-400">Save or print invoice</div>
                                 </div>
                             </button>
                         </div>

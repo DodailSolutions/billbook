@@ -12,12 +12,30 @@ import {
   AlertCircle,
   Send,
   FileText,
-  Users
+  Users,
+  Zap,
+  Shield,
+  Smartphone,
+  TrendingUp,
+  Clock
 } from 'lucide-react'
+
+interface QuickStat {
+  label: string
+  value: number
+  icon: React.ElementType
+  color: string
+}
 
 export default function WhatsAppConnectPage() {
   const [userRegion, setUserRegion] = useState<string | null>(null)
   const [regionLoading, setRegionLoading] = useState(true)
+  const [stats, setStats] = useState<QuickStat[]>([
+    { label: 'Total Customers', value: 0, icon: Users, color: 'blue' },
+    { label: 'Invoices Sent', value: 0, icon: FileText, color: 'green' },
+    { label: 'Active Today', value: 0, icon: TrendingUp, color: 'purple' },
+  ])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     // Check user region first
@@ -38,7 +56,40 @@ export default function WhatsAppConnectPage() {
         setRegionLoading(false)
         setUserRegion('IN') // Default to India on error
       })
+    
+    // Load stats
+    loadStats()
   }, [])
+  
+  const loadStats = async () => {
+    try {
+      // Load customer count
+      const customersRes = await fetch('/api/customers')
+      const customersData = await customersRes.json()
+      const customerCount = customersData.customers?.length || 0
+      
+      // Load invoice count
+      const invoicesRes = await fetch('/api/invoices')
+      const invoicesData = await invoicesRes.json()
+      const invoiceCount = invoicesData.invoices?.length || 0
+      
+      // Calculate active today (invoices created today)
+      const today = new Date().toDateString()
+      const activeToday = invoicesData.invoices?.filter((inv: any) => 
+        new Date(inv.created_at).toDateString() === today
+      ).length || 0
+      
+      setStats([
+        { label: 'Total Customers', value: customerCount, icon: Users, color: 'blue' },
+        { label: 'Invoices Created', value: invoiceCount, icon: FileText, color: 'green' },
+        { label: 'Created Today', value: activeToday, icon: Clock, color: 'purple' },
+      ])
+    } catch (error) {
+      console.error('Error loading stats:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   // Region check - Only available for India
   if (regionLoading) {
@@ -100,6 +151,38 @@ export default function WhatsAppConnectPage() {
           </Button>
         </Link>
       </div>
+
+      {/* Quick Stats */}
+      {!loading && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {stats.map((stat, index) => {
+            const Icon = stat.icon
+            const colorClasses = {
+              blue: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400',
+              green: 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400',
+              purple: 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400',
+            }[stat.color]
+            
+            return (
+              <Card key={index}>
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{stat.label}</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+                        {stat.value}
+                      </p>
+                    </div>
+                    <div className={`h-12 w-12 rounded-full ${colorClasses} flex items-center justify-center`}>
+                      <Icon className="h-6 w-6" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )
+          })}
+        </div>
+      )}
 
       {/* Status Banner */}
       <Card className="border-green-200 dark:border-green-500/20 bg-green-50 dark:bg-green-500/10">
@@ -208,14 +291,14 @@ export default function WhatsAppConnectPage() {
       </Card>
 
       {/* Quick Actions */}
-      <Card className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-700">
+      <Card className="bg-linear-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-700">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             🚀 Quick Actions
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-4">
             <Link href="/invoices" className="block">
               <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all hover:-translate-y-1 cursor-pointer">
                 <FileText className="h-8 w-8 text-green-600 mb-3" />
@@ -243,6 +326,82 @@ export default function WhatsAppConnectPage() {
                 <p className="text-sm text-gray-600 dark:text-gray-400">Verify integration is working</p>
               </div>
             </button>
+            <Link href="/whatsapp-crm" className="block">
+              <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all hover:-translate-y-1 cursor-pointer">
+                <Zap className="h-8 w-8 text-yellow-600 mb-3" />
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-1">WhatsApp CRM</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Manage customer conversations</p>
+              </div>
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Message Templates */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            💬 Message Templates
+            <span className="ml-auto text-xs font-normal bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-full">
+              Click to use
+            </span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-green-300 dark:hover:border-green-700 transition-colors cursor-pointer"
+                 onClick={() => {
+                   const msg = 'Hi! Your invoice is ready. Please check your email or click the link below to view and download.'
+                   window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank')
+                 }}>
+              <div className="flex items-start gap-3">
+                <div className="h-10 w-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
+                  <FileText className="h-5 w-5 text-green-600 dark:text-green-400" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Invoice Ready</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    "Hi! Your invoice is ready. Please check your email or click the link below to view and download."
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-green-300 dark:hover:border-green-700 transition-colors cursor-pointer"
+                 onClick={() => {
+                   const msg = 'Thank you for your business! Your payment has been received and your invoice is now marked as paid. 🙏'
+                   window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank')
+                 }}>
+              <div className="flex items-start gap-3">
+                <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
+                  <Check className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Payment Received</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    "Thank you for your business! Your payment has been received and your invoice is now marked as paid. 🙏"
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-green-300 dark:hover:border-green-700 transition-colors cursor-pointer"
+                 onClick={() => {
+                   const msg = 'Gentle reminder: Your invoice payment is due soon. Please let us know if you have any questions!'
+                   window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank')
+                 }}>
+              <div className="flex items-start gap-3">
+                <div className="h-10 w-10 rounded-full bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center shrink-0">
+                  <Clock className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Payment Reminder</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    "Gentle reminder: Your invoice payment is due soon. Please let us know if you have any questions!"
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>

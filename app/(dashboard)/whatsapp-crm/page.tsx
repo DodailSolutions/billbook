@@ -20,7 +20,10 @@ import {
   Check,
   Clock,
   AlertCircle,
-  Users
+  Users,
+  Settings,
+  Filter,
+  Archive
 } from 'lucide-react'
 
 interface WhatsAppContact {
@@ -293,21 +296,34 @@ export default function WhatsAppCRMPage() {
   return (
     <div className="h-[calc(100vh-4rem)] flex flex-col">
       {/* Header */}
-      <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+      <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-linear-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-            <MessageCircle className="h-6 w-6 text-green-600" />
-            WhatsApp CRM
-            <span className="inline-block px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs font-medium rounded-full ml-2">
-              Connected
-            </span>
-          </h1>
-          <Link href="/whatsapp-connect">
-            <Button variant="outline" size="sm" className="gap-2">
-              <AlertCircle className="h-4 w-4" />
-              Setup Guide
-            </Button>
-          </Link>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+              <MessageCircle className="h-6 w-6 text-green-600" />
+              WhatsApp CRM
+              <span className="inline-block px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs font-medium rounded-full ml-2">
+                ✓ Ready
+              </span>
+            </h1>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              Manage customer conversations and share invoices instantly
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Link href="/whatsapp-connect">
+              <Button variant="outline" size="sm" className="gap-2">
+                <Settings className="h-4 w-4" />
+                Settings
+              </Button>
+            </Link>
+            <Link href="/invoices">
+              <Button size="sm" className="gap-2 bg-green-600 hover:bg-green-700">
+                <FileText className="h-4 w-4" />
+                Send Invoice
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -315,7 +331,7 @@ export default function WhatsAppCRMPage() {
         {/* Contacts Sidebar */}
         <div className="w-80 border-r border-gray-200 dark:border-gray-700 flex flex-col bg-white dark:bg-gray-900">
           {/* Search */}
-          <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="p-4 border-b border-gray-200 dark:border-gray-700 space-y-3">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
@@ -324,6 +340,15 @@ export default function WhatsAppCRMPage() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-9"
               />
+            </div>
+            {/* Quick Filters */}
+            <div className="flex gap-2">
+              <button className="flex-1 px-3 py-1.5 text-xs font-medium rounded-md bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors">
+                All ({contacts.length})
+              </button>
+              <button className="flex-1 px-3 py-1.5 text-xs font-medium rounded-md bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                Unread
+              </button>
             </div>
           </div>
 
@@ -397,12 +422,12 @@ export default function WhatsAppCRMPage() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="secondary" size="sm">
-                  <Phone className="h-4 w-4" />
-                </Button>
-                <Button variant="secondary" size="sm">
-                  <Video className="h-4 w-4" />
-                </Button>
+                <Link href={`/invoices?customer=${selectedContact.name}`}>
+                  <Button variant="outline" size="sm" className="gap-2 border-green-200 text-green-700 hover:bg-green-50 dark:border-green-800 dark:text-green-400 dark:hover:bg-green-900/20">
+                    <FileText className="h-4 w-4" />
+                    <span className="hidden md:inline">Send Invoice</span>
+                  </Button>
+                </Link>
                 <Button variant="secondary" size="sm">
                   <MoreVertical className="h-4 w-4" />
                 </Button>
@@ -481,10 +506,49 @@ export default function WhatsAppCRMPage() {
             </div>
           </div>
         ) : (
-          <div className="flex-1 flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-            <div className="text-center text-gray-500">
-              <MessageCircle className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-              <p>Select a contact to start chatting</p>
+          <div className="flex-1 flex items-center justify-center bg-linear-to-br from-gray-50 to-green-50 dark:from-gray-900 dark:to-green-900/20">
+            <div className="text-center max-w-md px-6">
+              <div className="mb-6">
+                <div className="mx-auto w-24 h-24 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-4">
+                  <MessageCircle className="h-12 w-12 text-green-600 dark:text-green-400" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                  WhatsApp CRM
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-6">
+                  Select a contact from the left to start messaging, or send an invoice via WhatsApp to create new conversations automatically.
+                </p>
+              </div>
+              
+              <div className="space-y-3">
+                <Link href="/invoices">
+                  <Button className="w-full bg-green-600 hover:bg-green-700 gap-2">
+                    <FileText className="h-4 w-4" />
+                    Send Invoice via WhatsApp
+                  </Button>
+                </Link>
+                <Link href="/customers">
+                  <Button variant="outline" className="w-full gap-2">
+                    <Users className="h-4 w-4" />
+                    Manage Customers
+                  </Button>
+                </Link>
+              </div>
+
+              <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                <div className="flex items-start gap-3 text-left">
+                  <AlertCircle className="h-5 w-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm text-blue-900 dark:text-blue-100 font-medium mb-1">
+                      Pro Tip
+                    </p>
+                    <p className="text-xs text-blue-700 dark:text-blue-300">
+                      When you share an invoice via WhatsApp, the conversation will appear here automatically. 
+                      You can then continue chatting with your customer right from this page.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}
