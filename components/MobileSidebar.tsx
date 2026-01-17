@@ -71,21 +71,6 @@ const routes = [
 export function MobileSidebar() {
     const [isOpen, setIsOpen] = useState(false)
     const pathname = usePathname()
-    const [userRegion, setUserRegion] = useState<string | null>(null)
-
-    useEffect(() => {
-        // Fetch user region
-        fetch('/api/user/region')
-            .then(res => res.json())
-            .then(data => setUserRegion(data.region))
-            .catch(() => setUserRegion('IN'))
-    }, [])
-
-    // Filter routes based on region
-    const filteredRoutes = routes.filter(route => {
-        if (!route.regionOnly) return true
-        return userRegion === route.regionOnly
-    })
 
     const closeSidebar = () => setIsOpen(false)
 
@@ -153,7 +138,7 @@ export function MobileSidebar() {
                     {/* Navigation */}
                     <div className="flex-1 overflow-y-auto px-3 py-4">
                         <div className="space-y-2">
-                            {filteredRoutes.map((route) => (
+                            {routes.map((route) => (
                                 <Link
                                     key={route.href}
                                     href={route.href}
