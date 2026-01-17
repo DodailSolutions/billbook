@@ -179,7 +179,11 @@ export function InvoicesList({ invoices }: InvoicesListProps) {
                                     >
                                         <option value="draft">Draft</option>
                                         <option value="sent">Sent</option>
-                                    <option value="partial">Partial Payment</option>
+                                        <option value="partial">Partial Payment</option>
+                                        <option value="paid">Paid</option>
+                                        <option value="cancelled">Cancelled</option>
+                                    </select>
+
                                     <Link href={`/invoices/${invoice.id}`}>
                                         <Button variant="outline" size="icon">
                                             <Eye className="h-4 w-4" />
