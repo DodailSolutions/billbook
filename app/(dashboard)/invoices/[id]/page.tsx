@@ -23,9 +23,9 @@ export default async function InvoiceDetailPage({
     }
 
     const isPaid = invoice.status === 'paid'
-    const hasPartialPayment = invoice.is_partial_payment || (invoice.amount_paid && invoice.amount_paid > 0 && invoice.amount_paid < invoice.total)
-    const amountPaid = invoice.amount_paid || 0
-    const amountRemaining = invoice.amount_remaining || (invoice.total - amountPaid)
+    const hasPartialPayment = (invoice.is_partial_payment ?? false) || ((invoice.amount_paid ?? 0) > 0 && (invoice.amount_paid ?? 0) < invoice.total)
+    const amountPaid = invoice.amount_paid ?? 0
+    const amountRemaining = invoice.amount_remaining ?? (invoice.total - amountPaid)
 
     return (
         <div className="space-y-4 max-w-4xl mx-auto">
