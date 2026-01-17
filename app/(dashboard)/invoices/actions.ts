@@ -44,7 +44,15 @@ export async function getInvoices(): Promise<InvoiceWithDetails[]> {
             return []
         }
 
-        return data as InvoiceWithDetails[] || []
+        // Ensure partial payment fields are present with defaults if not in database
+        const invoicesWithDefaults = (data || []).map(invoice => ({
+            ...invoice,
+            amount_paid: invoice.amount_paid ?? 0,
+            amount_remaining: invoice.amount_remaining ?? invoice.total,
+            is_partial_payment: invoice.is_partial_payment ?? false
+        }))
+
+        return invoicesWithDefaults as InvoiceWithDetails[]
     } catch (err) {
         console.error('Unexpected error in getInvoices:', err)
         return []
@@ -75,7 +83,15 @@ export async function getInvoice(id: string): Promise<InvoiceWithDetails | null>
         return null
     }
 
-    return data as InvoiceWithDetails
+    // Ensure partial payment fields are present with defaults if not in database
+    const invoiceData = {
+        ...data,
+        amount_paid: data.amount_paid ?? 0,
+        amount_remaining: data.amount_remaining ?? data.total,
+        is_partial_payment: data.is_partial_payment ?? false
+    }
+
+    return invoiceData as InvoiceWithDetails
 }
 
 export async function generateInvoiceNumber(seriesId?: string): Promise<string> {
