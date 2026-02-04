@@ -109,26 +109,30 @@ export function ShareInvoiceButton({
             const pdfWidth = pdf.internal.pageSize.getWidth()
             const pdfHeight = pdf.internal.pageSize.getHeight()
             
-            const imgWidth = pdfWidth - 20
-            const imgHeight = (canvas.height * imgWidth) / canvas.width
+            // Calculate with margins
+            const maxWidth = pdfWidth - 20
+            const maxHeight = pdfHeight - 20
             
-            let heightLeft = imgHeight
-            let position = 10
+            let imgWidth = maxWidth
+            let imgHeight = (canvas.height * imgWidth) / canvas.width
             
-            pdf.addImage(
-                canvas.toDataURL('image/png'),
-                'PNG',
-                10,
-                position,
-                imgWidth,
-                imgHeight
-            )
-            
-            heightLeft -= pdfHeight
-            
-            while (heightLeft > 0) {
-                position = heightLeft - imgHeight + 10
-                pdf.addPage()
+            // If content fits on one page, scale it to fit nicely
+            if (imgHeight <= maxHeight) {
+                // Content fits! Center it on the page
+                const topMargin = (pdfHeight - imgHeight) / 2
+                pdf.addImage(
+                    canvas.toDataURL('image/png'),
+                    'PNG',
+                    10,
+                    topMargin,
+                    imgWidth,
+                    imgHeight
+                )
+            } else {
+                // Content is too long, use multi-page approach
+                let heightLeft = imgHeight
+                let position = 10
+                
                 pdf.addImage(
                     canvas.toDataURL('image/png'),
                     'PNG',
@@ -137,7 +141,22 @@ export function ShareInvoiceButton({
                     imgWidth,
                     imgHeight
                 )
+                
                 heightLeft -= pdfHeight
+                
+                while (heightLeft > 0) {
+                    position = heightLeft - imgHeight + 10
+                    pdf.addPage()
+                    pdf.addImage(
+                        canvas.toDataURL('image/png'),
+                        'PNG',
+                        10,
+                        position,
+                        imgWidth,
+                        imgHeight
+                    )
+                    heightLeft -= pdfHeight
+                }
             }
             
             // Cleanup
@@ -195,8 +214,13 @@ export function ShareInvoiceButton({
             
             setShowMenu(false)
         } catch (error) {
-            console.error('Error sharing via WhatsApp:', error)
-            alert('Failed to share PDF. Please try again.')
+            // Don't show error if user just canceled the share dialog
+            if (error instanceof Error && error.name === 'AbortError') {
+                console.log('Share canceled by user')
+            } else {
+                console.error('Error sharing via WhatsApp:', error)
+                alert('Failed to share PDF. Please try again.')
+            }
         } finally {
             setIsGenerating(false)
         }
@@ -266,8 +290,13 @@ export function ShareInvoiceButton({
             
             setShowMenu(false)
         } catch (error) {
-            console.error('Error sharing via email:', error)
-            alert('Failed to share PDF. Please try again.')
+            // Don't show error if user just canceled the share dialog
+            if (error instanceof Error && error.name === 'AbortError') {
+                console.log('Share canceled by user')
+            } else {
+                console.error('Error sharing via email:', error)
+                alert('Failed to share PDF. Please try again.')
+            }
         } finally {
             setIsGenerating(false)
         }

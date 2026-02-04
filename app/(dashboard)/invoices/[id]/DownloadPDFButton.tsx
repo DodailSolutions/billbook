@@ -99,28 +99,31 @@ export function DownloadPDFButton({ invoiceId }: DownloadPDFButtonProps) {
             const pdfWidth = pdf.internal.pageSize.getWidth()
             const pdfHeight = pdf.internal.pageSize.getHeight()
             
-            const imgWidth = pdfWidth - 20 // 10mm margin on each side
-            const imgHeight = (canvas.height * imgWidth) / canvas.width
+            // Calculate with margins
+            const maxWidth = pdfWidth - 20 // 10mm margin on each side
+            const maxHeight = pdfHeight - 20 // 10mm margin top and bottom
             
-            let heightLeft = imgHeight
-            let position = 10 // 10mm top margin
+            let imgWidth = maxWidth
+            let imgHeight = (canvas.height * imgWidth) / canvas.width
             
-            // Add first page
-            pdf.addImage(
-                canvas.toDataURL('image/png'),
-                'PNG',
-                10, // 10mm left margin
-                position,
-                imgWidth,
-                imgHeight
-            )
-            
-            heightLeft -= pdfHeight
-            
-            // Add additional pages if content is longer than one page
-            while (heightLeft > 0) {
-                position = heightLeft - imgHeight + 10
-                pdf.addPage()
+            // If content fits on one page, scale it to fit nicely
+            if (imgHeight <= maxHeight) {
+                // Content fits! Center it on the page
+                const topMargin = (pdfHeight - imgHeight) / 2
+                pdf.addImage(
+                    canvas.toDataURL('image/png'),
+                    'PNG',
+                    10,
+                    topMargin,
+                    imgWidth,
+                    imgHeight
+                )
+            } else {
+                // Content is too long, use multi-page approach
+                let heightLeft = imgHeight
+                let position = 10 // 10mm top margin
+                
+                // Add first page
                 pdf.addImage(
                     canvas.toDataURL('image/png'),
                     'PNG',
@@ -129,7 +132,23 @@ export function DownloadPDFButton({ invoiceId }: DownloadPDFButtonProps) {
                     imgWidth,
                     imgHeight
                 )
+                
                 heightLeft -= pdfHeight
+                
+                // Add additional pages
+                while (heightLeft > 0) {
+                    position = heightLeft - imgHeight + 10
+                    pdf.addPage()
+                    pdf.addImage(
+                        canvas.toDataURL('image/png'),
+                        'PNG',
+                        10,
+                        position,
+                        imgWidth,
+                        imgHeight
+                    )
+                    heightLeft -= pdfHeight
+                }
             }
             
             // Download the PDF
