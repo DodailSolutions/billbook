@@ -139,6 +139,14 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
             color: #1f2937;
             font-size: ${invoiceFontSize + 1}px;
         }
+        .gstin-highlight {
+            background: #fef3c7;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+            color: #92400e;
+            display: inline-block;
+        }
         .items-table {
             width: 100%;
             border-collapse: collapse;
@@ -245,7 +253,7 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
                     ${companyAddress ? `<div>${companyAddress}</div>` : ''}
                     ${companyEmail ? `<div>Email: ${companyEmail}</div>` : ''}
                     ${companyPhone ? `<div>Phone: ${companyPhone}</div>` : ''}
-                    ${showGstin && companyGstin ? `<div>GSTIN: ${companyGstin}</div>` : ''}
+                    ${showGstin && companyGstin ? `<div>GSTIN: <span class="${invoice.customer.gstin ? 'gstin-highlight' : ''}">${companyGstin}</span></div>` : ''}
                 </div>
                 ` : ''}
             </div>
@@ -273,7 +281,7 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
                         ${invoice.customer.email ? `<div>${invoice.customer.email}</div>` : ''}
                         ${invoice.customer.phone ? `<div>${invoice.customer.phone}</div>` : ''}
                         ${invoice.customer.address ? `<div>${invoice.customer.address}</div>` : ''}
-                        ${invoice.customer.gstin ? `<div>GSTIN: ${invoice.customer.gstin}</div>` : ''}
+                        ${invoice.customer.gstin ? `<div>GSTIN: <span class="${companyGstin ? 'gstin-highlight' : ''}">${invoice.customer.gstin}</span></div>` : ''}
                     </div>
                 </div>
             </div>
