@@ -37,7 +37,37 @@ export function DownloadPDFButton({ invoiceId }: DownloadPDFButtonProps) {
             container.style.width = '800px' // Fixed width for consistent rendering
             container.style.background = 'white'
             container.style.padding = '40px'
+            
+            // Add style to convert oklch colors to rgb (html2canvas doesn't support oklch)
+            const style = document.createElement('style')
+            style.textContent = `
+                * {
+                    color-scheme: light !important;
+                }
+                [style*="oklch"], [style*="lab"], [style*="lch"] {
+                    color: inherit !important;
+                }
+            `
+            container.appendChild(style)
             document.body.appendChild(container)
+            
+            // Convert all oklch/lab/lch colors to rgb for html2canvas compatibility
+            const allElements = container.querySelectorAll('*')
+            allElements.forEach((el: Element) => {
+                const htmlEl = el as HTMLElement
+                const computedStyle = window.getComputedStyle(htmlEl)
+                
+                // Force recompute colors to rgb
+                if (computedStyle.backgroundColor && computedStyle.backgroundColor !== 'rgba(0, 0, 0, 0)') {
+                    htmlEl.style.backgroundColor = computedStyle.backgroundColor
+                }
+                if (computedStyle.color) {
+                    htmlEl.style.color = computedStyle.color
+                }
+                if (computedStyle.borderColor) {
+                    htmlEl.style.borderColor = computedStyle.borderColor
+                }
+            })
             
             // Wait for images to load
             const images = container.getElementsByTagName('img')
@@ -58,6 +88,17 @@ export function DownloadPDFButton({ invoiceId }: DownloadPDFButtonProps) {
                 logging: false,
                 backgroundColor: '#ffffff',
                 windowWidth: 800,
+                ignoreElements: (element) => {
+                    // Ignore elements with problematic color formats
+                    const style = window.getComputedStyle(element)
+                    const bg = style.backgroundColor
+                    const color = style.color
+                    if (bg?.includes('lab') || bg?.includes('lch') || bg?.includes('oklch') ||
+                        color?.includes('lab') || color?.includes('lch') || color?.includes('oklch')) {
+                        return false // Don't ignore, but we've neutralized these
+                    }
+                    return false
+                },
             })
             
             // Calculate dimensions for A4
