@@ -69,8 +69,12 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
             margin-bottom: 25px;
             padding-bottom: 20px;
             border-bottom: 3px solid ${primaryColor};
+            gap: 40px;
         }
         .company-info {
+            flex: 1;
+        }
+        .header-right {
             flex: 1;
         }
         .company-name {
@@ -90,19 +94,20 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
             font-size: 32px;
             font-weight: bold;
             color: ${primaryColor};
+            text-align: right;
         }
         .invoice-number {
             font-size: 14px;
             color: #6b7280;
             margin-top: 8px;
+            text-align: right;
         }
         .invoice-dates {
-            display: flex;
-            gap: 20px;
+            margin-top: 20px;
             margin-bottom: 20px;
         }
         .date-item {
-            flex: 1;
+            margin-bottom: 12px;
         }
         .date-label {
             font-size: ${Math.max(10, invoiceFontSize - 2)}px;
@@ -116,7 +121,7 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
             font-weight: 600;
         }
         .customer-section {
-            margin-bottom: 30px;
+            margin-top: 15px;
         }
         .section-title {
             font-size: 14px;
@@ -244,33 +249,33 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
                 </div>
                 ` : ''}
             </div>
-            <div>
+            <div class="header-right">
                 <div class="invoice-title">INVOICE</div>
                 <div class="invoice-number">${invoice.invoice_number}</div>
-            </div>
-        </div>
-        
-        <div class="invoice-dates">
-            <div class="date-item">
-                <div class="date-label">Invoice Date</div>
-                <div class="date-value">${formatDate(invoice.invoice_date)}</div>
-            </div>
-            ${invoice.due_date ? `
-            <div class="date-item">
-                <div class="date-label">Due Date</div>
-                <div class="date-value">${formatDate(invoice.due_date)}</div>
-            </div>
-            ` : ''}
-        </div>
+                
+                <div class="invoice-dates">
+                    <div class="date-item">
+                        <div class="date-label">Invoice Date</div>
+                        <div class="date-value">${formatDate(invoice.invoice_date)}</div>
+                    </div>
+                    ${invoice.due_date ? `
+                    <div class="date-item">
+                        <div class="date-label">Due Date</div>
+                        <div class="date-value">${formatDate(invoice.due_date)}</div>
+                    </div>
+                    ` : ''}
+                </div>
 
-        <div class="customer-section">
-            <div class="section-title">Bill To:</div>
-            <div class="customer-details">
-                <div class="customer-name">${invoice.customer.name}</div>
-                ${invoice.customer.email ? `<div>${invoice.customer.email}</div>` : ''}
-                ${invoice.customer.phone ? `<div>${invoice.customer.phone}</div>` : ''}
-                ${invoice.customer.address ? `<div>${invoice.customer.address}</div>` : ''}
-                ${invoice.customer.gstin ? `<div>GSTIN: ${invoice.customer.gstin}</div>` : ''}
+                <div class="customer-section">
+                    <div class="section-title">Bill To:</div>
+                    <div class="customer-details">
+                        <div class="customer-name">${invoice.customer.name}</div>
+                        ${invoice.customer.email ? `<div>${invoice.customer.email}</div>` : ''}
+                        ${invoice.customer.phone ? `<div>${invoice.customer.phone}</div>` : ''}
+                        ${invoice.customer.address ? `<div>${invoice.customer.address}</div>` : ''}
+                        ${invoice.customer.gstin ? `<div>GSTIN: ${invoice.customer.gstin}</div>` : ''}
+                    </div>
+                </div>
             </div>
         </div>
 
