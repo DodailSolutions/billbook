@@ -5,15 +5,28 @@ import { NextRequest } from 'next/server'
 export async function GET(request: NextRequest) {
     const requestUrl = new URL(request.url)
     const code = requestUrl.searchParams.get('code')
+    const error = requestUrl.searchParams.get('error')
+    const error_description = requestUrl.searchParams.get('error_description')
     const next = requestUrl.searchParams.get('next') || '/dashboard'
+
+    // Handle errors from Supabase auth flow
+    if (error || error_description) {
+        console.error('Supabase auth callback error:', { error, error_description })
+        const errorMessage = error_description || error || 'Authentication failed'
+        return NextResponse.redirect(
+            new URL(`/login?error=${encodeURIComponent(errorMessage)}`, request.url)
+        )
+    }
 
     if (code) {
         const supabase = await createClient()
-        const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+        const { data, error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
         
-        if (error) {
-            console.error('Error exchanging code for session:', error)
-            return NextResponse.redirect(new URL('/login?message=' + encodeURIComponent('Authentication failed. Please try again.'), request.url))
+        if (exchangeError) {
+            console.error('Error exchanging code for session:', exchangeError)
+            return NextResponse.redirect(
+                new URL(`/login?error=${encodeURIComponent(exchangeError.message || 'Authentication failed. Please try again.')}`, request.url)
+            )
         }
 
         // Check if this is a password recovery session

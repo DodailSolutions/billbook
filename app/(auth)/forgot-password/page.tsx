@@ -3,7 +3,7 @@ import { ForgotPasswordForm } from "./ForgotPasswordForm"
 import { ArrowLeft } from "lucide-react"
 
 export default async function ForgotPasswordPage(props: { 
-    searchParams: Promise<{ message?: string, error?: string, success?: string, email?: string }> 
+    searchParams: Promise<{ message?: string, error?: string, error_description?: string, success?: string, email?: string }> 
 }) {
     const searchParams = await props.searchParams
     
@@ -13,7 +13,12 @@ export default async function ForgotPasswordPage(props: {
                 <ArrowLeft className="h-4 w-4" />
                 Back to Login
             </Link>
-            <ForgotPasswordForm message={searchParams.message} />
+            <ForgotPasswordForm 
+                message={searchParams.message}
+                error={searchParams.error_description || searchParams.error}
+                success={searchParams.success === 'true'}
+                email={searchParams.email}
+            />
         </div>
     )
 }

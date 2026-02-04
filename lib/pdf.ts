@@ -208,8 +208,16 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
             font-size: ${termsFontSize}px;
         }
         @media print {
+            @page {
+                margin: 1cm 1.5cm;
+                size: A4;
+            }
             body {
+                margin: 0;
                 padding: 20px;
+            }
+            .invoice-container {
+                padding: 0;
             }
             .no-print {
                 display: none;
@@ -324,6 +332,18 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
                     <span>Total:</span>
                     <span>₹${invoice.total.toFixed(2)}</span>
                 </div>
+                ${(invoice.amount_paid && invoice.amount_paid > 0) ? `
+                <div class="total-row" style="color: #10b981; font-weight: 600; border-top: 1px solid #e5e7eb; padding-top: 8px; margin-top: 4px;">
+                    <span>Amount Paid:</span>
+                    <span>₹${invoice.amount_paid.toFixed(2)}</span>
+                </div>
+                ${invoice.amount_remaining && invoice.amount_remaining > 0 ? `
+                <div class="total-row" style="color: #f59e0b; font-weight: 600;">
+                    <span>Amount Due:</span>
+                    <span>₹${invoice.amount_remaining.toFixed(2)}</span>
+                </div>
+                ` : ''}
+                ` : ''}
             </div>
         </div>
 

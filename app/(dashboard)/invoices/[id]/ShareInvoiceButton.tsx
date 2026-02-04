@@ -1,8 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { Share2, Mail, Copy, Check, Printer, MessageCircle } from 'lucide-react'
+import { Share2, Mail, Copy, Check, Printer, MessageCircle, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
+import jsPDF from 'jspdf'
+import html2canvas from 'html2canvas'
 
 interface ShareInvoiceButtonProps {
     invoiceId: string
@@ -21,51 +23,220 @@ export function ShareInvoiceButton({
 }: ShareInvoiceButtonProps) {
     const [showMenu, setShowMenu] = useState(false)
     const [copied, setCopied] = useState(false)
+    const [isGenerating, setIsGenerating] = useState(false)
 
     const invoiceUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/invoices/${invoiceId}`
-    const pdfUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/api/invoices/${invoiceId}/pdf?mode=preview`
 
-    const handleWhatsAppShare = () => {
-        const message = encodeURIComponent(
-            `Hi ${customerName}! 👋\n\n` +
-            `Here's your invoice from BillBooky:\n\n` +
-            `📄 Invoice: ${invoiceNumber}\n` +
-            `💰 Amount: ₹${total.toFixed(2)}\n\n` +
-            `🔗 View Invoice: ${invoiceUrl}\n` +
-            `📥 Download PDF: ${pdfUrl}\n\n` +
-            `Thank you for your business! 🙏`
-        )
-        
-        // If customer phone is provided, open directly to that chat
-        const whatsappUrl = customerPhone 
-            ? `https://wa.me/${customerPhone.replace(/[^0-9]/g, '')}?text=${message}`
-            : `https://wa.me/?text=${message}`
-        
-        window.open(whatsappUrl, '_blank')
-        setShowMenu(false)
-    }
-
-    const handlePrintInvoice = () => {
-        const printWindow = window.open(pdfUrl, '_blank')
-        if (!printWindow) {
-            alert('Please allow popups to print the invoice')
+    const generatePDFBlob = async (): Promise<Blob> => {
+        setIsGenerating(true)
+        try {
+            // Fetch the invoice HTML
+            const response = await fetch(`/api/invoices/${invoiceId}/pdf?mode=html`)
+            
+            if (!response.ok) {
+                throw new Error('Failed to fetch invoice')
+            }
+            
+            const html = await response.text()
+            
+            // Create a temporary container
+            const container = document.createElement('div')
+            container.innerHTML = html
+            container.style.position = 'absolute'
+            container.style.left = '-9999px'
+            container.style.width = '800px'
+            container.style.background = 'white'
+            container.style.padding = '40px'
+            document.body.appendChild(container)
+            
+            // Wait for images to load
+            const images = container.getElementsByTagName('img')
+            await Promise.all(
+                Array.from(images).map(img => {
+                    if (img.complete) return Promise.resolve()
+                    return new Promise(resolve => {
+                        img.onload = resolve
+                        img.onerror = resolve
+                    })
+                })
+            )
+            
+            // Convert to canvas
+            const canvas = await html2canvas(container, {
+                scale: 2,
+                useCORS: true,
+                logging: false,
+                backgroundColor: '#ffffff',
+                windowWidth: 800,
+            })
+            
+            // Generate PDF
+            const pdf = new jsPDF('p', 'mm', 'a4')
+            const pdfWidth = pdf.internal.pageSize.getWidth()
+            const pdfHeight = pdf.internal.pageSize.getHeight()
+            
+            const imgWidth = pdfWidth - 20
+            const imgHeight = (canvas.height * imgWidth) / canvas.width
+            
+            let heightLeft = imgHeight
+            let position = 10
+            
+            pdf.addImage(
+                canvas.toDataURL('image/png'),
+                'PNG',
+                10,
+                position,
+                imgWidth,
+                imgHeight
+            )
+            
+            heightLeft -= pdfHeight
+            
+            while (heightLeft > 0) {
+                position = heightLeft - imgHeight + 10
+                pdf.addPage()
+                pdf.addImage(
+                    canvas.toDataURL('image/png'),
+                    'PNG',
+                    10,
+                    position,
+                    imgWidth,
+                    imgHeight
+                )
+                heightLeft -= pdfHeight
+            }
+            
+            // Cleanup
+            document.body.removeChild(container)
+            
+            // Return PDF as blob
+            return pdf.output('blob')
+        } finally {
+            setIsGenerating(false)
         }
-        setShowMenu(false)
     }
 
-    const handleEmailShare = () => {
-        const subject = encodeURIComponent(`Invoice ${invoiceNumber}`)
-        const body = encodeURIComponent(
-            `Hi ${customerName},\n\n` +
-            `Please find your invoice details:\n\n` +
-            `Invoice: ${invoiceNumber}\n` +
-            `Amount: ₹${total.toFixed(2)}\n\n` +
-            `View Invoice: ${invoiceUrl}\n` +
-            `Download PDF: ${pdfUrl}\n\n` +
-            `Thank you for your business!`
-        )
-        window.location.href = `mailto:?subject=${subject}&body=${body}`
-        setShowMenu(false)
+    const handleWhatsAppShare = async () => {
+        try {
+            setIsGenerating(true)
+            
+            // Generate PDF
+            const pdfBlob = await generatePDFBlob()
+            const file = new File([pdfBlob], `Invoice-${invoiceNumber}.pdf`, { type: 'application/pdf' })
+            
+            // Check if Web Share API with files is supported
+            if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                await navigator.share({
+                    title: `Invoice ${invoiceNumber}`,
+                    text: `Hi ${customerName}! 👋\n\nHere's your invoice from BillBooky:\n\n📄 Invoice: ${invoiceNumber}\n💰 Amount: ₹${total.toFixed(2)}\n\nThank you for your business! 🙏`,
+                    files: [file]
+                })
+            } else {
+                // Fallback: Download PDF and show WhatsApp message
+                const url = URL.createObjectURL(pdfBlob)
+                const link = document.createElement('a')
+                link.href = url
+                link.download = `Invoice-${invoiceNumber}.pdf`
+                document.body.appendChild(link)
+                link.click()
+                document.body.removeChild(link)
+                URL.revokeObjectURL(url)
+                
+                // Open WhatsApp with message
+                const message = encodeURIComponent(
+                    `Hi ${customerName}! 👋\n\n` +
+                    `Here's your invoice from BillBooky:\n\n` +
+                    `📄 Invoice: ${invoiceNumber}\n` +
+                    `💰 Amount: ₹${total.toFixed(2)}\n\n` +
+                    `(PDF downloaded - please attach manually)\n\n` +
+                    `Thank you for your business! 🙏`
+                )
+                
+                const whatsappUrl = customerPhone 
+                    ? `https://wa.me/${customerPhone.replace(/[^0-9]/g, '')}?text=${message}`
+                    : `https://wa.me/?text=${message}`
+                
+                window.open(whatsappUrl, '_blank')
+            }
+            
+            setShowMenu(false)
+        } catch (error) {
+            console.error('Error sharing via WhatsApp:', error)
+            alert('Failed to share PDF. Please try again.')
+        } finally {
+            setIsGenerating(false)
+        }
+    }
+
+    const handlePrintInvoice = async () => {
+        try {
+            setIsGenerating(true)
+            const pdfBlob = await generatePDFBlob()
+            const url = URL.createObjectURL(pdfBlob)
+            const printWindow = window.open(url, '_blank')
+            
+            if (!printWindow) {
+                alert('Please allow popups to print the invoice')
+            } else {
+                // Clean up after window is closed
+                setTimeout(() => URL.revokeObjectURL(url), 60000)
+            }
+            
+            setShowMenu(false)
+        } catch (error) {
+            console.error('Error printing invoice:', error)
+            alert('Failed to print invoice. Please try again.')
+        } finally {
+            setIsGenerating(false)
+        }
+    }
+
+    const handleEmailShare = async () => {
+        try {
+            setIsGenerating(true)
+            
+            // Generate PDF
+            const pdfBlob = await generatePDFBlob()
+            const file = new File([pdfBlob], `Invoice-${invoiceNumber}.pdf`, { type: 'application/pdf' })
+            
+            // Check if Web Share API with files is supported
+            if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                await navigator.share({
+                    title: `Invoice ${invoiceNumber}`,
+                    text: `Hi ${customerName},\n\nPlease find your invoice details:\n\nInvoice: ${invoiceNumber}\nAmount: ₹${total.toFixed(2)}\n\nThank you for your business!`,
+                    files: [file]
+                })
+            } else {
+                // Fallback: Download PDF and open email client
+                const url = URL.createObjectURL(pdfBlob)
+                const link = document.createElement('a')
+                link.href = url
+                link.download = `Invoice-${invoiceNumber}.pdf`
+                document.body.appendChild(link)
+                link.click()
+                document.body.removeChild(link)
+                URL.revokeObjectURL(url)
+                
+                // Open email client
+                const subject = encodeURIComponent(`Invoice ${invoiceNumber}`)
+                const body = encodeURIComponent(
+                    `Hi ${customerName},\n\n` +
+                    `Please find your invoice attached.\n\n` +
+                    `Invoice: ${invoiceNumber}\n` +
+                    `Amount: ₹${total.toFixed(2)}\n\n` +
+                    `(PDF downloaded - please attach manually)\n\n` +
+                    `Thank you for your business!`
+                )
+                window.location.href = `mailto:?subject=${subject}&body=${body}`
+            }
+            
+            setShowMenu(false)
+        } catch (error) {
+            console.error('Error sharing via email:', error)
+            alert('Failed to share PDF. Please try again.')
+        } finally {
+            setIsGenerating(false)
+        }
     }
 
     const handleCopyLink = async () => {
@@ -108,15 +279,22 @@ export function ShareInvoiceButton({
                             {/* WhatsApp - Prominent placement at top */}
                             <button
                                 onClick={handleWhatsAppShare}
-                                className="w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors border border-transparent hover:border-green-200 dark:hover:border-green-800"
+                                disabled={isGenerating}
+                                className="w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors border border-transparent hover:border-green-200 dark:hover:border-green-800 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 <div className="h-8 w-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                                    <MessageCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                                    {isGenerating ? (
+                                        <Loader2 className="h-4 w-4 text-green-600 dark:text-green-400 animate-spin" />
+                                    ) : (
+                                        <MessageCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                                    )}
                                 </div>
                                 <div className="flex-1 text-left">
-                                    <div className="font-medium text-green-900 dark:text-green-100">WhatsApp</div>
+                                    <div className="font-medium text-green-900 dark:text-green-100">
+                                        {isGenerating ? 'Generating PDF...' : 'WhatsApp'}
+                                    </div>
                                     <div className="text-xs text-green-700 dark:text-green-400">
-                                        {customerPhone ? 'Send to customer' : 'Share via WhatsApp'}
+                                        {customerPhone ? 'Send PDF to customer' : 'Share PDF via WhatsApp'}
                                     </div>
                                 </div>
                             </button>
@@ -124,10 +302,15 @@ export function ShareInvoiceButton({
                             {/* Print PDF */}
                             <button
                                 onClick={handlePrintInvoice}
-                                className="w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                disabled={isGenerating}
+                                className="w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 <div className="h-8 w-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                                    <Printer className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                                    {isGenerating ? (
+                                        <Loader2 className="h-4 w-4 text-purple-600 dark:text-purple-400 animate-spin" />
+                                    ) : (
+                                        <Printer className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                                    )}
                                 </div>
                                 <div className="flex-1 text-left">
                                     <div className="font-medium">Print / Download</div>
@@ -138,15 +321,20 @@ export function ShareInvoiceButton({
                             {/* Email */}
                             <button
                                 onClick={handleEmailShare}
-                                className="w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                disabled={isGenerating}
+                                className="w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 <div className="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                                    <Mail className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                                    {isGenerating ? (
+                                        <Loader2 className="h-4 w-4 text-blue-600 dark:text-blue-400 animate-spin" />
+                                    ) : (
+                                        <Mail className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                                    )}
                                 </div>
                                 <div className="flex-1 text-left">
                                     <div className="font-medium">Email</div>
                                     <div className="text-xs text-gray-500 dark:text-gray-400">
-                                        Send via email
+                                        Send PDF via email
                                     </div>
                                 </div>
                             </button>

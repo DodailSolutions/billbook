@@ -32,12 +32,19 @@ export async function GET(
     <style>
         @media print {
             @page {
-                margin: 0;
+                margin: 1cm 1.5cm;
                 size: A4;
             }
             body {
                 margin: 0;
                 padding: 0;
+            }
+            .content-wrapper {
+                margin-top: 0;
+                padding: 20px;
+            }
+            .invoice-preview {
+                box-shadow: none;
             }
             .no-print {
                 display: none !important;
@@ -57,20 +64,22 @@ export async function GET(
             top: 0;
             left: 0;
             right: 0;
-            background: linear-gradient(to right, #3b82f6, #8b5cf6);
-            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 16px 24px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             z-index: 1000;
         }
         .toolbar-title {
             color: white;
-            font-size: 16px;
-            font-weight: 600;
+            font-size: 18px;
+            font-weight: 700;
             display: flex;
             align-items: center;
+            gap: 8px;
+        }
             gap: 8px;
         }
         .toolbar-actions {
@@ -141,11 +150,11 @@ export async function GET(
             📄 Invoice ${invoice.invoice_number}
         </div>
         <div class="toolbar-actions">
-            <button class="btn btn-secondary" onclick="window.close()" title="Close preview">
+            <button class="btn btn-secondary" onclick="window.close()" title="Close window">
                 ✕ Close
             </button>
-            <button class="btn btn-primary" onclick="window.print()" title="Save as PDF or Print">
-                🖨️ Download PDF
+            <button class="btn btn-primary" onclick="window.print()" title="Download as PDF or Print">
+                🖨️ Save / Print PDF
             </button>
         </div>
     </div>
@@ -187,6 +196,17 @@ export async function GET(
 </html>
     `
 
+    // If mode is 'html', return just the invoice HTML without wrapper
+    if (mode === 'html') {
+        return new NextResponse(html, {
+            headers: {
+                'Content-Type': 'text/html; charset=utf-8',
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+            },
+        })
+    }
+
+    // Otherwise return the full PDF preview page
     return new NextResponse(pdfHtml, {
         headers: {
             'Content-Type': 'text/html; charset=utf-8',

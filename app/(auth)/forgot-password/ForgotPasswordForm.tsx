@@ -1,6 +1,5 @@
 'use client'
 
-import { useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Input } from '@/components/ui/Input'
@@ -10,12 +9,13 @@ import { useFormStatus } from 'react-dom'
 
 interface ForgotPasswordFormProps {
     message?: string
+    error?: string
+    success?: boolean
+    email?: string
 }
 
-function SubmitButton() {
+function SubmitButton({ success }: { success?: boolean }) {
     const { pending } = useFormStatus()
-    const searchParams = useSearchParams()
-    const success = searchParams.get('success') === 'true'
     
     return (
         <Button 
@@ -40,17 +40,7 @@ function SubmitButton() {
     )
 }
 
-export function ForgotPasswordForm({ message }: ForgotPasswordFormProps) {
-    const searchParams = useSearchParams()
-    
-    // Derive all state from URL params directly
-    const errorParam = searchParams.get('error')
-    const successParam = searchParams.get('success')
-    const emailParam = searchParams.get('email')
-    
-    const error = errorParam ? decodeURIComponent(errorParam) : null
-    const success = successParam === 'true'
-    const email = emailParam ? decodeURIComponent(emailParam) : ''
+export function ForgotPasswordForm({ message, error, success, email }: ForgotPasswordFormProps) {
 
     return (
         <Card className="max-w-md mx-auto">
@@ -131,7 +121,7 @@ export function ForgotPasswordForm({ message }: ForgotPasswordFormProps) {
                         />
                     </div>
 
-                    <SubmitButton />
+                    <SubmitButton success={success} />
                 </form>
 
                 <div className="mt-6 text-center">
