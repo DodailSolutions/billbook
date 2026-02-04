@@ -66,7 +66,7 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
         .header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 40px;
+            margin-bottom: 25px;
             padding-bottom: 20px;
             border-bottom: 3px solid ${primaryColor};
         }
@@ -99,7 +99,7 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
         .invoice-dates {
             display: flex;
             gap: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
         .date-item {
             flex: 1;
@@ -115,8 +115,16 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
             font-size: ${invoiceFontSize + 2}px;
             font-weight: 600;
         }
+        .info-row {
+            display: flex;
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+        .info-column {
+            flex: 1;
+        }
         .customer-section {
-            margin-bottom: 40px;
+            flex: 1;
         }
         .section-title {
             font-size: 14px;
@@ -263,14 +271,26 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
             ` : ''}
         </div>
 
-        <div class="customer-section">
-            <div class="section-title">Bill To:</div>
-            <div class="customer-details">
-                <div class="customer-name">${invoice.customer.name}</div>
-                ${invoice.customer.email ? `<div>${invoice.customer.email}</div>` : ''}
-                ${invoice.customer.phone ? `<div>${invoice.customer.phone}</div>` : ''}
-                ${invoice.customer.address ? `<div>${invoice.customer.address}</div>` : ''}
-                ${invoice.customer.gstin ? `<div>GSTIN: ${invoice.customer.gstin}</div>` : ''}
+        <div class="info-row">
+            <div class="info-column">
+                <div class="section-title">From:</div>
+                <div class="customer-details">
+                    <div class="customer-name">${companyName}</div>
+                    ${companyAddress ? `<div>${companyAddress}</div>` : ''}
+                    ${companyEmail ? `<div>Email: ${companyEmail}</div>` : ''}
+                    ${companyPhone ? `<div>Phone: ${companyPhone}</div>` : ''}
+                    ${showGstin && companyGstin ? `<div>GSTIN: ${companyGstin}</div>` : ''}
+                </div>
+            </div>
+            <div class="customer-section">
+                <div class="section-title">Bill To:</div>
+                <div class="customer-details">
+                    <div class="customer-name">${invoice.customer.name}</div>
+                    ${invoice.customer.email ? `<div>${invoice.customer.email}</div>` : ''}
+                    ${invoice.customer.phone ? `<div>${invoice.customer.phone}</div>` : ''}
+                    ${invoice.customer.address ? `<div>${invoice.customer.address}</div>` : ''}
+                    ${invoice.customer.gstin ? `<div>GSTIN: ${invoice.customer.gstin}</div>` : ''}
+                </div>
             </div>
         </div>
 
