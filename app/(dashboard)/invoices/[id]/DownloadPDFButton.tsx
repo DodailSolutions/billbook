@@ -29,45 +29,38 @@ export function DownloadPDFButton({ invoiceId }: DownloadPDFButtonProps) {
             const invoiceNumberMatch = html.match(/Invoice[:\s#]*([A-Z0-9-]+)/i)
             const invoiceNumber = invoiceNumberMatch ? invoiceNumberMatch[1] : invoiceId
             
-            // Create a temporary container
-            const container = document.createElement('div')
-            container.innerHTML = html
-            container.style.position = 'absolute'
-            container.style.left = '-9999px'
-            container.style.width = '800px' // Fixed width for consistent rendering
-            container.style.background = 'white'
-            container.style.padding = '40px'
+            // Create an isolated iframe to render the HTML without global CSS
+            const iframe = document.createElement('iframe')
+            iframe.style.position = 'absolute'
+            iframe.style.left = '-9999px'
+            iframe.style.width = '800px'
+            iframe.style.height = '1200px'
+            iframe.style.border = 'none'
+            document.body.appendChild(iframe)
             
-            // Add style to convert oklch colors to rgb (html2canvas doesn't support oklch)
-            const style = document.createElement('style')
-            style.textContent = `
-                * {
-                    color-scheme: light !important;
-                }
-                [style*="oklch"], [style*="lab"], [style*="lch"] {
-                    color: inherit !important;
-                }
-            `
-            container.appendChild(style)
-            document.body.appendChild(container)
+            // Write clean HTML to iframe without any global styles
+            const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document
+            if (!iframeDoc) {
+                throw new Error('Failed to access iframe document')
+            }
             
-            // Convert all oklch/lab/lch colors to rgb for html2canvas compatibility
-            const allElements = container.querySelectorAll('*')
-            allElements.forEach((el: Element) => {
-                const htmlEl = el as HTMLElement
-                const computedStyle = window.getComputedStyle(htmlEl)
-                
-                // Force recompute colors to rgb
-                if (computedStyle.backgroundColor && computedStyle.backgroundColor !== 'rgba(0, 0, 0, 0)') {
-                    htmlEl.style.backgroundColor = computedStyle.backgroundColor
-                }
-                if (computedStyle.color) {
-                    htmlEl.style.color = computedStyle.color
-                }
-                if (computedStyle.borderColor) {
-                    htmlEl.style.borderColor = computedStyle.borderColor
-                }
-            })
+            iframeDoc.open()
+            iframeDoc.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <style>
+                        * { margin: 0; padding: 0; box-sizing: border-box; }
+                        body { background: white; padding: 40px; }
+                    </style>
+                </head>
+                <body>${html}</body>
+                </html>
+            `)
+            iframeDoc.close()
+            
+            const container = iframeDoc.body
             
             // Wait for images to load
             const images = container.getElementsByTagName('img')
@@ -143,7 +136,7 @@ export function DownloadPDFButton({ invoiceId }: DownloadPDFButtonProps) {
             pdf.save(`Invoice-${invoiceNumber}.pdf`)
             
             // Cleanup
-            document.body.removeChild(container)
+            document.body.removeChild(iframe)
             
         } catch (error) {
             console.error('Error generating PDF:', error)
