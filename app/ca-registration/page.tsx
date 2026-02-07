@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { createCAProfile } from '@/lib/ca-profile-actions'
+import { createClient } from '@/lib/supabase/client'
 import type { CASpecialization } from '@/lib/hire-ca-types'
 import {
   ArrowLeft,
@@ -46,6 +47,31 @@ export default function CARegistrationPage() {
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const supabase = createClient()
+      const { data: { session } } = await supabase.auth.getSession()
+      setIsAuthenticated(!!session)
+    }
+    checkAuth()
+  }, [])
+
+  // Restore form data from session storage if user is returning from signup
+  useEffect(() => {
+    if (isAuthenticated && typeof window !== 'undefined') {
+      const savedData = sessionStorage.getItem('caRegistrationData')
+      if (savedData) {
+        try {
+          const parsed = JSON.parse(savedData)
+          setFormData(parsed)
+        } catch (e) {
+          console.error('Failed to restore form data:', e)
+        }
+      }
+    }
+  }, [isAuthenticated])
 
   const [formData, setFormData] = useState({
     full_name: '',
@@ -91,6 +117,15 @@ export default function CARegistrationPage() {
       return
     }
 
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      // Save form data to session storage so we can restore it after login
+      sessionStorage.setItem('caRegistrationData', JSON.stringify(formData))
+      // Redirect to signup with return URL
+      router.push('/signup?returnTo=/ca-registration&message=Please sign up or log in to complete your CA registration')
+      return
+    }
+
     setLoading(true)
     const result = await createCAProfile({
       ...formData,
@@ -100,6 +135,8 @@ export default function CARegistrationPage() {
     setLoading(false)
 
     if (result.success) {
+      // Clear saved form data
+      sessionStorage.removeItem('caRegistrationData')
       setSubmitted(true)
     } else {
       alert(result.error || 'Failed to create profile')
