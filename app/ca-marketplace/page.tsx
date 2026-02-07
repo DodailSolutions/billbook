@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
+import { Footer } from '@/app/_components/Footer'
 import { getCAMarketplace } from '@/lib/hire-ca-actions'
 import type { CAMarketplaceItem, CASearchFilters, CASpecialization } from '@/lib/hire-ca-types'
 import {
@@ -117,7 +118,7 @@ export default function CAMarketplacePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+    <div className="min-h-screen bg-gray-50">
       {/* Rules & Policies Modal */}
       {showPolicies && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
@@ -133,12 +134,12 @@ export default function CAMarketplacePage() {
               <div className="space-y-6 text-sm">
                 {/* For Clients */}
                 <section>
-                  <h3 className="text-lg font-bold mb-3 text-blue-600 dark:text-blue-400">For Clients</h3>
+                  <h3 className="text-lg font-bold mb-3 text-blue-600">For Clients</h3>
                   
                   <div className="space-y-4">
                     <div>
                       <h4 className="font-semibold mb-2">1. Verification & Due Diligence</h4>
-                      <ul className="list-disc pl-5 space-y-1 text-gray-600 dark:text-gray-400">
+                      <ul className="list-disc pl-5 space-y-1 text-gray-600">
                         <li>All CAs on our platform are ICAI (Institute of Chartered Accountants of India) verified</li>
                         <li>Review CA profiles, ratings, and client reviews before engaging</li>
                         <li>Request credentials and certificates if needed for compliance</li>
@@ -148,7 +149,7 @@ export default function CAMarketplacePage() {
 
                     <div>
                       <h4 className="font-semibold mb-2">2. Engagement Terms</h4>
-                      <ul className="list-disc pl-5 space-y-1 text-gray-600 dark:text-gray-400">
+                      <ul className="list-disc pl-5 space-y-1 text-gray-600">
                         <li><strong>Consultation:</strong> One-time advisory sessions with defined scope and deliverables</li>
                         <li><strong>Monthly Retainer:</strong> Ongoing support with monthly fee; minimum 3-month commitment recommended</li>
                         <li><strong>Project-Based:</strong> Fixed scope with milestone-based payments and timelines</li>
@@ -159,7 +160,7 @@ export default function CAMarketplacePage() {
 
                     <div>
                       <h4 className="font-semibold mb-2">3. GST Filing Requirements</h4>
-                      <ul className="list-disc pl-5 space-y-1 text-gray-600 dark:text-gray-400">
+                      <ul className="list-disc pl-5 space-y-1 text-gray-600">
                         <li>Provide accurate and complete financial records by the 5th of each month</li>
                         <li>Maintain proper invoice records in BillBooky or provide Excel/CSV exports</li>
                         <li>Share GST portal credentials securely or grant EVC access to your CA</li>
@@ -171,7 +172,7 @@ export default function CAMarketplacePage() {
 
                     <div>
                       <h4 className="font-semibold mb-2">4. Income Tax Filing Requirements</h4>
-                      <ul className="list-disc pl-5 space-y-1 text-gray-600 dark:text-gray-400">
+                      <ul className="list-disc pl-5 space-y-1 text-gray-600">
                         <li>Submit all financial documents (Form 16, Form 26AS, investment proofs) by June 15th</li>
                         <li>For businesses: Maintain books of accounts, bank statements, and expense records</li>
                         <li>Share ITR portal login or grant e-filing access to your CA</li>
@@ -183,7 +184,7 @@ export default function CAMarketplacePage() {
 
                     <div>
                       <h4 className="font-semibold mb-2">5. Payment & Refund Policy</h4>
-                      <ul className="list-disc pl-5 space-y-1 text-gray-600 dark:text-gray-400">
+                      <ul className="list-disc pl-5 space-y-1 text-gray-600">
                         <li>Consultation fees: Full payment upfront before scheduled session</li>
                         <li>Monthly retainers: Advance payment by 1st of each month</li>
                         <li>Project-based: 50% advance, remaining upon completion or milestone-based</li>
@@ -195,7 +196,7 @@ export default function CAMarketplacePage() {
 
                     <div>
                       <h4 className="font-semibold mb-2">6. Data Security & Confidentiality</h4>
-                      <ul className="list-disc pl-5 space-y-1 text-gray-600 dark:text-gray-400">
+                      <ul className="list-disc pl-5 space-y-1 text-gray-600">
                         <li>CAs are bound by professional confidentiality under ICAI Code of Ethics</li>
                         <li>Share sensitive documents through BillBooky&apos;s secure document upload system</li>
                         <li>Never share bank passwords; use read-only access or bank statements</li>
@@ -213,7 +214,7 @@ export default function CAMarketplacePage() {
                   <div className="space-y-4">
                     <div>
                       <h4 className="font-semibold mb-2">1. Professional Conduct</h4>
-                      <ul className="list-disc pl-5 space-y-1 text-gray-600 dark:text-gray-400">
+                      <ul className="list-disc pl-5 space-y-1 text-gray-600">
                         <li>Maintain ICAI Code of Ethics and professional standards at all times</li>
                         <li>Only accept engagements within your area of expertise and certification</li>
                         <li>Disclose any conflicts of interest or limitations before accepting work</li>
@@ -224,7 +225,7 @@ export default function CAMarketplacePage() {
 
                     <div>
                       <h4 className="font-semibold mb-2">2. Accepting Client Work</h4>
-                      <ul className="list-disc pl-5 space-y-1 text-gray-600 dark:text-gray-400">
+                      <ul className="list-disc pl-5 space-y-1 text-gray-600">
                         <li>Review client requirements thoroughly before submitting proposals</li>
                         <li>Clearly state deliverables, timelines, fees, and payment terms in proposals</li>
                         <li>Accept only the number of clients you can service with quality and attention</li>
@@ -236,7 +237,7 @@ export default function CAMarketplacePage() {
 
                     <div>
                       <h4 className="font-semibold mb-2">3. GST Filing Service Standards</h4>
-                      <ul className="list-disc pl-5 space-y-1 text-gray-600 dark:text-gray-400">
+                      <ul className="list-disc pl-5 space-y-1 text-gray-600">
                         <li>Request complete records from clients by 5th of each month for timely filing</li>
                         <li>File GSTR-1 and GSTR-3B by due dates (10th and 20th of following month)</li>
                         <li>Reconcile ITC (Input Tax Credit) and reverse if claimed incorrectly</li>
@@ -250,7 +251,7 @@ export default function CAMarketplacePage() {
 
                     <div>
                       <h4 className="font-semibold mb-2">4. Income Tax Filing Service Standards</h4>
-                      <ul className="list-disc pl-5 space-y-1 text-gray-600 dark:text-gray-400">
+                      <ul className="list-disc pl-5 space-y-1 text-gray-600">
                         <li>Collect all necessary documents from clients by June 15th for timely filing</li>
                         <li>File individual ITRs by July 31st; business returns by October 31st</li>
                         <li>Optimize tax liability within legal framework; claim all eligible deductions</li>
@@ -265,7 +266,7 @@ export default function CAMarketplacePage() {
 
                     <div>
                       <h4 className="font-semibold mb-2">5. Pricing & Billing Guidelines</h4>
-                      <ul className="list-disc pl-5 space-y-1 text-gray-600 dark:text-gray-400">
+                      <ul className="list-disc pl-5 space-y-1 text-gray-600">
                         <li>Set fair and transparent pricing based on complexity and effort required</li>
                         <li>Clearly specify what&apos;s included and what attracts additional charges</li>
                         <li>Issue detailed invoices via BillBooky with service description and GST breakup</li>
@@ -277,7 +278,7 @@ export default function CAMarketplacePage() {
 
                     <div>
                       <h4 className="font-semibold mb-2">6. Quality & Compliance Commitments</h4>
-                      <ul className="list-disc pl-5 space-y-1 text-gray-600 dark:text-gray-400">
+                      <ul className="list-disc pl-5 space-y-1 text-gray-600">
                         <li>Zero tolerance for filing incorrect or fraudulent returns</li>
                         <li>Double-check all calculations, figures, and statutory compliance before submission</li>
                         <li>Keep up-to-date with GST Council updates, Finance Act amendments, and circulars</li>
@@ -290,7 +291,7 @@ export default function CAMarketplacePage() {
 
                     <div>
                       <h4 className="font-semibold mb-2">7. Ethics & Restrictions</h4>
-                      <ul className="list-disc pl-5 space-y-1 text-gray-600 dark:text-gray-400">
+                      <ul className="list-disc pl-5 space-y-1 text-gray-600">
                         <li>Never request clients to create fake invoices or manipulate records</li>
                         <li>Do not accept cash payments exceeding ₹10,000 per transaction</li>
                         <li>Refuse work involving money laundering, tax evasion, or illegal activities</li>
@@ -305,7 +306,7 @@ export default function CAMarketplacePage() {
                 {/* General Terms */}
                 <section className="border-t pt-6">
                   <h3 className="text-lg font-bold mb-3">General Terms</h3>
-                  <ul className="list-disc pl-5 space-y-1 text-gray-600 dark:text-gray-400">
+                  <ul className="list-disc pl-5 space-y-1 text-gray-600">
                     <li>BillBooky acts as a facilitator connecting clients and CAs; we are not party to agreements</li>
                     <li>Both parties must comply with Income Tax Act, GST Act, and all applicable laws</li>
                     <li>Disputes should be resolved amicably; escalate to BillBooky support if needed</li>
@@ -317,7 +318,7 @@ export default function CAMarketplacePage() {
 
                 <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg mt-6">
                   <p className="text-sm font-semibold mb-2">Need Help?</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-gray-600">
                     For questions about these policies or to report violations, contact us at{' '}
                     <a href="mailto:support@billbooky.com" className="text-blue-600 hover:underline">
                       support@billbooky.com
@@ -378,7 +379,7 @@ export default function CAMarketplacePage() {
 
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2">Find a Chartered Accountant</h1>
-          <p className="text-lg text-gray-600 dark:text-gray-400">
+          <p className="text-lg text-gray-600">
             Browse our network of {cas.length} verified CAs and find the perfect match for your business
           </p>
         </div>
@@ -389,11 +390,11 @@ export default function CAMarketplacePage() {
             <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer border-blue-200 dark:border-blue-800">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
-                  <Briefcase className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                  <Briefcase className="w-6 h-6 text-blue-600" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-lg">Post Your Requirements</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Get personalized proposals from CAs</p>
+                  <p className="text-sm text-gray-600">Get personalized proposals from CAs</p>
                 </div>
               </div>
             </Card>
@@ -406,7 +407,7 @@ export default function CAMarketplacePage() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-lg">View My Requests</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Check proposals and manage engagements</p>
+                  <p className="text-sm text-gray-600">Check proposals and manage engagements</p>
                 </div>
               </div>
             </Card>
@@ -575,7 +576,7 @@ export default function CAMarketplacePage() {
           <Card className="p-12">
             <div className="text-center">
               <div className="inline-block animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mb-4" />
-              <p className="text-lg text-gray-600 dark:text-gray-400">Loading CA marketplace...</p>
+              <p className="text-lg text-gray-600">Loading CA marketplace...</p>
               <p className="text-sm text-gray-500 mt-2">Finding the best chartered accountants for you</p>
             </div>
           </Card>
@@ -587,7 +588,7 @@ export default function CAMarketplacePage() {
             <h3 className="text-xl font-semibold mb-2">
               {searchQuery ? 'No matching CAs found' : 'No CAs available'}
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
+            <p className="text-gray-600 mb-4">
               {searchQuery 
                 ? `No CAs match "${searchQuery}". Try different search terms.`
                 : 'Try adjusting your filters or check back later'}
@@ -603,7 +604,7 @@ export default function CAMarketplacePage() {
           </Card>
         ) : (
           <>
-            <div className="mb-4 text-sm text-gray-600 dark:text-gray-400">
+            <div className="mb-4 text-sm text-gray-600">
               Showing {filteredCAsComputed.length} {filteredCAsComputed.length === 1 ? 'CA' : 'CAs'}
             </div>
 
@@ -619,7 +620,7 @@ export default function CAMarketplacePage() {
                         )}
                       </div>
                       {ca.firm_name && (
-                        <p className="text-sm text-gray-600 dark:text-gray-400">{ca.firm_name}</p>
+                        <p className="text-sm text-gray-600">{ca.firm_name}</p>
                       )}
                     </div>
                     <div className="flex items-center gap-1 bg-yellow-100 dark:bg-yellow-900/30 px-2 py-1 rounded-lg">
@@ -631,15 +632,15 @@ export default function CAMarketplacePage() {
                   </div>
 
                   <div className="space-y-2 mb-4">
-                    <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                    <div className="flex items-center text-sm text-gray-600">
                       <MapPin className="w-4 h-4 mr-2" />
                       {ca.city}, {ca.state}
                     </div>
-                    <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                    <div className="flex items-center text-sm text-gray-600">
                       <Briefcase className="w-4 h-4 mr-2" />
                       {ca.years_of_experience} years experience
                     </div>
-                    <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                    <div className="flex items-center text-sm text-gray-600">
                       <Users className="w-4 h-4 mr-2" />
                       {ca.total_clients} clients • {ca.total_reviews} reviews
                     </div>
@@ -655,14 +656,14 @@ export default function CAMarketplacePage() {
                       </span>
                     ))}
                     {ca.specializations.length > 3 && (
-                      <span className="px-2 py-1 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs rounded">
+                      <span className="px-2 py-1 bg-gray-100 dark:bg-gray-800 text-gray-600 text-xs rounded">
                         +{ca.specializations.length - 3} more
                       </span>
                     )}
                   </div>
 
                   {ca.bio && (
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
+                    <p className="text-sm text-gray-600 mb-4 line-clamp-2">
                       {ca.bio}
                     </p>
                   )}
@@ -671,7 +672,7 @@ export default function CAMarketplacePage() {
                     <div className="flex justify-between text-sm">
                       {ca.consultation_fee && (
                         <div>
-                          <span className="text-gray-600 dark:text-gray-400">Consultation</span>
+                          <span className="text-gray-600">Consultation</span>
                           <div className="flex items-center font-semibold">
                             <IndianRupee className="w-3 h-3" />
                             {ca.consultation_fee.toLocaleString()}
@@ -680,7 +681,7 @@ export default function CAMarketplacePage() {
                       )}
                       {ca.monthly_retainer_fee && (
                         <div>
-                          <span className="text-gray-600 dark:text-gray-400">Monthly</span>
+                          <span className="text-gray-600">Monthly</span>
                           <div className="flex items-center font-semibold">
                             <IndianRupee className="w-3 h-3" />
                             {ca.monthly_retainer_fee.toLocaleString()}
@@ -700,21 +701,7 @@ export default function CAMarketplacePage() {
         )}
       </div>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 mt-16">
-        <div className="container max-w-7xl mx-auto px-4 py-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              © 2026 BillBooky. All rights reserved.
-            </p>
-            <div className="flex gap-6 text-sm">
-              <Link href="/privacy" className="hover:text-blue-600 transition-colors">Privacy Policy</Link>
-              <Link href="/terms" className="hover:text-blue-600 transition-colors">Terms of Service</Link>
-              <Link href="/help" className="hover:text-blue-600 transition-colors">Support</Link>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }
