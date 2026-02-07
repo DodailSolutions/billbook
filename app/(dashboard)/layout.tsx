@@ -8,19 +8,19 @@ export default function DashboardLayout({
     children: React.ReactNode
 }) {
     return (
-        <div className="h-full relative">
+        <div className="h-full relative flex">
             <PlanExpiryChecker />
             
             {/* Mobile Sidebar */}
             <MobileSidebar />
             
             {/* Desktop Sidebar */}
-            <div className="hidden h-full md:flex md:w-72 md:flex-col md:fixed md:inset-y-0 z-80 bg-gray-900">
+            <div className="hidden md:block h-screen sticky top-0 z-80 bg-gray-900">
                 <Sidebar />
             </div>
             
             {/* Main Content */}
-            <main className="md:pl-72 min-h-screen bg-linear-to-br from-slate-50 via-white to-slate-50 dark:bg-slate-900">
+            <main className="flex-1 min-h-screen bg-linear-to-br from-slate-50 via-white to-slate-50">
                 {/* Add top padding on mobile for fixed header */}
                 <div className="p-4 md:p-8 pt-20 md:pt-8">
                     {children}

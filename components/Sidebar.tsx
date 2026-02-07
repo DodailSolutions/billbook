@@ -5,15 +5,15 @@ import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { LayoutDashboard, FileText, Users, RefreshCw, Bell, Settings, User, Bot, UserCog, FileBarChart, HelpCircle, MessageCircle, Briefcase, UserPlus } from "lucide-react"
+import { LayoutDashboard, FileText, Users, RefreshCw, Bell, Settings, User, Bot, UserCog, FileBarChart, HelpCircle, MessageCircle, Briefcase, UserPlus, ChevronLeft, ChevronRight } from "lucide-react"
 import { SignOutButton } from "./SignOutButton"
 import { PlanBanner } from "./PlanBanner"
-import { ThemeToggle } from "./ThemeToggle"
 import { getMyCAProfile } from "@/lib/ca-profile-actions"
 
 export function Sidebar() {
     const pathname = usePathname()
     const [isCA, setIsCA] = useState<boolean | null>(null)
+    const [isCollapsed, setIsCollapsed] = useState(false)
 
     useEffect(() => {
         async function checkCAStatus() {
@@ -102,8 +102,26 @@ export function Sidebar() {
     ]
 
     return (
-        <div className="space-y-4 py-4 flex flex-col h-full bg-linear-to-b from-slate-900 to-slate-800 text-white border-r border-slate-700">
+        <div className={cn(
+            "space-y-4 py-4 flex flex-col h-full bg-linear-to-b from-slate-900 to-slate-800 text-white border-r border-slate-700 transition-all duration-300",
+            isCollapsed ? "w-20" : "w-64"
+        )}>
             <div className="px-3 py-2 flex-1 overflow-y-auto">
+                {/* Collapse Toggle Button */}
+                <div className="flex items-center justify-end mb-4">
+                    <button
+                        onClick={() => setIsCollapsed(!isCollapsed)}
+                        className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                        title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+                    >
+                        {isCollapsed ? (
+                            <ChevronRight className="h-5 w-5 text-zinc-400" />
+                        ) : (
+                            <ChevronLeft className="h-5 w-5 text-zinc-400" />
+                        )}
+                    </button>
+                </div>
+
                 <Link href="/dashboard" className="flex items-center pl-3 mb-8 gap-3 group">
                     <div className="relative w-10 h-10 shrink-0">
                         <Image 
@@ -114,9 +132,11 @@ export function Sidebar() {
                             className="transition-transform duration-200 group-hover:scale-110"
                         />
                     </div>
-                    <h1 className="text-2xl font-bold bg-linear-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent transition-all duration-200 group-hover:scale-105">
-                        BillBooky
-                    </h1>
+                    {!isCollapsed && (
+                        <h1 className="text-2xl font-bold bg-linear-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent transition-all duration-200 group-hover:scale-105">
+                            BillBooky
+                        </h1>
+                    )}
                 </Link>
                 <div className="space-y-2">
                     {routes.map((route) => (
@@ -128,18 +148,27 @@ export function Sidebar() {
                                 pathname === route.href 
                                     ? "text-white bg-white/10 shadow-lg" 
                                     : "text-zinc-400 hover:text-white hover:bg-white/5",
+                                isCollapsed && "justify-center"
                             )}
+                            title={isCollapsed ? route.label : undefined}
                         >
                             {pathname === route.href && (
                                 <div className="absolute inset-0 bg-linear-to-r from-blue-500/20 to-violet-500/20 animate-pulse" />
                             )}
-                            <div className="flex items-center flex-1 relative z-10">
-                                <route.icon className={cn("h-5 w-5 mr-3 transition-transform duration-200 group-hover:scale-110", route.color)} />
-                                {route.label}
-                                {route.badge && (
-                                    <span className="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-600 text-white">
-                                        {route.badge}
-                                    </span>
+                            <div className={cn(
+                                "flex items-center relative z-10",
+                                isCollapsed ? "justify-center" : "flex-1"
+                            )}>
+                                <route.icon className={cn("h-5 w-5 transition-transform duration-200 group-hover:scale-110", route.color, !isCollapsed && "mr-3")} />
+                                {!isCollapsed && (
+                                    <>
+                                        {route.label}
+                                        {route.badge && (
+                                            <span className="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-600 text-white">
+                                                {route.badge}
+                                            </span>
+                                        )}
+                                    </>
                                 )}
                             </div>
                         </Link>
@@ -147,11 +176,7 @@ export function Sidebar() {
                 </div>
             </div>
             <div className="px-3 pb-4 space-y-2 shrink-0">
-                <PlanBanner />
-                <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                    <span className="text-sm text-zinc-400">Theme</span>
-                    <ThemeToggle />
-                </div>
+                {!isCollapsed && <PlanBanner />}
                 <SignOutButton />
             </div>
         </div>
