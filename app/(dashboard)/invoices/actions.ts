@@ -6,10 +6,7 @@ import { createClient } from '@/lib/supabase/server'
 import { calculateGSTComponents, validateGSTIN } from '@/lib/gst-utils'
 import { 
   autoClassifyGSTType, 
-  calculateRoundOff, 
-  performComplianceChecks,
-  checkApprovalRequired,
-  getCurrentFinancialYear
+  calculateRoundOff
 } from '@/lib/advanced-gst-utils'
 import type { Invoice, InvoiceWithDetails, InvoiceItem } from '@/lib/types'
 
@@ -198,47 +195,16 @@ export async function createInvoice(data: CreateInvoiceData) {
     // Calculate round-off
     const roundOff = calculateRoundOff(gstComponents.totalAmount)
 
-    // Generate invoice number with series support
+    // Generate invoice number
     const invoice_number = await generateInvoiceNumber(data.invoice_series_id)
 
-    // Get financial year
-    const financialYear = getCurrentFinancialYear()
-
-    // Perform compliance checks
-    const complianceWarnings = performComplianceChecks({
-        invoice_number,
-        customer_gstin: customer?.gstin,
-        company_gstin: companySettings?.company_gstin,
-        subtotal,
-        gst_amount: gstComponents.totalTax,
-        total: roundOff.roundedAmount,
-        supply_type: supplyType,
-        cgst_amount: gstComponents.cgst,
-        sgst_amount: gstComponents.sgst,
-        igst_amount: gstComponents.igst,
-        invoice_date: data.invoice_date,
-        items: data.items.map(item => ({
-            hsn_sac_code: item.hsn_sac_code,
-            gst_rate: item.gst_rate,
-            amount: item.quantity * item.unit_price
-        })),
-        reverse_charge_applicable: reverseChargeApplicable
-    })
-
-    // Check if approval required
-    const approvalCheck = checkApprovalRequired(roundOff.roundedAmount)
-
-    // Create invoice with full GST breakdown and new fields
+    // Create invoice with GST breakdown (simplified for compatibility)
     const { data: invoice, error: invoiceError } = await supabase
         .from('invoices')
         .insert([{
             user_id: user.id,
             customer_id: data.customer_id,
             invoice_number,
-            invoice_series_id: data.invoice_series_id || null,
-            financial_year: financialYear,
-            invoice_type: 'standard',
-            lifecycle_stage: 'draft',
             invoice_date: data.invoice_date,
             due_date: data.due_date || null,
             subtotal,
@@ -249,13 +215,7 @@ export async function createInvoice(data: CreateInvoiceData) {
             igst_amount: gstComponents.igst,
             supply_type: supplyType,
             reverse_charge_applicable: reverseChargeApplicable,
-            total_before_round_off: gstComponents.totalAmount,
-            round_off_amount: roundOff.roundOffAmount,
             total: roundOff.roundedAmount,
-            compliance_checked: true,
-            compliance_warnings: complianceWarnings,
-            requires_approval: approvalCheck.required,
-            auto_calculated: true,
             notes: data.notes || null,
             status: 'draft'
         }])
