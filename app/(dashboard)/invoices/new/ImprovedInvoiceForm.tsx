@@ -281,15 +281,15 @@ export function ImprovedInvoiceForm({ customers }: ImprovedInvoiceFormProps) {
                   
                   {/* Customer Selection */}
                   <div className="space-y-2">
-                    <label className="text-sm font-medium flex items-center gap-2">
+                    <label className="text-sm font-semibold text-gray-900 flex items-center gap-2">
                       Customer <span className="text-red-500">*</span>
                     </label>
                     <select 
                       value={formData.customer_id} 
                       onChange={(e) => setFormData({...formData, customer_id: e.target.value})}
-                      className={`w-full px-3 py-2 border rounded-md ${errors.customer_id ? 'border-red-500' : 'border-gray-300'}`}
+                      className={`w-full px-3 py-2.5 border rounded-md text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${errors.customer_id ? 'border-red-500' : 'border-gray-300'}`}
                     >
-                      <option value="">Select a customer</option>
+                      <option value="" className="text-gray-400">Select a customer</option>
                       {customers.map(customer => (
                         <option key={customer.id} value={customer.id}>
                           {customer.name}
@@ -302,12 +302,18 @@ export function ImprovedInvoiceForm({ customers }: ImprovedInvoiceFormProps) {
                         {errors.customer_id}
                       </p>
                     )}
+                    {!errors.customer_id && formData.customer_id && (
+                      <p className="text-sm text-green-600 flex items-center gap-1">
+                        <CheckCircle2 className="w-3 h-3" />
+                        Customer selected
+                      </p>
+                    )}
                   </div>
 
                   {/* Dates */}
                   <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">
+                      <label className="text-sm font-semibold text-gray-900">
                         Invoice Date <span className="text-red-500">*</span>
                       </label>
                       <Input
@@ -316,22 +322,32 @@ export function ImprovedInvoiceForm({ customers }: ImprovedInvoiceFormProps) {
                         onChange={(e) => setFormData({...formData, invoice_date: e.target.value})}
                         className={errors.invoice_date ? 'border-red-500' : ''}
                       />
+                      {errors.invoice_date && (
+                        <p className="text-sm text-red-500 flex items-center gap-1">
+                          <AlertCircle className="w-3 h-3" />
+                          {errors.invoice_date}
+                        </p>
+                      )}
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Due Date</label>
+                      <label className="text-sm font-semibold text-gray-900">Due Date</label>
                       <Input
                         type="date"
                         value={formData.due_date}
                         onChange={(e) => setFormData({...formData, due_date: e.target.value})}
                         min={formData.invoice_date}
                       />
+                      <p className="text-xs text-gray-500 flex items-center gap-1">
+                        Payment deadline for this invoice
+                      </p>
                     </div>
                   </div>
 
                   {/* Supply Type */}
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Supply Type</label>
+                    <label className="text-sm font-semibold text-gray-900">Supply Type</label>
+                    <p className="text-xs text-gray-500 mb-2">Select based on customer location</p>
                     <div className="grid grid-cols-2 gap-4">
                       <Button
                         type="button"
@@ -382,7 +398,7 @@ export function ImprovedInvoiceForm({ customers }: ImprovedInvoiceFormProps) {
                             onChange={(e) => setFormData({...formData, reverse_charge_applicable: e.target.checked})}
                             className="w-4 h-4"
                           />
-                          <span className="text-sm">Reverse Charge Applicable</span>
+                          <span className="text-sm text-gray-900 font-medium">Reverse Charge Applicable</span>
                         </label>
 
                         <label className="flex items-center gap-2 cursor-pointer">
@@ -392,7 +408,7 @@ export function ImprovedInvoiceForm({ customers }: ImprovedInvoiceFormProps) {
                             onChange={(e) => setFormData({...formData, is_recurring: e.target.checked})}
                             className="w-4 h-4"
                           />
-                          <span className="text-sm">Make this a Recurring Invoice</span>
+                          <span className="text-sm text-gray-900 font-medium">Make this a Recurring Invoice</span>
                         </label>
                       </div>
                     )}
@@ -442,17 +458,23 @@ export function ImprovedInvoiceForm({ customers }: ImprovedInvoiceFormProps) {
 
                         <div className="grid md:grid-cols-2 gap-4">
                           <div className="md:col-span-2 space-y-2">
-                            <label className="text-sm font-medium">Description *</label>
+                            <label className="text-sm font-semibold text-gray-900">Description *</label>
                             <Input
                               placeholder="e.g., Web Development Services"
                               value={item.description}
                               onChange={(e) => updateItem(item.id, 'description', e.target.value)}
                               className={errors[`item-${index}-desc`] ? 'border-red-500' : ''}
                             />
+                            {errors[`item-${index}-desc`] && (
+                              <p className="text-sm text-red-500 flex items-center gap-1">
+                                <AlertCircle className="w-3 h-3" />
+                                {errors[`item-${index}-desc`]}
+                              </p>
+                            )}
                           </div>
 
                           <div className="space-y-2">
-                            <label className="text-sm font-medium">HSN/SAC Code</label>
+                            <label className="text-sm font-semibold text-gray-900">HSN/SAC Code</label>
                             <Input
                               placeholder="998314"
                               value={item.hsn_sac_code}
@@ -461,7 +483,7 @@ export function ImprovedInvoiceForm({ customers }: ImprovedInvoiceFormProps) {
                           </div>
 
                           <div className="space-y-2">
-                            <label className="text-sm font-medium">Quantity *</label>
+                            <label className="text-sm font-semibold text-gray-900">Quantity *</label>
                             <Input
                               type="number"
                               min="0"
@@ -470,10 +492,16 @@ export function ImprovedInvoiceForm({ customers }: ImprovedInvoiceFormProps) {
                               onChange={(e) => updateItem(item.id, 'quantity', parseFloat(e.target.value) || 0)}
                               className={errors[`item-${index}-qty`] ? 'border-red-500' : ''}
                             />
+                            {errors[`item-${index}-qty`] && (
+                              <p className="text-sm text-red-500 flex items-center gap-1">
+                                <AlertCircle className="w-3 h-3" />
+                                {errors[`item-${index}-qty`]}
+                              </p>
+                            )}
                           </div>
 
                           <div className="space-y-2">
-                            <label className="text-sm font-medium">Rate *</label>
+                            <label className="text-sm font-semibold text-gray-900">Rate *</label>
                             <Input
                               type="number"
                               min="0"
@@ -483,14 +511,20 @@ export function ImprovedInvoiceForm({ customers }: ImprovedInvoiceFormProps) {
                               onChange={(e) => updateItem(item.id, 'unit_price', parseFloat(e.target.value) || 0)}
                               className={errors[`item-${index}-price`] ? 'border-red-500' : ''}
                             />
+                            {errors[`item-${index}-price`] && (
+                              <p className="text-sm text-red-500 flex items-center gap-1">
+                                <AlertCircle className="w-3 h-3" />
+                                {errors[`item-${index}-price`]}
+                              </p>
+                            )}
                           </div>
 
                           <div className="space-y-2">
-                            <label className="text-sm font-medium">GST Rate (%)</label>
+                            <label className="text-sm font-semibold text-gray-900">GST Rate (%)</label>
                             <select
                               value={item.gst_rate}
                               onChange={(e) => updateItem(item.id, 'gst_rate', parseFloat(e.target.value))}
-                              className="w-full px-3 py-2 border rounded-md"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             >
                               <option value="0">0%</option>
                               <option value="5">5%</option>
@@ -559,13 +593,13 @@ export function ImprovedInvoiceForm({ customers }: ImprovedInvoiceFormProps) {
 
                   {/* Notes */}
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Additional Notes</label>
+                    <label className="text-sm font-semibold text-gray-900">Additional Notes</label>
                     <textarea
                       placeholder="Add any additional information or payment instructions..."
                       value={formData.notes}
                       onChange={(e) => setFormData({...formData, notes: e.target.value})}
                       rows={4}
-                      className="w-full px-3 py-2 border rounded-md"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
                     />
                   </div>
 
