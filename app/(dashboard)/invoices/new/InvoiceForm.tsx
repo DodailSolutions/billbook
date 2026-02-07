@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { Plus, Trash2, Info, X } from "lucide-react"
+import { Plus, Trash2, Info, X, FileText } from "lucide-react"
 import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
 import { createInvoice, updateInvoice } from "../actions"
@@ -31,6 +31,7 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
     const [invoiceDate, setInvoiceDate] = useState(invoice?.invoice_date || new Date().toISOString().split('T')[0])
     const [dueDate, setDueDate] = useState(invoice?.due_date || '')
     const [notes, setNotes] = useState(invoice?.notes || '')
+    const [simplifiedView, setSimplifiedView] = useState(true)
     const [items, setItems] = useState<InvoiceItem[]>(
         invoice?.invoice_items.map(item => ({
             description: item.description,
@@ -215,7 +216,35 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
     }
 
     return (
-        <>
+        <>{/* Header with Simplified View Toggle */}
+            <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex items-center gap-3">
+                    <FileText className="w-6 h-6 text-gray-700 dark:text-gray-300" />
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                        {mode === 'edit' ? 'Edit Invoice' : 'New Invoice'}
+                    </h2>
+                </div>
+                <div className="flex items-center gap-3">
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Use Simplified View
+                    </span>
+                    <button
+                        type="button"
+                        onClick={() => setSimplifiedView(!simplifiedView)}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                            simplifiedView ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
+                        }`}
+                    >
+                        <span
+                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                simplifiedView ? 'translate-x-6' : 'translate-x-1'
+                            }`}
+                        />
+                    </button>
+                </div>
+            </div>
+
+            
             <div className="grid lg:grid-cols-3 gap-6">
                 {/* Form Section - Takes 2 columns */}
                 <div className="lg:col-span-2">
