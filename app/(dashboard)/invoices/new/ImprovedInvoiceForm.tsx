@@ -9,7 +9,7 @@ import {
   ArrowLeft, Plus, Trash2, Send, 
   User, Receipt, FileText, 
   AlertCircle, CheckCircle2, ChevronDown, ChevronUp,
-  Sparkles, Shield, Clock, X, UserPlus
+  Sparkles, Shield, Clock, X, UserPlus, Download, CheckCircle
 } from 'lucide-react'
 import { createInvoice } from '../actions'
 import type { Customer } from '@/lib/types'
@@ -39,6 +39,9 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [showAddCustomerModal, setShowAddCustomerModal] = useState(false)
   const [customers, setCustomers] = useState<Customer[]>(initialCustomers)
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [createdInvoiceId, setCreatedInvoiceId] = useState<string | null>(null)
+  const [isDownloading, setIsDownloading] = useState(false)
 
   // Form state
   const [formData, setFormData] = useState({
@@ -48,7 +51,13 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
     supply_type: 'intra-state' as 'intra-state' | 'inter-state',
     reverse_charge_applicable: false,
     is_recurring: false,
-    notes: ''
+    notes: '',
+    // Payment collection
+    mark_as_paid: false,
+    payment_amount: 0,
+    payment_method: '' as '' | 'cash' | 'bank_transfer' | 'upi' | 'card' | 'cheque',
+    payment_date: new Date().toISOString().split('T')[0],
+    payment_notes: ''
   })
 
   const [items, setItems] = useState<InvoiceItem[]>([
@@ -89,6 +98,16 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
   const totalIGST = items.reduce((sum, item) => sum + item.igst, 0)
   const gstPercentage = items.length > 0 ? items[0].gst_rate : 18
   const total = subtotal + totalCGST + totalSGST + totalIGST
+
+  // Auto-update payment amount when total changes or mark_as_paid changes
+  useEffect(() => {
+    if (formData.mark_as_paid) {
+      setFormData(prev => ({
+        ...prev,
+        payment_amount: total
+      }))
+    }
+  }, [total, formData.mark_as_paid])
 
   // Validation
   const validateStep = (step: number): boolean => {
@@ -174,9 +193,8 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
       const result = await createInvoice(invoiceData)
 
       if (result.success) {
-        alert('Invoice created successfully!')
-        router.push('/invoices')
-        router.refresh()
+        setCreatedInvoiceId(result.invoiceId)
+        setShowSuccessModal(true)
       } else {
         alert('Failed to create invoice')
       }
@@ -231,6 +249,38 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
       console.error('Error:', error)
       alert('Failed to create customer')
     }
+  }
+
+  // Download PDF handler
+  const handleDownloadPDF = async () => {
+    if (!createdInvoiceId) return
+    
+    setIsDownloading(true)
+    try {
+      const response = await fetch(`/api/invoices/${createdInvoiceId}/pdf`)
+      if (!response.ok) throw new Error('Failed to download PDF')
+      
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `invoice-${createdInvoiceId}.pdf`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+    } catch (error) {
+      console.error('Error downloading PDF:', error)
+      alert('Failed to download PDF')
+    } finally {
+      setIsDownloading(false)
+    }
+  }
+
+  // Navigate to invoices list
+  const handleViewInvoices = () => {
+    router.push('/invoices')
+    router.refresh()
   }
 
   return (
@@ -639,6 +689,109 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
                     </Card>
                   </div>
 
+                  {/* Payment Collection Section */}
+                  <Card className="bg-linear-to-br from-emerald-50 to-teal-50 border-emerald-200 dark:bg-white">
+                    <CardContent className="p-6 space-y-4">
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="checkbox"
+                          id="mark_as_paid"
+                          checked={formData.mark_as_paid}
+                          onChange={(e) => setFormData({
+                            ...formData, 
+                            mark_as_paid: e.target.checked,
+                            payment_method: e.target.checked && !formData.payment_method ? 'cash' : formData.payment_method
+                          })}
+                          className="w-5 h-5 text-emerald-600 focus:ring-2 focus:ring-emerald-500 rounded"
+                        />
+                        <label htmlFor="mark_as_paid" className="text-lg font-semibold text-gray-900 cursor-pointer">
+                          💰 Collect Payment Now
+                        </label>
+                      </div>
+
+                      {formData.mark_as_paid && (
+                        <div className="space-y-4 mt-4 pt-4 border-t border-emerald-200">
+                          <div className="grid md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <label className="text-sm font-semibold text-gray-900">
+                                Payment Amount <span className="text-red-500">*</span>
+                              </label>
+                              <Input
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                max={total}
+                                value={formData.payment_amount}
+                                onChange={(e) => setFormData({...formData, payment_amount: parseFloat(e.target.value) || 0})}
+                                placeholder="Enter amount"
+                                className="text-gray-900 bg-white"
+                              />
+                              <p className="text-xs text-gray-600">
+                                Maximum: ₹{total.toFixed(2)}
+                              </p>
+                            </div>
+
+                            <div className="space-y-2">
+                              <label className="text-sm font-semibold text-gray-900">
+                                Payment Method <span className="text-red-500">*</span>
+                              </label>
+                              <select
+                                value={formData.payment_method}
+                                onChange={(e) => setFormData({...formData, payment_method: e.target.value as any})}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                                required={formData.mark_as_paid}
+                              >
+                                <option value="">Select method</option>
+                                <option value="cash">💵 Cash</option>
+                                <option value="bank_transfer">🏦 Bank Transfer</option>
+                                <option value="upi">📱 UPI</option>
+                                <option value="card">💳 Card</option>
+                                <option value="cheque">📝 Cheque</option>
+                              </select>
+                            </div>
+                          </div>
+
+                          <div className="space-y-2">
+                            <label className="text-sm font-semibold text-gray-900">Payment Date</label>
+                            <Input
+                              type="date"
+                              value={formData.payment_date}
+                              onChange={(e) => setFormData({...formData, payment_date: e.target.value})}
+                              className="text-gray-900 bg-white"
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <label className="text-sm font-semibold text-gray-900">Payment Notes</label>
+                            <textarea
+                              placeholder="Transaction ID, reference number, or other payment details..."
+                              value={formData.payment_notes}
+                              onChange={(e) => setFormData({...formData, payment_notes: e.target.value})}
+                              rows={2}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-gray-900 bg-white"
+                            />
+                          </div>
+
+                          {formData.payment_amount < total && formData.payment_amount > 0 && (
+                            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                              <p className="text-sm font-medium text-yellow-800">
+                                ⚠️ Partial Payment: ₹{(total - formData.payment_amount).toFixed(2)} remaining
+                              </p>
+                            </div>
+                          )}
+
+                          {formData.payment_amount >= total && (
+                            <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
+                              <p className="text-sm font-medium text-emerald-800">
+                                ✅ Full payment collected - Invoice will be marked as PAID
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+
                   {/* Notes */}
                   <div className="space-y-2">
                     <label className="text-sm font-semibold text-gray-900">Additional Notes</label>
@@ -836,6 +989,93 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
                 </Button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Success Modal */}
+      {showSuccessModal && createdInvoiceId && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+          <div className="bg-white dark:bg-white rounded-xl shadow-2xl max-w-md w-full animate-in fade-in zoom-in duration-200">
+            <div className="p-6 text-center">
+              <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                <CheckCircle className="w-10 h-10 text-green-600" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                Invoice Created Successfully!
+              </h2>
+              <p className="text-gray-600 mb-6">
+                Your invoice has been created and is ready to download or share.
+              </p>
+
+              <div className="space-y-3">
+                <Button
+                  onClick={handleDownloadPDF}
+                  disabled={isDownloading}
+                  className="w-full gap-2 bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  {isDownloading ? (
+                    <>
+                      <Download className="w-4 h-4 animate-bounce" />
+                      Downloading...
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-4 h-4" />
+                      Download PDF
+                    </>
+                  )}
+                </Button>
+
+                <Button
+                  onClick={handleViewInvoices}
+                  variant="outline"
+                  className="w-full gap-2"
+                >
+                  <Receipt className="w-4 h-4" />
+                  View All Invoices
+                </Button>
+
+                <Button
+                  onClick={() => {
+                    setShowSuccessModal(false)
+                    setCreatedInvoiceId(null)
+                    // Reset form
+                    setFormData({
+                      customer_id: '',
+                      invoice_date: new Date().toISOString().split('T')[0],
+                      due_date: '',
+                      supply_type: 'intra-state',
+                      reverse_charge_applicable: false,
+                      is_recurring: false,
+                      notes: '',
+                      mark_as_paid: false,
+                      payment_amount: 0,
+                      payment_method: '',
+                      payment_date: new Date().toISOString().split('T')[0],
+                      payment_notes: ''
+                    })
+                    setItems([{
+                      id: crypto.randomUUID(),
+                      description: '',
+                      hsn_sac_code: '',
+                      quantity: 1,
+                      unit_price: 0,
+                      gst_rate: 18,
+                      amount: 0,
+                      cgst: 0,
+                      sgst: 0,
+                      igst: 0
+                    }])
+                    setCurrentStep(1)
+                  }}
+                  variant="ghost"
+                  className="w-full text-gray-600 hover:text-gray-900"
+                >
+                  Create Another Invoice
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       )}

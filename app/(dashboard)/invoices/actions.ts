@@ -148,6 +148,12 @@ interface CreateInvoiceData {
     recurring_frequency?: 'monthly' | 'yearly'
     recurring_start_date?: string
     recurring_end_date?: string
+    // Payment collection
+    mark_as_paid?: boolean
+    payment_amount?: number
+    payment_method?: 'cash' | 'bank_transfer' | 'upi' | 'card' | 'cheque'
+    payment_date?: string
+    payment_notes?: string
 }
 
 export async function createInvoice(data: CreateInvoiceData) {
@@ -257,6 +263,41 @@ export async function createInvoice(data: CreateInvoiceData) {
     if (itemsError) {
         console.error('Error creating invoice items:', itemsError)
         throw new Error('Failed to create invoice items')
+    }
+    
+    // Handle payment collection if mark_as_paid is true
+    if (data.mark_as_paid && data.payment_amount && data.payment_amount > 0) {
+        const { error: paymentError } = await supabase
+            .from('invoice_payments')
+            .insert({
+                invoice_id: invoice.id,
+                user_id: user.id,
+                amount: data.payment_amount,
+                payment_method: data.payment_method || 'cash',
+                payment_notes: data.payment_notes || null,
+                payment_date: data.payment_date || new Date().toISOString()
+            })
+
+        if (paymentError) {
+            console.error('Error recording payment:', paymentError)
+            // Don't fail the entire operation, just log the error
+        } else {
+            // Update invoice with payment details
+            const newStatus = data.payment_amount >= invoice.total ? 'paid' : 'partial'
+            const { error: updateError } = await supabase
+                .from('invoices')
+                .update({
+                    status: newStatus,
+                    amount_paid: data.payment_amount,
+                    amount_remaining: invoice.total - data.payment_amount,
+                    is_partial_payment: data.payment_amount < invoice.total
+                })
+                .eq('id', invoice.id)
+
+            if (updateError) {
+                console.error('Error updating invoice payment status:', updateError)
+            }
+        }
     }
     
     // If this is a recurring invoice, create the recurring template

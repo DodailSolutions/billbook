@@ -14,11 +14,11 @@ interface InvoicesListProps {
 }
 
 const statusColors = {
-    draft: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200',
-    sent: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200',
-    paid: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200',
-    partial: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200',
-    cancelled: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200',
+    draft: 'bg-gray-100 text-gray-800',
+    sent: 'bg-blue-100 text-blue-800',
+    paid: 'bg-green-100 text-green-800',
+    partial: 'bg-yellow-100 text-yellow-800',
+    cancelled: 'bg-red-100 text-red-800',
 }
 
 export function InvoicesList({ invoices }: InvoicesListProps) {
@@ -52,13 +52,13 @@ export function InvoicesList({ invoices }: InvoicesListProps) {
     return (
         <div className="space-y-3 md:space-y-4">
             {invoices.map((invoice) => (
-                <Card key={invoice.id} className="hover:shadow-lg transition-shadow">
+                <Card key={invoice.id} className="hover:shadow-lg transition-shadow bg-white dark:bg-white">
                     <CardContent className="p-4 md:p-6">
                         {/* Mobile Layout */}
                         <div className="flex flex-col md:hidden space-y-3">
                             <div className="flex items-start justify-between">
                                 <div className="flex-1">
-                                    <h3 className="text-base font-semibold mb-1">{invoice.invoice_number}</h3>
+                                    <h3 className="text-base font-semibold mb-1 text-gray-900">{invoice.invoice_number}</h3>
                                     <div className="flex gap-2 flex-wrap">
                                         <span className={cn(
                                             "inline-block px-2 py-1 rounded-full text-xs font-medium",
@@ -67,29 +67,29 @@ export function InvoicesList({ invoices }: InvoicesListProps) {
                                             {invoice.status.toUpperCase()}
                                         </span>
                                         {(invoice as any).recurring_invoices && (invoice as any).recurring_invoices.length > 0 && (
-                                            <span className="inline-block px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200">
+                                            <span className="inline-block px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
                                                 🔄 RECURRING
                                             </span>
                                         )}
                                     </div>
                                 </div>
-                                <p className="text-lg font-bold">₹{invoice.total.toFixed(2)}</p>
+                                <p className="text-lg font-bold text-gray-900">₹{invoice.total.toFixed(2)}</p>
                             </div>
                             
                             <div className="space-y-1 text-sm">
-                                <p className="text-muted-foreground">
-                                    Customer: <span className="font-medium text-foreground">{invoice.customer.name}</span>
+                                <p className="text-gray-600">
+                                    Customer: <span className="font-medium text-gray-900">{invoice.customer.name}</span>
                                 </p>
-                                <p className="text-muted-foreground">
+                                <p className="text-gray-600">
                                     Date: {formatDate(invoice.invoice_date)}
                                 </p>
                                 {(invoice as any).recurring_invoices && (invoice as any).recurring_invoices.length > 0 && (invoice as any).recurring_invoices[0].is_active && (
-                                    <p className="text-sm font-medium text-purple-700 dark:text-purple-300">
+                                    <p className="text-sm font-medium text-purple-700">
                                         📊 Next billing: {formatDate((invoice as any).recurring_invoices[0].next_invoice_date)}
                                     </p>
                                 )}
                                 {invoice.gst_percentage > 0 && (
-                                    <p className="text-xs text-muted-foreground">
+                                    <p className="text-xs text-gray-500">
                                         (incl. {invoice.gst_percentage}% GST)
                                     </p>
                                 )}
@@ -99,7 +99,7 @@ export function InvoicesList({ invoices }: InvoicesListProps) {
                                 <select
                                     value={invoice.status}
                                     onChange={(e) => handleStatusChange(invoice.id, e.target.value as any)}
-                                    className="flex-1 h-9 rounded-md border border-input bg-transparent px-3 text-sm"
+                                    className="flex-1 h-9 rounded-md border border-gray-300 bg-white px-3 text-sm text-gray-900"
                                 >
                                     <option value="draft">Draft</option>
                                     <option value="sent">Sent</option>
@@ -135,7 +135,7 @@ export function InvoicesList({ invoices }: InvoicesListProps) {
                         <div className="hidden md:flex items-center justify-between">
                             <div className="flex-1">
                                 <div className="flex items-center gap-3 mb-2">
-                                    <h3 className="text-lg font-semibold">{invoice.invoice_number}</h3>
+                                    <h3 className="text-lg font-semibold text-gray-900">{invoice.invoice_number}</h3>
                                     <span className={cn(
                                         "px-2 py-1 rounded-full text-xs font-medium",
                                         statusColors[invoice.status]
@@ -143,19 +143,19 @@ export function InvoicesList({ invoices }: InvoicesListProps) {
                                         {invoice.status.toUpperCase()}
                                     </span>
                                     {(invoice as any).recurring_invoices && (invoice as any).recurring_invoices.length > 0 && (
-                                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200">
+                                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
                                             🔄 RECURRING
                                         </span>
                                     )}
                                 </div>
-                                <p className="text-sm text-muted-foreground mb-1">
-                                    Customer: <span className="font-medium text-foreground">{invoice.customer.name}</span>
+                                <p className="text-sm text-gray-600 mb-1">
+                                    Customer: <span className="font-medium text-gray-900">{invoice.customer.name}</span>
                                 </p>
-                                <p className="text-sm text-muted-foreground">
+                                <p className="text-sm text-gray-600">
                                     Date: {formatDate(invoice.invoice_date)}
                                 </p>
                                 {(invoice as any).recurring_invoices && (invoice as any).recurring_invoices.length > 0 && (invoice as any).recurring_invoices[0].is_active && (
-                                    <p className="text-sm font-medium text-purple-700 dark:text-purple-300 mt-1">
+                                    <p className="text-sm font-medium text-purple-700 mt-1">
                                         📊 Next billing: {formatDate((invoice as any).recurring_invoices[0].next_invoice_date)} ({(invoice as any).recurring_invoices[0].frequency})
                                     </p>
                                 )}
@@ -163,9 +163,9 @@ export function InvoicesList({ invoices }: InvoicesListProps) {
 
                             <div className="flex items-center gap-4">
                                 <div className="text-right">
-                                    <p className="text-2xl font-bold">₹{invoice.total.toFixed(2)}</p>
+                                    <p className="text-2xl font-bold text-gray-900">₹{invoice.total.toFixed(2)}</p>
                                     {invoice.gst_percentage > 0 && (
-                                        <p className="text-xs text-muted-foreground">
+                                        <p className="text-xs text-gray-500">
                                             (incl. {invoice.gst_percentage}% GST)
                                         </p>
                                     )}
@@ -175,7 +175,7 @@ export function InvoicesList({ invoices }: InvoicesListProps) {
                                     <select
                                         value={invoice.status}
                                         onChange={(e) => handleStatusChange(invoice.id, e.target.value as any)}
-                                        className="h-9 rounded-md border border-input bg-transparent px-3 text-sm"
+                                        className="h-9 rounded-md border border-gray-300 bg-white px-3 text-sm text-gray-900"
                                     >
                                         <option value="draft">Draft</option>
                                         <option value="sent">Sent</option>
