@@ -96,7 +96,7 @@ export function AIAccountantChat({ businessName }: AIAccountantChatProps) {
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-white dark:bg-gray-900 rounded-xl border-2 border-gray-200 dark:border-gray-800 overflow-hidden">
+    <div className="flex-1 flex flex-col bg-white rounded-xl border-2 border-gray-200 overflow-hidden">
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
         {messages.map((message, index) => (
@@ -113,7 +113,7 @@ export function AIAccountantChat({ businessName }: AIAccountantChatProps) {
               className={`max-w-[80%] sm:max-w-[70%] rounded-2xl px-4 py-3 ${
                 message.role === 'user'
                   ? 'bg-emerald-600 text-white'
-                  : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'
+                  : 'bg-gray-100 text-gray-900 dark:text-white'
               }`}
             >
               <p className="text-sm sm:text-base whitespace-pre-wrap">{message.content}</p>
@@ -122,7 +122,7 @@ export function AIAccountantChat({ businessName }: AIAccountantChatProps) {
               </p>
             </div>
             {message.role === 'user' && (
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-600 dark:bg-gray-700 flex items-center justify-center shrink-0">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-600 flex items-center justify-center shrink-0">
                 <User className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
               </div>
             )}
@@ -133,7 +133,7 @@ export function AIAccountantChat({ businessName }: AIAccountantChatProps) {
             <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-600 flex items-center justify-center shrink-0">
               <Bot className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
             </div>
-            <div className="bg-gray-100 dark:bg-gray-800 rounded-2xl px-4 py-3">
+            <div className="bg-gray-100 rounded-2xl px-4 py-3">
               <Loader2 className="h-5 w-5 animate-spin text-emerald-600" />
             </div>
           </div>
@@ -142,7 +142,7 @@ export function AIAccountantChat({ businessName }: AIAccountantChatProps) {
       </div>
 
       {/* Input */}
-      <form onSubmit={handleSubmit} className="border-t-2 border-gray-200 dark:border-gray-800 p-4">
+      <form onSubmit={handleSubmit} className="border-t-2 border-gray-200 p-4">
         <div className="flex gap-2">
           <textarea
             ref={textareaRef}
@@ -150,7 +150,7 @@ export function AIAccountantChat({ businessName }: AIAccountantChatProps) {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Ask about bookkeeping, cash flow, or financial insights..."
-            className="flex-1 resize-none rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-emerald-500 dark:focus:border-emerald-500 min-h-13 max-h-32"
+            className="flex-1 resize-none rounded-lg border-2 border-gray-200  bg-white px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-emerald-500 dark:focus:border-emerald-500 min-h-13 max-h-32"
             rows={1}
             disabled={isLoading}
           />
@@ -166,7 +166,7 @@ export function AIAccountantChat({ businessName }: AIAccountantChatProps) {
             )}
           </Button>
         </div>
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+        <p className="text-xs text-gray-500 text-gray-600 mt-2">
           Press Enter to send, Shift + Enter for new line
         </p>
       </form>

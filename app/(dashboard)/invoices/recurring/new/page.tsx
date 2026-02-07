@@ -22,7 +22,7 @@ export default async function NewRecurringInvoicePage({
                 <h1 className="text-3xl font-bold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                     Create Recurring Invoice
                 </h1>
-                <p className="text-gray-600 dark:text-gray-400 mt-1">
+                <p className="text-gray-600 text-gray-600 mt-1">
                     {sourceInvoice 
                         ? `Creating recurring invoice from ${sourceInvoice.invoice_number}` 
                         : 'Set up automated invoice generation for regular billing cycles'

@@ -100,12 +100,12 @@ export default function HireCAPage() {
       <div className="container max-w-2xl mx-auto py-8 px-4">
         <Card className="p-8 text-center">
           <div className="flex justify-center mb-4">
-            <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
-              <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
+            <div className="w-16 h-16 bg-green-100  rounded-full flex items-center justify-center">
+              <CheckCircle className="w-8 h-8 text-green-600" />
             </div>
           </div>
           <h2 className="text-2xl font-bold mb-2">Request Submitted Successfully!</h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
+          <p className="text-gray-600 mb-6">
             Your hire request has been sent to our network of verified Chartered Accountants.
             You&apos;ll receive proposals within 24-48 hours.
           </p>
@@ -131,7 +131,7 @@ export default function HireCAPage() {
 
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Hire a Chartered Accountant</h1>
-        <p className="text-gray-600 dark:text-gray-400">
+        <p className="text-gray-600">
           Tell us about your requirements and we&apos;ll connect you with verified CAs
         </p>
       </div>
@@ -144,7 +144,7 @@ export default function HireCAPage() {
               className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
                 s <= step
                   ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 dark:bg-gray-700 text-gray-500'
+                  : 'bg-gray-200 text-gray-500'
               }`}
             >
               {s}
@@ -152,7 +152,7 @@ export default function HireCAPage() {
             {s < 3 && (
               <div
                 className={`w-24 h-1 ${
-                  s < step ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-700'
+                  s < step ? 'bg-blue-600' : 'bg-gray-200'
                 }`}
               />
             )}
@@ -176,11 +176,11 @@ export default function HireCAPage() {
                 className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
                   formData.request_type === type.value
                     ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/20'
-                    : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
+                    : 'border-gray-200  hover:border-blue-300'
                 }`}
               >
                 <div className="font-semibold">{type.label}</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">{type.description}</div>
+                <div className="text-sm text-gray-600">{type.description}</div>
               </div>
             ))}
           </div>
@@ -194,7 +194,7 @@ export default function HireCAPage() {
                 className={`p-3 border-2 rounded-lg cursor-pointer text-center transition-all ${
                   formData.service_needed.includes(service.value)
                     ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/20'
-                    : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
+                    : 'border-gray-200  hover:border-blue-300'
                 }`}
               >
                 {service.label}
@@ -227,7 +227,7 @@ export default function HireCAPage() {
                 onChange={(e) =>
                   setFormData((prev) => ({ ...prev, business_name: e.target.value }))
                 }
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
+                className="w-full px-4 py-2 border border-gray-300  rounded-lg bg-white"
                 placeholder="Your Business Name"
               />
             </div>
@@ -239,7 +239,7 @@ export default function HireCAPage() {
                 onChange={(e) =>
                   setFormData((prev) => ({ ...prev, business_type: e.target.value }))
                 }
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
+                className="w-full px-4 py-2 border border-gray-300  rounded-lg bg-white"
               >
                 <option value="">Select type</option>
                 {BUSINESS_TYPES.map((type) => (
@@ -264,7 +264,7 @@ export default function HireCAPage() {
                       annual_turnover: e.target.value ? Number(e.target.value) : undefined,
                     }))
                   }
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
+                  className="w-full px-4 py-2 border border-gray-300  rounded-lg bg-white"
                   placeholder="e.g., 5000000"
                 />
               </div>
@@ -282,7 +282,7 @@ export default function HireCAPage() {
                       number_of_invoices: e.target.value ? Number(e.target.value) : undefined,
                     }))
                   }
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
+                  className="w-full px-4 py-2 border border-gray-300  rounded-lg bg-white"
                   placeholder="e.g., 50"
                 />
               </div>
@@ -296,7 +296,7 @@ export default function HireCAPage() {
                   setFormData((prev) => ({ ...prev, description: e.target.value }))
                 }
                 rows={4}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
+                className="w-full px-4 py-2 border border-gray-300  rounded-lg bg-white"
                 placeholder="Provide details about what you need help with..."
                 required
               />
@@ -337,7 +337,7 @@ export default function HireCAPage() {
                       budget_min: e.target.value ? Number(e.target.value) : undefined,
                     }))
                   }
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
+                  className="w-full px-4 py-2 border border-gray-300  rounded-lg bg-white"
                   placeholder="e.g., 5000"
                 />
               </div>
@@ -355,7 +355,7 @@ export default function HireCAPage() {
                       budget_max: e.target.value ? Number(e.target.value) : undefined,
                     }))
                   }
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
+                  className="w-full px-4 py-2 border border-gray-300  rounded-lg bg-white"
                   placeholder="e.g., 15000"
                 />
               </div>
@@ -373,7 +373,7 @@ export default function HireCAPage() {
                   onChange={(e) =>
                     setFormData((prev) => ({ ...prev, preferred_start_date: e.target.value }))
                   }
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
+                  className="w-full px-4 py-2 border border-gray-300  rounded-lg bg-white"
                 />
               </div>
 
@@ -390,13 +390,13 @@ export default function HireCAPage() {
                       duration_months: e.target.value ? Number(e.target.value) : undefined,
                     }))
                   }
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
+                  className="w-full px-4 py-2 border border-gray-300  rounded-lg bg-white"
                   placeholder="e.g., 6"
                 />
               </div>
             </div>
 
-            <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+            <div className="border-t border-gray-200  pt-4">
               <h3 className="text-lg font-semibold mb-4 flex items-center">
                 <MapPin className="w-5 h-5 mr-2" />
                 Location Preferences
@@ -413,7 +413,7 @@ export default function HireCAPage() {
                     onChange={(e) =>
                       setFormData((prev) => ({ ...prev, preferred_city: e.target.value }))
                     }
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
+                    className="w-full px-4 py-2 border border-gray-300  rounded-lg bg-white"
                     placeholder="e.g., Mumbai"
                   />
                 </div>
@@ -428,7 +428,7 @@ export default function HireCAPage() {
                     onChange={(e) =>
                       setFormData((prev) => ({ ...prev, preferred_state: e.target.value }))
                     }
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
+                    className="w-full px-4 py-2 border border-gray-300  rounded-lg bg-white"
                     placeholder="e.g., Maharashtra"
                   />
                 </div>

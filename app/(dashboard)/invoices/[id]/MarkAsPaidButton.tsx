@@ -57,7 +57,7 @@ export function MarkAsPaidButton({ invoiceId, invoiceNumber }: MarkAsPaidButtonP
 
     return (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => !isSubmitting && setIsOpen(false)}>
-            <div className="bg-white dark:bg-gray-900 rounded-lg p-6 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
                 <h3 className="text-lg font-semibold mb-4">Mark Invoice as Paid</h3>
                 <p className="text-sm text-muted-foreground mb-4">
                     Invoice: {invoiceNumber}

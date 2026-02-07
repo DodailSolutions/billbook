@@ -92,7 +92,7 @@ export default function ProposalsPage({ params }: { params: { requestId: string 
       <div className="container max-w-6xl mx-auto py-8 px-4">
         <div className="text-center py-12">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
-          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading proposals...</p>
+          <p className="mt-4 text-gray-600 text-gray-600">Loading proposals...</p>
         </div>
       </div>
     )
@@ -130,7 +130,7 @@ export default function ProposalsPage({ params }: { params: { requestId: string 
             {request.service_needed.map((service) => (
               <span
                 key={service}
-                className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm font-medium"
+                className="px-3 py-1 bg-blue-100  text-blue-700 dark:text-blue-300 rounded-full text-sm font-medium"
               >
                 {service}
               </span>
@@ -138,12 +138,12 @@ export default function ProposalsPage({ params }: { params: { requestId: string 
           </div>
         </div>
 
-        <p className="text-gray-600 dark:text-gray-400 mb-4">{request.description}</p>
+        <p className="text-gray-600 text-gray-600 mb-4">{request.description}</p>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {request.budget_min && request.budget_max && (
             <div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Budget Range</div>
+              <div className="text-sm text-gray-600 text-gray-600">Budget Range</div>
               <div className="font-semibold">
                 ₹{request.budget_min.toLocaleString()} - ₹{request.budget_max.toLocaleString()}
               </div>
@@ -151,20 +151,20 @@ export default function ProposalsPage({ params }: { params: { requestId: string 
           )}
           {request.preferred_city && (
             <div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Location</div>
+              <div className="text-sm text-gray-600 text-gray-600">Location</div>
               <div className="font-semibold">{request.preferred_city}</div>
             </div>
           )}
           {request.preferred_start_date && (
             <div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Start Date</div>
+              <div className="text-sm text-gray-600 text-gray-600">Start Date</div>
               <div className="font-semibold">
                 {new Date(request.preferred_start_date).toLocaleDateString()}
               </div>
             </div>
           )}
           <div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">Proposals Received</div>
+            <div className="text-sm text-gray-600 text-gray-600">Proposals Received</div>
             <div className="font-semibold">{proposals.length}</div>
           </div>
         </div>
@@ -220,7 +220,7 @@ export default function ProposalsPage({ params }: { params: { requestId: string 
         <Card className="p-12 text-center">
           <Briefcase className="w-12 h-12 mx-auto text-gray-400 mb-4" />
           <h3 className="text-xl font-semibold mb-2">No proposals yet</h3>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-600 text-gray-600">
             CAs will submit their proposals within 24-48 hours
           </p>
         </Card>
@@ -241,7 +241,7 @@ export default function ProposalsPage({ params }: { params: { requestId: string 
                   onChange={(e) =>
                     setContractDetails((prev) => ({ ...prev, start_date: e.target.value }))
                   }
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
+                  className="w-full px-3 py-2 border border-gray-300  rounded-lg bg-white"
                   required
                 />
               </div>
@@ -254,7 +254,7 @@ export default function ProposalsPage({ params }: { params: { requestId: string 
                   onChange={(e) =>
                     setContractDetails((prev) => ({ ...prev, end_date: e.target.value }))
                   }
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
+                  className="w-full px-3 py-2 border border-gray-300  rounded-lg bg-white"
                 />
               </div>
 
@@ -266,7 +266,7 @@ export default function ProposalsPage({ params }: { params: { requestId: string 
                     setContractDetails((prev) => ({ ...prev, contract_terms: e.target.value }))
                   }
                   rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
+                  className="w-full px-3 py-2 border border-gray-300  rounded-lg bg-white"
                   placeholder="Enter any specific terms or conditions..."
                 />
               </div>
@@ -322,21 +322,21 @@ function ProposalCard({
             )}
           </div>
           {ca.firm_name && (
-            <p className="text-gray-600 dark:text-gray-400 mb-2">{ca.firm_name}</p>
+            <p className="text-gray-600 text-gray-600 mb-2">{ca.firm_name}</p>
           )}
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1">
               <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
               <span className="font-semibold">{ca.average_rating.toFixed(1)}</span>
-              <span className="text-sm text-gray-600 dark:text-gray-400">
+              <span className="text-sm text-gray-600 text-gray-600">
                 ({ca.total_reviews} reviews)
               </span>
             </div>
-            <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
+            <div className="flex items-center gap-1 text-sm text-gray-600 text-gray-600">
               <Briefcase className="w-4 h-4" />
               {ca.years_of_experience} years
             </div>
-            <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
+            <div className="flex items-center gap-1 text-sm text-gray-600 text-gray-600">
               <MapPin className="w-4 h-4" />
               {ca.city}
             </div>
@@ -344,7 +344,7 @@ function ProposalCard({
         </div>
 
         <div className="text-right">
-          <div className="text-sm text-gray-600 dark:text-gray-400">Proposed Fee</div>
+          <div className="text-sm text-gray-600 text-gray-600">Proposed Fee</div>
           <div className="flex items-center text-2xl font-bold text-green-600">
             <IndianRupee className="w-5 h-5" />
             {proposal.proposed_fee.toLocaleString()}
@@ -355,32 +355,32 @@ function ProposalCard({
 
       <div className="mb-4">
         <h4 className="font-semibold mb-2">Cover Letter</h4>
-        <p className="text-gray-600 dark:text-gray-400">{proposal.cover_letter}</p>
+        <p className="text-gray-600 text-gray-600">{proposal.cover_letter}</p>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
         {proposal.estimated_duration && (
           <div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">Duration</div>
+            <div className="text-sm text-gray-600 text-gray-600">Duration</div>
             <div className="font-semibold">{proposal.estimated_duration}</div>
           </div>
         )}
         {proposal.similar_projects_completed && proposal.similar_projects_completed > 0 && (
           <div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">Similar Projects</div>
+            <div className="text-sm text-gray-600 text-gray-600">Similar Projects</div>
             <div className="font-semibold">{proposal.similar_projects_completed}</div>
           </div>
         )}
         {proposal.availability_start_date && (
           <div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">Available From</div>
+            <div className="text-sm text-gray-600 text-gray-600">Available From</div>
             <div className="font-semibold">
               {new Date(proposal.availability_start_date).toLocaleDateString()}
             </div>
           </div>
         )}
         <div>
-          <div className="text-sm text-gray-600 dark:text-gray-400">Submitted</div>
+          <div className="text-sm text-gray-600 text-gray-600">Submitted</div>
           <div className="font-semibold">
             {new Date(proposal.created_at).toLocaleDateString()}
           </div>
@@ -390,12 +390,12 @@ function ProposalCard({
       {proposal.relevant_experience && (
         <div className="mb-4">
           <h4 className="font-semibold mb-2">Relevant Experience</h4>
-          <p className="text-sm text-gray-600 dark:text-gray-400">{proposal.relevant_experience}</p>
+          <p className="text-sm text-gray-600 text-gray-600">{proposal.relevant_experience}</p>
         </div>
       )}
 
       {showActions && onAccept && onReject && (
-        <div className="flex gap-3 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="flex gap-3 mt-4 pt-4 border-t border-gray-200 ">
           <Button onClick={onReject} variant="outline" className="flex-1">
             <XCircle className="w-4 h-4 mr-2" />
             Reject
@@ -408,7 +408,7 @@ function ProposalCard({
       )}
 
       {proposal.status === 'accepted' && (
-        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="mt-4 pt-4 border-t border-gray-200 ">
           <div className="flex items-center gap-2 text-green-600">
             <CheckCircle className="w-5 h-5" />
             <span className="font-semibold">Accepted on {new Date(proposal.responded_at || '').toLocaleDateString()}</span>
@@ -417,7 +417,7 @@ function ProposalCard({
       )}
 
       {proposal.status === 'rejected' && (
-        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="mt-4 pt-4 border-t border-gray-200 ">
           <div className="flex items-center gap-2 text-red-600">
             <XCircle className="w-5 h-5" />
             <span className="font-semibold">Rejected</span>

@@ -217,7 +217,7 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
 
     return (
         <>{/* Header with Simplified View Toggle */}
-            <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200 ">
                 <div className="flex items-center gap-3">
                     <FileText className="w-6 h-6 text-gray-700 dark:text-gray-300" />
                     <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -338,7 +338,7 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                         <option value="intra-state">Intra-State (CGST + SGST)</option>
                         <option value="inter-state">Inter-State (IGST)</option>
                     </select>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-gray-500 text-gray-600">
                         {supplyType === 'intra-state' ? 'GST split into CGST and SGST (50% each)' : 'Full GST amount as IGST'}
                     </p>
                 </div>
@@ -374,11 +374,11 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                         <p className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">Saved Items</p>
                         <div className="flex flex-wrap gap-2">
                             {savedItems.map((savedItem) => (
-                                <div key={savedItem.id} className="flex items-center gap-2 bg-white dark:bg-gray-800 px-3 py-1 rounded border border-blue-200 dark:border-blue-700 text-sm">
+                                <div key={savedItem.id} className="flex items-center gap-2 bg-white px-3 py-1 rounded border border-blue-200 dark:border-blue-700 text-sm">
                                     <button
                                         type="button"
                                         onClick={() => addSavedItem(savedItem)}
-                                        className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
+                                        className="text-blue-600 text-blue-600 hover:underline font-medium"
                                     >
                                         + {savedItem.name}
                                     </button>
@@ -399,7 +399,7 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                     {items.map((item, index) => (
                         <div key={index} className="border rounded-lg p-3 space-y-3">
                             <div className="space-y-2">
-                                <label className="text-xs text-gray-600 dark:text-gray-400">Description *</label>
+                                <label className="text-xs text-gray-600 text-gray-600">Description *</label>
                                 <Input
                                     placeholder="Item description"
                                     value={item.description}
@@ -410,7 +410,7 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
 
                             <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
                                 <div className="space-y-2">
-                                    <label className="text-xs text-gray-600 dark:text-gray-400">Qty *</label>
+                                    <label className="text-xs text-gray-600 text-gray-600">Qty *</label>
                                     <Input
                                         type="number"
                                         placeholder="Qty"
@@ -422,7 +422,7 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs text-gray-600 dark:text-gray-400">Price *</label>
+                                    <label className="text-xs text-gray-600 text-gray-600">Price *</label>
                                     <Input
                                         type="number"
                                         placeholder="Price"
@@ -434,7 +434,7 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs text-gray-600 dark:text-gray-400">HSN/SAC</label>
+                                    <label className="text-xs text-gray-600 text-gray-600">HSN/SAC</label>
                                     <Input
                                         placeholder="HSN/SAC Code"
                                         maxLength={6}
@@ -443,7 +443,7 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs text-gray-600 dark:text-gray-400">Type</label>
+                                    <label className="text-xs text-gray-600 text-gray-600">Type</label>
                                     <select
                                         value={item.hsn_sac_type || 'SAC'}
                                         onChange={(e) => updateItem(index, 'hsn_sac_type', e.target.value as 'HSN' | 'SAC')}
@@ -457,7 +457,7 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
 
                             <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
                                 <div className="space-y-2">
-                                    <label className="text-xs text-gray-600 dark:text-gray-400">GST Rate (%)</label>
+                                    <label className="text-xs text-gray-600 text-gray-600">GST Rate (%)</label>
                                     <Input
                                         type="number"
                                         placeholder="GST %"
@@ -472,7 +472,7 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs text-gray-600 dark:text-gray-400">Item Total</label>
+                                    <label className="text-xs text-gray-600 text-gray-600">Item Total</label>
                                     <div className="flex items-center h-9 rounded-md border border-input bg-muted px-3">
                                         <span className="text-sm font-medium">₹{(item.quantity * item.unit_price).toFixed(2)}</span>
                                     </div>
@@ -562,7 +562,7 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                                 <select
                                     value={recurringFrequency}
                                     onChange={(e) => setRecurringFrequency(e.target.value as 'monthly' | 'yearly')}
-                                    className="flex h-9 w-full rounded-md border border-input bg-white dark:bg-gray-900 px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                                    className="flex h-9 w-full rounded-md border border-input bg-white px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                                 >
                                     <option value="monthly">📅 Monthly</option>
                                     <option value="yearly">📆 Yearly</option>
@@ -653,8 +653,8 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
         {/* Add Customer Modal */}
         {showAddCustomerModal && (
             <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full">
-                    <div className="flex items-center justify-between p-6 border-b dark:border-gray-700">
+                <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+                    <div className="flex items-center justify-between p-6 border-b ">
                         <h2 className="text-lg font-semibold">Add New Customer</h2>
                         <button
                             onClick={() => setShowAddCustomerModal(false)}
@@ -708,8 +708,8 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
         {/* Save Item Modal */}
         {showSaveItemModal && (
             <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full">
-                    <div className="flex items-center justify-between p-6 border-b dark:border-gray-700">
+                <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+                    <div className="flex items-center justify-between p-6 border-b ">
                         <h2 className="text-lg font-semibold">Save Item for Later</h2>
                         <button
                             onClick={() => setShowSaveItemModal(false)}
@@ -729,7 +729,7 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                             />
                         </div>
                         {savedItemToSave && (
-                            <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded text-sm space-y-1">
+                            <div className="bg-gray-50 p-3 rounded text-sm space-y-1">
                                 <p><span className="font-medium">Description:</span> {savedItemToSave.description}</p>
                                 <p><span className="font-medium">Price:</span> ₹{savedItemToSave.unit_price.toFixed(2)}</p>
                                 <p><span className="font-medium">Qty:</span> {savedItemToSave.quantity}</p>

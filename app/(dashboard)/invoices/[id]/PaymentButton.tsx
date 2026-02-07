@@ -136,7 +136,7 @@ export default function PaymentButton({
                     }`}>
                         <div className="flex items-center gap-3">
                             {message.type === 'success' ? (
-                                <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+                                <CheckCircle className="h-5 w-5 text-green-600 text-green-600" />
                             ) : (
                                 <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
                             )}
@@ -170,7 +170,7 @@ export default function PaymentButton({
                     )}
                 </Button>
 
-                <div className="flex items-center justify-center gap-3 text-sm text-gray-600 dark:text-gray-400">
+                <div className="flex items-center justify-center gap-3 text-sm text-gray-600 text-gray-600">
                     <Image 
                         src="https://razorpay.com/assets/razorpay-glyph.svg" 
                         alt="Razorpay" 

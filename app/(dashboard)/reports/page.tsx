@@ -23,8 +23,8 @@ export default function ReportsPage() {
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
-                            <div className="h-10 w-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                                <FileBarChart className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                            <div className="h-10 w-10 rounded-lg bg-blue-100  flex items-center justify-center">
+                                <FileBarChart className="h-5 w-5 text-blue-600 text-blue-600" />
                             </div>
                             GST Report
                         </CardTitle>
@@ -96,8 +96,8 @@ export default function ReportsPage() {
                 <CardContent className="pt-6">
                     <div className="flex flex-col md:flex-row gap-6 items-center">
                         <div className="shrink-0">
-                            <div className="h-16 w-16 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                                <Shield className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+                            <div className="h-16 w-16 rounded-full bg-blue-100  flex items-center justify-center">
+                                <Shield className="h-8 w-8 text-blue-600 text-blue-600" />
                             </div>
                         </div>
                         <div className="flex-1">
@@ -118,16 +118,16 @@ export default function ReportsPage() {
                 </CardContent>
             </Card>
 
-            <Card className="bg-gray-50 dark:bg-gray-900/20 border-gray-200 dark:border-gray-800">
+            <Card className="bg-gray-50/20 border-gray-200">
                 <CardContent className="pt-6">
                     <div className="flex gap-4">
                         <div className="shrink-0">
-                            <div className="h-12 w-12 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                                <FileBarChart className="h-6 w-6 text-gray-600 dark:text-gray-400" />
+                            <div className="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center">
+                                <FileBarChart className="h-6 w-6 text-gray-600 text-gray-600" />
                             </div>
                         </div>
                         <div>
-                            <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">
+                            <h3 className="font-semibold text-gray-900  mb-1">
                                 Share Reports with Your CA or Accountant
                             </h3>
                             <p className="text-sm text-gray-700 dark:text-gray-300">

@@ -25,7 +25,7 @@ const ScoreBar = ({ label, score }: { label: string; score: number }) => {
           {score.toFixed(1)}
         </span>
       </div>
-      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+      <div className="w-full bg-gray-200 rounded-full h-2">
         <div
           className={`h-2 rounded-full ${getBarColor(score)} transition-all duration-500`}
           style={{ width: `${score}%` }}
@@ -60,7 +60,7 @@ export default async function GSTHealthScorePage() {
 
   const getGradeColor = (grade: string) => {
     if (grade.startsWith('A')) return 'text-green-700 bg-green-100 dark:bg-green-900/80 dark:text-green-200'
-    if (grade.startsWith('B')) return 'text-blue-700 bg-blue-100 dark:bg-blue-900/80 dark:text-blue-200'
+    if (grade.startsWith('B')) return 'text-blue-700 bg-blue-100 dark:bg-blue-900/80 text-blue-900'
     if (grade.startsWith('C')) return 'text-yellow-700 bg-yellow-100 dark:bg-yellow-900/80 dark:text-yellow-200'
     if (grade.startsWith('D')) return 'text-orange-700 bg-orange-100 dark:bg-orange-900/80 dark:text-orange-200'
     return 'text-red-700 bg-red-100 dark:bg-red-900/80 dark:text-red-200'
@@ -99,7 +99,7 @@ export default async function GSTHealthScorePage() {
             <Target className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
             GST Health Score
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
+          <p className="text-gray-600 text-gray-600 mt-1">
             Comprehensive compliance and performance analysis
           </p>
         </div>
@@ -132,7 +132,7 @@ export default async function GSTHealthScorePage() {
                   <div className="text-7xl font-bold text-gray-900 dark:text-white mb-2">
                     {healthScore.overall_score.toFixed(1)}
                   </div>
-                  <div className="text-gray-600 dark:text-gray-400 text-lg">
+                  <div className="text-gray-600 text-gray-600 text-lg">
                     out of 100
                   </div>
                   <div className="mt-4 flex items-center justify-center gap-2">
@@ -143,7 +143,7 @@ export default async function GSTHealthScorePage() {
                 </div>
               </div>
             </div>
-            <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <div className="mt-6 p-4 bg-gray-50 rounded-lg">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <AlertTriangle className={`h-5 w-5 ${getRiskColor(healthScore.risk_level).split(' ')[0]}`} />
@@ -166,8 +166,8 @@ export default async function GSTHealthScorePage() {
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
+                <CheckCircle2 className="h-5 w-5 text-green-600 text-green-600" />
+                <span className="text-sm font-medium text-gray-700 ">
                   On Time Filings
                 </span>
               </div>
@@ -179,7 +179,7 @@ export default async function GSTHealthScorePage() {
             <div className="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
               <div className="flex items-center gap-2">
                 <Clock className="h-5 w-5 text-red-600 dark:text-red-400" />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
+                <span className="text-sm font-medium text-gray-700 ">
                   Late Filings
                 </span>
               </div>
@@ -190,8 +190,8 @@ export default async function GSTHealthScorePage() {
 
             <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
               <div className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
+                <FileText className="h-5 w-5 text-blue-600 text-blue-600" />
+                <span className="text-sm font-medium text-gray-700 ">
                   Total Returns
                 </span>
               </div>
@@ -311,12 +311,12 @@ export default async function GSTHealthScorePage() {
           <CardContent>
             <div className="space-y-3">
               {history.slice(0, 6).map((record) => (
-                <div key={record.id} className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
+                <div key={record.id} className="flex items-center justify-between p-3 border border-gray-200  rounded-lg">
                   <div>
                     <div className="font-medium text-gray-900 dark:text-white">
                       {new Date(record.calculation_period_to).toLocaleDateString()}
                     </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                    <div className="text-sm text-gray-600 text-gray-600">
                       {new Date(record.calculation_period_from).toLocaleDateString()} -{' '}
                       {new Date(record.calculation_period_to).toLocaleDateString()}
                     </div>

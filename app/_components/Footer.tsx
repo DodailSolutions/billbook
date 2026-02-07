@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 export function Footer() {
   return (
     <footer className="border-t border-gray-200 bg-white mt-16">
@@ -7,10 +9,10 @@ export function Footer() {
           <div>
             <h3 className="font-semibold text-gray-900 mb-4">Product</h3>
             <ul className="space-y-3 text-sm text-gray-600">
-              <li><a href="/#features" className="hover:text-blue-600 transition-colors">Features</a></li>
-              <li><a href="/#pricing" className="hover:text-blue-600 transition-colors">Pricing</a></li>
-              <li><a href="/#lifetime-deal" className="hover:text-blue-600 transition-colors">Lifetime Deal</a></li>
-              <li><a href="/enterprise" className="hover:text-blue-600 transition-colors">Enterprise</a></li>
+              <li><Link href="/#features" className="hover:text-blue-600 transition-colors">Features</Link></li>
+              <li><Link href="/#pricing" className="hover:text-blue-600 transition-colors">Pricing</Link></li>
+              <li><Link href="/#lifetime-deal" className="hover:text-blue-600 transition-colors">Lifetime Deal</Link></li>
+              <li><Link href="/enterprise" className="hover:text-blue-600 transition-colors">Enterprise</Link></li>
             </ul>
           </div>
 
@@ -18,9 +20,9 @@ export function Footer() {
           <div>
             <h3 className="font-semibold text-gray-900 mb-4">For CAs</h3>
             <ul className="space-y-3 text-sm text-gray-600">
-              <li><a href="/ca-registration" className="hover:text-blue-600 transition-colors">Register as CA</a></li>
-              <li><a href="/hire-ca" className="hover:text-blue-600 transition-colors">Hire a CA</a></li>
-              <li><a href="/ca-marketplace" className="hover:text-blue-600 transition-colors">CA Marketplace</a></li>
+              <li><Link href="/ca-registration" className="hover:text-blue-600 transition-colors">Register as CA</Link></li>
+              <li><Link href="/hire-ca" className="hover:text-blue-600 transition-colors">Hire a CA</Link></li>
+              <li><Link href="/ca-marketplace" className="hover:text-blue-600 transition-colors">CA Marketplace</Link></li>
             </ul>
           </div>
 
@@ -28,9 +30,9 @@ export function Footer() {
           <div>
             <h3 className="font-semibold text-gray-900 mb-4">Support</h3>
             <ul className="space-y-3 text-sm text-gray-600">
-              <li><a href="/contact" className="hover:text-blue-600 transition-colors">Contact Us</a></li>
-              <li><a href="/help" className="hover:text-blue-600 transition-colors">Help Center</a></li>
-              <li><a href="/docs" className="hover:text-blue-600 transition-colors">Documentation</a></li>
+              <li><Link href="/contact" className="hover:text-blue-600 transition-colors">Contact Us</Link></li>
+              <li><Link href="/help" className="hover:text-blue-600 transition-colors">Help Center</Link></li>
+              <li><Link href="/docs" className="hover:text-blue-600 transition-colors">Documentation</Link></li>
             </ul>
           </div>
 
@@ -38,9 +40,9 @@ export function Footer() {
           <div>
             <h3 className="font-semibold text-gray-900 mb-4">Legal</h3>
             <ul className="space-y-3 text-sm text-gray-600">
-              <li><a href="/privacy" className="hover:text-blue-600 transition-colors">Privacy Policy</a></li>
-              <li><a href="/terms" className="hover:text-blue-600 transition-colors">Terms of Service</a></li>
-              <li><a href="/refund" className="hover:text-blue-600 transition-colors">Refund Policy</a></li>
+              <li><Link href="/privacy" className="hover:text-blue-600 transition-colors">Privacy Policy</Link></li>
+              <li><Link href="/terms" className="hover:text-blue-600 transition-colors">Terms of Service</Link></li>
+              <li><Link href="/refund" className="hover:text-blue-600 transition-colors">Refund Policy</Link></li>
             </ul>
           </div>
 
@@ -48,9 +50,9 @@ export function Footer() {
           <div>
             <h3 className="font-semibold text-gray-900 mb-4">Company</h3>
             <ul className="space-y-3 text-sm text-gray-600">
-              <li><a href="/about" className="hover:text-blue-600 transition-colors">About Us</a></li>
-              <li><a href="/blog" className="hover:text-blue-600 transition-colors">Blog</a></li>
-              <li><a href="/careers" className="hover:text-blue-600 transition-colors">Careers</a></li>
+              <li><Link href="/about" className="hover:text-blue-600 transition-colors">About Us</Link></li>
+              <li><Link href="/blog" className="hover:text-blue-600 transition-colors">Blog</Link></li>
+              <li><Link href="/careers" className="hover:text-blue-600 transition-colors">Careers</Link></li>
             </ul>
           </div>
         </div>

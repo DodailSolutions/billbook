@@ -51,8 +51,8 @@ export function SupportForm() {
     if (submitted) {
         return (
             <div className="text-center py-12">
-                <div className="inline-flex h-16 w-16 rounded-full bg-green-100 dark:bg-green-900/30 items-center justify-center mb-4">
-                    <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
+                <div className="inline-flex h-16 w-16 rounded-full bg-green-100  items-center justify-center mb-4">
+                    <CheckCircle className="h-8 w-8 text-green-600 text-green-600" />
                 </div>
                 <h3 className="text-xl font-semibold mb-2">Ticket Submitted Successfully!</h3>
                 <p className="text-muted-foreground mb-4">

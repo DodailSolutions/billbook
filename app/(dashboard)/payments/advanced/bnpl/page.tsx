@@ -52,10 +52,10 @@ export default async function BNPLPage() {
       case 'pending': return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-200'
       case 'approved': return 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-200'
       case 'rejected': return 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-200'
-      case 'active': return 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-200'
-      case 'completed': return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-200'
+      case 'active': return 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 text-blue-900'
+      case 'completed': return 'bg-gray-100 text-gray-700 '
       case 'defaulted': return 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-200'
-      default: return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-200'
+      default: return 'bg-gray-100 text-gray-700 '
     }
   }
 
@@ -79,7 +79,7 @@ export default async function BNPLPage() {
             <CreditCard className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
             Buy Now Pay Later (BNPL)
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
+          <p className="text-gray-600 text-gray-600 mt-1">
             Flexible payment options for your MSME customers
           </p>
         </div>
@@ -102,7 +102,7 @@ export default async function BNPLPage() {
             <div className="text-3xl font-bold text-yellow-600 dark:text-yellow-400">
               {pendingCount}
             </div>
-            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+            <p className="text-xs text-gray-600 text-gray-600 mt-1">
               Under review
             </p>
           </CardContent>
@@ -115,10 +115,10 @@ export default async function BNPLPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+            <div className="text-3xl font-bold text-blue-600 text-blue-600">
               {activeCount}
             </div>
-            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+            <p className="text-xs text-gray-600 text-gray-600 mt-1">
               Currently running
             </p>
           </CardContent>
@@ -131,10 +131,10 @@ export default async function BNPLPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-green-600 dark:text-green-400">
+            <div className="text-3xl font-bold text-green-600 text-green-600">
               {approvedCount}
             </div>
-            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+            <p className="text-xs text-gray-600 text-gray-600 mt-1">
               Ready to use
             </p>
           </CardContent>
@@ -150,7 +150,7 @@ export default async function BNPLPage() {
             <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
               ₹{totalApproved.toLocaleString('en-IN')}
             </div>
-            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+            <p className="text-xs text-gray-600 text-gray-600 mt-1">
               {rejectedCount} rejected • {completedCount} completed
             </p>
           </CardContent>
@@ -170,7 +170,7 @@ export default async function BNPLPage() {
             {['flexmoney', 'zestmoney', 'lazypay', 'simpl'].map((provider) => (
               <div 
                 key={provider}
-                className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg text-center hover:border-indigo-300 dark:hover:border-indigo-600 transition-colors"
+                className="p-4 border border-gray-200  rounded-lg text-center hover:border-indigo-300 dark:hover:border-indigo-600 transition-colors"
               >
                 <div className="inline-flex p-3 bg-indigo-100 dark:bg-indigo-900/20 rounded-full mb-3">
                   <CreditCard className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
@@ -178,7 +178,7 @@ export default async function BNPLPage() {
                 <h4 className="font-semibold text-gray-900 dark:text-white mb-1">
                   {getProviderName(provider)}
                 </h4>
-                <p className="text-xs text-gray-600 dark:text-gray-400">
+                <p className="text-xs text-gray-600 text-gray-600">
                   Instant approval
                 </p>
               </div>
@@ -201,7 +201,7 @@ export default async function BNPLPage() {
               {applications.map((app) => (
                 <div
                   key={app.id}
-                  className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-indigo-300 dark:hover:border-indigo-600 transition-colors"
+                  className="p-4 border border-gray-200  rounded-lg hover:border-indigo-300 dark:hover:border-indigo-600 transition-colors"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -216,21 +216,21 @@ export default async function BNPLPage() {
                       </div>
                       <div className="grid md:grid-cols-2 gap-4 mb-3">
                         <div>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">Customer</p>
+                          <p className="text-sm text-gray-600 text-gray-600">Customer</p>
                           <p className="font-semibold text-gray-900 dark:text-white">
                             {app.customers && typeof app.customers === 'object' && 'name' in app.customers ? (app.customers as { name: string }).name : 'Unknown'}
                           </p>
                         </div>
                         <div>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">Invoice</p>
+                          <p className="text-sm text-gray-600 text-gray-600">Invoice</p>
                           <p className="font-semibold text-gray-900 dark:text-white">
                             {app.invoices && typeof app.invoices === 'object' && 'invoice_number' in app.invoices ? (app.invoices as { invoice_number: string }).invoice_number : 'N/A'}
                           </p>
                         </div>
                       </div>
                       <div className="grid md:grid-cols-3 gap-4">
-                        <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                          <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+                        <div className="p-3 bg-gray-50 rounded-lg">
+                          <p className="text-xs text-gray-600 text-gray-600 mb-1">
                             Requested Amount
                           </p>
                           <p className="font-bold text-gray-900 dark:text-white">
@@ -239,20 +239,20 @@ export default async function BNPLPage() {
                         </div>
                         {app.approved_amount && (
                           <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                            <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+                            <p className="text-xs text-gray-600 text-gray-600 mb-1">
                               Approved Amount
                             </p>
-                            <p className="font-bold text-green-600 dark:text-green-400">
+                            <p className="font-bold text-green-600 text-green-600">
                               ₹{Number(app.approved_amount).toLocaleString('en-IN')}
                             </p>
                           </div>
                         )}
                         {app.tenure_months && (
                           <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                            <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+                            <p className="text-xs text-gray-600 text-gray-600 mb-1">
                               Tenure
                             </p>
-                            <p className="font-bold text-blue-600 dark:text-blue-400">
+                            <p className="font-bold text-blue-600 text-blue-600">
                               {app.tenure_months} months
                             </p>
                           </div>
@@ -265,7 +265,7 @@ export default async function BNPLPage() {
                           </p>
                         </div>
                       )}
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-3">
+                      <p className="text-xs text-gray-500 text-gray-600 mt-3">
                         Applied on {new Date(app.created_at).toLocaleDateString()}
                         {app.approval_date && ` • Approved on ${new Date(app.approval_date).toLocaleDateString()}`}
                       </p>
@@ -288,7 +288,7 @@ export default async function BNPLPage() {
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
               No BNPL Applications Yet
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
+            <p className="text-gray-600 text-gray-600 mb-4">
               Create your first BNPL application to offer flexible payment options
             </p>
             <Link href="/payments/advanced/bnpl/apply">
@@ -323,7 +323,7 @@ export default async function BNPLPage() {
             </div>
             <div className="text-center">
               <div className="inline-flex p-3 bg-green-100 dark:bg-green-900/20 rounded-full mb-3">
-                <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
+                <CheckCircle className="h-6 w-6 text-green-600 text-green-600" />
               </div>
               <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
                 2. Instant Approval
@@ -334,7 +334,7 @@ export default async function BNPLPage() {
             </div>
             <div className="text-center">
               <div className="inline-flex p-3 bg-blue-100 dark:bg-blue-900/20 rounded-full mb-3">
-                <TrendingUp className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                <TrendingUp className="h-6 w-6 text-blue-600 text-blue-600" />
               </div>
               <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
                 3. Flexible Repayment

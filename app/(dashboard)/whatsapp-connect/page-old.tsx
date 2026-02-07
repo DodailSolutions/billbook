@@ -182,7 +182,7 @@ export default function WhatsAppConnectPage() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <RefreshCw className="h-8 w-8 animate-spin text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+          <p className="text-gray-600 text-gray-600">Loading...</p>
         </div>
       </div>
     )
@@ -205,10 +205,10 @@ export default function WhatsAppConnectPage() {
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
               Feature Not Available
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-2">
+            <p className="text-gray-600 text-gray-600 mb-2">
               WhatsApp integration is currently only available for India region users.
             </p>
-            <p className="text-sm text-gray-500 dark:text-gray-500">
+            <p className="text-sm text-gray-500 ">
               This feature is optimized for Indian businesses.
             </p>
           </CardContent>
@@ -225,7 +225,7 @@ export default function WhatsAppConnectPage() {
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
             WhatsApp Integration
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
+          <p className="text-gray-600 text-gray-600 mt-1">
             Send invoices and messages to your customers via WhatsApp
           </p>
         </div>
@@ -240,7 +240,7 @@ export default function WhatsAppConnectPage() {
               <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
                 WhatsApp Click-to-Chat Integration
               </h3>
-              <p className="text-sm text-blue-800 dark:text-blue-200 mb-3">
+              <p className="text-sm text-blue-800 text-blue-900 mb-3">
                 This feature uses WhatsApp's official "Click to Chat" API. When you send an invoice or message, 
                 it will open WhatsApp on your device with the message pre-filled. Simply click send!
               </p>
@@ -268,7 +268,7 @@ export default function WhatsAppConnectPage() {
                 <h3 className="font-semibold text-blue-900 dark:text-blue-100">
                   Only Your Party Chats Will be Shown in BillBooky
                 </h3>
-                <p className="text-sm text-blue-700 dark:text-blue-200 mt-1">
+                <p className="text-sm text-blue-700 text-blue-900 mt-1">
                   When you connect WhatsApp, only your business contacts will be accessible. 
                   Your personal chats remain private and are not accessed by BillBooky.
                 </p>
@@ -295,7 +295,7 @@ export default function WhatsAppConnectPage() {
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                 Connect Your WhatsApp
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
+              <p className="text-gray-600 text-gray-600 mb-6 max-w-md mx-auto">
                 Seamlessly connect WhatsApp to send invoices directly to your customers
               </p>
               <Button 
@@ -335,7 +335,7 @@ export default function WhatsAppConnectPage() {
                   Scan this QR code
                 </h3>
                 
-                <div className="text-left bg-gray-50 dark:bg-gray-800 rounded-lg p-4 space-y-3">
+                <div className="text-left bg-gray-50 rounded-lg p-4 space-y-3">
                   <div className="flex items-start gap-3">
                     <div className="w-6 h-6 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold shrink-0">
                       1
@@ -362,12 +362,12 @@ export default function WhatsAppConnectPage() {
                   </div>
                 </div>
 
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                <p className="text-xs text-gray-500 text-gray-600">
                   Safe. Secure. Private.
                 </p>
 
                 {/* Demo button - remove in production */}
-                <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="pt-4 border-t border-gray-200 ">
                   <Button 
                     variant="outline" 
                     size="sm" 
@@ -391,7 +391,7 @@ export default function WhatsAppConnectPage() {
                 WhatsApp Connected
               </h3>
               {connectionStatus.phone_number && (
-                <p className="text-gray-600 dark:text-gray-400 mb-6">
+                <p className="text-gray-600 text-gray-600 mb-6">
                   {connectionStatus.phone_number}
                 </p>
               )}
@@ -424,7 +424,7 @@ export default function WhatsAppConnectPage() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Sent</p>
+                  <p className="text-sm text-gray-600 text-gray-600">Sent</p>
                   <p className="text-2xl font-bold text-gray-900 dark:text-white">
                     {stats.total_sent}
                   </p>
@@ -438,7 +438,7 @@ export default function WhatsAppConnectPage() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Delivered</p>
+                  <p className="text-sm text-gray-600 text-gray-600">Delivered</p>
                   <p className="text-2xl font-bold text-gray-900 dark:text-white">
                     {stats.total_delivered}
                   </p>
@@ -452,7 +452,7 @@ export default function WhatsAppConnectPage() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Read</p>
+                  <p className="text-sm text-gray-600 text-gray-600">Read</p>
                   <p className="text-2xl font-bold text-gray-900 dark:text-white">
                     {stats.total_read}
                   </p>
@@ -466,7 +466,7 @@ export default function WhatsAppConnectPage() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Failed</p>
+                  <p className="text-sm text-gray-600 text-gray-600">Failed</p>
                   <p className="text-2xl font-bold text-gray-900 dark:text-white">
                     {stats.total_failed}
                   </p>
@@ -485,49 +485,49 @@ export default function WhatsAppConnectPage() {
         </CardHeader>
         <CardContent>
           <div className="grid md:grid-cols-2 gap-4">
-            <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
               <Check className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
               <div>
                 <h4 className="font-semibold text-gray-900 dark:text-white mb-1">
                   Send Invoices Instantly
                 </h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-gray-600 text-gray-600">
                   Share invoices directly with customers via WhatsApp with PDF attached
                 </p>
               </div>
             </div>
 
-            <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
               <Check className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
               <div>
                 <h4 className="font-semibold text-gray-900 dark:text-white mb-1">
                   Privacy Protected
                 </h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-gray-600 text-gray-600">
                   Only your business contacts are accessible. Personal chats remain private
                 </p>
               </div>
             </div>
 
-            <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
               <Check className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
               <div>
                 <h4 className="font-semibold text-gray-900 dark:text-white mb-1">
                   Track Delivery Status
                 </h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-gray-600 text-gray-600">
                   See when messages are sent, delivered, and read by customers
                 </p>
               </div>
             </div>
 
-            <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
               <Check className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
               <div>
                 <h4 className="font-semibold text-gray-900 dark:text-white mb-1">
                   Secure Connection
                 </h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-gray-600 text-gray-600">
                   End-to-end encrypted connection just like WhatsApp Web
                 </p>
               </div>

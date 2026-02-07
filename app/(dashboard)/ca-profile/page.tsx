@@ -128,7 +128,7 @@ export default function CAProfileManagementPage() {
       <div className="container max-w-6xl mx-auto py-8 px-4">
         <div className="text-center py-12">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
-          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading profile...</p>
+          <p className="mt-4 text-gray-600 text-gray-600">Loading profile...</p>
         </div>
       </div>
     )
@@ -143,7 +143,7 @@ export default function CAProfileManagementPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold mb-2">CA Profile Management</h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-600 text-gray-600">
             Manage your professional profile, services, and pricing
           </p>
         </div>
@@ -172,7 +172,7 @@ export default function CAProfileManagementPage() {
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Rating</p>
+                <p className="text-sm text-gray-600 text-gray-600">Rating</p>
                 <p className="text-2xl font-bold">{stats.average_rating.toFixed(1)}</p>
               </div>
               <Star className="w-8 h-8 text-yellow-500" />
@@ -182,7 +182,7 @@ export default function CAProfileManagementPage() {
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Reviews</p>
+                <p className="text-sm text-gray-600 text-gray-600">Reviews</p>
                 <p className="text-2xl font-bold">{stats.total_reviews}</p>
               </div>
               <Award className="w-8 h-8 text-purple-600" />
@@ -192,7 +192,7 @@ export default function CAProfileManagementPage() {
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Clients</p>
+                <p className="text-sm text-gray-600 text-gray-600">Clients</p>
                 <p className="text-2xl font-bold">{stats.total_clients}</p>
               </div>
               <Users className="w-8 h-8 text-blue-600" />
@@ -202,7 +202,7 @@ export default function CAProfileManagementPage() {
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Proposals</p>
+                <p className="text-sm text-gray-600 text-gray-600">Proposals</p>
                 <p className="text-2xl font-bold">{stats.proposals_sent}</p>
               </div>
               <TrendingUp className="w-8 h-8 text-green-600" />
@@ -212,7 +212,7 @@ export default function CAProfileManagementPage() {
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Active</p>
+                <p className="text-sm text-gray-600 text-gray-600">Active</p>
                 <p className="text-2xl font-bold">{stats.active_engagements}</p>
               </div>
               <Briefcase className="w-8 h-8 text-orange-600" />
@@ -222,7 +222,7 @@ export default function CAProfileManagementPage() {
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Earnings</p>
+                <p className="text-sm text-gray-600 text-gray-600">Earnings</p>
                 <p className="text-xl font-bold">₹{(stats.total_earnings / 1000).toFixed(0)}k</p>
               </div>
               <IndianRupee className="w-8 h-8 text-emerald-600" />
@@ -244,26 +244,26 @@ export default function CAProfileManagementPage() {
             {!editing ? (
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm text-gray-600 dark:text-gray-400">Full Name</label>
+                  <label className="text-sm text-gray-600 text-gray-600">Full Name</label>
                   <p className="font-semibold">{profile.full_name}</p>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm text-gray-600 dark:text-gray-400">Email</label>
+                    <label className="text-sm text-gray-600 text-gray-600">Email</label>
                     <p className="font-semibold">{profile.email}</p>
                   </div>
                   <div>
-                    <label className="text-sm text-gray-600 dark:text-gray-400">Phone</label>
+                    <label className="text-sm text-gray-600 text-gray-600">Phone</label>
                     <p className="font-semibold">{profile.phone}</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm text-gray-600 dark:text-gray-400">Firm Name</label>
+                    <label className="text-sm text-gray-600 text-gray-600">Firm Name</label>
                     <p className="font-semibold">{profile.firm_name || 'N/A'}</p>
                   </div>
                   <div>
-                    <label className="text-sm text-gray-600 dark:text-gray-400">Experience</label>
+                    <label className="text-sm text-gray-600 text-gray-600">Experience</label>
                     <p className="font-semibold">{profile.years_of_experience} years</p>
                   </div>
                 </div>
@@ -278,7 +278,7 @@ export default function CAProfileManagementPage() {
                     onChange={(e) =>
                       setFormData((prev) => ({ ...prev, full_name: e.target.value }))
                     }
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
+                    className="w-full px-4 py-2 border border-gray-300  rounded-lg bg-white"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
@@ -290,7 +290,7 @@ export default function CAProfileManagementPage() {
                       onChange={(e) =>
                         setFormData((prev) => ({ ...prev, email: e.target.value }))
                       }
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
+                      className="w-full px-4 py-2 border border-gray-300  rounded-lg bg-white"
                     />
                   </div>
                   <div>
@@ -301,7 +301,7 @@ export default function CAProfileManagementPage() {
                       onChange={(e) =>
                         setFormData((prev) => ({ ...prev, phone: e.target.value }))
                       }
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
+                      className="w-full px-4 py-2 border border-gray-300  rounded-lg bg-white"
                     />
                   </div>
                 </div>
@@ -314,7 +314,7 @@ export default function CAProfileManagementPage() {
                       onChange={(e) =>
                         setFormData((prev) => ({ ...prev, firm_name: e.target.value }))
                       }
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
+                      className="w-full px-4 py-2 border border-gray-300  rounded-lg bg-white"
                     />
                   </div>
                   <div>
@@ -328,7 +328,7 @@ export default function CAProfileManagementPage() {
                           years_of_experience: Number(e.target.value),
                         }))
                       }
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
+                      className="w-full px-4 py-2 border border-gray-300  rounded-lg bg-white"
                     />
                   </div>
                 </div>
@@ -348,7 +348,7 @@ export default function CAProfileManagementPage() {
                 {profile.specializations.map((spec) => (
                   <span
                     key={spec}
-                    className="px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full font-medium"
+                    className="px-3 py-1.5 bg-blue-100  text-blue-700 dark:text-blue-300 rounded-full font-medium"
                   >
                     {spec}
                   </span>
@@ -363,7 +363,7 @@ export default function CAProfileManagementPage() {
                     className={`p-3 border-2 rounded-lg text-center transition-all ${
                       formData.specializations.includes(spec)
                         ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/20'
-                        : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
+                        : 'border-gray-200  hover:border-blue-300'
                     }`}
                   >
                     {spec}
@@ -382,7 +382,7 @@ export default function CAProfileManagementPage() {
 
             {!editing ? (
               <div className="space-y-2">
-                <p className="text-gray-600 dark:text-gray-400">{profile.office_address}</p>
+                <p className="text-gray-600 text-gray-600">{profile.office_address}</p>
                 <p className="font-semibold">
                   {profile.city}, {profile.state} - {profile.pincode}
                 </p>
@@ -397,7 +397,7 @@ export default function CAProfileManagementPage() {
                     onChange={(e) =>
                       setFormData((prev) => ({ ...prev, office_address: e.target.value }))
                     }
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
+                    className="w-full px-4 py-2 border border-gray-300  rounded-lg bg-white"
                   />
                 </div>
                 <div className="grid grid-cols-3 gap-4">
@@ -409,7 +409,7 @@ export default function CAProfileManagementPage() {
                       onChange={(e) =>
                         setFormData((prev) => ({ ...prev, city: e.target.value }))
                       }
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
+                      className="w-full px-4 py-2 border border-gray-300  rounded-lg bg-white"
                     />
                   </div>
                   <div>
@@ -420,7 +420,7 @@ export default function CAProfileManagementPage() {
                       onChange={(e) =>
                         setFormData((prev) => ({ ...prev, state: e.target.value }))
                       }
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
+                      className="w-full px-4 py-2 border border-gray-300  rounded-lg bg-white"
                     />
                   </div>
                   <div>
@@ -431,7 +431,7 @@ export default function CAProfileManagementPage() {
                       onChange={(e) =>
                         setFormData((prev) => ({ ...prev, pincode: e.target.value }))
                       }
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
+                      className="w-full px-4 py-2 border border-gray-300  rounded-lg bg-white"
                     />
                   </div>
                 </div>
@@ -444,7 +444,7 @@ export default function CAProfileManagementPage() {
             <h2 className="text-xl font-bold mb-4">Professional Bio</h2>
 
             {!editing ? (
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-gray-600 text-gray-600">
                 {profile.bio || 'No bio added yet'}
               </p>
             ) : (
@@ -452,7 +452,7 @@ export default function CAProfileManagementPage() {
                 value={formData.bio}
                 onChange={(e) => setFormData((prev) => ({ ...prev, bio: e.target.value }))}
                 rows={4}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
+                className="w-full px-4 py-2 border border-gray-300  rounded-lg bg-white"
                 placeholder="Tell clients about your expertise..."
               />
             )}
@@ -471,7 +471,7 @@ export default function CAProfileManagementPage() {
             {!editing ? (
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm text-gray-600 dark:text-gray-400">
+                  <label className="text-sm text-gray-600 text-gray-600">
                     Consultation Fee
                   </label>
                   <p className="text-2xl font-bold">
@@ -481,7 +481,7 @@ export default function CAProfileManagementPage() {
                   </p>
                 </div>
                 <div>
-                  <label className="text-sm text-gray-600 dark:text-gray-400">
+                  <label className="text-sm text-gray-600 text-gray-600">
                     Monthly Retainer
                   </label>
                   <p className="text-2xl font-bold">
@@ -504,7 +504,7 @@ export default function CAProfileManagementPage() {
                         consultation_fee: e.target.value ? Number(e.target.value) : undefined,
                       }))
                     }
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
+                    className="w-full px-4 py-2 border border-gray-300  rounded-lg bg-white"
                     placeholder="e.g., 2000"
                   />
                 </div>
@@ -519,7 +519,7 @@ export default function CAProfileManagementPage() {
                         monthly_retainer_fee: e.target.value ? Number(e.target.value) : undefined,
                       }))
                     }
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
+                    className="w-full px-4 py-2 border border-gray-300  rounded-lg bg-white"
                     placeholder="e.g., 10000"
                   />
                 </div>
@@ -537,7 +537,7 @@ export default function CAProfileManagementPage() {
                   <CheckCircle className="w-8 h-8 text-green-600" />
                   <div>
                     <p className="font-semibold text-green-600">Verified</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-gray-600 text-gray-600">
                       ICAI: {profile.icai_membership_number}
                     </p>
                   </div>
@@ -547,7 +547,7 @@ export default function CAProfileManagementPage() {
                   <Award className="w-8 h-8 text-yellow-600" />
                   <div>
                     <p className="font-semibold text-yellow-600">Pending Verification</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-gray-600 text-gray-600">
                       Under review (24-48 hours)
                     </p>
                   </div>
@@ -557,7 +557,7 @@ export default function CAProfileManagementPage() {
                   <X className="w-8 h-8 text-red-600" />
                   <div>
                     <p className="font-semibold text-red-600">Verification Failed</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-gray-600 text-gray-600">
                       Please contact support
                     </p>
                   </div>
@@ -576,8 +576,8 @@ export default function CAProfileManagementPage() {
                 <span
                   className={`px-3 py-1 rounded-full text-sm font-semibold ${
                     profile.available_for_hire
-                      ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
-                      : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
+                      ? 'bg-green-100  text-green-700 dark:text-green-300'
+                      : 'bg-gray-100 text-gray-700 dark:text-gray-300'
                   }`}
                 >
                   {profile.available_for_hire ? 'Yes' : 'No'}

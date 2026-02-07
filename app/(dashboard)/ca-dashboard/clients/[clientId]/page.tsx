@@ -89,7 +89,7 @@ export default async function ClientDetailsPage({ params }: ClientDetailsPagePro
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
+            <CardTitle className="text-sm font-medium">
               Health Score
             </CardTitle>
           </CardHeader>
@@ -109,7 +109,7 @@ export default async function ClientDetailsPage({ params }: ClientDetailsPagePro
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
+            <CardTitle className="text-sm font-medium">
               Risk Level
             </CardTitle>
           </CardHeader>
@@ -126,7 +126,7 @@ export default async function ClientDetailsPage({ params }: ClientDetailsPagePro
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
+            <CardTitle className="text-sm font-medium">
               Open Alerts
             </CardTitle>
           </CardHeader>
@@ -139,7 +139,7 @@ export default async function ClientDetailsPage({ params }: ClientDetailsPagePro
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
+            <CardTitle className="text-sm font-medium">
               Access Until
             </CardTitle>
           </CardHeader>
@@ -160,7 +160,7 @@ export default async function ClientDetailsPage({ params }: ClientDetailsPagePro
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
-              <span className="text-gray-600 dark:text-gray-400">Pending</span>
+              <span className="text-gray-600">Pending</span>
               <span className="text-2xl font-bold text-orange-600">
                 {client.pending_gstr1}
               </span>
@@ -175,7 +175,7 @@ export default async function ClientDetailsPage({ params }: ClientDetailsPagePro
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
-              <span className="text-gray-600 dark:text-gray-400">Pending</span>
+              <span className="text-gray-600">Pending</span>
               <span className="text-2xl font-bold text-orange-600">
                 {client.pending_gstr3b}
               </span>
@@ -201,7 +201,7 @@ export default async function ClientDetailsPage({ params }: ClientDetailsPagePro
               {alerts.slice(0, 5).map((alert) => (
                 <div
                   key={alert.id}
-                  className="p-3 border border-gray-200 dark:border-gray-600 rounded-lg"
+                  className="p-3 border border-gray-200 rounded-lg"
                 >
                   <div className="flex items-start justify-between mb-2">
                     <Badge
@@ -217,7 +217,7 @@ export default async function ClientDetailsPage({ params }: ClientDetailsPagePro
                     {alert.alert_message}
                   </p>
                   {alert.resolution_steps && (
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                    <p className="text-xs text-gray-600 mt-1">
                       {alert.resolution_steps}
                     </p>
                   )}
@@ -254,13 +254,13 @@ export default async function ClientDetailsPage({ params }: ClientDetailsPagePro
               {invoices.map((invoice) => (
                 <div
                   key={invoice.id}
-                  className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-600 rounded-lg hover:border-emerald-300 dark:hover:border-emerald-500 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                  className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:border-emerald-300 dark:hover:border-emerald-500 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
                 >
                   <div>
                     <div className="font-medium text-gray-900 dark:text-white">
                       {invoice.invoice_number}
                     </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                    <div className="text-sm text-gray-600">
                       {new Date(invoice.invoice_date).toLocaleDateString()}
                     </div>
                   </div>

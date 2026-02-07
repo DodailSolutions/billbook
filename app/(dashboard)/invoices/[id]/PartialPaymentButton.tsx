@@ -89,7 +89,7 @@ export function PartialPaymentButton({
 
     return (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => !isSubmitting && setIsOpen(false)}>
-            <div className="bg-white dark:bg-gray-900 rounded-lg p-6 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
                 <h3 className="text-lg font-semibold mb-4">Record Payment</h3>
                 <p className="text-sm text-muted-foreground mb-4">
                     Invoice: {invoiceNumber}
@@ -97,15 +97,15 @@ export function PartialPaymentButton({
 
                 <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
                     <div className="flex justify-between text-sm mb-1">
-                        <span className="text-gray-600 dark:text-gray-400">Total Amount:</span>
+                        <span className="text-gray-600 text-gray-600">Total Amount:</span>
                         <span className="font-semibold">₹{totalAmount.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-sm mb-1">
-                        <span className="text-gray-600 dark:text-gray-400">Paid So Far:</span>
+                        <span className="text-gray-600 text-gray-600">Paid So Far:</span>
                         <span className="font-semibold text-green-600">₹{amountPaid.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-sm pt-2 border-t border-blue-200 dark:border-blue-800">
-                        <span className="text-gray-600 dark:text-gray-400 font-medium">Remaining:</span>
+                        <span className="text-gray-600 text-gray-600 font-medium">Remaining:</span>
                         <span className="font-bold text-blue-600">₹{amountRemaining.toFixed(2)}</span>
                     </div>
                 </div>

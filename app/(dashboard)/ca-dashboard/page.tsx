@@ -62,7 +62,7 @@ export default async function CADashboardPage() {
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
             CA Dashboard
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
+          <p className="text-gray-600 text-gray-600 mt-1">
             {caProfile.ca_name} • {caProfile.ca_firm_name || 'Independent CA'}
           </p>
         </div>
@@ -89,13 +89,13 @@ export default async function CADashboardPage() {
             <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">
               Total Clients
             </CardTitle>
-            <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            <Users className="h-4 w-4 text-blue-600 text-blue-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-gray-900 dark:text-white">
               {dashboard.total_clients}
             </div>
-            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+            <p className="text-xs text-gray-600 text-gray-600 mt-1">
               {dashboard.active_clients} active
             </p>
           </CardContent>
@@ -112,7 +112,7 @@ export default async function CADashboardPage() {
             <div className="text-2xl font-bold text-red-600 dark:text-red-400">
               {dashboard.critical_alerts}
             </div>
-            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+            <p className="text-xs text-gray-600 text-gray-600 mt-1">
               {dashboard.total_alerts} total alerts
             </p>
           </CardContent>
@@ -129,7 +129,7 @@ export default async function CADashboardPage() {
             <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
               {dashboard.pending_returns}
             </div>
-            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+            <p className="text-xs text-gray-600 text-gray-600 mt-1">
               Across all clients
             </p>
           </CardContent>
@@ -140,13 +140,13 @@ export default async function CADashboardPage() {
             <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">
               Returns Filed
             </CardTitle>
-            <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
+            <CheckCircle2 className="h-4 w-4 text-green-600 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+            <div className="text-2xl font-bold text-green-600 text-green-600">
               {dashboard.pending_returns || 0}
             </div>
-            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+            <p className="text-xs text-gray-600 text-gray-600 mt-1">
               Pending Returns
             </p>
           </CardContent>
@@ -179,7 +179,7 @@ export default async function CADashboardPage() {
                     href={`/ca-dashboard/clients/${client.client_user_id}`}
                     className="block"
                   >
-                    <div className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-600 rounded-lg hover:border-emerald-300 dark:hover:border-emerald-500 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                    <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-emerald-300 dark:hover:border-emerald-500 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
                       <div className="flex items-center gap-4">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
@@ -190,7 +190,7 @@ export default async function CADashboardPage() {
                               {client.access_status}
                             </Badge>
                           </div>
-                          <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                          <div className="flex items-center gap-4 text-sm text-gray-600 text-gray-600">
                             <span className="flex items-center gap-1">
                               <TrendingUp className="h-3 w-3" />
                               Health: {client.health_score || 'N/A'}
@@ -261,7 +261,7 @@ export default async function CADashboardPage() {
         </CardHeader>
         <CardContent>
           {dashboard.recent_activity.length === 0 ? (
-            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+            <div className="text-center py-8 text-gray-500 text-gray-600">
               <Clock className="h-8 w-8 mx-auto mb-2 opacity-50" />
               <p className="text-sm">No recent activity</p>
             </div>
@@ -270,19 +270,19 @@ export default async function CADashboardPage() {
               {dashboard.recent_activity.slice(0, 5).map((activity) => (
                 <div
                   key={activity.id}
-                  className="flex items-start gap-3 p-3 border border-gray-200 dark:border-gray-700 rounded-lg"
+                  className="flex items-start gap-3 p-3 border border-gray-200  rounded-lg"
                 >
-                  <Activity className="h-4 w-4 text-gray-400 dark:text-gray-500 mt-0.5" />
+                  <Activity className="h-4 w-4 text-gray-400  mt-0.5" />
                   <div className="flex-1">
                     <p className="text-sm text-gray-900 dark:text-white">
                       {activity.activity_description}
                     </p>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                      <span className="text-xs text-gray-500 text-gray-600">
                         {new Date(activity.performed_at).toLocaleString()}
                       </span>
                       {activity.ip_address && (
-                        <span className="text-xs text-gray-400 dark:text-gray-500">
+                        <span className="text-xs text-gray-400 ">
                           • IP: {activity.ip_address}
                         </span>
                       )}

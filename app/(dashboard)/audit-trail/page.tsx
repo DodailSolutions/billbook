@@ -19,13 +19,13 @@ export default async function AuditTrailPage() {
   const getActionIcon = (action: string) => {
     switch (action) {
       case 'create':
-        return <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
+        return <CheckCircle2 className="h-4 w-4 text-green-600 text-green-600" />
       case 'update':
-        return <Edit className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+        return <Edit className="h-4 w-4 text-blue-600 text-blue-600" />
       case 'delete':
         return <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
       case 'view':
-        return <Eye className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+        return <Eye className="h-4 w-4 text-gray-600 text-gray-600" />
       case 'export':
         return <Download className="h-4 w-4 text-purple-600 dark:text-purple-400" />
       case 'file':
@@ -33,7 +33,7 @@ export default async function AuditTrailPage() {
       case 'cancel':
         return <XCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
       default:
-        return <Clock className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+        return <Clock className="h-4 w-4 text-gray-600 text-gray-600" />
     }
   }
 
@@ -42,17 +42,17 @@ export default async function AuditTrailPage() {
       case 'create':
         return 'bg-green-100 text-green-700 dark:bg-green-900/80 dark:text-green-200'
       case 'update':
-        return 'bg-blue-100 text-blue-700 dark:bg-blue-900/80 dark:text-blue-200'
+        return 'bg-blue-100 text-blue-700 dark:bg-blue-900/80 text-blue-900'
       case 'delete':
         return 'bg-red-100 text-red-700 dark:bg-red-900/80 dark:text-red-200'
       case 'view':
-        return 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200'
+        return 'bg-gray-100 text-gray-700 '
       case 'export':
         return 'bg-purple-100 text-purple-700 dark:bg-purple-900/80 dark:text-purple-200'
       case 'file':
         return 'bg-orange-100 text-orange-700 dark:bg-orange-900/80 dark:text-orange-200'
       default:
-        return 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200'
+        return 'bg-gray-100 text-gray-700 '
     }
   }
 
@@ -70,7 +70,7 @@ export default async function AuditTrailPage() {
             <Shield className="h-8 w-8 text-emerald-600" />
             Audit Trail
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
+          <p className="text-gray-600 text-gray-600 mt-1">
             Complete activity log with timestamp and IP tracking
           </p>
         </div>
@@ -90,7 +90,7 @@ export default async function AuditTrailPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
+            <CardTitle className="text-sm font-medium text-gray-600 text-gray-600">
               Total Actions
             </CardTitle>
           </CardHeader>
@@ -121,7 +121,7 @@ export default async function AuditTrailPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+            <div className="text-2xl font-bold text-blue-600 text-blue-600">
               {auditLogs.filter(log => {
                 const logDate = new Date(log.performed_at)
                 const today = new Date()
@@ -138,7 +138,7 @@ export default async function AuditTrailPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+            <div className="text-2xl font-bold text-green-600 text-green-600">
               {auditLogs.filter(log => {
                 const logDate = new Date(log.performed_at)
                 const weekAgo = new Date()
@@ -175,7 +175,7 @@ export default async function AuditTrailPage() {
                   className={`p-4 border rounded-lg ${
                     log.is_critical_action
                       ? 'border-red-300 dark:border-red-600 bg-red-50 dark:bg-red-900/30'
-                      : 'border-gray-200 dark:border-gray-600'
+                      : 'border-gray-200'
                   }`}
                 >
                   <div className="flex items-start justify-between">
@@ -198,7 +198,7 @@ export default async function AuditTrailPage() {
                         <p className="text-sm text-gray-900 dark:text-white font-medium">
                           {log.action_description}
                         </p>
-                        <div className="flex items-center gap-3 mt-2 text-xs text-gray-600 dark:text-gray-400">
+                        <div className="flex items-center gap-3 mt-2 text-xs text-gray-600 text-gray-600">
                           <span className="flex items-center gap-1">
                             <Clock className="h-3 w-3" />
                             {new Date(log.performed_at).toLocaleString()}
@@ -213,13 +213,13 @@ export default async function AuditTrailPage() {
                           )}
                           {log.geolocation && (
                             <span className="flex items-center gap-1">
-                              <span className="text-gray-500 dark:text-gray-400">📍</span>
+                              <span className="text-gray-500 text-gray-600">📍</span>
                               {log.geolocation.city}, {log.geolocation.country}
                             </span>
                           )}
                         </div>
                         {log.user_agent && (
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">
+                          <p className="text-xs text-gray-500 text-gray-600 mt-1 truncate">
                             {log.user_agent}
                           </p>
                         )}
@@ -228,7 +228,7 @@ export default async function AuditTrailPage() {
                             <summary className="text-xs text-blue-600 cursor-pointer hover:underline">
                               View Changes
                             </summary>
-                            <div className="mt-2 p-2 bg-gray-100 dark:bg-gray-800 rounded text-xs space-y-1">
+                            <div className="mt-2 p-2 bg-gray-100 rounded text-xs space-y-1">
                               {log.old_values && (
                                 <div>
                                   <span className="font-semibold text-red-600">Before:</span>
@@ -266,7 +266,7 @@ export default async function AuditTrailPage() {
             Compliance Information
           </CardTitle>
         </CardHeader>
-        <CardContent className="text-sm text-blue-800 dark:text-blue-200 space-y-2">
+        <CardContent className="text-sm text-blue-800 text-blue-900 space-y-2">
           <p>✓ All audit logs are retained for 7 years as per compliance requirements</p>
           <p>✓ IP addresses and timestamps are recorded for all critical actions</p>
           <p>✓ Before/After state is captured for all modifications</p>

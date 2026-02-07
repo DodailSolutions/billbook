@@ -149,13 +149,13 @@ export default function RecurringInvoiceForm({ customers, sourceInvoice }: Recur
                     {/* Customer Selection */}
                     <div className="grid gap-6 md:grid-cols-2">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                            <label className="block text-sm font-medium text-gray-700  mb-2">
                                 Customer *
                             </label>
                             <select
                                 value={customerId}
                                 onChange={(e) => setCustomerId(e.target.value)}
-                                className="w-full px-4 py-2.5 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors"
+                                className="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 bg-white text-gray-900  transition-colors"
                                 required
                             >
                                 <option value="">Select a customer</option>
@@ -168,13 +168,13 @@ export default function RecurringInvoiceForm({ customers, sourceInvoice }: Recur
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                            <label className="block text-sm font-medium text-gray-700  mb-2">
                                 Billing Frequency *
                             </label>
                             <select
                                 value={frequency}
                                 onChange={(e) => setFrequency(e.target.value as 'monthly' | 'yearly')}
-                                className="w-full px-4 py-2.5 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors"
+                                className="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 bg-white text-gray-900  transition-colors"
                                 required
                             >
                                 <option value="monthly">Monthly</option>
@@ -186,7 +186,7 @@ export default function RecurringInvoiceForm({ customers, sourceInvoice }: Recur
                     {/* Dates */}
                     <div className="grid gap-6 md:grid-cols-2">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                            <label className="block text-sm font-medium text-gray-700  mb-2">
                                 <Calendar className="h-4 w-4 inline mr-1" />
                                 Start Date *
                             </label>
@@ -199,7 +199,7 @@ export default function RecurringInvoiceForm({ customers, sourceInvoice }: Recur
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                            <label className="block text-sm font-medium text-gray-700  mb-2">
                                 <Calendar className="h-4 w-4 inline mr-1" />
                                 End Date (Optional)
                             </label>
@@ -217,7 +217,7 @@ export default function RecurringInvoiceForm({ customers, sourceInvoice }: Recur
 
                     {/* GST */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                        <label className="block text-sm font-medium text-gray-700  mb-2">
                             GST Percentage (%)
                         </label>
                         <Input
@@ -233,7 +233,7 @@ export default function RecurringInvoiceForm({ customers, sourceInvoice }: Recur
                     {/* Items */}
                     <div className="space-y-4">
                         <div className="flex items-center justify-between">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+                            <label className="block text-sm font-medium text-gray-700 ">
                                 Invoice Items *
                             </label>
                             <Button
@@ -248,7 +248,7 @@ export default function RecurringInvoiceForm({ customers, sourceInvoice }: Recur
                         </div>
 
                         {items.map((item, index) => (
-                            <Card key={index} className="p-4 bg-gray-50 dark:bg-gray-800/80 border-gray-200 dark:border-gray-700">
+                            <Card key={index} className="p-4 bg-gray-50/80 border-gray-200 ">
                                 <div className="space-y-3">
                                     <div className="flex items-start gap-3">
                                         <div className="flex-1">
@@ -306,28 +306,28 @@ export default function RecurringInvoiceForm({ customers, sourceInvoice }: Recur
                     </div>
 
                     {/* Totals */}
-                    <div className="border-t-2 dark:border-gray-700 pt-4 space-y-3 bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg">
+                    <div className="border-t-2  pt-4 space-y-3 bg-gray-50/50 p-4 rounded-lg">
                         <div className="flex justify-between text-base">
                             <span className="text-gray-600 dark:text-gray-300">Subtotal:</span>
-                            <span className="font-semibold text-gray-900 dark:text-gray-100">₹{subtotal.toFixed(2)}</span>
+                            <span className="font-semibold text-gray-900 ">₹{subtotal.toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between text-base">
                             <span className="text-gray-600 dark:text-gray-300">GST ({gstPercentage}%):</span>
-                            <span className="font-semibold text-gray-900 dark:text-gray-100">₹{gstAmount.toFixed(2)}</span>
+                            <span className="font-semibold text-gray-900 ">₹{gstAmount.toFixed(2)}</span>
                         </div>
-                        <div className="flex justify-between text-xl font-bold border-t-2 dark:border-gray-700 pt-3">
-                            <span className="text-gray-900 dark:text-gray-100">Total per Invoice:</span>
-                            <span className="text-blue-600 dark:text-blue-400">₹{total.toFixed(2)}</span>
+                        <div className="flex justify-between text-xl font-bold border-t-2  pt-3">
+                            <span className="text-gray-900 ">Total per Invoice:</span>
+                            <span className="text-blue-600 text-blue-600">₹{total.toFixed(2)}</span>
                         </div>
                     </div>
 
                     {/* Notes */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                        <label className="block text-sm font-medium text-gray-700  mb-2">
                             Notes
                         </label>
                         <textarea
-                            className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
+                            className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 bg-white text-gray-900  placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
                             rows={3}
                             value={notes}
                             onChange={(e) => setNotes(e.target.value)}

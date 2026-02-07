@@ -41,7 +41,7 @@ async function AnalyticsContent() {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="bg-white dark:bg-gray-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-800">
+      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
         <div className="flex items-center gap-4">
           <div className="p-3 bg-linear-to-br from-purple-500 to-blue-600 rounded-xl shadow-lg">
             <BarChart3 className="h-8 w-8 text-white" />
@@ -50,7 +50,7 @@ async function AnalyticsContent() {
             <h1 className="text-3xl font-bold bg-linear-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
               Business Analytics
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">
+            <p className="text-gray-600 text-gray-600 mt-1">
               Comprehensive insights and real-time business intelligence
             </p>
           </div>
@@ -63,25 +63,25 @@ async function AnalyticsContent() {
           <div className="p-6">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                  <Activity className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                <div className="p-2 bg-blue-100  rounded-lg">
+                  <Activity className="h-6 w-6 text-blue-600 text-blue-600" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                  <h2 className="text-xl font-semibold text-gray-900 ">
                     Business Health Index
                   </h2>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-gray-600 text-gray-600">
                     Overall performance score and indicators
                   </p>
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-4xl font-bold text-blue-600 dark:text-blue-400">
+                <div className="text-4xl font-bold text-blue-600 text-blue-600">
                   {businessHealth.overall_score}
                 </div>
                 <div className={`text-sm font-medium mt-1 px-3 py-1 rounded-full inline-block ${
-                  businessHealth.category === 'excellent' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' :
-                  businessHealth.category === 'good' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' :
+                  businessHealth.category === 'excellent' ? 'bg-green-100 text-green-700  dark:text-green-300' :
+                  businessHealth.category === 'good' ? 'bg-blue-100 text-blue-700  dark:text-blue-300' :
                   businessHealth.category === 'fair' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300' :
                   'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
                 }`}>
@@ -98,11 +98,11 @@ async function AnalyticsContent() {
                 { label: 'Growth', value: businessHealth.scores.growth_score, color: 'orange' },
                 { label: 'Compliance', value: businessHealth.scores.compliance_score, color: 'indigo' }
               ].map((score) => (
-                <div key={score.label} className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                <div key={score.label} className="text-center p-4 bg-gray-50 rounded-lg">
                   <div className={`text-2xl font-bold text-${score.color}-600 dark:text-${score.color}-400`}>
                     {score.value}
                   </div>
-                  <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                  <div className="text-xs text-gray-600 text-gray-600 mt-1">
                     {score.label}
                   </div>
                 </div>
@@ -119,13 +119,13 @@ async function AnalyticsContent() {
                     <AlertCircle className={`h-5 w-5 mt-0.5 ${
                       rec.priority === 'high' ? 'text-red-600 dark:text-red-400' :
                       rec.priority === 'medium' ? 'text-yellow-600 dark:text-yellow-400' :
-                      'text-blue-600 dark:text-blue-400'
+                      'text-blue-600 text-blue-600'
                     }`} />
                     <div className="flex-1">
-                      <div className="font-medium text-gray-900 dark:text-gray-100">
+                      <div className="font-medium text-gray-900 ">
                         {rec.message}
                       </div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                      <div className="text-sm text-gray-600 text-gray-600 mt-1">
                         {rec.action}
                       </div>
                     </div>
@@ -144,41 +144,41 @@ async function AnalyticsContent() {
           <Card>
             <div className="p-6">
               <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-                  <DollarSign className="h-6 w-6 text-green-600 dark:text-green-400" />
+                <div className="p-2 bg-green-100  rounded-lg">
+                  <DollarSign className="h-6 w-6 text-green-600 text-green-600" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                  <h2 className="text-xl font-semibold text-gray-900 ">
                     Real-time Cash Flow
                   </h2>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-gray-600 text-gray-600">
                     Current cash position
                   </p>
                 </div>
               </div>
               
               <div className="space-y-4">
-                <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Opening Balance</span>
-                  <span className="font-semibold text-gray-900 dark:text-gray-100">
+                <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                  <span className="text-sm text-gray-600 text-gray-600">Opening Balance</span>
+                  <span className="font-semibold text-gray-900 ">
                     ₹{cashFlow.opening_cash_balance?.toLocaleString('en-IN') || '0'}
                   </span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Cash Inflow</span>
-                  <span className="font-semibold text-green-600 dark:text-green-400">
+                  <span className="text-sm text-gray-600 text-gray-600">Cash Inflow</span>
+                  <span className="font-semibold text-green-600 text-green-600">
                     +₹{cashFlow.cash_inflow?.toLocaleString('en-IN') || '0'}
                   </span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Cash Outflow</span>
+                  <span className="text-sm text-gray-600 text-gray-600">Cash Outflow</span>
                   <span className="font-semibold text-red-600 dark:text-red-400">
                     -₹{cashFlow.cash_outflow?.toLocaleString('en-IN') || '0'}
                   </span>
                 </div>
                 <div className="flex justify-between items-center p-4 bg-linear-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg border-2 border-blue-200 dark:border-blue-800">
-                  <span className="font-medium text-gray-900 dark:text-gray-100">Closing Balance</span>
-                  <span className="text-xl font-bold text-blue-600 dark:text-blue-400">
+                  <span className="font-medium text-gray-900 ">Closing Balance</span>
+                  <span className="text-xl font-bold text-blue-600 text-blue-600">
                     ₹{cashFlow.closing_cash_balance?.toLocaleString('en-IN') || '0'}
                   </span>
                 </div>
@@ -196,30 +196,30 @@ async function AnalyticsContent() {
                   <Shield className="h-6 w-6 text-orange-600 dark:text-orange-400" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                  <h2 className="text-xl font-semibold text-gray-900 ">
                     GST Liability Tracker
                   </h2>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-gray-600 text-gray-600">
                     Current GST obligations
                   </p>
                 </div>
               </div>
               
               <div className="space-y-4">
-                <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">GST Collected</span>
-                  <span className="font-semibold text-gray-900 dark:text-gray-100">
+                <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                  <span className="text-sm text-gray-600 text-gray-600">GST Collected</span>
+                  <span className="font-semibold text-gray-900 ">
                     ₹{gstLiability.total_gst_collected.toLocaleString('en-IN')}
                   </span>
                 </div>
-                <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">ITC Available</span>
-                  <span className="font-semibold text-green-600 dark:text-green-400">
+                <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                  <span className="text-sm text-gray-600 text-gray-600">ITC Available</span>
+                  <span className="font-semibold text-green-600 text-green-600">
                     ₹{gstLiability.itc_available.toLocaleString('en-IN')}
                   </span>
                 </div>
                 <div className="flex justify-between items-center p-4 bg-linear-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 rounded-lg border-2 border-orange-200 dark:border-orange-800">
-                  <span className="font-medium text-gray-900 dark:text-gray-100">Net GST Payable</span>
+                  <span className="font-medium text-gray-900 ">Net GST Payable</span>
                   <span className="text-xl font-bold text-orange-600 dark:text-orange-400">
                     ₹{gstLiability.net_gst_payable.toLocaleString('en-IN')}
                   </span>
@@ -227,22 +227,22 @@ async function AnalyticsContent() {
                 
                 <div className="grid grid-cols-3 gap-2 mt-4">
                   <div className="text-center p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                    <div className="text-sm font-semibold text-blue-600 dark:text-blue-400">
+                    <div className="text-sm font-semibold text-blue-600 text-blue-600">
                       ₹{gstLiability.output_gst_breakdown.cgst.toLocaleString('en-IN')}
                     </div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400">CGST</div>
+                    <div className="text-xs text-gray-600 text-gray-600">CGST</div>
                   </div>
                   <div className="text-center p-2 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                    <div className="text-sm font-semibold text-green-600 dark:text-green-400">
+                    <div className="text-sm font-semibold text-green-600 text-green-600">
                       ₹{gstLiability.output_gst_breakdown.sgst.toLocaleString('en-IN')}
                     </div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400">SGST</div>
+                    <div className="text-xs text-gray-600 text-gray-600">SGST</div>
                   </div>
                   <div className="text-center p-2 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
                     <div className="text-sm font-semibold text-purple-600 dark:text-purple-400">
                       ₹{gstLiability.output_gst_breakdown.igst.toLocaleString('en-IN')}
                     </div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400">IGST</div>
+                    <div className="text-xs text-gray-600 text-gray-600">IGST</div>
                   </div>
                 </div>
 
@@ -253,7 +253,7 @@ async function AnalyticsContent() {
                 }`}>
                   <span className="text-sm font-medium">Filing Status</span>
                   <span className={`text-sm font-semibold uppercase ${
-                    gstLiability.filing_status === 'filed' ? 'text-green-600 dark:text-green-400' :
+                    gstLiability.filing_status === 'filed' ? 'text-green-600 text-green-600' :
                     gstLiability.filing_status === 'overdue' ? 'text-red-600 dark:text-red-400' :
                     'text-yellow-600 dark:text-yellow-400'
                   }`}>
@@ -275,10 +275,10 @@ async function AnalyticsContent() {
                 <Brain className="h-6 w-6 text-purple-600 dark:text-purple-400" />
               </div>
               <div>
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                <h2 className="text-xl font-semibold text-gray-900 ">
                   AI Insights in Plain English
                 </h2>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-gray-600 text-gray-600">
                   Intelligent business recommendations
                 </p>
               </div>
@@ -300,11 +300,11 @@ async function AnalyticsContent() {
                       insight.priority === 'critical' ? 'text-red-600 dark:text-red-400' :
                       insight.priority === 'high' ? 'text-orange-600 dark:text-orange-400' :
                       insight.priority === 'medium' ? 'text-yellow-600 dark:text-yellow-400' :
-                      'text-blue-600 dark:text-blue-400'
+                      'text-blue-600 text-blue-600'
                     }`} />
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+                        <h3 className="font-semibold text-gray-900 ">
                           {insight.title}
                         </h3>
                         <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
@@ -319,17 +319,17 @@ async function AnalyticsContent() {
                       <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
                         {insight.description}
                       </p>
-                      <div className="bg-white dark:bg-gray-800 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
-                        <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                      <div className="bg-white p-3 rounded-lg border border-gray-200 ">
+                        <div className="text-xs font-medium text-gray-600 text-gray-600 mb-1">
                           Impact:
                         </div>
-                        <div className="text-sm text-gray-900 dark:text-gray-100 mb-2">
+                        <div className="text-sm text-gray-900  mb-2">
                           {insight.impact}
                         </div>
-                        <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                        <div className="text-xs font-medium text-gray-600 text-gray-600 mb-1">
                           Recommendation:
                         </div>
-                        <div className="text-sm text-blue-600 dark:text-blue-400 font-medium">
+                        <div className="text-sm text-blue-600 text-blue-600 font-medium">
                           {insight.recommendation}
                         </div>
                       </div>
@@ -352,10 +352,10 @@ async function AnalyticsContent() {
                   <MapPin className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                  <h2 className="text-xl font-semibold text-gray-900 ">
                     City-wise Profitability
                   </h2>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-gray-600 text-gray-600">
                     Revenue and profit breakdown by location
                   </p>
                 </div>
@@ -364,7 +364,7 @@ async function AnalyticsContent() {
                 <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
                   {profitability.overall_margin.toFixed(1)}%
                 </div>
-                <div className="text-xs text-gray-600 dark:text-gray-400">
+                <div className="text-xs text-gray-600 text-gray-600">
                   Overall Margin
                 </div>
               </div>
@@ -373,7 +373,7 @@ async function AnalyticsContent() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-gray-200 dark:border-gray-700">
+                  <tr className="border-b border-gray-200 ">
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-300">
                       City
                     </th>
@@ -396,19 +396,19 @@ async function AnalyticsContent() {
                 </thead>
                 <tbody>
                   {profitability.data.slice(0, 10).map((item, idx) => (
-                    <tr key={idx} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                      <td className="py-3 px-4 font-medium text-gray-900 dark:text-gray-100">
+                    <tr key={idx} className="border-b border-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                      <td className="py-3 px-4 font-medium text-gray-900 ">
                         {item.dimension}
                       </td>
                       <td className="py-3 px-4 text-right text-gray-700 dark:text-gray-300">
                         ₹{item.revenue.toLocaleString('en-IN')}
                       </td>
-                      <td className="py-3 px-4 text-right font-medium text-green-600 dark:text-green-400">
+                      <td className="py-3 px-4 text-right font-medium text-green-600 text-green-600">
                         ₹{item.gross_profit.toLocaleString('en-IN')}
                       </td>
                       <td className="py-3 px-4 text-right">
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          item.gross_margin >= 30 ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' :
+                          item.gross_margin >= 30 ? 'bg-green-100 text-green-700  dark:text-green-300' :
                           item.gross_margin >= 15 ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300' :
                           'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
                         }`}>
@@ -439,10 +439,10 @@ async function AnalyticsContent() {
                 <TrendingUp className="h-6 w-6 text-cyan-600 dark:text-cyan-400" />
               </div>
               <div>
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                <h2 className="text-xl font-semibold text-gray-900 ">
                   Collection Efficiency Score
                 </h2>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-gray-600 text-gray-600">
                   Payment collection performance
                 </p>
               </div>
@@ -452,7 +452,7 @@ async function AnalyticsContent() {
               <div className="text-5xl font-bold text-cyan-600 dark:text-cyan-400 mb-2">
                 {collectionEfficiency.collection_efficiency_percentage?.toFixed(1) || '0'}%
               </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">
+              <div className="text-sm text-gray-600 text-gray-600">
                 Collection Efficiency Rate
               </div>
             </div>
@@ -469,10 +469,10 @@ async function AnalyticsContent() {
                 <FileText className="h-6 w-6 text-pink-600 dark:text-pink-400" />
               </div>
               <div>
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                <h2 className="text-xl font-semibold text-gray-900 ">
                   Export-Ready MIS Reports
                 </h2>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-gray-600 text-gray-600">
                   Generate comprehensive business reports
                 </p>
               </div>
@@ -495,10 +495,10 @@ async function AnalyticsContent() {
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">{report.icon}</span>
                   <div>
-                    <div className="font-medium text-gray-900 dark:text-gray-100 group-hover:text-${report.color}-600">
+                    <div className="font-medium text-gray-900  group-hover:text-${report.color}-600">
                       {report.label}
                     </div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400">
+                    <div className="text-xs text-gray-600 text-gray-600">
                       Click to generate
                     </div>
                   </div>
