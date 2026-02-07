@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/Button'
 import { FileText, Users, IndianRupee, Zap, CheckCircle, Shield, TrendingUp, RefreshCw, Clock, Building2, ArrowRight, Star, Check, BarChart3, Smartphone, Globe, Lock } from 'lucide-react'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { createClient } from '@/lib/supabase/server'
+import { FAQSection } from './_components/FAQSection'
+import { TestimonialCarousel } from './_components/TestimonialCarousel'
 
 const FEATURES = [
   { icon: FileText, title: 'Quick Invoice Creation', desc: 'Create professional invoices in under 60 seconds', color: 'blue' },
@@ -21,12 +23,6 @@ const BENEFITS = [
   'Payment tracking',
   'Mobile responsive',
   'Cloud storage',
-]
-
-const TESTIMONIALS = [
-  { name: 'Rajesh Kumar', role: 'Freelance Designer', content: 'BillBooky made invoicing so simple. I love the clean interface and GST compliance features.', rating: 5 },
-  { name: 'Priya Sharma', role: 'Consulting Firm Owner', content: 'Perfect for my consulting business. The recurring invoices feature saves me hours every month!', rating: 5 },
-  { name: 'Amit Patel', role: 'E-commerce Store', content: 'Switched from Excel to BillBooky. Best decision for my business. Highly recommend!', rating: 5 },
 ]
 
 export default async function Home() {
@@ -460,34 +456,332 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-4">
-              Loved by Indian businesses
-            </h2>
-            <p className="text-xl text-gray-600">See what our customers have to say</p>
+      {/* Lifetime Deal Section */}
+      <section className="py-20 md:py-32 bg-amber-50">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-100 border border-amber-200 rounded-full text-amber-900 text-sm font-semibold mb-6">
+            <Zap className="h-4 w-4 text-amber-600" />
+            Limited Time Offer
           </div>
+          
+          <h2 className="text-4xl md:text-6xl font-bold mb-4 text-gray-900">
+            Lifetime Deal
+          </h2>
+          <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto">
+            Pay once, use forever. No monthly fees, no hidden charges.
+          </p>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {TESTIMONIALS.map((testimonial, idx) => (
-              <div key={idx} className="bg-white rounded-xl p-6 border border-gray-200">
-                <div className="flex gap-1 mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                  ))}
-                </div>
-                <p className="text-gray-700 mb-4 leading-relaxed">"{testimonial.content}"</p>
+          <div className="bg-white rounded-3xl p-8 md:p-12 shadow-xl border border-gray-200 max-w-3xl mx-auto">
+            <div className="mb-6">
+              <div className="text-gray-500 text-lg mb-2">
+                <span className="line-through">₹15,999</span>
+                <span className="ml-2 bg-red-500 text-white text-sm px-2 py-1 rounded">38% OFF</span>
+              </div>
+              <div className="flex items-baseline justify-center gap-2 mb-3">
+                <span className="text-6xl md:text-7xl font-bold text-gray-900">₹9,999</span>
+              </div>
+              <p className="text-lg font-semibold text-amber-600">One-time payment • Lifetime access</p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-4 my-8 text-left">
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-1" />
                 <div>
-                  <div className="font-semibold text-gray-900">{testimonial.name}</div>
-                  <div className="text-sm text-gray-600">{testimonial.role}</div>
+                  <p className="font-semibold text-gray-900">Unlimited Invoices</p>
+                  <p className="text-sm text-gray-600">No monthly limits, ever</p>
                 </div>
               </div>
-            ))}
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-1" />
+                <div>
+                  <p className="font-semibold text-gray-900">All Premium Features</p>
+                  <p className="text-sm text-gray-600">Everything in Professional plan</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-1" />
+                <div>
+                  <p className="font-semibold text-gray-900">Free Updates</p>
+                  <p className="text-sm text-gray-600">All future features included</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-1" />
+                <div>
+                  <p className="font-semibold text-gray-900">Priority Support</p>
+                  <p className="text-sm text-gray-600">Lifetime priority assistance</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-1" />
+                <div>
+                  <p className="font-semibold text-gray-900">Recurring Billing</p>
+                  <p className="text-sm text-gray-600">Automated invoices & reminders</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-1" />
+                <div>
+                  <p className="font-semibold text-gray-900">Custom Branding</p>
+                  <p className="text-sm text-gray-600">Logo, colors, fonts</p>
+                </div>
+              </div>
+            </div>
+
+            <Link href="/pricing?checkout=lifetime">
+              <Button 
+                size="lg"
+                className="w-full md:w-auto bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold text-lg px-12 py-6 shadow-xl"
+              >
+                Get Lifetime Access Now →
+              </Button>
+            </Link>
+
+            <div className="mt-6 space-y-2">
+              <p className="text-sm text-gray-600">
+                ✨ <strong>Limited spots available</strong> • Secure your lifetime deal before price increases
+              </p>
+              <p className="text-sm text-gray-600">
+                💳 One-time payment via Razorpay • 14-day money-back guarantee
+              </p>
+            </div>
+
+            <div className="mt-8 pt-6 border-t border-gray-200">
+              <p className="text-xs text-gray-500">
+                * Fair usage policy applies. Lifetime access for single business entity. Unlimited invoices with reasonable usage.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-12 grid md:grid-cols-3 gap-6 text-center">
+            <div className="bg-white rounded-xl p-6 border border-amber-200">
+              <div className="text-3xl font-bold mb-2 text-gray-900">500+</div>
+              <div className="text-gray-700 font-medium">Happy Customers</div>
+            </div>
+            <div className="bg-white rounded-xl p-6 border border-amber-200">
+              <div className="text-3xl font-bold mb-2 text-gray-900">₹0</div>
+              <div className="text-gray-700 font-medium">Monthly Fees</div>
+            </div>
+            <div className="bg-white rounded-xl p-6 border border-amber-200">
+              <div className="text-3xl font-bold mb-2 text-gray-900">Forever</div>
+              <div className="text-gray-700 font-medium">Access Guaranteed</div>
+            </div>
           </div>
         </div>
       </section>
+
+      {/* Enterprise Plan */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-linear-to-br from-gray-900 to-gray-800 rounded-2xl p-8 md:p-12 text-white">
+            <div className="text-center md:text-left">
+              <h3 className="text-3xl font-bold mb-3">Enterprise</h3>
+              <p className="text-gray-300 mb-2 text-lg">₹999/month • Up to 10 team members</p>
+              <p className="text-gray-400 mb-6">Everything in Professional + larger team size + AI Accountant + Advanced Analytics</p>
+              
+              <div className="grid md:grid-cols-2 gap-4 mb-8">
+                <div className="flex items-center gap-2 text-gray-300">
+                  <CheckCircle className="h-5 w-5 text-emerald-400" />
+                  <span>Custom integrations</span>
+                </div>
+                <div className="flex items-center gap-2 text-gray-300">
+                  <CheckCircle className="h-5 w-5 text-emerald-400" />
+                  <span>Dedicated support</span>
+                </div>
+                <div className="flex items-center gap-2 text-gray-300">
+                  <CheckCircle className="h-5 w-5 text-emerald-400" />
+                  <span>API access</span>
+                </div>
+                <div className="flex items-center gap-2 text-gray-300">
+                  <CheckCircle className="h-5 w-5 text-emerald-400" />
+                  <span>White label option</span>
+                </div>
+              </div>
+
+              <div className="flex flex-col md:flex-row gap-4">
+                <Link href="/pricing" className="flex-1">
+                  <Button className="w-full bg-white text-gray-900 hover:bg-gray-100 font-semibold px-8">
+                    View Pricing
+                  </Button>
+                </Link>
+                <Link href="/contact" className="flex-1">
+                  <Button variant="outline" className="w-full bg-white/10 border-2 border-white/30 text-white hover:bg-white/20 font-semibold px-8">
+                    Contact Sales
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <TestimonialCarousel />
+
+      {/* Why Choose BillBooky - SEO Section */}
+      <section className="py-20 md:py-32 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <span className="inline-block px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-600 text-sm font-semibold mb-4">
+              Why Choose Us
+            </span>
+            <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-4">
+              India&apos;s #1 Free Invoice Generator
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Built specifically for Indian businesses, trusted by 10,000+ MSMEs, freelancers, and startups across India
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+            <div className="bg-gray-50 rounded-2xl p-8 border border-gray-200 hover:shadow-lg transition-all">
+              <div className="inline-flex p-3 bg-emerald-100 text-emerald-600 rounded-xl mb-4">
+                <IndianRupee className="h-6 w-6" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">
+                100% Free Forever
+              </h3>
+              <p className="text-gray-600 leading-relaxed">
+                No hidden charges, no credit card required. Create up to 50 invoices absolutely free. Premium plans start at just ₹299/month for unlimited invoices.
+              </p>
+            </div>
+
+            <div className="bg-gray-50 rounded-2xl p-8 border border-gray-200 hover:shadow-lg transition-all">
+              <div className="inline-flex p-3 bg-blue-100 text-blue-600 rounded-xl mb-4">
+                <CheckCircle className="h-6 w-6" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">
+                GST Compliant
+              </h3>
+              <p className="text-gray-600 leading-relaxed">
+                Automatic CGST, SGST, IGST calculations. Includes GSTIN validation, HSN/SAC codes, reverse charge mechanism, and full compliance with Indian tax laws.
+              </p>
+            </div>
+
+            <div className="bg-gray-50 rounded-2xl p-8 border border-gray-200 hover:shadow-lg transition-all">
+              <div className="inline-flex p-3 bg-purple-100 text-purple-600 rounded-xl mb-4">
+                <Zap className="h-6 w-6" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">
+                Create in 60 Seconds
+              </h3>
+              <p className="text-gray-600 leading-relaxed">
+                No complicated setup or lengthy tutorials. Sign up, add your business details, and generate professional invoices instantly. So simple, anyone can use it!
+              </p>
+            </div>
+
+            <div className="bg-gray-50 rounded-2xl p-8 border border-gray-200 hover:shadow-lg transition-all">
+              <div className="inline-flex p-3 bg-orange-100 text-orange-600 rounded-xl mb-4">
+                <Shield className="h-6 w-6" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">
+                Secure & Reliable
+              </h3>
+              <p className="text-gray-600 leading-relaxed">
+                Cloud-based with automatic backups. Your data is encrypted and stored securely. Access from anywhere, anytime on any device with bank-level security.
+              </p>
+            </div>
+
+            <div className="bg-gray-50 rounded-2xl p-8 border border-gray-200 hover:shadow-lg transition-all">
+              <div className="inline-flex p-3 bg-teal-100 text-teal-600 rounded-xl mb-4">
+                <RefreshCw className="h-6 w-6" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">
+                Recurring Invoices
+              </h3>
+              <p className="text-gray-600 leading-relaxed">
+                Perfect for subscription businesses. Automate monthly, quarterly, or yearly invoices. Set it once and never miss a billing cycle again.
+              </p>
+            </div>
+
+            <div className="bg-gray-50 rounded-2xl p-8 border border-gray-200 hover:shadow-lg transition-all">
+              <div className="inline-flex p-3 bg-pink-100 text-pink-600 rounded-xl mb-4">
+                <FileText className="h-6 w-6" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">
+                Custom Branding
+              </h3>
+              <p className="text-gray-600 leading-relaxed">
+                Add your company logo, choose custom colors and fonts. Make professional invoices that match your brand identity perfectly.
+              </p>
+            </div>
+          </div>
+
+          {/* Who It's For */}
+          <div className="bg-gray-50 rounded-3xl p-8 md:p-12 border border-gray-200 mb-16">
+            <h3 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+              Perfect For Every Indian Business
+            </h3>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="text-center">
+                <div className="inline-flex p-4 bg-emerald-50 rounded-2xl mb-4">
+                  <Users className="h-8 w-8 text-emerald-600" />
+                </div>
+                <h4 className="font-semibold text-gray-900 mb-2">Freelancers</h4>
+                <p className="text-sm text-gray-600">Consultants, designers, developers, writers</p>
+              </div>
+              <div className="text-center">
+                <div className="inline-flex p-4 bg-blue-50 rounded-2xl mb-4">
+                  <Building2 className="h-8 w-8 text-blue-600" />
+                </div>
+                <h4 className="font-semibold text-gray-900 mb-2">Small Business</h4>
+                <p className="text-sm text-gray-600">Retail shops, service providers, traders</p>
+              </div>
+              <div className="text-center">
+                <div className="inline-flex p-4 bg-purple-50 rounded-2xl mb-4">
+                  <TrendingUp className="h-8 w-8 text-purple-600" />
+                </div>
+                <h4 className="font-semibold text-gray-900 mb-2">Startups</h4>
+                <p className="text-sm text-gray-600">Tech companies, SaaS, e-commerce</p>
+              </div>
+              <div className="text-center">
+                <div className="inline-flex p-4 bg-orange-50 rounded-2xl mb-4">
+                  <Building2 className="h-8 w-8 text-orange-600" />
+                </div>
+                <h4 className="font-semibold text-gray-900 mb-2">Enterprises</h4>
+                <p className="text-sm text-gray-600">Manufacturing, wholesale, agencies</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Made in India */}
+          <div className="bg-linear-to-br from-emerald-600 to-teal-600 rounded-3xl p-8 md:p-12 text-white text-center">
+            <div className="max-w-3xl mx-auto">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-medium mb-6">
+                <span className="text-2xl">🇮🇳</span>
+                <span>Proudly Made in India</span>
+              </div>
+              <h3 className="text-3xl md:text-4xl font-bold mb-4">
+                Built for India, By Indians
+              </h3>
+              <p className="text-xl text-emerald-50 mb-8">
+                Supporting Indian rupee (₹), all GST slabs, Hindi & regional languages. Data stored in India complying with all regulations. Join the Digital India movement!
+              </p>
+              <div className="flex flex-wrap justify-center gap-4 text-emerald-50">
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5" />
+                  <span>₹ INR Currency</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5" />
+                  <span>GST Compliant</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5" />
+                  <span>Hindi Support</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5" />
+                  <span>India Servers</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <FAQSection />
 
       {/* CTA Section */}
       <section className="py-20 md:py-32">
@@ -547,15 +841,26 @@ export default async function Home() {
                 <li><Link href="#features" className="hover:text-white transition-colors">Features</Link></li>
                 <li><Link href="#pricing" className="hover:text-white transition-colors">Pricing</Link></li>
                 <li><Link href="/dashboard" className="hover:text-white transition-colors">Dashboard</Link></li>
+                <li><Link href="/faq" className="hover:text-white transition-colors">FAQ</Link></li>
               </ul>
             </div>
             
             <div>
-              <h5 className="font-bold text-white mb-4">Company</h5>
+              <h5 className="font-bold text-white mb-4">For CAs</h5>
               <ul className="space-y-2 text-sm">
+                <li><Link href="/for-cas" className="hover:text-white transition-colors">Why Join BillBooky</Link></li>
+                <li><Link href="/ca-registration" className="hover:text-white transition-colors">Register as CA</Link></li>
+                <li><Link href="/ca-marketplace" className="hover:text-white transition-colors">CA Marketplace</Link></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h5 className="font-bold text-white mb-4">Support</h5>
+              <ul className="space-y-2 text-sm">
+                <li><Link href="/support" className="hover:text-white transition-colors">Help Center</Link></li>
+                <li><Link href="/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
                 <li><Link href="/about" className="hover:text-white transition-colors">About Us</Link></li>
-                <li><Link href="/contact" className="hover:text-white transition-colors">Contact</Link></li>
-                <li><Link href="/ca-marketplace" className="hover:text-white transition-colors">CA Services</Link></li>
+                <li><a href="mailto:support@billbooky.com" className="hover:text-white transition-colors">Email Support</a></li>
               </ul>
             </div>
             
@@ -570,11 +875,10 @@ export default async function Home() {
           </div>
           
           <div className="pt-8 border-t border-gray-800 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-sm">© 2026 BillBooky. All rights reserved.</p>
+            <p className="text-sm">© 2026 BillBooky. A product of <span className="font-semibold">Dodail Solutions Private Limited</span>. Proudly serving Indian businesses with ❤️</p>
             <div className="flex items-center gap-4 text-sm">
-              <span>🇮🇳 Made in India</span>
-              <span>•</span>
-              <span className="text-blue-400">GST Compliant</span>
+              <span className="font-semibold">Made in India 🇮🇳</span>
+              <span className="text-emerald-400">GST Compliant • 100% Free</span>
             </div>
           </div>
         </div>
