@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { 
-  ArrowLeft, Plus, Trash2, Save, Send, 
+  ArrowLeft, Plus, Trash2, Send, 
   User, Receipt, FileText, 
   AlertCircle, CheckCircle2, ChevronDown, ChevronUp,
   Sparkles, Shield, Clock
@@ -78,7 +78,7 @@ export function ImprovedInvoiceForm({ customers }: ImprovedInvoiceFormProps) {
         igst: formData.supply_type === 'inter-state' ? gstAmount : 0
       }
     }))
-  }, [items.map(i => `${i.quantity}-${i.unit_price}-${i.gst_rate}`).join(), formData.supply_type])
+  }, [items, formData.supply_type])
 
   // Calculate totals
   const subtotal = items.reduce((sum, item) => sum + item.amount, 0)
@@ -133,7 +133,7 @@ export function ImprovedInvoiceForm({ customers }: ImprovedInvoiceFormProps) {
   }
 
   // Update item
-  const updateItem = (id: string, field: keyof InvoiceItem, value: any) => {
+  const updateItem = (id: string, field: keyof InvoiceItem, value: string | number) => {
     setItems(items.map(item => 
       item.id === id ? { ...item, [field]: value } : item
     ))
@@ -271,7 +271,7 @@ export function ImprovedInvoiceForm({ customers }: ImprovedInvoiceFormProps) {
             {/* Step 1: Customer Details */}
             {currentStep === 1 && (
               <Card className="shadow-lg border-0 bg-white">
-                <CardHeader className="border-b bg-gradient-to-r from-blue-50 to-purple-50">
+                <CardHeader className="border-b bg-linear-to-r from-blue-50 to-purple-50">
                   <CardTitle className="flex items-center gap-2">
                     <User className="w-5 h-5 text-blue-600" />
                     Customer & Invoice Details
@@ -405,7 +405,7 @@ export function ImprovedInvoiceForm({ customers }: ImprovedInvoiceFormProps) {
             {/* Step 2: Items */}
             {currentStep === 2 && (
               <Card className="shadow-lg border-0 bg-white">
-                <CardHeader className="border-b bg-gradient-to-r from-blue-50 to-purple-50">
+                <CardHeader className="border-b bg-linear-to-r from-blue-50 to-purple-50">
                   <div className="flex items-center justify-between">
                     <CardTitle className="flex items-center gap-2">
                       <Receipt className="w-5 h-5 text-blue-600" />
@@ -521,7 +521,7 @@ export function ImprovedInvoiceForm({ customers }: ImprovedInvoiceFormProps) {
             {/* Step 3: Review */}
             {currentStep === 3 && (
               <Card className="shadow-lg border-0 bg-white">
-                <CardHeader className="border-b bg-gradient-to-r from-blue-50 to-purple-50">
+                <CardHeader className="border-b bg-linear-to-r from-blue-50 to-purple-50">
                   <CardTitle className="flex items-center gap-2">
                     <FileText className="w-5 h-5 text-blue-600" />
                     Review Invoice
@@ -576,7 +576,7 @@ export function ImprovedInvoiceForm({ customers }: ImprovedInvoiceFormProps) {
                     <Button
                       type="submit"
                       disabled={isSubmitting}
-                      className="flex-1 gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                      className="flex-1 gap-2 bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                     >
                       <Send className="w-4 h-4" />
                       {isSubmitting ? 'Creating...' : 'Create Invoice'}
@@ -608,7 +608,7 @@ export function ImprovedInvoiceForm({ customers }: ImprovedInvoiceFormProps) {
           {/* Live Preview Sidebar */}
           <div className="lg:col-span-1">
             <Card className="sticky top-4 shadow-xl border-0 bg-white">
-              <CardHeader className="border-b bg-gradient-to-r from-purple-50 to-blue-50">
+              <CardHeader className="border-b bg-linear-to-r from-purple-50 to-blue-50">
                 <CardTitle className="text-lg">Invoice Preview</CardTitle>
               </CardHeader>
               <CardContent className="p-6 space-y-4">
