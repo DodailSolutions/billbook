@@ -5,90 +5,101 @@ import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { LayoutDashboard, FileText, Users, RefreshCw, Bell, Settings, User, Bot, UserCog, FileBarChart, HelpCircle, MessageCircle, Briefcase } from "lucide-react"
+import { LayoutDashboard, FileText, Users, RefreshCw, Bell, Settings, User, Bot, UserCog, FileBarChart, HelpCircle, MessageCircle, Briefcase, UserPlus } from "lucide-react"
 import { SignOutButton } from "./SignOutButton"
 import { PlanBanner } from "./PlanBanner"
 import { ThemeToggle } from "./ThemeToggle"
-
-const routes = [
-    {
-        label: 'Dashboard',
-        icon: LayoutDashboard,
-        href: '/dashboard',
-        color: "text-sky-500"
-    },
-    {
-        label: 'Invoices',
-        icon: FileText,
-        href: '/invoices',
-        color: "text-violet-500",
-    },
-    {
-        label: 'Recurring',
-        icon: RefreshCw,
-        href: '/invoices/recurring',
-        color: "text-purple-500",
-    },
-    {
-        label: 'Reminders',
-        icon: Bell,
-        href: '/reminders',
-        color: "text-yellow-500",
-    },
-    {
-        label: 'Customers',
-        icon: Users,
-        href: '/customers',
-        color: "text-pink-700",
-    },
-    {
-        label: 'AI Accountant',
-        icon: Bot,
-        href: '/ai-accountant',
-        color: "text-emerald-500",
-        badge: 'PRO'
-    },
-    {
-        label: 'Reports',
-        icon: FileBarChart,
-        href: '/reports',
-        color: "text-orange-500",
-    },
-    {
-        label: 'CA Dashboard',
-        icon: Briefcase,
-        href: '/ca-dashboard',
-        color: "text-emerald-500",
-    },
-    {
-        label: 'Team',
-        icon: UserCog,
-        href: '/team',
-        color: "text-blue-500",
-        badge: 'PRO'
-    },
-    {
-        label: 'Support',
-        icon: HelpCircle,
-        href: '/help',
-        color: "text-cyan-500",
-    },
-    {
-        label: 'Account',
-        icon: User,
-        href: '/settings',
-        color: "text-gray-400",
-    },
-    {
-        label: 'Invoice Settings',
-        icon: Settings,
-        href: '/invoices/settings',
-        color: "text-gray-400",
-    },
-]
+import { getMyCAProfile } from "@/lib/ca-profile-actions"
 
 export function Sidebar() {
     const pathname = usePathname()
+    const [isCA, setIsCA] = useState<boolean | null>(null)
+
+    useEffect(() => {
+        async function checkCAStatus() {
+            const profile = await getMyCAProfile()
+            setIsCA(!!profile)
+        }
+        checkCAStatus()
+    }, [])
+
+    const routes = [
+        {
+            label: 'Dashboard',
+            icon: LayoutDashboard,
+            href: '/dashboard',
+            color: "text-sky-500"
+        },
+        {
+            label: 'Invoices',
+            icon: FileText,
+            href: '/invoices',
+            color: "text-violet-500",
+        },
+        {
+            label: 'Recurring',
+            icon: RefreshCw,
+            href: '/invoices/recurring',
+            color: "text-purple-500",
+        },
+        {
+            label: 'Reminders',
+            icon: Bell,
+            href: '/reminders',
+            color: "text-yellow-500",
+        },
+        {
+            label: 'Customers',
+            icon: Users,
+            href: '/customers',
+            color: "text-pink-700",
+        },
+        {
+            label: 'AI Accountant',
+            icon: Bot,
+            href: '/ai-accountant',
+            color: "text-emerald-500",
+            badge: 'PRO'
+        },
+        {
+            label: 'Reports',
+            icon: FileBarChart,
+            href: '/reports',
+            color: "text-orange-500",
+        },
+        // Conditional: Show "CA Dashboard" for CAs, "Hire CA" for regular users
+        ...(isCA !== null ? [{
+            label: isCA ? 'CA Dashboard' : 'Hire CA',
+            icon: isCA ? Briefcase : UserPlus,
+            href: isCA ? '/ca-dashboard' : '/reports/hire-ca',
+            color: "text-emerald-500",
+        }] : []),
+        {
+            label: 'Team',
+            icon: UserCog,
+            href: '/team',
+            color: "text-blue-500",
+            badge: 'PRO'
+        },
+        {
+            label: 'Support',
+            icon: HelpCircle,
+            href: '/help',
+            color: "text-cyan-500",
+        },
+        {
+            label: 'Account',
+            icon: User,
+            href: '/settings',
+            color: "text-gray-400",
+        },
+        {
+            label: 'Invoice Settings',
+            icon: Settings,
+            href: '/invoices/settings',
+            color: "text-gray-400",
+        },
+    ]
 
     return (
         <div className="space-y-4 py-4 flex flex-col h-full bg-linear-to-b from-slate-900 to-slate-800 text-white border-r border-slate-700">
