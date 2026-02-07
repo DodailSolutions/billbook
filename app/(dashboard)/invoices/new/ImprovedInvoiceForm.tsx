@@ -9,7 +9,7 @@ import {
   ArrowLeft, Plus, Trash2, Send, 
   User, Receipt, FileText, 
   AlertCircle, CheckCircle2, ChevronDown, ChevronUp,
-  Sparkles, Shield, Clock
+  Sparkles, Shield, Clock, X, UserPlus
 } from 'lucide-react'
 import { createInvoice } from '../actions'
 import type { Customer } from '@/lib/types'
@@ -31,12 +31,14 @@ interface ImprovedInvoiceFormProps {
   customers: Customer[]
 }
 
-export function ImprovedInvoiceForm({ customers }: ImprovedInvoiceFormProps) {
+export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInvoiceFormProps) {
   const router = useRouter()
   const [currentStep, setCurrentStep] = useState(1)
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [showAddCustomerModal, setShowAddCustomerModal] = useState(false)
+  const [customers, setCustomers] = useState<Customer[]>(initialCustomers)
 
   // Form state
   const [formData, setFormData] = useState({
@@ -197,6 +199,40 @@ export function ImprovedInvoiceForm({ customers }: ImprovedInvoiceFormProps) {
     setCurrentStep(currentStep - 1)
   }
 
+  // Add customer handler
+  const handleAddCustomer = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const form = new FormData(e.currentTarget)
+    
+    try {
+      const response = await fetch('/api/customers/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: form.get('name'),
+          email: form.get('email'),
+          phone: form.get('phone'),
+          address: form.get('address'),
+          gstin: form.get('gstin'),
+        })
+      })
+
+      const data = await response.json()
+      
+      if (response.ok && data.customer) {
+        setCustomers([...customers, data.customer])
+        setFormData({...formData, customer_id: data.customer.id})
+        setShowAddCustomerModal(false)
+        e.currentTarget.reset()
+      } else {
+        alert(data.error || 'Failed to create customer')
+      }
+    } catch (error) {
+      console.error('Error:', error)
+      alert('Failed to create customer')
+    }
+  }
+
   return (
     <div className="container max-w-7xl mx-auto px-4 py-8">
       {/* Header */}
@@ -272,7 +308,7 @@ export function ImprovedInvoiceForm({ customers }: ImprovedInvoiceFormProps) {
             {currentStep === 1 && (
               <Card className="shadow-lg border-0 bg-white">
                 <CardHeader className="border-b bg-linear-to-r from-blue-50 to-purple-50">
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2 text-gray-900">
                     <User className="w-5 h-5 text-blue-600" />
                     Customer & Invoice Details
                   </CardTitle>
@@ -281,9 +317,21 @@ export function ImprovedInvoiceForm({ customers }: ImprovedInvoiceFormProps) {
                   
                   {/* Customer Selection */}
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-                      Customer <span className="text-red-500">*</span>
-                    </label>
+                    <div className="flex items-center justify-between">
+                      <label className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                        Customer <span className="text-red-500">*</span>
+                      </label>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowAddCustomerModal(true)}
+                        className="gap-1 text-xs h-7"
+                      >
+                        <UserPlus className="w-3 h-3" />
+                        Add New
+                      </Button>
+                    </div>
                     <select 
                       value={formData.customer_id} 
                       onChange={(e) => setFormData({...formData, customer_id: e.target.value})}
@@ -423,7 +471,7 @@ export function ImprovedInvoiceForm({ customers }: ImprovedInvoiceFormProps) {
               <Card className="shadow-lg border-0 bg-white">
                 <CardHeader className="border-b bg-linear-to-r from-blue-50 to-purple-50">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="flex items-center gap-2">
+                    <CardTitle className="flex items-center gap-2 text-gray-900">
                       <Receipt className="w-5 h-5 text-blue-600" />
                       Invoice Items
                     </CardTitle>
@@ -535,7 +583,7 @@ export function ImprovedInvoiceForm({ customers }: ImprovedInvoiceFormProps) {
                           </div>
 
                           <div className="space-y-2">
-                            <label className="text-sm font-medium">Amount</label>
+                            <label className="text-sm font-semibold text-gray-900">Amount</label>
                             <Input
                               value={`₹${item.amount.toFixed(2)}`}
                               disabled
@@ -556,7 +604,7 @@ export function ImprovedInvoiceForm({ customers }: ImprovedInvoiceFormProps) {
             {currentStep === 3 && (
               <Card className="shadow-lg border-0 bg-white">
                 <CardHeader className="border-b bg-linear-to-r from-blue-50 to-purple-50">
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2 text-gray-900">
                     <FileText className="w-5 h-5 text-blue-600" />
                     Review Invoice
                   </CardTitle>
@@ -643,7 +691,7 @@ export function ImprovedInvoiceForm({ customers }: ImprovedInvoiceFormProps) {
           <div className="lg:col-span-1">
             <Card className="sticky top-4 shadow-xl border-0 bg-white">
               <CardHeader className="border-b bg-linear-to-r from-purple-50 to-blue-50">
-                <CardTitle className="text-lg">Invoice Preview</CardTitle>
+                <CardTitle className="text-lg text-gray-900 font-bold">Invoice Preview</CardTitle>
               </CardHeader>
               <CardContent className="p-6 space-y-4">
                 
@@ -657,16 +705,16 @@ export function ImprovedInvoiceForm({ customers }: ImprovedInvoiceFormProps) {
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Invoice #:</span>
-                    <span className="font-semibold">INV-2026-001</span>
+                    <span className="font-semibold text-gray-900">INV-2026-001</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Date:</span>
-                    <span className="font-semibold">{formData.invoice_date}</span>
+                    <span className="font-semibold text-gray-900">{formData.invoice_date}</span>
                   </div>
                   {formData.due_date && (
                     <div className="flex justify-between">
                       <span className="text-gray-600">Due Date:</span>
-                      <span className="font-semibold">{formData.due_date}</span>
+                      <span className="font-semibold text-gray-900">{formData.due_date}</span>
                     </div>
                   )}
                 </div>
@@ -675,10 +723,10 @@ export function ImprovedInvoiceForm({ customers }: ImprovedInvoiceFormProps) {
 
                 {/* Items */}
                 <div className="space-y-2">
-                  <h3 className="font-semibold text-sm">Items</h3>
+                  <h3 className="font-semibold text-sm text-gray-900">Items</h3>
                   {items.map((item, index) => (
                     <div key={item.id} className="text-xs space-y-1 p-2 bg-gray-50 rounded">
-                      <div className="font-medium">{item.description || `Item ${index + 1}`}</div>
+                      <div className="font-medium text-gray-900">{item.description || `Item ${index + 1}`}</div>
                       <div className="flex justify-between text-gray-600">
                         <span>{item.quantity} × ₹{item.unit_price.toFixed(2)}</span>
                         <span className="font-semibold">₹{item.amount.toFixed(2)}</span>
@@ -693,7 +741,7 @@ export function ImprovedInvoiceForm({ customers }: ImprovedInvoiceFormProps) {
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Subtotal:</span>
-                    <span>₹{subtotal.toFixed(2)}</span>
+                    <span className="font-semibold text-gray-900">₹{subtotal.toFixed(2)}</span>
                   </div>
                   
                   {formData.supply_type === 'intra-state' ? (
@@ -717,7 +765,7 @@ export function ImprovedInvoiceForm({ customers }: ImprovedInvoiceFormProps) {
                   <div className="border-t" />
                   
                   <div className="flex justify-between font-bold text-lg">
-                    <span>Total:</span>
+                    <span className="text-gray-900">Total:</span>
                     <span className="text-blue-600">₹{total.toFixed(2)}</span>
                   </div>
                 </div>
@@ -727,6 +775,70 @@ export function ImprovedInvoiceForm({ customers }: ImprovedInvoiceFormProps) {
           </div>
         </div>
       </form>
+
+      {/* Add Customer Modal */}
+      {showAddCustomerModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+            <div className="flex items-center justify-between p-6 border-b">
+              <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <UserPlus className="w-5 h-5 text-blue-600" />
+                Add New Customer
+              </h2>
+              <button
+                onClick={() => setShowAddCustomerModal(false)}
+                className="text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <form onSubmit={handleAddCustomer} className="p-6 space-y-4">
+              <div className="space-y-2">
+                <label htmlFor="cust-name" className="text-sm font-semibold text-gray-900">
+                  Name <span className="text-red-500">*</span>
+                </label>
+                <Input id="cust-name" name="name" required placeholder="Enter customer name" />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="cust-email" className="text-sm font-semibold text-gray-900">Email</label>
+                <Input id="cust-email" name="email" type="email" placeholder="customer@example.com" />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="cust-phone" className="text-sm font-semibold text-gray-900">Phone</label>
+                <Input id="cust-phone" name="phone" type="tel" placeholder="+91 XXXXX XXXXX" />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="cust-gstin" className="text-sm font-semibold text-gray-900">GSTIN</label>
+                <Input id="cust-gstin" name="gstin" maxLength={15} placeholder="15 digit GSTIN" />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="cust-address" className="text-sm font-semibold text-gray-900">Address</label>
+                <textarea
+                  id="cust-address"
+                  name="address"
+                  rows={2}
+                  placeholder="Enter customer address"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div className="flex gap-2 pt-4">
+                <Button type="submit" className="flex-1 gap-2">
+                  <UserPlus className="w-4 h-4" />
+                  Add Customer
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowAddCustomerModal(false)}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
