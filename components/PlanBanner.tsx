@@ -29,8 +29,8 @@ export function PlanBanner() {
     // Lifetime plans - show special badge
     if (planStatus.isLifetime) {
         return (
-            <div className="px-3 pb-4">
-                <div className="bg-linear-to-r from-amber-500 to-orange-500 rounded-lg p-3 shadow-lg">
+            <div>
+                <div className="bg-linear-to-r from-amber-500 to-orange-500 rounded-lg p-3 shadow-md hover:shadow-lg transition-shadow">
                     <div className="flex items-center gap-2 mb-1">
                         <Crown className="h-4 w-4 text-white" />
                         <p className="text-xs font-bold text-white">LIFETIME PRO</p>
@@ -44,14 +44,14 @@ export function PlanBanner() {
     // Free plan - show upgrade prompt
     if (planStatus.planSlug === 'free') {
         return (
-            <Link href="/pricing" className="px-3 pb-4 block">
-                <div className="bg-linear-to-r from-emerald-500 to-blue-500 rounded-lg p-3 shadow-lg hover:shadow-xl transition-shadow cursor-pointer">
+            <Link href="/pricing" className="block">
+                <div className="bg-linear-to-r from-emerald-500 to-blue-500 rounded-lg p-3 shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer">
                     <div className="flex items-center gap-2 mb-1">
                         <Zap className="h-4 w-4 text-white" />
                         <p className="text-xs font-bold text-white">FREE PLAN</p>
                     </div>
                     <p className="text-xs text-white/90 mb-2">Up to 50 invoices</p>
-                    <div className="bg-white/20 rounded px-2 py-1">
+                    <div className="bg-white/20 rounded px-2 py-1 hover:bg-white/30 transition-colors">
                         <p className="text-xs text-white font-semibold">Upgrade →</p>
                     </div>
                 </div>
@@ -64,9 +64,9 @@ export function PlanBanner() {
     const bgColor = isExpiringSoon ? 'from-orange-500 to-red-500' : 'from-blue-500 to-violet-500'
 
     return (
-        <div className="px-3 pb-4">
+        <div>
             <Link href="/pricing">
-                <div className={`bg-linear-to-r ${bgColor} rounded-lg p-3 shadow-lg hover:shadow-xl transition-shadow cursor-pointer`}>
+                <div className={`bg-linear-to-r ${bgColor} rounded-lg p-3 shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer`}>
                     <div className="flex items-center justify-between mb-1">
                         <p className="text-xs font-bold text-white uppercase">{planStatus.planName}</p>
                         {planStatus.hasActivePlan && <span className="text-xs text-white/90">●</span>}

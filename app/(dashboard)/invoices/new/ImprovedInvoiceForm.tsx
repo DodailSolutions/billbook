@@ -306,7 +306,7 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
             
             {/* Step 1: Customer Details */}
             {currentStep === 1 && (
-              <Card className="shadow-lg border-0 bg-white">
+              <Card className="shadow-lg border-0 bg-white dark:bg-white">
                 <CardHeader className="border-b bg-linear-to-r from-blue-50 to-purple-50">
                   <CardTitle className="flex items-center gap-2 text-gray-900">
                     <User className="w-5 h-5 text-blue-600" />
@@ -468,7 +468,7 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
 
             {/* Step 2: Items */}
             {currentStep === 2 && (
-              <Card className="shadow-lg border-0 bg-white">
+              <Card className="shadow-lg border-0 bg-white dark:bg-white">
                 <CardHeader className="border-b bg-linear-to-r from-blue-50 to-purple-50">
                   <div className="flex items-center justify-between">
                     <CardTitle className="flex items-center gap-2 text-gray-900">
@@ -484,7 +484,7 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
                 <CardContent className="p-6 space-y-4">
                   
                   {items.map((item, index) => (
-                    <Card key={item.id} className="border-2 hover:border-blue-200 transition-colors">
+                    <Card key={item.id} className="border-2 border-gray-200 hover:border-blue-200 transition-colors bg-white dark:bg-white dark:border-gray-200">
                       <CardContent className="p-4 space-y-4">
                         
                         <div className="flex items-start justify-between">
@@ -602,7 +602,7 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
 
             {/* Step 3: Review */}
             {currentStep === 3 && (
-              <Card className="shadow-lg border-0 bg-white">
+              <Card className="shadow-lg border-0 bg-white dark:bg-white">
                 <CardHeader className="border-b bg-linear-to-r from-blue-50 to-purple-50">
                   <CardTitle className="flex items-center gap-2 text-gray-900">
                     <FileText className="w-5 h-5 text-blue-600" />
@@ -613,14 +613,14 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
                   
                   {/* Summary Cards */}
                   <div className="grid md:grid-cols-3 gap-4">
-                    <Card className="bg-blue-50 border-blue-200">
+                    <Card className="bg-blue-50 border-blue-200 dark:bg-blue-50">
                       <CardContent className="p-4">
                         <div className="text-sm text-blue-600 font-medium">Subtotal</div>
                         <div className="text-2xl font-bold text-blue-900">₹{subtotal.toFixed(2)}</div>
                       </CardContent>
                     </Card>
 
-                    <Card className="bg-green-50 border-green-200">
+                    <Card className="bg-green-50 border-green-200 dark:bg-green-50">
                       <CardContent className="p-4">
                         <div className="text-sm text-green-600 font-medium">
                           {formData.supply_type === 'intra-state' ? 'CGST + SGST' : 'IGST'}
@@ -631,7 +631,7 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
                       </CardContent>
                     </Card>
 
-                    <Card className="bg-purple-50 border-purple-200">
+                    <Card className="bg-purple-50 border-purple-200 dark:bg-purple-50">
                       <CardContent className="p-4">
                         <div className="text-sm text-purple-600 font-medium">Total</div>
                         <div className="text-2xl font-bold text-purple-900">₹{total.toFixed(2)}</div>
@@ -689,7 +689,7 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
 
           {/* Live Preview Sidebar */}
           <div className="lg:col-span-1">
-            <Card className="sticky top-4 shadow-xl border-0 bg-white">
+            <Card className="sticky top-4 shadow-xl border-0 bg-white dark:bg-white">
               <CardHeader className="border-b bg-linear-to-r from-purple-50 to-blue-50">
                 <CardTitle className="text-lg text-gray-900 font-bold">Invoice Preview</CardTitle>
               </CardHeader>
@@ -725,7 +725,7 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
                 <div className="space-y-2">
                   <h3 className="font-semibold text-sm text-gray-900">Items</h3>
                   {items.map((item, index) => (
-                    <div key={item.id} className="text-xs space-y-1 p-2 bg-gray-50 rounded">
+                    <div key={item.id} className="text-xs space-y-1 p-2 bg-gray-50 dark:bg-gray-50 rounded">
                       <div className="font-medium text-gray-900">{item.description || `Item ${index + 1}`}</div>
                       <div className="flex justify-between text-gray-600">
                         <span>{item.quantity} × ₹{item.unit_price.toFixed(2)}</span>
@@ -779,8 +779,8 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
       {/* Add Customer Modal */}
       {showAddCustomerModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
-            <div className="flex items-center justify-between p-6 border-b">
+          <div className="bg-white dark:bg-white rounded-lg shadow-xl max-w-md w-full">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
               <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                 <UserPlus className="w-5 h-5 text-blue-600" />
                 Add New Customer

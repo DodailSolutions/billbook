@@ -103,7 +103,7 @@ export function Sidebar() {
 
     return (
         <div className={cn(
-            "space-y-4 py-4 flex flex-col h-full bg-linear-to-b from-slate-900 to-slate-800 text-white border-r border-slate-700 transition-all duration-300",
+            "space-y-4 py-4 flex flex-col h-full bg-white border-r border-gray-200 text-gray-900 transition-all duration-300 shadow-sm",
             isCollapsed ? "w-20" : "w-64"
         )}>
             <div className="px-3 py-2 flex-1 overflow-y-auto">
@@ -111,13 +111,13 @@ export function Sidebar() {
                 <div className="flex items-center justify-end mb-4">
                     <button
                         onClick={() => setIsCollapsed(!isCollapsed)}
-                        className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                        className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
                         title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
                     >
                         {isCollapsed ? (
-                            <ChevronRight className="h-5 w-5 text-zinc-400" />
+                            <ChevronRight className="h-5 w-5 text-gray-600" />
                         ) : (
-                            <ChevronLeft className="h-5 w-5 text-zinc-400" />
+                            <ChevronLeft className="h-5 w-5 text-gray-600" />
                         )}
                     </button>
                 </div>
@@ -133,12 +133,12 @@ export function Sidebar() {
                         />
                     </div>
                     {!isCollapsed && (
-                        <h1 className="text-2xl font-bold bg-linear-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent transition-all duration-200 group-hover:scale-105">
+                        <h1 className="text-2xl font-bold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent transition-all duration-200 group-hover:scale-105">
                             BillBooky
                         </h1>
                     )}
                 </Link>
-                <div className="space-y-2">
+                <div className="space-y-1">
                     {routes.map((route) => (
                         <Link
                             key={route.href}
@@ -146,14 +146,14 @@ export function Sidebar() {
                             className={cn(
                                 "text-sm group flex p-3 w-full justify-start font-medium cursor-pointer rounded-lg transition-all duration-200 relative overflow-hidden",
                                 pathname === route.href 
-                                    ? "text-white bg-white/10 shadow-lg" 
-                                    : "text-zinc-400 hover:text-white hover:bg-white/5",
+                                    ? "text-blue-600 bg-blue-50 shadow-sm border border-blue-100" 
+                                    : "text-gray-700 hover:text-blue-600 hover:bg-gray-50",
                                 isCollapsed && "justify-center"
                             )}
                             title={isCollapsed ? route.label : undefined}
                         >
                             {pathname === route.href && (
-                                <div className="absolute inset-0 bg-linear-to-r from-blue-500/20 to-violet-500/20 animate-pulse" />
+                                <div className="absolute inset-0 bg-linear-to-r from-blue-50 to-purple-50" />
                             )}
                             <div className={cn(
                                 "flex items-center relative z-10",
@@ -164,7 +164,7 @@ export function Sidebar() {
                                     <>
                                         {route.label}
                                         {route.badge && (
-                                            <span className="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-600 text-white">
+                                            <span className="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500 text-white shadow-sm">
                                                 {route.badge}
                                             </span>
                                         )}
@@ -175,7 +175,7 @@ export function Sidebar() {
                     ))}
                 </div>
             </div>
-            <div className="px-3 pb-4 space-y-2 shrink-0">
+            <div className="px-3 pb-4 space-y-2 shrink-0 border-t border-gray-200 pt-4">
                 {!isCollapsed && <PlanBanner />}
                 <SignOutButton />
             </div>
