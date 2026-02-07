@@ -21,6 +21,12 @@ export type FeeStructure = 'one_time' | 'monthly' | 'hourly' | 'project_based'
 
 export type FeeFrequency = 'one_time' | 'monthly' | 'quarterly' | 'annually'
 
+export type DataAccessStatus = 'pending' | 'approved' | 'rejected' | 'revoked'
+
+export type DataAccessType = 'invoices' | 'bank_statements' | 'expense_records' | 'gst_portal' | 'itr_portal' | 'financial_statements' | 'purchase_records' | 'sales_records'
+
+export type PaymentStatus = 'pending' | 'processing' | 'completed' | 'failed' | 'refunded'
+
 export interface CAProfessional {
   id: string
   user_id: string
@@ -151,6 +157,63 @@ export interface CASearchFilters {
   max_retainer_fee?: number
   min_experience?: number
   languages?: string[]
+}
+
+export interface CAPayment {
+  id: string
+  engagement_id: string
+  user_id: string
+  ca_professional_id: string
+  amount: number
+  payment_method: string
+  transaction_id?: string
+  payment_gateway: string
+  status: PaymentStatus
+  payment_date?: string
+  due_date?: string
+  invoice_url?: string
+  notes?: string
+  created_at: string
+  updated_at: string
+}
+
+export interface CADataAccessRequest {
+  id: string
+  engagement_id: string
+  ca_professional_id: string
+  user_id: string
+  data_types_requested: DataAccessType[]
+  purpose: string
+  access_duration_days: number
+  urgency: 'low' | 'medium' | 'high'
+  specific_requirements?: string
+  status: DataAccessStatus
+  requested_at: string
+  reviewed_at?: string
+  client_notes?: string
+  access_granted_at?: string
+  access_expires_at?: string
+  revoked_at?: string
+  created_at: string
+  updated_at: string
+}
+
+export interface CADataAccess {
+  id: string
+  access_request_id: string
+  ca_professional_id: string
+  user_id: string
+  data_type: DataAccessType
+  can_view: boolean
+  can_download: boolean
+  can_edit: boolean
+  access_start_date: string
+  access_end_date: string
+  last_accessed_at?: string
+  access_count: number
+  is_active: boolean
+  created_at: string
+  updated_at: string
 }
 
 export interface CAMarketplaceItem extends CAProfessional {

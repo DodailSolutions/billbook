@@ -79,7 +79,20 @@ export default function CAProfilePage({ params }: { params: { caId: string } }) 
 
   return (
     <div className="container max-w-6xl mx-auto py-8 px-4">
-      <Button variant="ghost" onClick={() => router.back()} className="mb-6">
+      {/* Breadcrumb Navigation */}
+      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-4">
+        <Link href="/reports" className="hover:text-blue-600 transition-colors">
+          Reports
+        </Link>
+        <span>/</span>
+        <Link href="/reports/ca-marketplace" className="hover:text-blue-600 transition-colors">
+          CA Marketplace
+        </Link>
+        <span>/</span>
+        <span className="text-gray-900 dark:text-white truncate max-w-50">{ca.full_name}</span>
+      </div>
+
+      <Button variant="ghost" onClick={() => router.push('/reports/ca-marketplace')} className="mb-6">
         <ArrowLeft className="w-4 h-4 mr-2" />
         Back to Marketplace
       </Button>
@@ -273,9 +286,17 @@ export default function CAProfilePage({ params }: { params: { caId: string } }) 
                 ))}
               </div>
             ) : (
-              <p className="text-gray-600 dark:text-gray-400 text-center py-8">
-                No reviews yet
-              </p>
+              <div className="text-center py-8">
+                <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Star className="w-8 h-8 text-gray-400" />
+                </div>
+                <p className="text-gray-600 dark:text-gray-400 mb-2">
+                  No reviews yet
+                </p>
+                <p className="text-sm text-gray-500">
+                  Be the first to work with {ca.full_name} and leave a review
+                </p>
+              </div>
             )}
           </Card>
         </div>

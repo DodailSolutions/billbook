@@ -30,9 +30,6 @@ export default async function AnalyticsPage() {
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
-                        <Link href="/admin" className="text-sm text-blue-600 hover:underline mb-2 inline-block">
-                            ← Back to Dashboard
-                        </Link>
                         <h1 className="text-3xl font-bold flex items-center gap-2">
                             <BarChart3 className="h-8 w-8 text-blue-600" />
                             Business Type Analytics

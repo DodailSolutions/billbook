@@ -953,7 +953,7 @@ export default async function Home() {
               <ul className="space-y-2 text-sm text-gray-600">
                 <li><Link href="/for-cas" className="hover:text-emerald-600 transition-colors">Why Join BillBooky</Link></li>
                 <li><Link href="/ca-registration" className="hover:text-emerald-600 transition-colors">Register as CA</Link></li>
-                <li><Link href="/reports/ca-marketplace" className="hover:text-emerald-600 transition-colors">CA Marketplace</Link></li>
+                <li><Link href="/ca-marketplace" className="hover:text-emerald-600 transition-colors">CA Marketplace</Link></li>
               </ul>
             </div>
             

@@ -300,7 +300,7 @@ export default function MyCARequestsPage() {
                     </Button>
                   </Link>
                   {request.status === 'hired' && request.ca_professional_id && (
-                    <Link href={`/reports/ca-marketplace/${request.ca_professional_id}`}>
+                    <Link href={`/ca-marketplace/${request.ca_professional_id}`}>
                       <Button variant="outline">
                         View CA Profile
                       </Button>

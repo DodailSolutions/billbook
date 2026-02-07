@@ -5,7 +5,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { LayoutDashboard, FileText, Users, RefreshCw, Bell, Settings, User, Bot, UserCog, FileBarChart, HelpCircle, MessageCircle } from "lucide-react"
+import { LayoutDashboard, FileText, Users, RefreshCw, Bell, Settings, User, Bot, UserCog, FileBarChart, HelpCircle, MessageCircle, Briefcase } from "lucide-react"
 import { SignOutButton } from "./SignOutButton"
 import { PlanBanner } from "./PlanBanner"
 import { ThemeToggle } from "./ThemeToggle"
@@ -53,6 +53,12 @@ const routes = [
         icon: FileBarChart,
         href: '/reports',
         color: "text-orange-500",
+    },
+    {
+        label: 'CA Dashboard',
+        icon: Briefcase,
+        href: '/ca-dashboard',
+        color: "text-emerald-500",
     },
     {
         label: 'Team',

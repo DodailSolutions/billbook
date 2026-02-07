@@ -44,9 +44,6 @@ export default async function UsersManagementPage() {
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div>
-                        <Link href="/admin" className="text-sm text-blue-600 hover:underline mb-2 inline-block">
-                            ← Back to Dashboard
-                        </Link>
                         <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
                             <User className="h-8 w-8 text-blue-600" />
                             User Management

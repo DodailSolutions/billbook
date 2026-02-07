@@ -487,7 +487,7 @@ export default async function ForCAsPage() {
             <div>
               <h5 className="font-bold text-gray-900 dark:text-white mb-4">For Businesses</h5>
               <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                <li><Link href="/reports/ca-marketplace" className="hover:text-blue-600 transition-colors">Find a CA</Link></li>
+                <li><Link href="/ca-marketplace" className="hover:text-blue-600 transition-colors">Find a CA</Link></li>
                 <li><Link href="/reports/hire-ca" className="hover:text-blue-600 transition-colors">Post Request</Link></li>
                 <li><Link href="/" className="hover:text-blue-600 transition-colors">Home</Link></li>
               </ul>

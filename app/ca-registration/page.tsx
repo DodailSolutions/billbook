@@ -125,8 +125,8 @@ export default function CARegistrationPage() {
             <Button variant="outline" onClick={() => router.push('/')}>
               Back to Home
             </Button>
-            <Button onClick={() => router.push('/login')}>
-              Sign In to Your Account
+            <Button onClick={() => router.push('/ca-profile')}>
+              View My Profile
             </Button>
           </div>
         </Card>

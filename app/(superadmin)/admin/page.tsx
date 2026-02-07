@@ -137,12 +137,7 @@ export default async function SuperAdminDashboard() {
                             Welcome back! Here&apos;s what&apos;s happening today.
                         </p>
                     </div>
-                    <Link href="/admin/settings">
-                        <Button variant="secondary" className="flex items-center gap-2">
-                            <Settings className="h-4 w-4" />
-                            Settings
-                        </Button>
-                    </Link>
+                    {/* Navigation handled by sidebar */}
                 </div>
 
                 {/* Stats Grid */}

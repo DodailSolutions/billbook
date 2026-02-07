@@ -28,7 +28,7 @@ export default async function CADashboardPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Link href="/settings/ca-profile">
+            <Link href="/ca-profile">
               <Button>Set Up CA Profile</Button>
             </Link>
           </CardContent>

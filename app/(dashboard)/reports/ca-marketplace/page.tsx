@@ -47,6 +47,7 @@ const STATES = [
 export default function CAMarketplacePage() {
   const router = useRouter()
   const [cas, setCAs] = useState<CAMarketplaceItem[]>([])
+  const [filteredCAs, setFilteredCAs] = useState<CAMarketplaceItem[]>([])
   const [loading, setLoading] = useState(true)
   const [showFilters, setShowFilters] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -65,6 +66,7 @@ export default function CAMarketplacePage() {
     setLoading(true)
     const data = await getCAMarketplace(filters)
     setCAs(data)
+    setFilteredCAs(data)
     setLoading(false)
   }, [filters])
 
@@ -72,6 +74,20 @@ export default function CAMarketplacePage() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     loadCAs()
   }, [loadCAs])
+
+  useEffect(() => {
+    if (searchQuery.trim()) {
+      const filtered = cas.filter(ca => 
+        ca.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        ca.firm_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        ca.specializations.some(s => s.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        ca.city.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+      setFilteredCAs(filtered)
+    } else {
+      setFilteredCAs(cas)
+    }
+  }, [searchQuery, cas])
 
   const handleApplyFilters = () => {
     loadCAs()
@@ -113,9 +129,18 @@ export default function CAMarketplacePage() {
 
   return (
     <div className="container max-w-7xl mx-auto py-8 px-4">
-      <Button variant="ghost" onClick={() => router.back()} className="mb-6">
+      {/* Breadcrumb Navigation */}
+      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-4">
+        <Link href="/reports" className="hover:text-blue-600 transition-colors">
+          Reports
+        </Link>
+        <span>/</span>
+        <span className="text-gray-900 dark:text-white">CA Marketplace</span>
+      </div>
+
+      <Button variant="ghost" onClick={() => router.push('/reports')} className="mb-6">
         <ArrowLeft className="w-4 h-4 mr-2" />
-        Back
+        Back to Reports
       </Button>
 
       <div className="mb-8">
@@ -123,6 +148,36 @@ export default function CAMarketplacePage() {
         <p className="text-gray-600 dark:text-gray-400">
           Browse our network of {cas.length} verified CAs and find the perfect match for your business
         </p>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <Link href="/reports/hire-ca">
+          <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer border-blue-200 dark:border-blue-800">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
+                <Briefcase className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div>
+                <h3 className="font-semibold">Post Your Requirements</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Get personalized proposals from CAs</p>
+              </div>
+            </div>
+          </Card>
+        </Link>
+        <Link href="/reports/my-ca-requests">
+          <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer border-emerald-200 dark:border-emerald-800">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg flex items-center justify-center">
+                <Users className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+              </div>
+              <div>
+                <h3 className="font-semibold">View My Requests</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Check proposals and manage engagements</p>
+              </div>
+            </div>
+          </Card>
+        </Link>
       </div>
 
       {/* Search and Filter Bar */}
@@ -284,20 +339,34 @@ export default function CAMarketplacePage() {
 
       {/* Results */}
       {loading ? (
-        <div className="text-center py-12">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
-          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading CAs...</p>
-        </div>
+        <Card className="p-12">
+          <div className="text-center">
+            <div className="inline-block animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mb-4" />
+            <p className="text-lg text-gray-600 dark:text-gray-400">Loading CA marketplace...</p>
+            <p className="text-sm text-gray-500 mt-2">Finding the best chartered accountants for you</p>
+          </div>
+        </Card>
       ) : filteredCAs.length === 0 ? (
         <Card className="p-12 text-center">
-          <Briefcase className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-          <h3 className="text-xl font-semibold mb-2">No CAs found</h3>
+          <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Users className="w-8 h-8 text-gray-400" />
+          </div>
+          <h3 className="text-xl font-semibold mb-2">
+            {searchQuery ? 'No matching CAs found' : 'No CAs available'}
+          </h3>
           <p className="text-gray-600 dark:text-gray-400 mb-4">
-            Try adjusting your filters or search query
+            {searchQuery 
+              ? `No CAs match "${searchQuery}". Try different search terms.`
+              : 'Try adjusting your filters or check back later'}
           </p>
-          <Button variant="outline" onClick={handleClearFilters}>
-            Clear All Filters
-          </Button>
+          <div className="flex gap-3 justify-center">
+            {searchQuery && (
+              <Button variant="outline" onClick={() => setSearchQuery('')}>
+                Clear Search
+              </Button>
+            )}
+            <Button onClick={handleClearFilters}>Clear All Filters</Button>
+          </div>
         </Card>
       ) : (
         <>
