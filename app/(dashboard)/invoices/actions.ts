@@ -452,6 +452,8 @@ export async function updateInvoice(id: string, data: UpdateInvoiceData) {
 }
 
 export async function updateInvoiceStatus(id: string, status: Invoice['status']) {
+    'use server'
+    
     try {
         const supabase = await createClient()
 

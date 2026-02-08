@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from "react"
+import { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { Plus, Trash2, Info, X, FileText } from "lucide-react"
 import { Button } from "@/components/ui/Button"
@@ -57,10 +57,9 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
     const [recurringFrequency, setRecurringFrequency] = useState<'monthly' | 'yearly'>('monthly')
     const [recurringStartDate, setRecurringStartDate] = useState(new Date().toISOString().split('T')[0])
     const [recurringEndDate, setRecurringEndDate] = useState('')
-    const [nextBillingDate, setNextBillingDate] = useState('')
     
     // Calculate next billing date when recurring settings change
-    useEffect(() => {
+    const nextBillingDate = useMemo(() => {
         if (isRecurring && recurringStartDate) {
             const startDate = new Date(recurringStartDate)
             const nextDate = new Date(startDate)
@@ -71,10 +70,9 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                 nextDate.setFullYear(nextDate.getFullYear() + 1)
             }
             
-            setNextBillingDate(nextDate.toISOString().split('T')[0])
-        } else {
-            setNextBillingDate('')
+            return nextDate.toISOString().split('T')[0]
         }
+        return ''
     }, [isRecurring, recurringStartDate, recurringFrequency])
 
     const addItem = () => {
@@ -344,7 +342,7 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                         <option value="intra-state">Intra-State (CGST + SGST)</option>
                         <option value="inter-state">Inter-State (IGST)</option>
                     </select>
-                    <p className="text-xs text-gray-500 text-gray-600">
+                    <p className="text-xs text-gray-600">
                         {supplyType === 'intra-state' ? 'GST split into CGST and SGST (50% each)' : 'Full GST amount as IGST'}
                     </p>
                 </div>
@@ -384,7 +382,7 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                                     <button
                                         type="button"
                                         onClick={() => addSavedItem(savedItem)}
-                                        className="text-blue-600 text-blue-600 hover:underline font-medium"
+                                        className="text-blue-600 hover:underline font-medium"
                                     >
                                         + {savedItem.name}
                                     </button>
@@ -405,7 +403,7 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                     {items.map((item, index) => (
                         <div key={index} className="border rounded-lg p-3 space-y-3">
                             <div className="space-y-2">
-                                <label className="text-xs text-gray-600 text-gray-600">Description *</label>
+                                <label className="text-xs text-gray-600">Description *</label>
                                 <Input
                                     placeholder="Item description"
                                     value={item.description}
@@ -416,7 +414,7 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
 
                             <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
                                 <div className="space-y-2">
-                                    <label className="text-xs text-gray-600 text-gray-600">Qty *</label>
+                                    <label className="text-xs text-gray-600">Qty *</label>
                                     <Input
                                         type="number"
                                         placeholder="Qty"
@@ -428,7 +426,7 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs text-gray-600 text-gray-600">Price *</label>
+                                    <label className="text-xs text-gray-600">Price *</label>
                                     <Input
                                         type="number"
                                         placeholder="Price"
@@ -440,7 +438,7 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs text-gray-600 text-gray-600">HSN/SAC</label>
+                                    <label className="text-xs text-gray-600">HSN/SAC</label>
                                     <Input
                                         placeholder="HSN/SAC Code"
                                         maxLength={6}
@@ -449,7 +447,7 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs text-gray-600 text-gray-600">Type</label>
+                                    <label className="text-xs text-gray-600">Type</label>
                                     <select
                                         value={item.hsn_sac_type || 'SAC'}
                                         onChange={(e) => updateItem(index, 'hsn_sac_type', e.target.value as 'HSN' | 'SAC')}
@@ -463,7 +461,7 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
 
                             <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
                                 <div className="space-y-2">
-                                    <label className="text-xs text-gray-600 text-gray-600">GST Rate (%)</label>
+                                    <label className="text-xs text-gray-600">GST Rate (%)</label>
                                     <Input
                                         type="number"
                                         placeholder="GST %"
@@ -478,7 +476,7 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-xs text-gray-600 text-gray-600">Item Total</label>
+                                    <label className="text-xs text-gray-600">Item Total</label>
                                     <div className="flex items-center h-9 rounded-md border border-input bg-muted px-3">
                                         <span className="text-sm font-medium">₹{(item.quantity * item.unit_price).toFixed(2)}</span>
                                     </div>
@@ -622,7 +620,7 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
 
                         <div className="bg-blue-100 dark:bg-blue-900/40 border border-blue-300 dark:border-blue-700 rounded p-3">
                             <p className="text-sm text-blue-900 dark:text-blue-100">
-                                <strong>ℹ️ How it works:</strong> This invoice will be automatically generated {recurringFrequency === 'monthly' ? 'every month' : 'every year'} starting from {new Date(recurringStartDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}. You'll receive reminders before each billing date.
+                                <strong>ℹ️ How it works:</strong> This invoice will be automatically generated {recurringFrequency === 'monthly' ? 'every month' : 'every year'} starting from {new Date(recurringStartDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}. You&apos;ll receive reminders before each billing date.
                             </p>
                         </div>
                     </div>
