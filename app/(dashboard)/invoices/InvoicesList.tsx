@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Trash2, Eye, Download } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/Card"
@@ -22,7 +23,9 @@ const statusColors = {
 }
 
 export function InvoicesList({ invoices }: InvoicesListProps) {
+    const router = useRouter()
     const [deletingId, setDeletingId] = useState<string | null>(null)
+    const [updatingId, setUpdatingId] = useState<string | null>(null)
 
     const handleDelete = async (id: string) => {
         if (!confirm('Are you sure you want to delete this invoice?')) {
@@ -32,6 +35,7 @@ export function InvoicesList({ invoices }: InvoicesListProps) {
         setDeletingId(id)
         try {
             await deleteInvoice(id)
+            router.refresh()
         } catch (error) {
             console.error('Error deleting invoice:', error)
             alert('Failed to delete invoice')
@@ -40,12 +44,20 @@ export function InvoicesList({ invoices }: InvoicesListProps) {
         }
     }
 
-    const handleStatusChange = async (id: string, status: 'draft' | 'sent' | 'paid' | 'cancelled') => {
+    const handleStatusChange = async (id: string, status: 'draft' | 'sent' | 'paid' | 'partial' | 'cancelled') => {
+        setUpdatingId(id)
         try {
-            await updateInvoiceStatus(id, status)
+            const result = await updateInvoiceStatus(id, status)
+            if (result?.success) {
+                // Force refresh to get updated data from server
+                router.refresh()
+                console.log('Invoice status updated successfully')
+            }
         } catch (error) {
             console.error('Error updating status:', error)
-            alert('Failed to update status')
+            alert('Failed to update status. Please try again.')
+        } finally {
+            setUpdatingId(null)
         }
     }
 
@@ -98,8 +110,9 @@ export function InvoicesList({ invoices }: InvoicesListProps) {
                             <div className="flex gap-2 pt-2 border-t">
                                 <select
                                     value={invoice.status}
-                                    onChange={(e) => handleStatusChange(invoice.id, e.target.value as any)}
-                                    className="flex-1 h-9 rounded-md border border-gray-300 bg-white px-3 text-sm text-gray-900"
+                                    onChange={(e) => handleStatusChange(invoice.id, e.target.value as 'draft' | 'sent' | 'paid' | 'partial' | 'cancelled')}
+                                    disabled={updatingId === invoice.id}
+                                    className="flex-1 h-9 rounded-md border border-gray-300 bg-white px-3 text-sm text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     <option value="draft">Draft</option>
                                     <option value="sent">Sent</option>
@@ -174,8 +187,9 @@ export function InvoicesList({ invoices }: InvoicesListProps) {
                                 <div className="flex gap-2">
                                     <select
                                         value={invoice.status}
-                                        onChange={(e) => handleStatusChange(invoice.id, e.target.value as any)}
-                                        className="h-9 rounded-md border border-gray-300 bg-white px-3 text-sm text-gray-900"
+                                        onChange={(e) => handleStatusChange(invoice.id, e.target.value as 'draft' | 'sent' | 'paid' | 'partial' | 'cancelled')}
+                                        disabled={updatingId === invoice.id}
+                                        className="flex-1 h-9 rounded-md border border-gray-300 bg-white px-3 text-sm text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         <option value="draft">Draft</option>
                                         <option value="sent">Sent</option>
