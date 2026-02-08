@@ -47,7 +47,12 @@ export async function getInvoices(): Promise<InvoiceWithDetails[]> {
             ...invoice,
             amount_paid: invoice.amount_paid ?? 0,
             amount_remaining: invoice.amount_remaining ?? invoice.total,
-            is_partial_payment: invoice.is_partial_payment ?? false
+            is_partial_payment: invoice.is_partial_payment ?? false,
+            recurring_invoices: Array.isArray(invoice.recurring_invoices) 
+                ? invoice.recurring_invoices 
+                : invoice.recurring_invoices 
+                    ? [invoice.recurring_invoices] 
+                    : []
         }))
 
         return invoicesWithDefaults as InvoiceWithDetails[]
@@ -437,25 +442,31 @@ export async function updateInvoice(id: string, data: UpdateInvoiceData) {
 }
 
 export async function updateInvoiceStatus(id: string, status: Invoice['status']) {
-    const supabase = await createClient()
+    try {
+        const supabase = await createClient()
 
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-        throw new Error('Not authenticated')
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) {
+            throw new Error('Not authenticated')
+        }
+
+        const { error } = await supabase
+            .from('invoices')
+            .update({ status })
+            .eq('id', id)
+            .eq('user_id', user.id)
+
+        if (error) {
+            console.error('Error updating invoice status:', error)
+            throw new Error('Failed to update invoice status')
+        }
+
+        revalidatePath('/invoices')
+        return { success: true }
+    } catch (error) {
+        console.error('Error in updateInvoiceStatus:', error)
+        throw error
     }
-
-    const { error } = await supabase
-        .from('invoices')
-        .update({ status })
-        .eq('id', id)
-        .eq('user_id', user.id)
-
-    if (error) {
-        console.error('Error updating invoice status:', error)
-        throw new Error('Failed to update invoice status')
-    }
-
-    revalidatePath('/invoices')
 }
 
 export async function deleteInvoice(id: string) {

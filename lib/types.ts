@@ -73,6 +73,12 @@ export interface InvoiceItem {
 export interface InvoiceWithDetails extends Invoice {
     customer: Customer
     invoice_items: InvoiceItem[]
+    recurring_invoices?: Array<{
+        id: string
+        frequency: 'monthly' | 'yearly'
+        next_invoice_date: string
+        is_active: boolean
+    }>
 }
 
 export interface InvoiceSequence {
