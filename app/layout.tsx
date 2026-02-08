@@ -112,6 +112,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
       >
+        {children}
+        <SpeedInsights />
+        
         {/* Structured Data - SoftwareApplication */}
         <script
           type="application/ld+json"
@@ -200,9 +203,6 @@ export default function RootLayout({
             }),
           }}
         />
-        
-        {children}
-        <SpeedInsights />
       </body>
     </html>
   );
