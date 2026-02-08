@@ -162,113 +162,114 @@ interface CreateInvoiceData {
 }
 
 export async function createInvoice(data: CreateInvoiceData) {
-    const supabase = await createClient()
+    try {
+        const supabase = await createClient()
 
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-        throw new Error('Not authenticated')
-    }
-
-    // Get customer for auto GST classification
-    const { data: customer } = await supabase
-        .from('customers')
-        .select('state_code, gstin')
-        .eq('id', data.customer_id)
-        .single()
-
-    // Get company GST settings for auto-classification
-    const { data: companySettings } = await supabase
-        .from('company_gst_settings')
-        .select('company_state_code, company_gstin')
-        .eq('user_id', user.id)
-        .single()
-
-    // Auto-classify supply type if not provided
-    let supplyType = data.supply_type || 'intra-state'
-    if (companySettings && customer?.state_code) {
-        const classification = autoClassifyGSTType(
-            companySettings.company_state_code,
-            customer.state_code
-        )
-        supplyType = classification.supplyType
-        console.log('Auto-classified GST:', classification.reason)
-    }
-
-    const reverseChargeApplicable = data.reverse_charge_applicable || false
-
-    // Calculate totals with proper GST breakdown
-    const subtotal = data.items.reduce((sum, item) => {
-        return sum + (item.quantity * item.unit_price)
-    }, 0)
-
-    // Calculate GST components based on supply type
-    const gstComponents = calculateGSTComponents(subtotal, data.gst_percentage, supplyType)
-
-    // Calculate round-off
-    const roundOff = calculateRoundOff(gstComponents.totalAmount)
-
-    // Generate invoice number
-    const invoice_number = await generateInvoiceNumber(data.invoice_series_id)
-
-    // Create invoice with GST breakdown (simplified for compatibility)
-    const { data: invoice, error: invoiceError } = await supabase
-        .from('invoices')
-        .insert([{
-            user_id: user.id,
-            customer_id: data.customer_id,
-            invoice_number,
-            invoice_date: data.invoice_date,
-            due_date: data.due_date || null,
-            subtotal,
-            gst_percentage: data.gst_percentage,
-            gst_amount: gstComponents.totalTax,
-            cgst_amount: gstComponents.cgst,
-            sgst_amount: gstComponents.sgst,
-            igst_amount: gstComponents.igst,
-            supply_type: supplyType,
-            reverse_charge_applicable: reverseChargeApplicable,
-            total: roundOff.roundedAmount,
-            notes: data.notes || null,
-            status: 'draft'
-        }])
-        .select()
-        .single()
-
-    if (invoiceError) {
-        console.error('Error creating invoice:', invoiceError)
-        throw new Error('Failed to create invoice')
-    }
-
-    // Create invoice items with HSN/SAC and individual tax rates
-    const items = data.items.map(item => {
-        const itemAmount = item.quantity * item.unit_price
-        const itemGSTRate = item.gst_rate !== undefined ? item.gst_rate : data.gst_percentage
-        const itemGSTComponents = calculateGSTComponents(itemAmount, itemGSTRate, supplyType)
-
-        return {
-            invoice_id: invoice.id,
-            description: item.description,
-            quantity: item.quantity,
-            unit_price: item.unit_price,
-            amount: itemAmount,
-            hsn_sac_code: item.hsn_sac_code || null,
-            hsn_sac_type: item.hsn_sac_type || null,
-            gst_rate: itemGSTRate,
-            item_cgst: itemGSTComponents.cgst,
-            item_sgst: itemGSTComponents.sgst,
-            item_igst: itemGSTComponents.igst,
-            item_tax_amount: itemGSTComponents.totalTax
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) {
+            return { success: false, error: 'Not authenticated' }
         }
-    })
 
-    const { error: itemsError } = await supabase
-        .from('invoice_items')
-        .insert(items)
+        // Get customer for auto GST classification
+        const { data: customer } = await supabase
+            .from('customers')
+            .select('state_code, gstin')
+            .eq('id', data.customer_id)
+            .single()
 
-    if (itemsError) {
-        console.error('Error creating invoice items:', itemsError)
-        throw new Error('Failed to create invoice items')
-    }
+        // Get company GST settings for auto-classification
+        const { data: companySettings } = await supabase
+            .from('company_gst_settings')
+            .select('company_state_code, company_gstin')
+            .eq('user_id', user.id)
+            .single()
+
+        // Auto-classify supply type if not provided
+        let supplyType = data.supply_type || 'intra-state'
+        if (companySettings && customer?.state_code) {
+            const classification = autoClassifyGSTType(
+                companySettings.company_state_code,
+                customer.state_code
+            )
+            supplyType = classification.supplyType
+            console.log('Auto-classified GST:', classification.reason)
+        }
+
+        const reverseChargeApplicable = data.reverse_charge_applicable || false
+
+        // Calculate totals with proper GST breakdown
+        const subtotal = data.items.reduce((sum, item) => {
+            return sum + (item.quantity * item.unit_price)
+        }, 0)
+
+        // Calculate GST components based on supply type
+        const gstComponents = calculateGSTComponents(subtotal, data.gst_percentage, supplyType)
+
+        // Calculate round-off
+        const roundOff = calculateRoundOff(gstComponents.totalAmount)
+
+        // Generate invoice number
+        const invoice_number = await generateInvoiceNumber(data.invoice_series_id)
+
+        // Create invoice with GST breakdown (simplified for compatibility)
+        const { data: invoice, error: invoiceError } = await supabase
+            .from('invoices')
+            .insert([{
+                user_id: user.id,
+                customer_id: data.customer_id,
+                invoice_number,
+                invoice_date: data.invoice_date,
+                due_date: data.due_date || null,
+                subtotal,
+                gst_percentage: data.gst_percentage,
+                gst_amount: gstComponents.totalTax,
+                cgst_amount: gstComponents.cgst,
+                sgst_amount: gstComponents.sgst,
+                igst_amount: gstComponents.igst,
+                supply_type: supplyType,
+                reverse_charge_applicable: reverseChargeApplicable,
+                total: roundOff.roundedAmount,
+                notes: data.notes || null,
+                status: 'draft'
+            }])
+            .select()
+            .single()
+
+        if (invoiceError) {
+            console.error('Error creating invoice:', invoiceError)
+            return { success: false, error: 'Failed to create invoice' }
+        }
+
+        // Create invoice items with HSN/SAC and individual tax rates
+        const items = data.items.map(item => {
+            const itemAmount = item.quantity * item.unit_price
+            const itemGSTRate = item.gst_rate !== undefined ? item.gst_rate : data.gst_percentage
+            const itemGSTComponents = calculateGSTComponents(itemAmount, itemGSTRate, supplyType)
+
+            return {
+                invoice_id: invoice.id,
+                description: item.description,
+                quantity: item.quantity,
+                unit_price: item.unit_price,
+                amount: itemAmount,
+                hsn_sac_code: item.hsn_sac_code || null,
+                hsn_sac_type: item.hsn_sac_type || null,
+                gst_rate: itemGSTRate,
+                item_cgst: itemGSTComponents.cgst,
+                item_sgst: itemGSTComponents.sgst,
+                item_igst: itemGSTComponents.igst,
+                item_tax_amount: itemGSTComponents.totalTax
+            }
+        })
+
+        const { error: itemsError } = await supabase
+            .from('invoice_items')
+            .insert(items)
+
+        if (itemsError) {
+            console.error('Error creating invoice items:', itemsError)
+            return { success: false, error: 'Failed to create invoice items' }
+        }
     
     // Handle payment collection if mark_as_paid is true
     if (data.mark_as_paid && data.payment_amount && data.payment_amount > 0) {
@@ -328,8 +329,12 @@ export async function createInvoice(data: CreateInvoiceData) {
         }
     }
 
-    revalidatePath('/invoices')
-    return { success: true, invoiceId: invoice.id }
+        revalidatePath('/invoices')
+        return { success: true, invoiceId: invoice.id }
+    } catch (error) {
+        console.error('Error in createInvoice:', error)
+        return { success: false, error: 'An unexpected error occurred while creating invoice' }
+    }
 }
 
 interface UpdateInvoiceData {
@@ -351,94 +356,99 @@ interface UpdateInvoiceData {
 }
 
 export async function updateInvoice(id: string, data: UpdateInvoiceData) {
-    const supabase = await createClient()
+    try {
+        const supabase = await createClient()
 
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-        throw new Error('Not authenticated')
-    }
-
-    const supplyType = data.supply_type || 'intra-state'
-    const reverseChargeApplicable = data.reverse_charge_applicable || false
-
-    // Calculate totals with proper GST breakdown
-    const subtotal = data.items.reduce((sum, item) => {
-        return sum + (item.quantity * item.unit_price)
-    }, 0)
-
-    // Calculate GST components based on supply type
-    const gstComponents = calculateGSTComponents(subtotal, data.gst_percentage, supplyType)
-
-    // Update invoice with full GST breakdown
-    const { error: invoiceError } = await supabase
-        .from('invoices')
-        .update({
-            customer_id: data.customer_id,
-            invoice_date: data.invoice_date,
-            due_date: data.due_date || null,
-            subtotal,
-            gst_percentage: data.gst_percentage,
-            gst_amount: gstComponents.totalTax,
-            cgst_amount: gstComponents.cgst,
-            sgst_amount: gstComponents.sgst,
-            igst_amount: gstComponents.igst,
-            supply_type: supplyType,
-            reverse_charge_applicable: reverseChargeApplicable,
-            total: gstComponents.totalAmount,
-            notes: data.notes || null,
-        })
-        .eq('id', id)
-        .eq('user_id', user.id)
-
-    if (invoiceError) {
-        console.error('Error updating invoice:', invoiceError)
-        throw new Error('Failed to update invoice')
-    }
-
-    // Delete existing items
-    const { error: deleteError } = await supabase
-        .from('invoice_items')
-        .delete()
-        .eq('invoice_id', id)
-
-    if (deleteError) {
-        console.error('Error deleting old invoice items:', deleteError)
-        throw new Error('Failed to update invoice items')
-    }
-
-    // Create new invoice items with HSN/SAC and individual tax rates
-    const items = data.items.map(item => {
-        const itemAmount = item.quantity * item.unit_price
-        const itemGSTRate = item.gst_rate !== undefined ? item.gst_rate : data.gst_percentage
-        const itemGSTComponents = calculateGSTComponents(itemAmount, itemGSTRate, supplyType)
-
-        return {
-            invoice_id: id,
-            description: item.description,
-            quantity: item.quantity,
-            unit_price: item.unit_price,
-            amount: itemAmount,
-            hsn_sac_code: item.hsn_sac_code || null,
-            hsn_sac_type: item.hsn_sac_type || null,
-            gst_rate: itemGSTRate,
-            item_cgst: itemGSTComponents.cgst,
-            item_sgst: itemGSTComponents.sgst,
-            item_igst: itemGSTComponents.igst,
-            item_tax_amount: itemGSTComponents.totalTax
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) {
+            return { success: false, error: 'Not authenticated' }
         }
-    })
 
-    const { error: itemsError } = await supabase
-        .from('invoice_items')
-        .insert(items)
+        const supplyType = data.supply_type || 'intra-state'
+        const reverseChargeApplicable = data.reverse_charge_applicable || false
 
-    if (itemsError) {
-        console.error('Error creating invoice items:', itemsError)
-        throw new Error('Failed to create invoice items')
+        // Calculate totals with proper GST breakdown
+        const subtotal = data.items.reduce((sum, item) => {
+            return sum + (item.quantity * item.unit_price)
+        }, 0)
+
+        // Calculate GST components based on supply type
+        const gstComponents = calculateGSTComponents(subtotal, data.gst_percentage, supplyType)
+
+        // Update invoice with full GST breakdown
+        const { error: invoiceError } = await supabase
+            .from('invoices')
+            .update({
+                customer_id: data.customer_id,
+                invoice_date: data.invoice_date,
+                due_date: data.due_date || null,
+                subtotal,
+                gst_percentage: data.gst_percentage,
+                gst_amount: gstComponents.totalTax,
+                cgst_amount: gstComponents.cgst,
+                sgst_amount: gstComponents.sgst,
+                igst_amount: gstComponents.igst,
+                supply_type: supplyType,
+                reverse_charge_applicable: reverseChargeApplicable,
+                total: gstComponents.totalAmount,
+                notes: data.notes || null,
+            })
+            .eq('id', id)
+            .eq('user_id', user.id)
+
+        if (invoiceError) {
+            console.error('Error updating invoice:', invoiceError)
+            return { success: false, error: 'Failed to update invoice' }
+        }
+
+        // Delete existing items
+        const { error: deleteError } = await supabase
+            .from('invoice_items')
+            .delete()
+            .eq('invoice_id', id)
+
+        if (deleteError) {
+            console.error('Error deleting old invoice items:', deleteError)
+            return { success: false, error: 'Failed to update invoice items' }
+        }
+
+        // Create new invoice items with HSN/SAC and individual tax rates
+        const items = data.items.map(item => {
+            const itemAmount = item.quantity * item.unit_price
+            const itemGSTRate = item.gst_rate !== undefined ? item.gst_rate : data.gst_percentage
+            const itemGSTComponents = calculateGSTComponents(itemAmount, itemGSTRate, supplyType)
+
+            return {
+                invoice_id: id,
+                description: item.description,
+                quantity: item.quantity,
+                unit_price: item.unit_price,
+                amount: itemAmount,
+                hsn_sac_code: item.hsn_sac_code || null,
+                hsn_sac_type: item.hsn_sac_type || null,
+                gst_rate: itemGSTRate,
+                item_cgst: itemGSTComponents.cgst,
+                item_sgst: itemGSTComponents.sgst,
+                item_igst: itemGSTComponents.igst,
+                item_tax_amount: itemGSTComponents.totalTax
+            }
+        })
+
+        const { error: itemsError } = await supabase
+            .from('invoice_items')
+            .insert(items)
+
+        if (itemsError) {
+            console.error('Error creating invoice items:', itemsError)
+            return { success: false, error: 'Failed to create invoice items' }
+        }
+
+        revalidatePath('/invoices')
+        return { success: true, invoiceId: id }
+    } catch (error) {
+        console.error('Error in updateInvoice:', error)
+        return { success: false, error: 'An unexpected error occurred while updating invoice' }
     }
-
-    revalidatePath('/invoices')
-    return { success: true, invoiceId: id }
 }
 
 export async function updateInvoiceStatus(id: string, status: Invoice['status']) {
@@ -447,7 +457,7 @@ export async function updateInvoiceStatus(id: string, status: Invoice['status'])
 
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) {
-            throw new Error('Not authenticated')
+            return { success: false, error: 'Not authenticated' }
         }
 
         const { error } = await supabase
@@ -458,37 +468,43 @@ export async function updateInvoiceStatus(id: string, status: Invoice['status'])
 
         if (error) {
             console.error('Error updating invoice status:', error)
-            throw new Error('Failed to update invoice status')
+            return { success: false, error: 'Failed to update invoice status' }
         }
 
         revalidatePath('/invoices')
         return { success: true }
     } catch (error) {
         console.error('Error in updateInvoiceStatus:', error)
-        throw error
+        return { success: false, error: 'An unexpected error occurred' }
     }
 }
 
 export async function deleteInvoice(id: string) {
-    const supabase = await createClient()
+    try {
+        const supabase = await createClient()
 
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-        throw new Error('Not authenticated')
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) {
+            return { success: false, error: 'Not authenticated' }
+        }
+
+        const { error } = await supabase
+            .from('invoices')
+            .delete()
+            .eq('id', id)
+            .eq('user_id', user.id)
+
+        if (error) {
+            console.error('Error deleting invoice:', error)
+            return { success: false, error: 'Failed to delete invoice' }
+        }
+
+        revalidatePath('/invoices')
+        return { success: true }
+    } catch (error) {
+        console.error('Error in deleteInvoice:', error)
+        return { success: false, error: 'An unexpected error occurred' }
     }
-
-    const { error } = await supabase
-        .from('invoices')
-        .delete()
-        .eq('id', id)
-        .eq('user_id', user.id)
-
-    if (error) {
-        console.error('Error deleting invoice:', error)
-        throw new Error('Failed to delete invoice')
-    }
-
-    revalidatePath('/invoices')
 }
 
 // Helper function to create recurring invoice template from regular invoice

@@ -33,32 +33,31 @@ export function InvoicesList({ invoices }: InvoicesListProps) {
         }
 
         setDeletingId(id)
-        try {
-            await deleteInvoice(id)
+        const result = await deleteInvoice(id)
+        
+        if (result.success) {
             router.refresh()
-        } catch (error) {
-            console.error('Error deleting invoice:', error)
-            alert('Failed to delete invoice')
-        } finally {
-            setDeletingId(null)
+        } else {
+            console.error('Error deleting invoice:', result.error)
+            alert(result.error || 'Failed to delete invoice')
         }
+        
+        setDeletingId(null)
     }
 
     const handleStatusChange = async (id: string, status: 'draft' | 'sent' | 'paid' | 'partial' | 'cancelled') => {
         setUpdatingId(id)
-        try {
-            const result = await updateInvoiceStatus(id, status)
-            if (result?.success) {
-                // Force refresh to get updated data from server
-                router.refresh()
-                console.log('Invoice status updated successfully')
-            }
-        } catch (error) {
-            console.error('Error updating status:', error)
-            alert('Failed to update status. Please try again.')
-        } finally {
-            setUpdatingId(null)
+        const result = await updateInvoiceStatus(id, status)
+        
+        if (result.success) {
+            // Force refresh to get updated data from server
+            router.refresh()
+        } else {
+            console.error('Error updating status:', result.error)
+            alert(result.error || 'Failed to update status. Please try again.')
         }
+        
+        setUpdatingId(null)
     }
 
     return (

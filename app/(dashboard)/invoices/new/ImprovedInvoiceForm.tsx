@@ -196,7 +196,7 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
         setCreatedInvoiceId(result.invoiceId)
         setShowSuccessModal(true)
       } else {
-        alert('Failed to create invoice')
+        alert(result.error || 'Failed to create invoice')
       }
     } catch (error) {
       console.error('Error creating invoice:', error)

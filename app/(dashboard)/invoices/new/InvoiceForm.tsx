@@ -200,17 +200,23 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                 if (result.success) {
                     router.push('/invoices')
                     router.refresh()
+                } else {
+                    alert(result.error || 'Failed to update invoice')
+                    setIsSubmitting(false)
                 }
             } else {
                 const result = await createInvoice(invoiceData)
                 if (result.success) {
                     router.push('/invoices')
                     router.refresh()
+                } else {
+                    alert(result.error || 'Failed to create invoice')
+                    setIsSubmitting(false)
                 }
             }
         } catch (error) {
             console.error(`Error ${mode === 'edit' ? 'updating' : 'creating'} invoice:`, error)
-            alert(`Failed to ${mode === 'edit' ? 'update' : 'create'} invoice`)
+            alert(`Unexpected error occurred`)
             setIsSubmitting(false)
         }
     }
