@@ -2,6 +2,17 @@
 
 A modern, production-ready invoice management web application built with Next.js 14, TypeScript, Supabase, and Tailwind CSS.
 
+> **📖 [Complete Documentation](DOCUMENTATION.md)** - For comprehensive guide covering all features, setup, API reference, and more.
+
+## Quick Links
+
+- 📄 **[Complete Documentation](DOCUMENTATION.md)** - Everything in one place
+- ⚡ **[Performance & SEO Guide](PERFORMANCE_SEO_OPTIMIZATION.md)** - Optimization details
+- 🎯 **[Feature List](FEATURES.md)** - All features overview
+- 📝 **[Changelog](CHANGELOG.md)** - Version history
+
+---
+
 ## Features
 
 ✅ **User Authentication**
