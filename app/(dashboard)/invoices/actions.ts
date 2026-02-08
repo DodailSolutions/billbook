@@ -457,10 +457,12 @@ export async function updateInvoiceStatus(id: string, status: Invoice['status'])
     try {
         // Validate inputs
         if (!id || typeof id !== 'string') {
+            console.error('Invalid invoice ID:', id)
             return { success: false, error: 'Invalid invoice ID' }
         }
         
         if (!status || !['draft', 'sent', 'paid', 'partial', 'cancelled'].includes(status)) {
+            console.error('Invalid status:', status)
             return { success: false, error: 'Invalid status' }
         }
         
@@ -473,24 +475,69 @@ export async function updateInvoiceStatus(id: string, status: Invoice['status'])
         }
         
         if (!user) {
+            console.error('No user found in updateInvoiceStatus')
             return { success: false, error: 'Not authenticated' }
         }
 
-        const { error } = await supabase
+        // First check if invoice exists and belongs to user
+        const { data: existingInvoice, error: fetchError } = await supabase
+            .from('invoices')
+            .select('id, status')
+            .eq('id', id)
+            .eq('user_id', user.id)
+            .single()
+
+        if (fetchError) {
+            console.error('Error fetching invoice for status update:', {
+                message: fetchError.message,
+                details: fetchError.details,
+                hint: fetchError.hint,
+                code: fetchError.code
+            })
+            return { success: false, error: 'Invoice not found or access denied' }
+        }
+
+        if (!existingInvoice) {
+            console.error('Invoice not found:', id, 'for user:', user.id)
+            return { success: false, error: 'Invoice not found' }
+        }
+
+        // Now update the status
+        const { data: updatedData, error: updateError } = await supabase
             .from('invoices')
             .update({ status })
             .eq('id', id)
             .eq('user_id', user.id)
+            .select()
 
-        if (error) {
-            console.error('Error updating invoice status:', error)
-            return { success: false, error: 'Failed to update invoice status' }
+        if (updateError) {
+            console.error('Supabase error updating invoice status:', {
+                message: updateError.message,
+                details: updateError.details,
+                hint: updateError.hint,
+                code: updateError.code,
+                invoiceId: id,
+                userId: user.id,
+                newStatus: status
+            })
+            return { success: false, error: `Database error: ${updateError.message}` }
         }
+
+        if (!updatedData || updatedData.length === 0) {
+            console.error('No rows were updated. Invoice ID:', id, 'User ID:', user.id)
+            return { success: false, error: 'Failed to update invoice - no rows affected' }
+        }
+
+        console.log('Successfully updated invoice status:', {
+            invoiceId: id,
+            oldStatus: existingInvoice.status,
+            newStatus: status
+        })
 
         revalidatePath('/invoices')
         return { success: true }
     } catch (error) {
-        console.error('Error in updateInvoiceStatus:', error)
+        console.error('Unexpected error in updateInvoiceStatus:', error)
         return { success: false, error: 'An unexpected error occurred' }
     }
 }
