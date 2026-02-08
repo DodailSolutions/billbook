@@ -1,11 +1,18 @@
 import Link from 'next/link'
 import Image from 'next/image'
+import dynamic from 'next/dynamic'
 import { Button } from '@/components/ui/Button'
 import { FileText, Users, IndianRupee, Zap, CheckCircle, Shield, TrendingUp, RefreshCw, Clock, Building2, ArrowRight, Star, Check, BarChart3, Smartphone, Globe, Lock } from 'lucide-react'
-import { ThemeToggle } from '@/components/ThemeToggle'
 import { createClient } from '@/lib/supabase/server'
-import { FAQSection } from './_components/FAQSection'
-import { TestimonialCarousel } from './_components/TestimonialCarousel'
+
+// Lazy load below-the-fold components for better performance
+const FAQSection = dynamic(() => import('./_components/FAQSection').then(mod => ({ default: mod.FAQSection })), {
+  loading: () => <div className="py-20 text-center">Loading FAQ...</div>,
+})
+
+const TestimonialCarousel = dynamic(() => import('./_components/TestimonialCarousel').then(mod => ({ default: mod.TestimonialCarousel })), {
+  loading: () => <div className="py-20 text-center">Loading testimonials...</div>,
+})
 
 const FEATURES = [
   { icon: FileText, title: 'Quick Invoice Creation', desc: 'Create professional invoices in under 60 seconds', color: 'blue' },

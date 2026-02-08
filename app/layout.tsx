@@ -108,7 +108,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
-      <head>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning
+      >
+        {/* Structured Data - SoftwareApplication */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -145,11 +149,58 @@ export default function RootLayout({
             }),
           }}
         />
-      </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        suppressHydrationWarning
-      >
+        
+        {/* Structured Data - Organization */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'Organization',
+              name: 'BillBooky',
+              legalName: 'Dodail Solutions Private Limited',
+              url: 'https://billbooky.dodail.com',
+              logo: 'https://billbooky.dodail.com/logo-icon.svg',
+              foundingDate: '2024',
+              description: 'Free GST-compliant invoice generator for Indian businesses',
+              address: {
+                '@type': 'PostalAddress',
+                addressCountry: 'IN',
+              },
+              sameAs: [
+                'https://twitter.com/billbooky',
+                'https://linkedin.com/company/billbooky',
+              ],
+              contactPoint: {
+                '@type': 'ContactPoint',
+                contactType: 'Customer Support',
+                email: 'support@billbooky.com',
+              },
+            }),
+          }}
+        />
+        
+        {/* Structured Data - WebSite with SearchAction */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'WebSite',
+              name: 'BillBooky',
+              url: 'https://billbooky.dodail.com',
+              potentialAction: {
+                '@type': 'SearchAction',
+                target: {
+                  '@type': 'EntryPoint',
+                  urlTemplate: 'https://billbooky.dodail.com/search?q={search_term_string}',
+                },
+                'query-input': 'required name=search_term_string',
+              },
+            }),
+          }}
+        />
+        
         {children}
         <SpeedInsights />
       </body>
