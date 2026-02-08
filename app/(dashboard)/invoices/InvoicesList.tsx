@@ -33,31 +33,41 @@ export function InvoicesList({ invoices }: InvoicesListProps) {
         }
 
         setDeletingId(id)
-        const result = await deleteInvoice(id)
-        
-        if (result.success) {
-            router.refresh()
-        } else {
-            console.error('Error deleting invoice:', result.error)
-            alert(result.error || 'Failed to delete invoice')
+        try {
+            const result = await deleteInvoice(id)
+            
+            if (result.success) {
+                router.refresh()
+            } else {
+                console.error('Error deleting invoice:', result.error)
+                alert(result.error || 'Failed to delete invoice')
+            }
+        } catch (error) {
+            console.error('Server error deleting invoice:', error)
+            alert('A server error occurred. Please try again.')
+        } finally {
+            setDeletingId(null)
         }
-        
-        setDeletingId(null)
     }
 
     const handleStatusChange = async (id: string, status: 'draft' | 'sent' | 'paid' | 'partial' | 'cancelled') => {
         setUpdatingId(id)
-        const result = await updateInvoiceStatus(id, status)
-        
-        if (result.success) {
-            // Force refresh to get updated data from server
-            router.refresh()
-        } else {
-            console.error('Error updating status:', result.error)
-            alert(result.error || 'Failed to update status. Please try again.')
+        try {
+            const result = await updateInvoiceStatus(id, status)
+            
+            if (result.success) {
+                // Force refresh to get updated data from server
+                router.refresh()
+            } else {
+                console.error('Error updating status:', result.error)
+                alert(result.error || 'Failed to update status. Please try again.')
+            }
+        } catch (error) {
+            console.error('Server error updating status:', error)
+            alert('A server error occurred. Please try again or contact support if the issue persists.')
+        } finally {
+            setUpdatingId(null)
         }
-        
-        setUpdatingId(null)
     }
 
     return (

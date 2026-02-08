@@ -455,9 +455,23 @@ export async function updateInvoiceStatus(id: string, status: Invoice['status'])
     'use server'
     
     try {
+        // Validate inputs
+        if (!id || typeof id !== 'string') {
+            return { success: false, error: 'Invalid invoice ID' }
+        }
+        
+        if (!status || !['draft', 'sent', 'paid', 'partial', 'cancelled'].includes(status)) {
+            return { success: false, error: 'Invalid status' }
+        }
+        
         const supabase = await createClient()
 
-        const { data: { user } } = await supabase.auth.getUser()
+        const { data: { user }, error: authError } = await supabase.auth.getUser()
+        if (authError) {
+            console.error('Auth error in updateInvoiceStatus:', authError)
+            return { success: false, error: 'Authentication failed' }
+        }
+        
         if (!user) {
             return { success: false, error: 'Not authenticated' }
         }
