@@ -161,7 +161,7 @@ export async function createInvoice(data: CreateInvoiceData) {
 
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
-        return redirect('/login')
+        throw new Error('Not authenticated')
     }
 
     // Get customer for auto GST classification
@@ -350,7 +350,7 @@ export async function updateInvoice(id: string, data: UpdateInvoiceData) {
 
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
-        return redirect('/login')
+        throw new Error('Not authenticated')
     }
 
     const supplyType = data.supply_type || 'intra-state'
@@ -441,7 +441,7 @@ export async function updateInvoiceStatus(id: string, status: Invoice['status'])
 
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
-        return redirect('/login')
+        throw new Error('Not authenticated')
     }
 
     const { error } = await supabase
@@ -463,7 +463,7 @@ export async function deleteInvoice(id: string) {
 
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
-        return redirect('/login')
+        throw new Error('Not authenticated')
     }
 
     const { error } = await supabase
