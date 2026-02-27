@@ -154,7 +154,7 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
         }
         .items-table thead {
             background: linear-gradient(135deg, ${primaryColor}, ${secondaryColor});
-            color: white;
+            color: white !important;
         }
         .items-table th {
             padding: 12px;
@@ -163,6 +163,7 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            color: white !important;
         }
         .items-table th.text-right {
             text-align: right;

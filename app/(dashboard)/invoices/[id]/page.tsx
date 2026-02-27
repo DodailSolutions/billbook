@@ -101,17 +101,17 @@ export default async function InvoiceDetailPage({
 
                     <div className="border rounded-lg overflow-hidden">
                         <table className="w-full">
-                            <thead className="bg-muted">
+                            <thead className="bg-gradient-to-r from-blue-600 to-blue-700">
                                 <tr>
-                                    <th className="text-left p-3 font-semibold">Description</th>
+                                    <th className="text-left p-3 font-semibold text-white">Description</th>
                                     {invoice.invoice_items.some(item => item.hsn_sac_code) && (
-                                        <th className="text-left p-3 font-semibold">HSN/SAC</th>
+                                        <th className="text-left p-3 font-semibold text-white">HSN/SAC</th>
                                     )}
-                                    <th className="text-right p-3 font-semibold">Qty</th>
-                                    <th className="text-right p-3 font-semibold">Price</th>
-                                    <th className="text-right p-3 font-semibold">Amount</th>
+                                    <th className="text-right p-3 font-semibold text-white">Qty</th>
+                                    <th className="text-right p-3 font-semibold text-white">Price</th>
+                                    <th className="text-right p-3 font-semibold text-white">Amount</th>
                                     {invoice.invoice_items.some(item => item.gst_rate) && (
-                                        <th className="text-right p-3 font-semibold">GST</th>
+                                        <th className="text-right p-3 font-semibold text-white">GST</th>
                                     )}
                                 </tr>
                             </thead>
