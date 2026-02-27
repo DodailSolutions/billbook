@@ -92,7 +92,7 @@ export default function MyCARequestsPage() {
       <div className="container max-w-6xl mx-auto py-8 px-4">
         <div className="text-center py-12">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
-          <p className="mt-4 text-gray-600 text-gray-600">Loading requests...</p>
+          <p className="mt-4 text-gray-600">Loading requests...</p>
         </div>
       </div>
     )
@@ -108,7 +108,7 @@ export default function MyCARequestsPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold mb-2">My CA Hire Requests</h1>
-          <p className="text-gray-600 text-gray-600">
+          <p className="text-gray-600">
             Track your requests and review proposals from CAs
           </p>
         </div>
@@ -126,7 +126,7 @@ export default function MyCARequestsPage() {
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 text-gray-600">Total Requests</p>
+                <p className="text-sm text-gray-600">Total Requests</p>
                 <p className="text-2xl font-bold">{stats.total_requests}</p>
               </div>
               <FileText className="w-8 h-8 text-blue-600" />
@@ -136,7 +136,7 @@ export default function MyCARequestsPage() {
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 text-gray-600">Open</p>
+                <p className="text-sm text-gray-600">Open</p>
                 <p className="text-2xl font-bold">{stats.open_requests}</p>
               </div>
               <Clock className="w-8 h-8 text-yellow-600" />
@@ -146,7 +146,7 @@ export default function MyCARequestsPage() {
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 text-gray-600">Hired</p>
+                <p className="text-sm text-gray-600">Hired</p>
                 <p className="text-2xl font-bold">{stats.hired}</p>
               </div>
               <CheckCircle className="w-8 h-8 text-green-600" />
@@ -156,7 +156,7 @@ export default function MyCARequestsPage() {
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 text-gray-600">Proposals Received</p>
+                <p className="text-sm text-gray-600">Proposals Received</p>
                 <p className="text-2xl font-bold">{stats.total_proposals}</p>
               </div>
               <Users className="w-8 h-8 text-purple-600" />
@@ -202,7 +202,7 @@ export default function MyCARequestsPage() {
           <h3 className="text-xl font-semibold mb-2">
             {filter === 'all' ? 'No hire requests yet' : `No ${STATUS_CONFIG[filter as HireRequestStatus]?.label.toLowerCase()} requests`}
           </h3>
-          <p className="text-gray-600 text-gray-600 mb-4">
+          <p className="text-gray-600 mb-4">
             {filter === 'all' 
               ? 'Create your first request to get started'
               : 'Try selecting a different filter to see more requests'
@@ -239,7 +239,7 @@ export default function MyCARequestsPage() {
                       {request.service_needed.map((service) => (
                         <span
                           key={service}
-                          className="px-2 py-1 bg-blue-100  text-blue-700 dark:text-blue-300 text-sm rounded"
+                          className="px-2 py-1 bg-blue-100 text-blue-700 dark:text-blue-300 text-sm rounded"
                         >
                           {service}
                         </span>
@@ -247,14 +247,14 @@ export default function MyCARequestsPage() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-sm text-gray-600 text-gray-600">Created</div>
+                    <div className="text-sm text-gray-600">Created</div>
                     <div className="font-semibold">
                       {new Date(request.created_at).toLocaleDateString()}
                     </div>
                   </div>
                 </div>
 
-                <p className="text-gray-600 text-gray-600 mb-4 line-clamp-2">
+                <p className="text-gray-600 mb-4 line-clamp-2">
                   {request.description}
                 </p>
 
@@ -262,7 +262,7 @@ export default function MyCARequestsPage() {
                   {request.budget_min && request.budget_max && (
                     <div className="flex items-center text-sm">
                       <DollarSign className="w-4 h-4 mr-2 text-gray-400" />
-                      <span className="text-gray-600 text-gray-600">
+                      <span className="text-gray-600">
                         ₹{request.budget_min.toLocaleString()} - ₹{request.budget_max.toLocaleString()}
                       </span>
                     </div>
@@ -271,14 +271,14 @@ export default function MyCARequestsPage() {
                   {request.preferred_city && (
                     <div className="flex items-center text-sm">
                       <MapPin className="w-4 h-4 mr-2 text-gray-400" />
-                      <span className="text-gray-600 text-gray-600">{request.preferred_city}</span>
+                      <span className="text-gray-600">{request.preferred_city}</span>
                     </div>
                   )}
 
                   {request.preferred_start_date && (
                     <div className="flex items-center text-sm">
                       <Calendar className="w-4 h-4 mr-2 text-gray-400" />
-                      <span className="text-gray-600 text-gray-600">
+                      <span className="text-gray-600">
                         {new Date(request.preferred_start_date).toLocaleDateString()}
                       </span>
                     </div>
@@ -286,7 +286,7 @@ export default function MyCARequestsPage() {
 
                   <div className="flex items-center text-sm">
                     <Users className="w-4 h-4 mr-2 text-gray-400" />
-                    <span className="text-gray-600 text-gray-600">
+                    <span className="text-gray-600">
                       {request.proposals_received} proposal{request.proposals_received !== 1 ? 's' : ''}
                     </span>
                   </div>

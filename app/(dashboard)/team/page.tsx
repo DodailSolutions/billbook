@@ -58,12 +58,12 @@ export default async function TeamMembersPage() {
         <div className="max-w-4xl mx-auto">
           <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 sm:p-12 text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-6">
-              <Lock className="h-8 w-8 text-gray-600 text-gray-600" />
+              <Lock className="h-8 w-8 text-gray-600" />
             </div>
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-4">
               Team Members is a Premium Feature
             </h1>
-            <p className="text-gray-600 text-gray-600 mb-8 max-w-2xl mx-auto">
+            <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
               Upgrade to Professional, Lifetime, or Enterprise plan to invite team members and collaborate on your invoicing.
             </p>
             <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-xl p-6 mb-8 text-left max-w-md mx-auto">
@@ -104,10 +104,10 @@ export default async function TeamMembersPage() {
               <Users className="h-8 w-8 text-emerald-600" />
               Team Members
             </h1>
-            <p className="text-gray-600 text-gray-600 mt-1">
+            <p className="text-gray-600 mt-1">
               Collaborate with your team • {teamLimit.current} of {teamLimit.allowed} members used
               {isLifetimePlan && teamLimit.purchased_slots > 0 && (
-                <span className="ml-2 text-blue-600 text-blue-600">
+                <span className="ml-2 text-blue-600">
                   ({teamLimit.base_limit} base + {teamLimit.purchased_slots} purchased)
                 </span>
               )}
@@ -139,7 +139,7 @@ export default async function TeamMembersPage() {
                   <h3 className="font-semibold text-blue-900 dark:text-blue-300 mb-2">
                     Active Additional Slots
                   </h3>
-                  <div className="space-y-1 text-sm text-blue-800 text-blue-900">
+                  <div className="space-y-1 text-sm text-blue-900">
                     <p>✓ Total purchased slots: {addons.active_slots}</p>
                     {addons.monthly_slots > 0 && <p>  • Monthly: {addons.monthly_slots} slot(s)</p>}
                     {addons.yearly_slots > 0 && <p>  • Yearly: {addons.yearly_slots} slot(s)</p>}
@@ -161,11 +161,11 @@ export default async function TeamMembersPage() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 text-gray-600">Total Members</p>
+                  <p className="text-sm text-gray-600">Total Members</p>
                   <p className="text-2xl font-bold text-gray-900 dark:text-white">{teamLimit.current}</p>
                 </div>
                 <div className="p-3 bg-blue-100 dark:bg-blue-900 rounded-lg">
-                  <Users className="h-6 w-6 text-blue-600 text-blue-600" />
+                  <Users className="h-6 w-6 text-blue-600" />
                 </div>
               </div>
             </CardContent>
@@ -175,13 +175,13 @@ export default async function TeamMembersPage() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 text-gray-600">Active Members</p>
+                  <p className="text-sm text-gray-600">Active Members</p>
                   <p className="text-2xl font-bold text-gray-900 dark:text-white">
                     {teamMembers?.filter(m => m.status === 'active').length || 0}
                   </p>
                 </div>
                 <div className="p-3 bg-green-100 dark:bg-green-900 rounded-lg">
-                  <Shield className="h-6 w-6 text-green-600 text-green-600" />
+                  <Shield className="h-6 w-6 text-green-600" />
                 </div>
               </div>
             </CardContent>
@@ -191,7 +191,7 @@ export default async function TeamMembersPage() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 text-gray-600">Pending Invites</p>
+                  <p className="text-sm text-gray-600">Pending Invites</p>
                   <p className="text-2xl font-bold text-gray-900 dark:text-white">
                     {teamMembers?.filter(m => m.status === 'pending').length || 0}
                   </p>

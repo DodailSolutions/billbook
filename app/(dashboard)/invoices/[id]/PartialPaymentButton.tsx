@@ -97,15 +97,15 @@ export function PartialPaymentButton({
 
                 <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
                     <div className="flex justify-between text-sm mb-1">
-                        <span className="text-gray-600 text-gray-600">Total Amount:</span>
+                        <span className="text-gray-600">Total Amount:</span>
                         <span className="font-semibold">₹{totalAmount.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-sm mb-1">
-                        <span className="text-gray-600 text-gray-600">Paid So Far:</span>
+                        <span className="text-gray-600">Paid So Far:</span>
                         <span className="font-semibold text-green-600">₹{amountPaid.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-sm pt-2 border-t border-blue-200 dark:border-blue-800">
-                        <span className="text-gray-600 text-gray-600 font-medium">Remaining:</span>
+                        <span className="text-gray-600 font-medium">Remaining:</span>
                         <span className="font-bold text-blue-600">₹{amountRemaining.toFixed(2)}</span>
                     </div>
                 </div>

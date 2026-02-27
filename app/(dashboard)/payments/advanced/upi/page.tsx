@@ -23,10 +23,10 @@ export default async function UPIPaymentsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-            <Smartphone className="h-8 w-8 text-blue-600 text-blue-600" />
+            <Smartphone className="h-8 w-8 text-blue-600" />
             UPI Payment Setup
           </h1>
-          <p className="text-gray-600 text-gray-600 mt-1">
+          <p className="text-gray-600 mt-1">
             Manage your UPI IDs and generate payment QR codes
           </p>
         </div>
@@ -42,7 +42,7 @@ export default async function UPIPaymentsPage() {
       <Card className="border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20">
         <CardContent className="pt-6">
           <div className="flex gap-3">
-            <Smartphone className="h-5 w-5 text-blue-600 text-blue-600 mt-0.5" />
+            <Smartphone className="h-5 w-5 text-blue-600 mt-0.5" />
             <div>
               <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
                 Native UPI Integration
@@ -64,7 +64,7 @@ export default async function UPIPaymentsPage() {
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                 No UPI IDs Added Yet
               </h3>
-              <p className="text-gray-600 text-gray-600 mb-4">
+              <p className="text-gray-600 mb-4">
                 Add your first UPI ID to start accepting payments
               </p>
               <Link href="/payments/advanced/upi/add">
@@ -84,7 +84,7 @@ export default async function UPIPaymentsPage() {
                     <div className="flex items-center gap-2 mb-2">
                       <CardTitle className="text-xl">{upi.upi_id}</CardTitle>
                       {upi.is_primary && (
-                        <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/50 text-blue-900">
+                        <Badge className="bg-blue-100 dark:bg-blue-900/50 text-blue-900">
                           <Star className="h-3 w-3 mr-1" />
                           Primary
                         </Badge>
@@ -117,7 +117,7 @@ export default async function UPIPaymentsPage() {
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="p-4 bg-gray-50 rounded-lg">
-                    <p className="text-sm text-gray-600 text-gray-600 mb-1">
+                    <p className="text-sm text-gray-600 mb-1">
                       Payment Method
                     </p>
                     <p className="font-semibold text-gray-900 dark:text-white">
@@ -125,7 +125,7 @@ export default async function UPIPaymentsPage() {
                     </p>
                   </div>
                   <div className="p-4 bg-gray-50 rounded-lg">
-                    <p className="text-sm text-gray-600 text-gray-600 mb-1">
+                    <p className="text-sm text-gray-600 mb-1">
                       QR Code
                     </p>
                     <p className="font-semibold text-gray-900 dark:text-white">
@@ -133,7 +133,7 @@ export default async function UPIPaymentsPage() {
                     </p>
                   </div>
                   <div className="p-4 bg-gray-50 rounded-lg">
-                    <p className="text-sm text-gray-600 text-gray-600 mb-1">
+                    <p className="text-sm text-gray-600 mb-1">
                       Added On
                     </p>
                     <p className="font-semibold text-gray-900 dark:text-white">
@@ -159,7 +159,7 @@ export default async function UPIPaymentsPage() {
           <div className="grid md:grid-cols-2 gap-4">
             <div className="flex gap-3">
               <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg h-fit">
-                <QrCode className="h-5 w-5 text-blue-600 text-blue-600" />
+                <QrCode className="h-5 w-5 text-blue-600" />
               </div>
               <div>
                 <h4 className="font-semibold text-gray-900 dark:text-white mb-1">
@@ -172,7 +172,7 @@ export default async function UPIPaymentsPage() {
             </div>
             <div className="flex gap-3">
               <div className="p-2 bg-green-100 dark:bg-green-900/20 rounded-lg h-fit">
-                <Smartphone className="h-5 w-5 text-green-600 text-green-600" />
+                <Smartphone className="h-5 w-5 text-green-600" />
               </div>
               <div>
                 <h4 className="font-semibold text-gray-900 dark:text-white mb-1">

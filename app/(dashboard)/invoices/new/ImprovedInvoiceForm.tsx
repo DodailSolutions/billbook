@@ -192,7 +192,7 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
 
       const result = await createInvoice(invoiceData)
 
-      if (result.success) {
+      if (result.success && result.invoiceId) {
         setCreatedInvoiceId(result.invoiceId)
         setShowSuccessModal(true)
       } else {
@@ -210,11 +210,24 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
   const nextStep = () => {
     if (validateStep(currentStep)) {
       setCurrentStep(currentStep + 1)
+      // Smooth scroll to top of form
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    } else {
+      // Show first error
+      const firstError = Object.keys(errors)[0]
+      if (firstError) {
+        const errorElement = document.getElementById(firstError)
+        if (errorElement) {
+          errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }
+      }
     }
   }
 
   const prevStep = () => {
     setCurrentStep(currentStep - 1)
+    // Smooth scroll to top of form
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   // Add customer handler
@@ -257,30 +270,28 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
     
     setIsDownloading(true)
     try {
-      const response = await fetch(`/api/invoices/${createdInvoiceId}/pdf`)
-      if (!response.ok) throw new Error('Failed to download PDF')
+      // Open PDF in new window - the API returns HTML that can be printed as PDF
+      const pdfWindow = window.open(`/api/invoices/${createdInvoiceId}/pdf?mode=download`, '_blank')
       
-      const blob = await response.blob()
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `invoice-${createdInvoiceId}.pdf`
-      document.body.appendChild(a)
-      a.click()
-      window.URL.revokeObjectURL(url)
-      document.body.removeChild(a)
+      if (!pdfWindow) {
+        alert('Please allow popups to download the PDF. You can also view the invoice from the invoices list.')
+      }
+      
+      // Close the success modal after a short delay
+      setTimeout(() => {
+        setIsDownloading(false)
+      }, 500)
     } catch (error) {
-      console.error('Error downloading PDF:', error)
-      alert('Failed to download PDF')
-    } finally {
+      console.error('Error opening PDF:', error)
+      alert('Failed to open PDF. Please try viewing the invoice from the invoices list.')
       setIsDownloading(false)
     }
   }
 
   // Navigate to invoices list
   const handleViewInvoices = () => {
+    setShowSuccessModal(false)
     router.push('/invoices')
-    router.refresh()
   }
 
   return (
@@ -1076,6 +1087,17 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
                 </Button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Loading Overlay */}
+      {isSubmitting && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm">
+          <div className="bg-white rounded-lg p-8 shadow-2xl flex flex-col items-center gap-4">
+            <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
+            <p className="text-lg font-semibold text-gray-900">Creating your invoice...</p>
+            <p className="text-sm text-gray-600">Please wait a moment</p>
           </div>
         </div>
       )}

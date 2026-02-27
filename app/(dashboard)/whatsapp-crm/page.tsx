@@ -213,7 +213,7 @@ export default function WhatsAppCRMPage() {
             <p className="text-gray-600 mb-2">
               WhatsApp CRM is currently only available for India region users.
             </p>
-            <p className="text-sm text-gray-500 ">
+            <p className="text-sm text-gray-500">
               This feature uses WhatsApp Business API which is optimized for Indian businesses and compliance requirements.
             </p>
           </CardContent>
@@ -239,7 +239,7 @@ export default function WhatsAppCRMPage() {
             <p className="text-gray-600 mb-2 max-w-md mx-auto">
               Manage all your customer conversations in one place. Send invoices, track payments, and provide support - all through WhatsApp.
             </p>
-            <p className="text-sm text-gray-500  mb-8">
+            <p className="text-sm text-gray-500 mb-8">
               Quick setup • No phone number needed • Works instantly
             </p>
             <div className="flex gap-3 justify-center flex-wrap">
@@ -263,7 +263,7 @@ export default function WhatsAppCRMPage() {
         <div className="grid md:grid-cols-3 gap-4\">
           <Card>
             <CardContent className="pt-6 text-center">
-              <div className="h-12 w-12 bg-green-100  rounded-full flex items-center justify-center mx-auto mb-3\">
+              <div className="h-12 w-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3\">
                 <MessageCircle className="h-6 w-6 text-green-600" />
               </div>
               <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Instant Messaging</h3>
@@ -272,7 +272,7 @@ export default function WhatsAppCRMPage() {
           </Card>
           <Card>
             <CardContent className="pt-6 text-center">
-              <div className="h-12 w-12 bg-blue-100  rounded-full flex items-center justify-center mx-auto mb-3">
+              <div className="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
                 <Users className="h-6 w-6 text-blue-600" />
               </div>
               <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Contact Management</h3>
@@ -296,13 +296,13 @@ export default function WhatsAppCRMPage() {
   return (
     <div className="h-[calc(100vh-4rem)] flex flex-col">
       {/* Header */}
-      <div className="p-4 border-b border-gray-200  bg-linear-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20">
+      <div className="p-4 border-b border-gray-200 bg-linear-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
               <MessageCircle className="h-6 w-6 text-green-600" />
               WhatsApp CRM
-              <span className="inline-block px-2 py-1 bg-green-100  text-green-700 dark:text-green-300 text-xs font-medium rounded-full ml-2">
+              <span className="inline-block px-2 py-1 bg-green-100 text-green-700 dark:text-green-300 text-xs font-medium rounded-full ml-2">
                 ✓ Ready
               </span>
             </h1>
@@ -329,9 +329,9 @@ export default function WhatsAppCRMPage() {
 
       <div className="flex-1 flex overflow-hidden">
         {/* Contacts Sidebar */}
-        <div className="w-80 border-r border-gray-200  flex flex-col bg-white">
+        <div className="w-80 border-r border-gray-200 flex flex-col bg-white">
           {/* Search */}
-          <div className="p-4 border-b border-gray-200  space-y-3">
+          <div className="p-4 border-b border-gray-200 space-y-3">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
@@ -343,7 +343,7 @@ export default function WhatsAppCRMPage() {
             </div>
             {/* Quick Filters */}
             <div className="flex gap-2">
-              <button className="flex-1 px-3 py-1.5 text-xs font-medium rounded-md bg-green-100  text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors">
+              <button className="flex-1 px-3 py-1.5 text-xs font-medium rounded-md bg-green-100 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors">
                 All ({contacts.length})
               </button>
               <button className="flex-1 px-3 py-1.5 text-xs font-medium rounded-md bg-gray-100 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
@@ -407,7 +407,7 @@ export default function WhatsAppCRMPage() {
         {selectedContact ? (
           <div className="flex-1 flex flex-col bg-gray-50">
             {/* Chat Header */}
-            <div className="p-4 bg-white border-b border-gray-200  flex items-center justify-between">
+            <div className="p-4 bg-white border-b border-gray-200 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center text-white font-semibold">
                   {selectedContact.name.charAt(0).toUpperCase()}
@@ -480,7 +480,7 @@ export default function WhatsAppCRMPage() {
             </div>
 
             {/* Message Input */}
-            <div className="p-4 bg-white border-t border-gray-200 ">
+            <div className="p-4 bg-white border-t border-gray-200">
               <div className="flex items-center gap-2">
                 <Button variant="secondary" size="sm">
                   <Paperclip className="h-4 w-4" />
@@ -509,7 +509,7 @@ export default function WhatsAppCRMPage() {
           <div className="flex-1 flex items-center justify-center bg-linear-to-br from-gray-50 to-green-50 dark:from-gray-900 dark:to-green-900/20">
             <div className="text-center max-w-md px-6">
               <div className="mb-6">
-                <div className="mx-auto w-24 h-24 bg-green-100  rounded-full flex items-center justify-center mb-4">
+                <div className="mx-auto w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-4">
                   <MessageCircle className="h-12 w-12 text-green-600" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">

@@ -128,7 +128,7 @@ export function InviteMemberModal({ canAdd, currentCount, maxAllowed, roles }: I
                     <SelectItem key={role.id} value={role.id}>
                       <div className="flex flex-col items-start">
                         <span className="font-medium">{role.name}</span>
-                        <span className="text-xs text-gray-500 text-gray-600">
+                        <span className="text-xs text-gray-600">
                           {role.description}
                         </span>
                       </div>
@@ -139,7 +139,7 @@ export function InviteMemberModal({ canAdd, currentCount, maxAllowed, roles }: I
             </div>
 
             <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
-              <p className="text-sm text-blue-800 text-blue-900">
+              <p className="text-sm text-blue-900">
                 💡 An email invitation will be sent to this address. The invite is valid for 7 days.
               </p>
             </div>

@@ -115,7 +115,7 @@ export default async function ForCAsPage() {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950">
       {/* Navigation */}
-      <nav className="sticky top-0 z-50 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-gray-200 ">
+      <nav className="sticky top-0 z-50 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-gray-200">
         <div className="flex items-center justify-between p-4 md:p-6 max-w-7xl mx-auto">
           <Link href="/" className="flex items-center gap-2">
             <div className="relative w-8 h-8 shrink-0">
@@ -128,7 +128,7 @@ export default async function ForCAsPage() {
                 priority
               />
             </div>
-            <h1 className="text-xl md:text-2xl font-bold text-gray-900 ">BillBooky</h1>
+            <h1 className="text-xl md:text-2xl font-bold text-gray-900">BillBooky</h1>
           </Link>
           <div className="flex items-center gap-2 md:gap-3">
             <ThemeToggle />
@@ -141,7 +141,7 @@ export default async function ForCAsPage() {
             ) : (
               <>
                 <Link href="/login">
-                  <Button variant="secondary" className="bg-white dark:bg-gray-800 border-gray-300  text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">
+                  <Button variant="secondary" className="bg-white dark:bg-gray-800 border-gray-300 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">
                     Sign In
                   </Button>
                 </Link>
@@ -167,7 +167,7 @@ export default async function ForCAsPage() {
               <span className="text-sm font-medium text-blue-600">For Chartered Accountants</span>
             </div>
             
-            <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-gray-900  mb-6">
+            <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-gray-900 mb-6">
               Grow Your CA Practice
               <span className="block mt-2 text-blue-600">
                 Connect with Clients
@@ -204,7 +204,7 @@ export default async function ForCAsPage() {
                     <Button 
                       size="lg" 
                       variant="outline"
-                      className="border-2 border-gray-300  hover:bg-gray-50 dark:hover:bg-gray-800"
+                      className="border-2 border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
                     >
                       Already Registered? Sign In
                     </Button>
@@ -214,7 +214,7 @@ export default async function ForCAsPage() {
             </div>
 
             {/* Trust Badge */}
-            <div className="mt-8 flex items-center justify-center gap-6 text-sm text-gray-600 ">
+            <div className="mt-8 flex items-center justify-center gap-6 text-sm text-gray-600">
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-5 w-5 text-emerald-600" />
                 <span>ICAI Verified</span>
@@ -239,10 +239,10 @@ export default async function ForCAsPage() {
             {STATS.map((stat) => {
               const Icon = stat.icon
               return (
-                <div key={stat.label} className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200  shadow-sm hover:shadow-md transition-all duration-200 text-center">
+                <div key={stat.label} className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 text-center">
                   <Icon className="h-8 w-8 text-blue-600 mx-auto mb-3" />
-                  <div className="text-4xl font-bold mb-2 text-gray-900 ">{stat.value}</div>
-                  <div className="text-sm text-gray-600 ">{stat.label}</div>
+                  <div className="text-4xl font-bold mb-2 text-gray-900">{stat.value}</div>
+                  <div className="text-sm text-gray-600">{stat.label}</div>
                 </div>
               )
             })}
@@ -253,7 +253,7 @@ export default async function ForCAsPage() {
       {/* Benefits Section */}
       <section className="px-6 py-20 md:py-32 max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-6xl font-bold tracking-tight text-gray-900  mb-4">
+          <h2 className="text-4xl md:text-6xl font-bold tracking-tight text-gray-900 mb-4">
             Why Join BillBooky?
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
@@ -275,12 +275,12 @@ export default async function ForCAsPage() {
             return (
               <div 
                 key={benefit.title}
-                className="group bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200  shadow-sm hover:shadow-lg hover:border-blue-200 dark:hover:border-blue-700 transition-all duration-200"
+                className="group bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 shadow-sm hover:shadow-lg hover:border-blue-200 dark:hover:border-blue-700 transition-all duration-200"
               >
                 <div className={`inline-flex p-3 ${iconColorClasses[benefit.color as keyof typeof iconColorClasses]} rounded-xl mb-4 group-hover:scale-105 transition-transform`}>
                   <Icon className="h-6 w-6" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900  mb-3">{benefit.title}</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">{benefit.title}</h3>
                 <p className="text-gray-600 dark:text-gray-300 leading-relaxed">{benefit.description}</p>
               </div>
             )
@@ -292,7 +292,7 @@ export default async function ForCAsPage() {
       <section className="px-6 py-20 md:py-32 bg-linear-to-b from-gray-50 to-white dark:from-gray-900/50 dark:to-gray-950">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-6xl font-bold tracking-tight text-gray-900  mb-4">
+            <h2 className="text-4xl md:text-6xl font-bold tracking-tight text-gray-900 mb-4">
               How It Works
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
@@ -305,14 +305,14 @@ export default async function ForCAsPage() {
               const Icon = step.icon
               return (
                 <div key={step.step} className="relative">
-                  <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200  shadow-sm hover:shadow-lg transition-all duration-200">
+                  <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-200">
                     <div className="flex items-center gap-4 mb-4">
                       <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold shrink-0">
                         {step.step}
                       </div>
                       <Icon className="h-8 w-8 text-blue-600" />
                     </div>
-                    <h3 className="text-lg font-bold text-gray-900  mb-2">{step.title}</h3>
+                    <h3 className="text-lg font-bold text-gray-900 mb-2">{step.title}</h3>
                     <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">{step.description}</p>
                   </div>
                   {step.step !== '4' && (
@@ -328,7 +328,7 @@ export default async function ForCAsPage() {
       {/* Services Section */}
       <section className="px-6 py-20 md:py-32 max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-6xl font-bold tracking-tight text-gray-900  mb-4">
+          <h2 className="text-4xl md:text-6xl font-bold tracking-tight text-gray-900 mb-4">
             Services You Can Offer
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
@@ -340,10 +340,10 @@ export default async function ForCAsPage() {
           {SERVICES_YOU_CAN_OFFER.map((service) => (
             <div 
               key={service}
-              className="flex items-center gap-3 bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200  shadow-sm hover:shadow-md hover:border-blue-200 dark:hover:border-blue-700 transition-all duration-200"
+              className="flex items-center gap-3 bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 shadow-sm hover:shadow-md hover:border-blue-200 dark:hover:border-blue-700 transition-all duration-200"
             >
               <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0" />
-              <span className="text-gray-900  font-medium">{service}</span>
+              <span className="text-gray-900 font-medium">{service}</span>
             </div>
           ))}
         </div>
@@ -402,14 +402,14 @@ export default async function ForCAsPage() {
       {/* FAQ Section */}
       <section className="px-6 py-20 max-w-4xl mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-gray-900  mb-4">
+          <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-gray-900 mb-4">
             Frequently Asked Questions
           </h2>
         </div>
 
         <div className="space-y-6">
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 ">
-            <h3 className="text-lg font-bold text-gray-900  mb-2">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200">
+            <h3 className="text-lg font-bold text-gray-900 mb-2">
               Is there any registration fee?
             </h3>
             <p className="text-gray-600 dark:text-gray-300">
@@ -417,8 +417,8 @@ export default async function ForCAsPage() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 ">
-            <h3 className="text-lg font-bold text-gray-900  mb-2">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200">
+            <h3 className="text-lg font-bold text-gray-900 mb-2">
               How do I get paid?
             </h3>
             <p className="text-gray-600 dark:text-gray-300">
@@ -426,8 +426,8 @@ export default async function ForCAsPage() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 ">
-            <h3 className="text-lg font-bold text-gray-900  mb-2">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200">
+            <h3 className="text-lg font-bold text-gray-900 mb-2">
               Can I set my own rates?
             </h3>
             <p className="text-gray-600 dark:text-gray-300">
@@ -435,8 +435,8 @@ export default async function ForCAsPage() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 ">
-            <h3 className="text-lg font-bold text-gray-900  mb-2">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200">
+            <h3 className="text-lg font-bold text-gray-900 mb-2">
               Do I need ICAI membership?
             </h3>
             <p className="text-gray-600 dark:text-gray-300">
@@ -444,8 +444,8 @@ export default async function ForCAsPage() {
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 ">
-            <h3 className="text-lg font-bold text-gray-900  mb-2">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200">
+            <h3 className="text-lg font-bold text-gray-900 mb-2">
               How are disputes handled?
             </h3>
             <p className="text-gray-600 dark:text-gray-300">

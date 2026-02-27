@@ -187,20 +187,20 @@ export default async function InvoiceDetailPage({
                         {isPaid ? (
                             <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
                                 <div className="flex items-center gap-3">
-                                    <div className="h-10 w-10 rounded-full bg-green-100  flex items-center justify-center">
-                                        <svg className="h-6 w-6 text-green-600 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+                                        <svg className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                         </svg>
                                     </div>
                                     <div className="flex-1">
                                         <p className="font-semibold text-green-800 dark:text-green-300">Payment Received</p>
-                                        <p className="text-sm text-green-600 text-green-600">
+                                        <p className="text-sm text-green-600">
                                             {hasPartialPayment && `Received in ${invoice.amount_paid && invoice.total ? Math.ceil(amountPaid / (invoice.total / 10)) : 'multiple'} payment(s) - `}
                                             {invoice.payment_method && `Via ${invoice.payment_method.replace('_', ' ')}`}
                                             {invoice.paid_at && ` on ${formatDate(invoice.paid_at)}`}
                                         </p>
                                         {invoice.payment_notes && (
-                                            <p className="text-xs text-green-600 text-green-600 mt-1">
+                                            <p className="text-xs text-green-600 mt-1">
                                                 {invoice.payment_notes}
                                             </p>
                                         )}
@@ -212,22 +212,22 @@ export default async function InvoiceDetailPage({
                                 <div className="flex items-center justify-between mb-3">
                                     <div>
                                         <p className="font-semibold text-blue-800 dark:text-blue-300">Partial Payment Received</p>
-                                        <p className="text-sm text-blue-600 text-blue-600">
+                                        <p className="text-sm text-blue-600">
                                             {((amountPaid / invoice.total) * 100).toFixed(1)}% paid
                                         </p>
                                     </div>
                                 </div>
                                 <div className="space-y-2 mb-4">
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-gray-600 text-gray-600">Total Amount:</span>
+                                        <span className="text-gray-600">Total Amount:</span>
                                         <span className="font-semibold">₹{invoice.total.toFixed(2)}</span>
                                     </div>
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-gray-600 text-gray-600">Amount Paid:</span>
+                                        <span className="text-gray-600">Amount Paid:</span>
                                         <span className="font-semibold text-green-600">₹{amountPaid.toFixed(2)}</span>
                                     </div>
                                     <div className="flex justify-between text-sm pt-2 border-t border-blue-200 dark:border-blue-800">
-                                        <span className="text-gray-600 text-gray-600 font-medium">Amount Remaining:</span>
+                                        <span className="text-gray-600 font-medium">Amount Remaining:</span>
                                         <span className="font-bold text-blue-600">₹{amountRemaining.toFixed(2)}</span>
                                     </div>
                                 </div>

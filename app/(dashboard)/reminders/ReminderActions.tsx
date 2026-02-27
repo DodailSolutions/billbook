@@ -52,7 +52,7 @@ export default function ReminderActions({ reminder }: ReminderActionsProps) {
     }
 
     return (
-        <div className="flex items-center gap-2 pt-3 border-t border-gray-200 ">
+        <div className="flex items-center gap-2 pt-3 border-t border-gray-200">
             <Button
                 variant="outline"
                 size="sm"
@@ -60,7 +60,7 @@ export default function ReminderActions({ reminder }: ReminderActionsProps) {
                 disabled={isLoading}
                 className="flex-1"
             >
-                <Check className="h-4 w-4 mr-1 text-green-600 text-green-600" />
+                <Check className="h-4 w-4 mr-1 text-green-600" />
                 Mark Sent
             </Button>
             <Button
@@ -69,7 +69,7 @@ export default function ReminderActions({ reminder }: ReminderActionsProps) {
                 onClick={handleDismiss}
                 disabled={isLoading}
             >
-                <X className="h-4 w-4 text-gray-600 text-gray-600" />
+                <X className="h-4 w-4 text-gray-600" />
             </Button>
         </div>
     )

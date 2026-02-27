@@ -77,7 +77,7 @@ export default function CADataAccessPage({ params }: { params: { clientId: strin
       <div className="container max-w-6xl mx-auto py-8 px-4">
         <Card className="p-8 text-center">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4" />
-          <p className="text-gray-600 text-gray-600">Loading data access information...</p>
+          <p className="text-gray-600">Loading data access information...</p>
         </Card>
       </div>
     )
@@ -97,7 +97,7 @@ export default function CADataAccessPage({ params }: { params: { clientId: strin
           <Shield className="w-8 h-8 text-blue-600" />
           <h1 className="text-3xl font-bold">Client Data Access</h1>
         </div>
-        <p className="text-gray-600 text-gray-600">
+        <p className="text-gray-600">
           Request and manage access to client data for GST filing, tax returns, and services.
         </p>
       </div>
@@ -142,12 +142,12 @@ export default function CADataAccessPage({ params }: { params: { clientId: strin
                     <FileText className="w-5 h-5 text-blue-600" />
                     <h3 className="font-semibold">{access.data_type.replace(/_/g, ' ')}</h3>
                   </div>
-                  <span className="px-2 py-0.5 bg-green-100  text-green-700 dark:text-green-300 text-xs rounded-full font-semibold">
+                  <span className="px-2 py-0.5 bg-green-100 text-green-700 dark:text-green-300 text-xs rounded-full font-semibold">
                     ACTIVE
                   </span>
                 </div>
 
-                <div className="space-y-2 text-sm text-gray-600 text-gray-600">
+                <div className="space-y-2 text-sm text-gray-600">
                   <div className="flex items-center justify-between">
                     <span>Can View:</span>
                     <span className="font-medium">
@@ -168,7 +168,7 @@ export default function CADataAccessPage({ params }: { params: { clientId: strin
                   </div>
                 </div>
 
-                <div className="mt-3 pt-3 border-t border-gray-200 ">
+                <div className="mt-3 pt-3 border-t border-gray-200">
                   <div className="flex items-center gap-2 text-xs text-gray-500">
                     <Calendar className="w-3 h-3" />
                     <span>
@@ -200,7 +200,7 @@ export default function CADataAccessPage({ params }: { params: { clientId: strin
         {requests.length === 0 ? (
           <Card className="p-8 text-center">
             <Shield className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600 text-gray-600">
+            <p className="text-gray-600">
               No data access requests yet. Request access to start working with client data.
             </p>
           </Card>
@@ -214,7 +214,7 @@ export default function CADataAccessPage({ params }: { params: { clientId: strin
                       {getStatusIcon(request.status)}
                       <h3 className="font-semibold">{request.status.toUpperCase()}</h3>
                     </div>
-                    <p className="text-sm text-gray-600 text-gray-600">
+                    <p className="text-sm text-gray-600">
                       {request.engagement_type} • Requested on{' '}
                       {new Date(request.requested_at).toLocaleDateString()}
                     </p>
@@ -261,7 +261,7 @@ export default function CADataAccessPage({ params }: { params: { clientId: strin
                 )}
 
                 {request.status === 'approved' && request.access_expires_at && (
-                  <div className="mt-3 flex items-center gap-2 text-sm text-green-600 text-green-600">
+                  <div className="mt-3 flex items-center gap-2 text-sm text-green-600">
                     <CheckCircle className="w-4 h-4" />
                     <span>
                       Access valid until {new Date(request.access_expires_at).toLocaleDateString()}

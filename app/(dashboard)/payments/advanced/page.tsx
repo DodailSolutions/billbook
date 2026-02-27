@@ -53,7 +53,7 @@ export default async function AdvancedPaymentsPage() {
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
             Advanced Payments
           </h1>
-          <p className="text-gray-600 text-gray-600 mt-1">
+          <p className="text-gray-600 mt-1">
             UPI, WhatsApp Pay, Auto-reconciliation, BNPL & Late Fees
           </p>
         </div>
@@ -71,13 +71,13 @@ export default async function AdvancedPaymentsPage() {
             <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">
               Active UPI IDs
             </CardTitle>
-            <Smartphone className="h-4 w-4 text-blue-600 text-blue-600" />
+            <Smartphone className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-gray-900 dark:text-white">
               {upiDetails.filter(u => u.is_active).length}
             </div>
-            <p className="text-xs text-gray-600 text-gray-600 mt-1">
+            <p className="text-xs text-gray-600 mt-1">
               {upiDetails.filter(u => u.is_primary).length} primary
             </p>
           </CardContent>
@@ -94,7 +94,7 @@ export default async function AdvancedPaymentsPage() {
             <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
               {unreconciledTransactions.length}
             </div>
-            <p className="text-xs text-gray-600 text-gray-600 mt-1">
+            <p className="text-xs text-gray-600 mt-1">
               Transactions pending
             </p>
           </CardContent>
@@ -111,7 +111,7 @@ export default async function AdvancedPaymentsPage() {
             <div className="text-2xl font-bold text-red-600 dark:text-red-400">
               {failedPayments.length}
             </div>
-            <p className="text-xs text-gray-600 text-gray-600 mt-1">
+            <p className="text-xs text-gray-600 mt-1">
               Need attention
             </p>
           </CardContent>
@@ -122,13 +122,13 @@ export default async function AdvancedPaymentsPage() {
             <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">
               Active BNPL
             </CardTitle>
-            <CreditCard className="h-4 w-4 text-green-600 text-green-600" />
+            <CreditCard className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600 text-green-600">
+            <div className="text-2xl font-bold text-green-600">
               {activeBNPL}
             </div>
-            <p className="text-xs text-gray-600 text-gray-600 mt-1">
+            <p className="text-xs text-gray-600 mt-1">
               Applications
             </p>
           </CardContent>
@@ -143,9 +143,9 @@ export default async function AdvancedPaymentsPage() {
             <CardHeader>
               <div className="flex items-center gap-3 mb-2">
                 <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
-                  <Smartphone className="h-6 w-6 text-blue-600 text-blue-600" />
+                  <Smartphone className="h-6 w-6 text-blue-600" />
                 </div>
-                <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/50 text-blue-900">
+                <Badge className="bg-blue-100 dark:bg-blue-900/50 text-blue-900">
                   Active
                 </Badge>
               </div>
@@ -157,15 +157,15 @@ export default async function AdvancedPaymentsPage() {
             <CardContent>
               <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-green-600 text-green-600" />
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
                   Multiple UPI IDs
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-green-600 text-green-600" />
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
                   Auto QR generation
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-green-600 text-green-600" />
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
                   UPI intent links
                 </li>
               </ul>
@@ -179,7 +179,7 @@ export default async function AdvancedPaymentsPage() {
             <CardHeader>
               <div className="flex items-center gap-3 mb-2">
                 <div className="p-2 bg-green-100 dark:bg-green-900/20 rounded-lg">
-                  <MessageCircle className="h-6 w-6 text-green-600 text-green-600" />
+                  <MessageCircle className="h-6 w-6 text-green-600" />
                 </div>
                 <Badge className="bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-200">
                   Active
@@ -193,15 +193,15 @@ export default async function AdvancedPaymentsPage() {
             <CardContent>
               <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-green-600 text-green-600" />
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
                   Payment link generation
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-green-600 text-green-600" />
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
                   Click tracking
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-green-600 text-green-600" />
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
                   Auto-expiry management
                 </li>
               </ul>
@@ -231,15 +231,15 @@ export default async function AdvancedPaymentsPage() {
             <CardContent>
               <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-green-600 text-green-600" />
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
                   Bank statement import
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-green-600 text-green-600" />
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
                   Smart invoice matching
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-green-600 text-green-600" />
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
                   Confidence scoring
                 </li>
               </ul>
@@ -267,11 +267,11 @@ export default async function AdvancedPaymentsPage() {
             <CardContent>
               <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-green-600 text-green-600" />
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
                   Weekly/Monthly/Quarterly
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-green-600 text-green-600" />
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
                   Auto-payment tracking
                 </li>
                 <li className="flex items-center gap-2">
@@ -303,11 +303,11 @@ export default async function AdvancedPaymentsPage() {
             <CardContent>
               <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-green-600 text-green-600" />
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
                   4 Provider integrations
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-green-600 text-green-600" />
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
                   Instant approval
                 </li>
                 <li className="flex items-center gap-2">
@@ -339,15 +339,15 @@ export default async function AdvancedPaymentsPage() {
             <CardContent>
               <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-green-600 text-green-600" />
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
                   Tiered/Fixed/Percentage
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-green-600 text-green-600" />
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
                   Grace period support
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-green-600 text-green-600" />
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
                   Auto-notification
                 </li>
               </ul>
@@ -379,7 +379,7 @@ export default async function AdvancedPaymentsPage() {
                     <p className="text-sm font-medium text-gray-900 dark:text-white">
                       ₹{Number(payment.amount).toLocaleString('en-IN')}
                     </p>
-                    <p className="text-xs text-gray-600 text-gray-600 mt-1">
+                    <p className="text-xs text-gray-600 mt-1">
                       {payment.failure_reason || 'Payment failed'}
                       {payment.retry_count > 0 && ` • ${payment.retry_count} retries`}
                     </p>

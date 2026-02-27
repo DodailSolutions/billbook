@@ -238,7 +238,7 @@ export function PurchaseAddonModal({ isLifetimePlan, currentSlots, onSuccess }: 
                     <CardContent>
                       <div className="space-y-2">
                         <div className="text-3xl font-bold">₹{pricePerSlot}</div>
-                        <div className="text-sm text-gray-600 text-gray-600">
+                        <div className="text-sm text-gray-600">
                           per slot/{option.billing_period === 'yearly' ? 'year' : 'month'}
                         </div>
                         <div className="pt-2 border-t">
@@ -261,14 +261,14 @@ export function PurchaseAddonModal({ isLifetimePlan, currentSlots, onSuccess }: 
               <h4 className="font-semibold text-blue-900 dark:text-blue-300 mb-3">Order Summary</h4>
               <div className="space-y-2 text-sm">
                 <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-2 text-blue-800 text-blue-900">
+                  <span className="flex items-center gap-2 text-blue-900">
                     <Users className="h-4 w-4" />
                     Additional team slots
                   </span>
                   <span className="font-medium">{quantity}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-2 text-blue-800 text-blue-900">
+                  <span className="flex items-center gap-2 text-blue-900">
                     <Calendar className="h-4 w-4" />
                     Duration
                   </span>

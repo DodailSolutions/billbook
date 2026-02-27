@@ -113,8 +113,8 @@ export function ShareInvoiceButton({
             const maxWidth = pdfWidth - 20
             const maxHeight = pdfHeight - 20
             
-            let imgWidth = maxWidth
-            let imgHeight = (canvas.height * imgWidth) / canvas.width
+            const imgWidth = maxWidth
+            const imgHeight = (canvas.height * imgWidth) / canvas.width
             
             // If content fits on one page, scale it to fit nicely
             if (imgHeight <= maxHeight) {
@@ -333,9 +333,9 @@ export function ShareInvoiceButton({
                     />
                     
                     {/* Share Menu */}
-                    <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200  z-50 overflow-hidden">
+                    <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 z-50 overflow-hidden">
                         <div className="p-2">
-                            <div className="px-3 py-2 text-xs font-semibold text-gray-500 text-gray-600 uppercase tracking-wide">
+                            <div className="px-3 py-2 text-xs font-semibold text-gray-600 uppercase tracking-wide">
                                 Share Options
                             </div>
                             
@@ -345,18 +345,18 @@ export function ShareInvoiceButton({
                                 disabled={isGenerating}
                                 className="w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors border border-transparent hover:border-green-200 dark:hover:border-green-800 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                <div className="h-8 w-8 rounded-full bg-green-100  flex items-center justify-center">
+                                <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center">
                                     {isGenerating ? (
-                                        <Loader2 className="h-4 w-4 text-green-600 text-green-600 animate-spin" />
+                                        <Loader2 className="h-4 w-4 text-green-600 animate-spin" />
                                     ) : (
-                                        <MessageCircle className="h-4 w-4 text-green-600 text-green-600" />
+                                        <MessageCircle className="h-4 w-4 text-green-600" />
                                     )}
                                 </div>
                                 <div className="flex-1 text-left">
                                     <div className="font-medium text-green-900 dark:text-green-100">
                                         {isGenerating ? 'Generating PDF...' : 'WhatsApp'}
                                     </div>
-                                    <div className="text-xs text-green-700 text-green-600">
+                                    <div className="text-xs text-green-600">
                                         {customerPhone ? 'Send PDF to customer' : 'Share PDF via WhatsApp'}
                                     </div>
                                 </div>
@@ -377,7 +377,7 @@ export function ShareInvoiceButton({
                                 </div>
                                 <div className="flex-1 text-left">
                                     <div className="font-medium">Print / Download</div>
-                                    <div className="text-xs text-gray-500 text-gray-600">Save as PDF or print</div>
+                                    <div className="text-xs text-gray-600">Save as PDF or print</div>
                                 </div>
                             </button>
 
@@ -387,16 +387,16 @@ export function ShareInvoiceButton({
                                 disabled={isGenerating}
                                 className="w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                <div className="h-8 w-8 rounded-full bg-blue-100  flex items-center justify-center">
+                                <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
                                     {isGenerating ? (
-                                        <Loader2 className="h-4 w-4 text-blue-600 text-blue-600 animate-spin" />
+                                        <Loader2 className="h-4 w-4 text-blue-600 animate-spin" />
                                     ) : (
-                                        <Mail className="h-4 w-4 text-blue-600 text-blue-600" />
+                                        <Mail className="h-4 w-4 text-blue-600" />
                                     )}
                                 </div>
                                 <div className="flex-1 text-left">
                                     <div className="font-medium">Email</div>
-                                    <div className="text-xs text-gray-500 text-gray-600">
+                                    <div className="text-xs text-gray-600">
                                         Send PDF via email
                                     </div>
                                 </div>
@@ -409,16 +409,16 @@ export function ShareInvoiceButton({
                             >
                                 <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center">
                                     {copied ? (
-                                        <Check className="h-4 w-4 text-green-600 text-green-600" />
+                                        <Check className="h-4 w-4 text-green-600" />
                                     ) : (
-                                        <Copy className="h-4 w-4 text-gray-600 text-gray-600" />
+                                        <Copy className="h-4 w-4 text-gray-600" />
                                     )}
                                 </div>
                                 <div className="flex-1 text-left">
                                     <div className="font-medium">
                                         {copied ? 'Copied!' : 'Copy Link'}
                                     </div>
-                                    <div className="text-xs text-gray-500 text-gray-600">
+                                    <div className="text-xs text-gray-600">
                                         Copy invoice URL
                                     </div>
                                 </div>

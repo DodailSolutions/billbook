@@ -24,20 +24,20 @@ export default function DataAccessPage() {
           <Shield className="w-8 h-8 text-blue-600" />
           <h1 className="text-3xl font-bold">Data Access Management</h1>
         </div>
-        <p className="text-gray-600 text-gray-600">
+        <p className="text-gray-600">
           Review and manage data access requests from your hired CAs for GST filing, tax returns,
           and other services.
         </p>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-6 border-b border-gray-200 ">
+      <div className="flex gap-2 mb-6 border-b border-gray-200">
         <button
           onClick={() => setActiveTab('requests')}
           className={`px-4 py-2 font-medium transition-colors border-b-2 ${
             activeTab === 'requests'
               ? 'border-blue-600 text-blue-600'
-              : 'border-transparent text-gray-600 text-gray-600 hover:text-gray-900 dark:hover:text-gray-200'
+              : 'border-transparent text-gray-600 hover:text-gray-900 dark:hover:text-gray-200'
           }`}
         >
           Access Requests
@@ -47,7 +47,7 @@ export default function DataAccessPage() {
           className={`px-4 py-2 font-medium transition-colors border-b-2 ${
             activeTab === 'info'
               ? 'border-blue-600 text-blue-600'
-              : 'border-transparent text-gray-600 text-gray-600 hover:text-gray-900 dark:hover:text-gray-200'
+              : 'border-transparent text-gray-600 hover:text-gray-900 dark:hover:text-gray-200'
           }`}
         >
           Security Info
@@ -61,12 +61,12 @@ export default function DataAccessPage() {
         <div className="space-y-6">
           <Card className="p-6">
             <div className="flex items-start gap-4 mb-4">
-              <div className="w-12 h-12 bg-blue-100  rounded-lg flex items-center justify-center shrink-0">
-                <Lock className="w-6 h-6 text-blue-600 text-blue-600" />
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center shrink-0">
+                <Lock className="w-6 h-6 text-blue-600" />
               </div>
               <div>
                 <h3 className="text-xl font-bold mb-2">How Data Access Works</h3>
-                <p className="text-gray-600 text-gray-600">
+                <p className="text-gray-600">
                   When you hire a CA for GST filing, tax returns, or other services, they need
                   access to specific financial data to complete their work professionally and
                   accurately.
@@ -81,7 +81,7 @@ export default function DataAccessPage() {
                 </div>
                 <div>
                   <h4 className="font-semibold mb-1">CA Requests Access</h4>
-                  <p className="text-sm text-gray-600 text-gray-600">
+                  <p className="text-sm text-gray-600">
                     After payment confirmation, your CA can request access to specific data types
                     (invoices, bank statements, GST portal, etc.) needed for their services.
                   </p>
@@ -94,7 +94,7 @@ export default function DataAccessPage() {
                 </div>
                 <div>
                   <h4 className="font-semibold mb-1">You Review & Decide</h4>
-                  <p className="text-sm text-gray-600 text-gray-600">
+                  <p className="text-sm text-gray-600">
                     You receive a notification and can review the request details. Approve only
                     the data types necessary for the specific service you hired them for.
                   </p>
@@ -107,7 +107,7 @@ export default function DataAccessPage() {
                 </div>
                 <div>
                   <h4 className="font-semibold mb-1">Time-Limited Access</h4>
-                  <p className="text-sm text-gray-600 text-gray-600">
+                  <p className="text-sm text-gray-600">
                     Once approved, access is granted for the specified duration (typically 90
                     days). Access automatically expires after this period.
                   </p>
@@ -120,7 +120,7 @@ export default function DataAccessPage() {
                 </div>
                 <div>
                   <h4 className="font-semibold mb-1">Revoke Anytime</h4>
-                  <p className="text-sm text-gray-600 text-gray-600">
+                  <p className="text-sm text-gray-600">
                     You maintain full control and can revoke access at any time if you
                     terminate the engagement or have security concerns.
                   </p>
@@ -131,12 +131,12 @@ export default function DataAccessPage() {
 
           <Card className="p-6">
             <div className="flex items-start gap-4 mb-4">
-              <div className="w-12 h-12 bg-green-100  rounded-lg flex items-center justify-center shrink-0">
-                <Shield className="w-6 h-6 text-green-600 text-green-600" />
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center shrink-0">
+                <Shield className="w-6 h-6 text-green-600" />
               </div>
               <div>
                 <h3 className="text-xl font-bold mb-2">Security & Privacy</h3>
-                <p className="text-gray-600 text-gray-600">
+                <p className="text-gray-600">
                   We take data security seriously. Here&apos;s how your data is protected:
                 </p>
               </div>
@@ -144,36 +144,36 @@ export default function DataAccessPage() {
 
             <ul className="space-y-3 mt-4">
               <li className="flex items-start gap-3">
-                <FileText className="w-5 h-5 text-green-600 text-green-600 shrink-0 mt-0.5" />
-                <div className="text-sm text-gray-600 text-gray-600">
+                <FileText className="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
+                <div className="text-sm text-gray-600">
                   <strong>Verified CAs Only:</strong> All CAs are ICAI-verified professionals
                   bound by confidentiality and professional ethics
                 </div>
               </li>
               <li className="flex items-start gap-3">
-                <FileText className="w-5 h-5 text-green-600 text-green-600 shrink-0 mt-0.5" />
-                <div className="text-sm text-gray-600 text-gray-600">
+                <FileText className="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
+                <div className="text-sm text-gray-600">
                   <strong>Granular Permissions:</strong> Control exactly what data each CA can
                   access (view, download, or edit permissions)
                 </div>
               </li>
               <li className="flex items-start gap-3">
-                <FileText className="w-5 h-5 text-green-600 text-green-600 shrink-0 mt-0.5" />
-                <div className="text-sm text-gray-600 text-gray-600">
+                <FileText className="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
+                <div className="text-sm text-gray-600">
                   <strong>Audit Trail:</strong> All data access is logged and tracked for
                   security and compliance
                 </div>
               </li>
               <li className="flex items-start gap-3">
-                <FileText className="w-5 h-5 text-green-600 text-green-600 shrink-0 mt-0.5" />
-                <div className="text-sm text-gray-600 text-gray-600">
+                <FileText className="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
+                <div className="text-sm text-gray-600">
                   <strong>Encrypted Transfer:</strong> All data is encrypted during transfer using
                   industry-standard SSL/TLS protocols
                 </div>
               </li>
               <li className="flex items-start gap-3">
-                <FileText className="w-5 h-5 text-green-600 text-green-600 shrink-0 mt-0.5" />
-                <div className="text-sm text-gray-600 text-gray-600">
+                <FileText className="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
+                <div className="text-sm text-gray-600">
                   <strong>Automatic Expiry:</strong> Access automatically expires after the
                   specified duration - no manual intervention needed
                 </div>

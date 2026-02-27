@@ -150,7 +150,7 @@ export function AIAccountantChat({ businessName }: AIAccountantChatProps) {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Ask about bookkeeping, cash flow, or financial insights..."
-            className="flex-1 resize-none rounded-lg border-2 border-gray-200  bg-white px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-emerald-500 dark:focus:border-emerald-500 min-h-13 max-h-32"
+            className="flex-1 resize-none rounded-lg border-2 border-gray-200 bg-white px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-emerald-500 dark:focus:border-emerald-500 min-h-13 max-h-32"
             rows={1}
             disabled={isLoading}
           />
@@ -166,7 +166,7 @@ export function AIAccountantChat({ businessName }: AIAccountantChatProps) {
             )}
           </Button>
         </div>
-        <p className="text-xs text-gray-500 text-gray-600 mt-2">
+        <p className="text-xs text-gray-600 mt-2">
           Press Enter to send, Shift + Enter for new line
         </p>
       </form>

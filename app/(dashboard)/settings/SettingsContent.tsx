@@ -168,7 +168,7 @@ export default function SettingsContent({ initialProfile }: SettingsContentProps
                                 </div>
                                 <button 
                                     type="button"
-                                    className="absolute bottom-0 right-0 p-2 bg-white rounded-full shadow-lg border-2 border-gray-100  hover:scale-110 transition-transform"
+                                    className="absolute bottom-0 right-0 p-2 bg-white rounded-full shadow-lg border-2 border-gray-100 hover:scale-110 transition-transform"
                                     title="Change avatar"
                                 >
                                     <Camera className="h-4 w-4 text-gray-600" />
@@ -177,7 +177,7 @@ export default function SettingsContent({ initialProfile }: SettingsContentProps
                             
                             {/* User Info */}
                             <div>
-                                <h3 className="text-lg font-semibold text-gray-900 ">
+                                <h3 className="text-lg font-semibold text-gray-900">
                                     {fullName || 'User'}
                                 </h3>
                                 <p className="text-sm text-gray-600">
@@ -189,14 +189,14 @@ export default function SettingsContent({ initialProfile }: SettingsContentProps
                             <div className="w-full pt-4 border-t border-gray-200">
                                 <div className="flex justify-around text-center">
                                     <div>
-                                        <p className="text-2xl font-bold text-gray-900 ">
+                                        <p className="text-2xl font-bold text-gray-900">
                                             {Math.floor((Date.now() - new Date(initialProfile?.created_at || '').getTime()) / (1000 * 60 * 60 * 24))}
                                         </p>
                                         <p className="text-xs text-gray-600">Days Active</p>
                                     </div>
                                     <div className="border-l border-gray-200"></div>
                                     <div>
-                                        <p className="text-2xl font-bold text-gray-900 ">Free</p>
+                                        <p className="text-2xl font-bold text-gray-900">Free</p>
                                         <p className="text-xs text-gray-600">Plan</p>
                                     </div>
                                 </div>
@@ -218,7 +218,7 @@ export default function SettingsContent({ initialProfile }: SettingsContentProps
                     <Card className="lg:col-span-2">
                         <form onSubmit={handleUpdateProfile} className="space-y-6">
                             <div>
-                                <h2 className="text-xl font-semibold text-gray-900  mb-2">
+                                <h2 className="text-xl font-semibold text-gray-900 mb-2">
                                     Personal Information
                                 </h2>
                                 <p className="text-sm text-gray-600">
@@ -285,7 +285,7 @@ export default function SettingsContent({ initialProfile }: SettingsContentProps
                                     <select
                                         value={selectedLanguage}
                                         onChange={(e) => setSelectedLanguage(e.target.value)}
-                                        className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-white text-gray-900  focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     >
                                         {SUPPORTED_LANGUAGES.map((lang) => (
                                             <option key={lang.code} value={lang.code}>
@@ -303,7 +303,7 @@ export default function SettingsContent({ initialProfile }: SettingsContentProps
                                     <select
                                         value={selectedTimezone}
                                         onChange={(e) => setSelectedTimezone(e.target.value)}
-                                        className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-white text-gray-900  focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     >
                                         <option value="Asia/Kolkata">India (IST)</option>
                                         <option value="America/New_York">New York (EST)</option>
@@ -345,14 +345,14 @@ export default function SettingsContent({ initialProfile }: SettingsContentProps
                 <div className="space-y-6">
                     {/* Security Overview */}
                     <div className="grid gap-4 md:grid-cols-3">
-                        <Card className="bg-linear-to-br from-green-50 to-emerald-50  border-green-200 ">
+                        <Card className="bg-linear-to-br from-green-50 to-emerald-50 border-green-200">
                             <div className="flex items-center gap-3">
-                                <div className="p-3 bg-green-100  rounded-full">
+                                <div className="p-3 bg-green-100 rounded-full">
                                     <CheckCircle className="h-6 w-6 text-green-600" />
                                 </div>
                                 <div>
                                     <p className="text-sm text-gray-600">Password Strength</p>
-                                    <p className="text-lg font-semibold text-gray-900 ">Strong</p>
+                                    <p className="text-lg font-semibold text-gray-900">Strong</p>
                                 </div>
                             </div>
                         </Card>
@@ -363,7 +363,7 @@ export default function SettingsContent({ initialProfile }: SettingsContentProps
                                 </div>
                                 <div>
                                     <p className="text-sm text-gray-600">Email Verified</p>
-                                    <p className="text-lg font-semibold text-gray-900 ">Yes</p>
+                                    <p className="text-lg font-semibold text-gray-900">Yes</p>
                                 </div>
                             </div>
                         </Card>
@@ -374,7 +374,7 @@ export default function SettingsContent({ initialProfile }: SettingsContentProps
                                 </div>
                                 <div>
                                     <p className="text-sm text-gray-600">Last Changed</p>
-                                    <p className="text-lg font-semibold text-gray-900 ">30d ago</p>
+                                    <p className="text-lg font-semibold text-gray-900">30d ago</p>
                                 </div>
                             </div>
                         </Card>
@@ -385,7 +385,7 @@ export default function SettingsContent({ initialProfile }: SettingsContentProps
                         <form onSubmit={handleChangePassword} className="space-y-6">
                             <div className="flex items-start justify-between">
                                 <div>
-                                    <h2 className="text-xl font-semibold text-gray-900  mb-2 flex items-center gap-2">
+                                    <h2 className="text-xl font-semibold text-gray-900 mb-2 flex items-center gap-2">
                                         <Lock className="h-5 w-5 text-blue-600" />
                                         Change Password
                                     </h2>
@@ -393,7 +393,7 @@ export default function SettingsContent({ initialProfile }: SettingsContentProps
                                         Update your password to keep your account secure
                                     </p>
                                 </div>
-                                <div className="hidden sm:block px-3 py-1 bg-blue-100  text-blue-700 dark:text-blue-300 text-xs rounded-full">
+                                <div className="hidden sm:block px-3 py-1 bg-blue-100 text-blue-700 dark:text-blue-300 text-xs rounded-full">
                                     Recommended every 90 days
                                 </div>
                             </div>
@@ -495,16 +495,16 @@ export default function SettingsContent({ initialProfile }: SettingsContentProps
                     <Card>
                         <form onSubmit={handleUpdateEmail} className="space-y-6">
                             <div>
-                                <h2 className="text-xl font-semibold text-gray-900  mb-2 flex items-center gap-2">
+                                <h2 className="text-xl font-semibold text-gray-900 mb-2 flex items-center gap-2">
                                     <Mail className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                                     Change Email Address
                                 </h2>
                                 <div className="flex items-center gap-2 text-sm">
                                     <span className="text-gray-600">Current email:</span>
-                                    <span className="font-medium text-gray-900  px-3 py-1 bg-gray-100 rounded-full">
+                                    <span className="font-medium text-gray-900 px-3 py-1 bg-gray-100 rounded-full">
                                         {initialProfile?.email}
                                     </span>
-                                    <span className="text-xs bg-green-100  text-green-700  px-2 py-1 rounded-full flex items-center gap-1">
+                                    <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full flex items-center gap-1">
                                         <CheckCircle className="h-3 w-3" />
                                         Verified
                                     </span>
@@ -582,7 +582,7 @@ export default function SettingsContent({ initialProfile }: SettingsContentProps
                 <div className="space-y-6">
                     <Card>
                         <div className="mb-6">
-                            <h2 className="text-xl font-semibold text-gray-900  mb-2 flex items-center gap-2">
+                            <h2 className="text-xl font-semibold text-gray-900 mb-2 flex items-center gap-2">
                                 <Bell className="h-5 w-5 text-blue-600" />
                                 Notification Preferences
                             </h2>
@@ -638,7 +638,7 @@ export default function SettingsContent({ initialProfile }: SettingsContentProps
                                             <span className="text-lg">{notification.icon}</span>
                                         </div>
                                         <div className="flex-1">
-                                            <p className="text-sm font-medium text-gray-900 ">
+                                            <p className="text-sm font-medium text-gray-900">
                                                 {notification.label}
                                             </p>
                                             <p className="text-xs text-gray-600">
@@ -677,7 +677,7 @@ export default function SettingsContent({ initialProfile }: SettingsContentProps
                     {/* Quick Actions */}
                     <Card>
                         <div className="mb-6">
-                            <h3 className="text-lg font-semibold text-gray-900  mb-2">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-2">
                                 Quick Actions
                             </h3>
                             <p className="text-sm text-gray-600">
@@ -690,11 +690,11 @@ export default function SettingsContent({ initialProfile }: SettingsContentProps
                                 className="p-4 text-left rounded-lg border-2 border-dashed border-green-300 dark:border-green-700 hover:border-green-500 dark:hover:border-green-500 hover:bg-green-50 dark:hover:bg-green-900/20 transition-all group"
                             >
                                 <div className="flex items-center gap-3">
-                                    <div className="p-2 bg-green-100  rounded-lg group-hover:scale-110 transition-transform">
+                                    <div className="p-2 bg-green-100 rounded-lg group-hover:scale-110 transition-transform">
                                         <CheckCircle className="h-5 w-5 text-green-600" />
                                     </div>
                                     <div>
-                                        <p className="font-medium text-gray-900 ">Enable All</p>
+                                        <p className="font-medium text-gray-900">Enable All</p>
                                         <p className="text-xs text-gray-600">Turn on all notifications</p>
                                     </div>
                                 </div>
@@ -704,11 +704,11 @@ export default function SettingsContent({ initialProfile }: SettingsContentProps
                                 className="p-4 text-left rounded-lg border-2 border-dashed border-red-300 dark:border-red-700 hover:border-red-500 dark:hover:border-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all group"
                             >
                                 <div className="flex items-center gap-3">
-                                    <div className="p-2 bg-red-100  rounded-lg group-hover:scale-110 transition-transform">
+                                    <div className="p-2 bg-red-100 rounded-lg group-hover:scale-110 transition-transform">
                                         <AlertCircle className="h-5 w-5 text-red-600" />
                                     </div>
                                     <div>
-                                        <p className="font-medium text-gray-900 ">Disable All</p>
+                                        <p className="font-medium text-gray-900">Disable All</p>
                                         <p className="text-xs text-gray-600">Turn off all notifications</p>
                                     </div>
                                 </div>

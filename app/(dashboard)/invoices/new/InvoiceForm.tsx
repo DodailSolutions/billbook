@@ -221,7 +221,7 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
 
     return (
         <>{/* Header with Simplified View Toggle */}
-            <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200 ">
+            <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
                 <div className="flex items-center gap-3">
                     <FileText className="w-6 h-6 text-gray-700 dark:text-gray-300" />
                     <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -658,7 +658,7 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
         {showAddCustomerModal && (
             <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                 <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
-                    <div className="flex items-center justify-between p-6 border-b ">
+                    <div className="flex items-center justify-between p-6 border-b">
                         <h2 className="text-lg font-semibold">Add New Customer</h2>
                         <button
                             onClick={() => setShowAddCustomerModal(false)}
@@ -713,7 +713,7 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
         {showSaveItemModal && (
             <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                 <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
-                    <div className="flex items-center justify-between p-6 border-b ">
+                    <div className="flex items-center justify-between p-6 border-b">
                         <h2 className="text-lg font-semibold">Save Item for Later</h2>
                         <button
                             onClick={() => setShowSaveItemModal(false)}

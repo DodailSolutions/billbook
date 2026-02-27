@@ -54,7 +54,7 @@ export default async function CAAccessPage() {
             <Shield className="h-8 w-8 text-emerald-600" />
             CA Collaboration
           </h1>
-          <p className="text-gray-600 text-gray-600 mt-1">
+          <p className="text-gray-600 mt-1">
             Manage Chartered Accountant access to your GST data
           </p>
         </div>
@@ -105,7 +105,7 @@ export default async function CAAccessPage() {
                           {access.access_level.replace('_', ' ').toUpperCase()}
                         </Badge>
                       </div>
-                      <div className="space-y-1 text-sm text-gray-600 text-gray-600">
+                      <div className="space-y-1 text-sm text-gray-600">
                         <div className="flex items-center gap-4">
                           <span className="flex items-center gap-1">
                             <Clock className="h-3 w-3" />
@@ -178,7 +178,7 @@ export default async function CAAccessPage() {
                           PENDING
                         </Badge>
                       </div>
-                      <p className="text-sm text-gray-600 text-gray-600">
+                      <p className="text-sm text-gray-600">
                         Sent: {new Date(access.invitation_sent_at!).toLocaleDateString()}
                       </p>
                     </div>
@@ -215,7 +215,7 @@ export default async function CAAccessPage() {
                         <Badge className={getStatusColor(access.status)}>
                           {access.status.toUpperCase()}
                         </Badge>
-                        <span className="text-sm text-gray-600 text-gray-600">
+                        <span className="text-sm text-gray-600">
                           {access.status === 'revoked' && access.revoked_at
                             ? `Revoked on ${new Date(access.revoked_at).toLocaleDateString()}`
                             : `Expired on ${new Date(access.valid_until!).toLocaleDateString()}`}
@@ -242,7 +242,7 @@ export default async function CAAccessPage() {
             About CA Collaboration
           </CardTitle>
         </CardHeader>
-        <CardContent className="text-sm text-blue-800 text-blue-900 space-y-2">
+        <CardContent className="text-sm text-blue-900 space-y-2">
           <p>✓ Grant your CA secure access to specific modules and data</p>
           <p>✓ Control access levels: View Only, Edit, or Full access</p>
           <p>✓ Set validity periods and revoke access anytime</p>

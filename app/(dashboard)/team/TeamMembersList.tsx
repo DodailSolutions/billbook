@@ -116,7 +116,7 @@ export function TeamMembersList({ members, roles }: TeamMembersListProps) {
       case 'pending':
         return <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"><Clock className="h-3 w-3 mr-1" />Pending</Badge>
       case 'suspended':
-        return <Badge className="bg-gray-100 text-gray-800 "><XCircle className="h-3 w-3 mr-1" />Suspended</Badge>
+        return <Badge className="bg-gray-100 text-gray-800"><XCircle className="h-3 w-3 mr-1" />Suspended</Badge>
       default:
         return <Badge variant="outline">{status}</Badge>
     }
@@ -131,7 +131,7 @@ export function TeamMembersList({ members, roles }: TeamMembersListProps) {
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
           No team members yet
         </h3>
-        <p className="text-gray-600 text-gray-600 mb-4">
+        <p className="text-gray-600 mb-4">
           Start by inviting your first team member to collaborate
         </p>
       </div>
@@ -170,13 +170,13 @@ export function TeamMembersList({ members, roles }: TeamMembersListProps) {
                   </Badge>
                 </TableCell>
                 <TableCell>{getStatusBadge(member.status)}</TableCell>
-                <TableCell className="text-sm text-gray-600 text-gray-600">
+                <TableCell className="text-sm text-gray-600">
                   {member.joined_at 
                     ? formatDistanceToNow(new Date(member.joined_at), { addSuffix: true })
                     : '-'
                   }
                 </TableCell>
-                <TableCell className="text-sm text-gray-600 text-gray-600">
+                <TableCell className="text-sm text-gray-600">
                   {member.last_active_at 
                     ? formatDistanceToNow(new Date(member.last_active_at), { addSuffix: true })
                     : '-'

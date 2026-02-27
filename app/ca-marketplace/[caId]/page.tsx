@@ -60,7 +60,7 @@ export default function CAProfilePage({ params }: { params: { caId: string } }) 
     return (
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
-        <header className="bg-white  border-b border-gray-200  sticky top-0 z-50">
+        <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
           <div className="container max-w-7xl mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
               <Link href="/" className="flex items-center gap-3">
@@ -82,7 +82,7 @@ export default function CAProfilePage({ params }: { params: { caId: string } }) 
         <div className="container max-w-6xl mx-auto py-16 px-4">
           <div className="text-center">
             <div className="inline-block animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mb-4" />
-            <p className="text-lg text-gray-600 ">Loading CA profile...</p>
+            <p className="text-lg text-gray-600">Loading CA profile...</p>
           </div>
         </div>
       </div>
@@ -93,7 +93,7 @@ export default function CAProfilePage({ params }: { params: { caId: string } }) 
     return (
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
-        <header className="bg-white  border-b border-gray-200  sticky top-0 z-50">
+        <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
           <div className="container max-w-7xl mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
               <Link href="/" className="flex items-center gap-3">
@@ -118,7 +118,7 @@ export default function CAProfilePage({ params }: { params: { caId: string } }) 
         <div className="container max-w-6xl mx-auto py-16 px-4">
           <Card className="p-12 text-center">
             <h3 className="text-2xl font-semibold mb-2">CA not found</h3>
-            <p className="text-gray-600  mb-6">
+            <p className="text-gray-600 mb-6">
               The CA profile you&apos;re looking for doesn&apos;t exist
             </p>
             <Button onClick={() => router.push('/ca-marketplace')}>Browse All CAs</Button>
@@ -144,11 +144,11 @@ export default function CAProfilePage({ params }: { params: { caId: string } }) 
 
               <div className="space-y-6 text-sm">
                 <section>
-                  <h3 className="text-lg font-bold mb-3 text-blue-600 ">For Clients</h3>
+                  <h3 className="text-lg font-bold mb-3 text-blue-600">For Clients</h3>
                   <div className="space-y-4">
                     <div>
                       <h4 className="font-semibold mb-2">1. GST Filing Requirements</h4>
-                      <ul className="list-disc pl-5 space-y-1 text-gray-600 ">
+                      <ul className="list-disc pl-5 space-y-1 text-gray-600">
                         <li>Provide accurate and complete financial records by the 5th of each month</li>
                         <li>Maintain proper invoice records in BillBooky or provide Excel/CSV exports</li>
                         <li>Monthly filing: GSTR-1, GSTR-3B; Quarterly filing as per turnover eligibility</li>
@@ -158,7 +158,7 @@ export default function CAProfilePage({ params }: { params: { caId: string } }) 
 
                     <div>
                       <h4 className="font-semibold mb-2">2. Income Tax Filing Requirements</h4>
-                      <ul className="list-disc pl-5 space-y-1 text-gray-600 ">
+                      <ul className="list-disc pl-5 space-y-1 text-gray-600">
                         <li>Submit all financial documents (Form 16, Form 26AS, investment proofs) by June 15th</li>
                         <li>Individual ITR filing deadline: July 31st; Business/Audit cases: October 31st</li>
                         <li>Advance tax payments must be coordinated quarterly (June 15, Sept 15, Dec 15, Mar 15)</li>
@@ -167,7 +167,7 @@ export default function CAProfilePage({ params }: { params: { caId: string } }) 
 
                     <div>
                       <h4 className="font-semibold mb-2">3. Payment Terms</h4>
-                      <ul className="list-disc pl-5 space-y-1 text-gray-600 ">
+                      <ul className="list-disc pl-5 space-y-1 text-gray-600">
                         <li>Consultation fees: Full payment upfront before scheduled session</li>
                         <li>Monthly retainers: Advance payment by 1st of each month</li>
                         <li>Project-based: 50% advance, remaining upon completion or milestone-based</li>
@@ -182,7 +182,7 @@ export default function CAProfilePage({ params }: { params: { caId: string } }) 
                   <div className="space-y-4">
                     <div>
                       <h4 className="font-semibold mb-2">1. Professional Standards</h4>
-                      <ul className="list-disc pl-5 space-y-1 text-gray-600 ">
+                      <ul className="list-disc pl-5 space-y-1 text-gray-600">
                         <li>Maintain ICAI Code of Ethics at all times</li>
                         <li>Only accept engagements within your area of expertise</li>
                         <li>Respond to client queries within 24 hours on business days</li>
@@ -191,7 +191,7 @@ export default function CAProfilePage({ params }: { params: { caId: string } }) 
 
                     <div>
                       <h4 className="font-semibold mb-2">2. GST Filing Service Standards</h4>
-                      <ul className="list-disc pl-5 space-y-1 text-gray-600 ">
+                      <ul className="list-disc pl-5 space-y-1 text-gray-600">
                         <li>File GSTR-1 and GSTR-3B by due dates (10th and 20th of following month)</li>
                         <li>Reconcile ITC (Input Tax Credit) and resolve discrepancies</li>
                         <li>Prepare and file annual returns (GSTR-9/9C) by December 31st deadline</li>
@@ -201,7 +201,7 @@ export default function CAProfilePage({ params }: { params: { caId: string } }) 
 
                     <div>
                       <h4 className="font-semibold mb-2">3. Income Tax Filing Service Standards</h4>
-                      <ul className="list-disc pl-5 space-y-1 text-gray-600 ">
+                      <ul className="list-disc pl-5 space-y-1 text-gray-600">
                         <li>File individual ITRs by July 31st; business returns by October 31st</li>
                         <li>Optimize tax liability within legal framework</li>
                         <li>E-verify returns within 30 days using Aadhaar OTP, net banking, or DSC</li>
@@ -211,7 +211,7 @@ export default function CAProfilePage({ params }: { params: { caId: string } }) 
 
                     <div>
                       <h4 className="font-semibold mb-2">4. Ethics & Compliance</h4>
-                      <ul className="list-disc pl-5 space-y-1 text-gray-600 ">
+                      <ul className="list-disc pl-5 space-y-1 text-gray-600">
                         <li>Zero tolerance for filing incorrect or fraudulent returns</li>
                         <li>Maintain client confidentiality under ICAI Code of Ethics</li>
                         <li>Refuse work involving tax evasion or illegal activities</li>
@@ -220,9 +220,9 @@ export default function CAProfilePage({ params }: { params: { caId: string } }) 
                   </div>
                 </section>
 
-                <div className="bg-blue-50  p-4 rounded-lg">
+                <div className="bg-blue-50 p-4 rounded-lg">
                   <p className="text-sm font-semibold mb-2">Need Help?</p>
-                  <p className="text-sm text-gray-600 ">
+                  <p className="text-sm text-gray-600">
                     For questions, contact{' '}
                     <a href="mailto:support@billbooky.com" className="text-blue-600 hover:underline">
                       support@billbooky.com
@@ -243,7 +243,7 @@ export default function CAProfilePage({ params }: { params: { caId: string } }) 
       )}
 
       {/* Header */}
-      <header className="bg-white  border-b border-gray-200  sticky top-0 z-50">
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="container max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center gap-3">
@@ -296,17 +296,17 @@ export default function CAProfilePage({ params }: { params: { caId: string } }) 
                     )}
                   </div>
                   {ca.firm_name && (
-                    <p className="text-lg text-gray-600  mb-2">{ca.firm_name}</p>
+                    <p className="text-lg text-gray-600 mb-2">{ca.firm_name}</p>
                   )}
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-1">
                       <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
                       <span className="text-xl font-semibold">{ca.average_rating.toFixed(1)}</span>
-                      <span className="text-gray-600 ">
+                      <span className="text-gray-600">
                         ({ca.total_reviews} reviews)
                       </span>
                     </div>
-                    <div className="flex items-center gap-1 text-gray-600 ">
+                    <div className="flex items-center gap-1 text-gray-600">
                       <Users className="w-4 h-4" />
                       {ca.total_clients} clients
                     </div>
@@ -315,19 +315,19 @@ export default function CAProfilePage({ params }: { params: { caId: string } }) 
               </div>
 
               <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="flex items-center text-gray-600 ">
+                <div className="flex items-center text-gray-600">
                   <MapPin className="w-5 h-5 mr-2" />
                   {ca.city}, {ca.state}
                 </div>
-                <div className="flex items-center text-gray-600 ">
+                <div className="flex items-center text-gray-600">
                   <Briefcase className="w-5 h-5 mr-2" />
                   {ca.years_of_experience} years experience
                 </div>
-                <div className="flex items-center text-gray-600 ">
+                <div className="flex items-center text-gray-600">
                   <Mail className="w-5 h-5 mr-2" />
                   {ca.email}
                 </div>
-                <div className="flex items-center text-gray-600 ">
+                <div className="flex items-center text-gray-600">
                   <Phone className="w-5 h-5 mr-2" />
                   {ca.phone}
                 </div>
@@ -336,7 +336,7 @@ export default function CAProfilePage({ params }: { params: { caId: string } }) 
               {ca.bio && (
                 <div className="mb-6">
                   <h3 className="text-lg font-semibold mb-2">About</h3>
-                  <p className="text-gray-600 ">{ca.bio}</p>
+                  <p className="text-gray-600">{ca.bio}</p>
                 </div>
               )}
 
@@ -364,7 +364,7 @@ export default function CAProfilePage({ params }: { params: { caId: string } }) 
                     {ca.education.map((edu, index) => (
                       <li key={index} className="flex items-start">
                         <CheckCircle className="w-4 h-4 text-green-600 mr-2 mt-0.5" />
-                        <span className="text-gray-600 ">{edu}</span>
+                        <span className="text-gray-600">{edu}</span>
                       </li>
                     ))}
                   </ul>
@@ -381,7 +381,7 @@ export default function CAProfilePage({ params }: { params: { caId: string } }) 
                     {ca.certifications.map((cert, index) => (
                       <li key={index} className="flex items-start">
                         <CheckCircle className="w-4 h-4 text-blue-600 mr-2 mt-0.5" />
-                        <span className="text-gray-600 ">{cert}</span>
+                        <span className="text-gray-600">{cert}</span>
                       </li>
                     ))}
                   </ul>
@@ -431,31 +431,31 @@ export default function CAProfilePage({ params }: { params: { caId: string } }) 
                         </span>
                       </div>
 
-                      <p className="text-gray-600  mb-3">{review.review_text}</p>
+                      <p className="text-gray-600 mb-3">{review.review_text}</p>
 
                       {(review.communication_rating || review.expertise_rating || review.timeliness_rating || review.value_for_money_rating) && (
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
                           {review.communication_rating && (
                             <div className="flex items-center gap-1">
-                              <span className="text-gray-600 ">Communication:</span>
+                              <span className="text-gray-600">Communication:</span>
                               <span className="font-semibold">{review.communication_rating}/5</span>
                             </div>
                           )}
                           {review.expertise_rating && (
                             <div className="flex items-center gap-1">
-                              <span className="text-gray-600 ">Expertise:</span>
+                              <span className="text-gray-600">Expertise:</span>
                               <span className="font-semibold">{review.expertise_rating}/5</span>
                             </div>
                           )}
                           {review.timeliness_rating && (
                             <div className="flex items-center gap-1">
-                              <span className="text-gray-600 ">Timeliness:</span>
+                              <span className="text-gray-600">Timeliness:</span>
                               <span className="font-semibold">{review.timeliness_rating}/5</span>
                             </div>
                           )}
                           {review.value_for_money_rating && (
                             <div className="flex items-center gap-1">
-                              <span className="text-gray-600 ">Value:</span>
+                              <span className="text-gray-600">Value:</span>
                               <span className="font-semibold">{review.value_for_money_rating}/5</span>
                             </div>
                           )}
@@ -465,7 +465,7 @@ export default function CAProfilePage({ params }: { params: { caId: string } }) 
                       {review.ca_response && (
                         <div className="mt-3 pl-4 border-l-2 border-blue-600">
                           <p className="text-sm font-semibold mb-1">CA Response:</p>
-                          <p className="text-sm text-gray-600 ">{review.ca_response}</p>
+                          <p className="text-sm text-gray-600">{review.ca_response}</p>
                         </div>
                       )}
                     </div>
@@ -476,7 +476,7 @@ export default function CAProfilePage({ params }: { params: { caId: string } }) 
                   <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Star className="w-8 h-8 text-gray-400" />
                   </div>
-                  <p className="text-gray-600  mb-2">
+                  <p className="text-gray-600 mb-2">
                     No reviews yet
                   </p>
                   <p className="text-sm text-gray-500">
@@ -495,7 +495,7 @@ export default function CAProfilePage({ params }: { params: { caId: string } }) 
 
               {ca.consultation_fee && (
                 <div className="mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
-                  <div className="text-sm text-gray-600  mb-1">
+                  <div className="text-sm text-gray-600 mb-1">
                     Consultation Fee
                   </div>
                   <div className="flex items-center text-2xl font-bold">
@@ -508,7 +508,7 @@ export default function CAProfilePage({ params }: { params: { caId: string } }) 
 
               {ca.monthly_retainer_fee && (
                 <div className="mb-4">
-                  <div className="text-sm text-gray-600  mb-1">
+                  <div className="text-sm text-gray-600 mb-1">
                     Monthly Retainer
                   </div>
                   <div className="flex items-center text-2xl font-bold">
@@ -538,7 +538,7 @@ export default function CAProfilePage({ params }: { params: { caId: string } }) 
                   ].map((item) => (
                     <div key={item.label}>
                       <div className="flex justify-between text-sm mb-1">
-                        <span className="text-gray-600 ">{item.label}</span>
+                        <span className="text-gray-600">{item.label}</span>
                         <span className="font-semibold">{item.value.toFixed(1)}/5</span>
                       </div>
                       <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
@@ -559,8 +559,8 @@ export default function CAProfilePage({ params }: { params: { caId: string } }) 
                 <Building className="w-5 h-5 mr-2" />
                 Office Location
               </h3>
-              <p className="text-gray-600  text-sm mb-2">{ca.office_address}</p>
-              <p className="text-gray-600  text-sm">
+              <p className="text-gray-600 text-sm mb-2">{ca.office_address}</p>
+              <p className="text-gray-600 text-sm">
                 {ca.city}, {ca.state} {ca.pincode}
               </p>
             </Card>
@@ -573,7 +573,7 @@ export default function CAProfilePage({ params }: { params: { caId: string } }) 
               </h3>
               <div className="flex items-center gap-2 text-sm">
                 <CheckCircle className="w-5 h-5 text-green-600" />
-                <span className="text-gray-600 ">
+                <span className="text-gray-600">
                   Member: {ca.icai_membership_number}
                 </span>
               </div>

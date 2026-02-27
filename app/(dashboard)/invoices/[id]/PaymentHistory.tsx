@@ -114,8 +114,8 @@ export function PaymentHistory({ invoiceId }: PaymentHistoryProps) {
                             key={payment.id}
                             className="flex items-start gap-3 p-4 bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-800 rounded-lg"
                         >
-                            <div className="h-10 w-10 rounded-full bg-green-100  flex items-center justify-center shrink-0">
-                                <DollarSign className="h-5 w-5 text-green-600 text-green-600" />
+                            <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+                                <DollarSign className="h-5 w-5 text-green-600" />
                             </div>
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-start justify-between gap-2 mb-1">
@@ -123,15 +123,15 @@ export function PaymentHistory({ invoiceId }: PaymentHistoryProps) {
                                         <p className="font-semibold text-gray-900 dark:text-white">
                                             ₹{payment.amount.toFixed(2)}
                                         </p>
-                                        <p className="text-xs text-gray-500 text-gray-600">
+                                        <p className="text-xs text-gray-600">
                                             Payment #{payments.length - index}
                                         </p>
                                     </div>
-                                    <span className="text-xs font-medium px-2 py-1 bg-green-100  text-green-700 dark:text-green-300 rounded-full">
+                                    <span className="text-xs font-medium px-2 py-1 bg-green-100 text-green-700 dark:text-green-300 rounded-full">
                                         {paymentMethodLabels[payment.payment_method] || payment.payment_method}
                                     </span>
                                 </div>
-                                <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-600 text-gray-600 mt-2">
+                                <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-600 mt-2">
                                     <div className="flex items-center gap-1">
                                         <Calendar className="h-3 w-3" />
                                         <span className="text-xs">{formatDate(payment.payment_date)}</span>
@@ -148,12 +148,12 @@ export function PaymentHistory({ invoiceId }: PaymentHistoryProps) {
                     ))}
 
                     {payments.length > 1 && (
-                        <div className="pt-3 border-t border-gray-200 ">
+                        <div className="pt-3 border-t border-gray-200">
                             <div className="flex items-center justify-between">
                                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                                     Total Paid
                                 </span>
-                                <span className="text-lg font-bold text-green-600 text-green-600">
+                                <span className="text-lg font-bold text-green-600">
                                     ₹{totalPaid.toFixed(2)}
                                 </span>
                             </div>

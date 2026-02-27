@@ -31,12 +31,12 @@ export default async function AIAccountantPage() {
         <div className="max-w-4xl mx-auto">
           <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 sm:p-12 text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-6">
-              <Lock className="h-8 w-8 text-gray-600 text-gray-600" />
+              <Lock className="h-8 w-8 text-gray-600" />
             </div>
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-4">
               AI Accountant is a Premium Feature
             </h1>
-            <p className="text-gray-600 text-gray-600 mb-8 max-w-2xl mx-auto">
+            <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
               Upgrade to Professional, Lifetime, or Enterprise plan to get access to your personal AI Accountant assistant that helps with bookkeeping, cash flow analysis, and financial insights.
             </p>
             <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-xl p-6 mb-8 text-left max-w-md mx-auto">
@@ -78,7 +78,7 @@ export default async function AIAccountantPage() {
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">
             AI Accountant Assistant
           </h1>
-          <p className="text-gray-600 text-gray-600">
+          <p className="text-gray-600">
             Your personal AI accountant for {profile?.business_name || 'your business'}. Ask about bookkeeping, cash flow, or financial insights.
           </p>
         </div>
