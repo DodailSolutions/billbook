@@ -1,7 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { checkSuperAdminAccess } from '../actions'
+import { checkSuperAdminAccess } from '@/lib/admin-auth'
 
 export async function getAllPayments() {
     const supabase = await createClient()
