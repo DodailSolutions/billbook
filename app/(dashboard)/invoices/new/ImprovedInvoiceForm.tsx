@@ -13,6 +13,8 @@ import {
 } from 'lucide-react'
 import { createInvoice } from '../actions'
 import type { Customer } from '@/lib/types'
+import jsPDF from 'jspdf'
+import html2canvas from 'html2canvas'
 
 interface InvoiceItem {
   id: string
@@ -264,26 +266,146 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
     }
   }
 
-  // Download PDF handler
+  // Download PDF handler - Direct download without print dialog
   const handleDownloadPDF = async () => {
     if (!createdInvoiceId) return
     
     setIsDownloading(true)
     try {
-      // Open PDF in new window - the API returns HTML that can be printed as PDF
-      const pdfWindow = window.open(`/api/invoices/${createdInvoiceId}/pdf?mode=download`, '_blank')
+      // Fetch the invoice HTML
+      const response = await fetch(`/api/invoices/${createdInvoiceId}/pdf?mode=html`)
       
-      if (!pdfWindow) {
-        alert('Please allow popups to download the PDF. You can also view the invoice from the invoices list.')
+      if (!response.ok) {
+        throw new Error('Failed to fetch invoice')
       }
       
-      // Close the success modal after a short delay
-      setTimeout(() => {
-        setIsDownloading(false)
-      }, 500)
+      const html = await response.text()
+      
+      // Extract invoice number from HTML if possible
+      const invoiceNumberMatch = html.match(/Invoice[:\s#]*([A-Z0-9-]+)/i)
+      const invoiceNumber = invoiceNumberMatch ? invoiceNumberMatch[1] : createdInvoiceId
+      
+      // Create an isolated iframe to render the HTML without global CSS
+      const iframe = document.createElement('iframe')
+      iframe.style.position = 'absolute'
+      iframe.style.left = '-9999px'
+      iframe.style.width = '800px'
+      iframe.style.height = '1200px'
+      iframe.style.border = 'none'
+      document.body.appendChild(iframe)
+      
+      // Write clean HTML to iframe without any global styles
+      const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document
+      if (!iframeDoc) {
+        throw new Error('Failed to access iframe document')
+      }
+      
+      iframeDoc.open()
+      iframeDoc.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { background: white; padding: 40px; }
+          </style>
+        </head>
+        <body>${html}</body>
+        </html>
+      `)
+      iframeDoc.close()
+      
+      const container = iframeDoc.body
+      
+      // Wait for images to load
+      const images = container.getElementsByTagName('img')
+      await Promise.all(
+        Array.from(images).map(img => {
+          if (img.complete) return Promise.resolve()
+          return new Promise(resolve => {
+            img.onload = resolve
+            img.onerror = resolve
+          })
+        })
+      )
+      
+      // Convert to canvas
+      const canvas = await html2canvas(container, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        windowWidth: 800,
+      })
+      
+      // Calculate dimensions for A4
+      const pdf = new jsPDF('p', 'mm', 'a4')
+      const pdfWidth = pdf.internal.pageSize.getWidth()
+      const pdfHeight = pdf.internal.pageSize.getHeight()
+      
+      // Calculate with margins
+      const maxWidth = pdfWidth - 20 // 10mm margin on each side
+      const maxHeight = pdfHeight - 20 // 10mm margin top and bottom
+      
+      let imgWidth = maxWidth
+      let imgHeight = (canvas.height * imgWidth) / canvas.width
+      
+      // If content fits on one page, scale it to fit nicely
+      if (imgHeight <= maxHeight) {
+        // Content fits! Center it on the page
+        const topMargin = (pdfHeight - imgHeight) / 2
+        pdf.addImage(
+          canvas.toDataURL('image/png'),
+          'PNG',
+          10,
+          topMargin,
+          imgWidth,
+          imgHeight
+        )
+      } else {
+        // Content is too long, use multi-page approach
+        let heightLeft = imgHeight
+        let position = 10 // 10mm top margin
+        
+        // Add first page
+        pdf.addImage(
+          canvas.toDataURL('image/png'),
+          'PNG',
+          10,
+          position,
+          imgWidth,
+          imgHeight
+        )
+        
+        heightLeft -= pdfHeight
+        
+        // Add additional pages
+        while (heightLeft > 0) {
+          position = heightLeft - imgHeight + 10
+          pdf.addPage()
+          pdf.addImage(
+            canvas.toDataURL('image/png'),
+            'PNG',
+            10,
+            position,
+            imgWidth,
+            imgHeight
+          )
+          heightLeft -= pdfHeight
+        }
+      }
+      
+      // Download the PDF
+      pdf.save(`Invoice-${invoiceNumber}.pdf`)
+      
+      // Cleanup
+      document.body.removeChild(iframe)
+      setIsDownloading(false)
+      
     } catch (error) {
-      console.error('Error opening PDF:', error)
-      alert('Failed to open PDF. Please try viewing the invoice from the invoices list.')
+      console.error('Error generating PDF:', error)
+      alert('Failed to download PDF. Please try viewing the invoice from the invoices list.')
       setIsDownloading(false)
     }
   }

@@ -3,12 +3,14 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { Trash2, Eye, Download } from "lucide-react"
+import { Trash2, Eye, Download, Loader2 } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/Card"
 import { Button } from "@/components/ui/Button"
 import { deleteInvoice, updateInvoiceStatus } from "./actions"
 import type { InvoiceWithDetails } from "@/lib/types"
 import { cn, formatDate } from "@/lib/utils"
+import jsPDF from 'jspdf'
+import html2canvas from 'html2canvas'
 
 interface InvoicesListProps {
     invoices: InvoiceWithDetails[]
@@ -34,6 +36,116 @@ export function InvoicesList({ invoices }: InvoicesListProps) {
     const router = useRouter()
     const [deletingId, setDeletingId] = useState<string | null>(null)
     const [updatingId, setUpdatingId] = useState<string | null>(null)
+    const [downloadingId, setDownloadingId] = useState<string | null>(null)
+
+    const handleDownloadPDF = async (invoiceId: string, event: React.MouseEvent) => {
+        event.preventDefault()
+        setDownloadingId(invoiceId)
+        
+        try {
+            // Fetch the invoice HTML
+            const response = await fetch(`/api/invoices/${invoiceId}/pdf?mode=html`)
+            
+            if (!response.ok) {
+                throw new Error('Failed to fetch invoice')
+            }
+            
+            const html = await response.text()
+            
+            // Extract invoice number from HTML
+            const invoiceNumberMatch = html.match(/Invoice[:\s#]*([A-Z0-9-]+)/i)
+            const invoiceNumber = invoiceNumberMatch ? invoiceNumberMatch[1] : invoiceId
+            
+            // Create iframe to render HTML
+            const iframe = document.createElement('iframe')
+            iframe.style.position = 'absolute'
+            iframe.style.left = '-9999px'
+            iframe.style.width = '800px'
+            iframe.style.height = '1200px'
+            iframe.style.border = 'none'
+            document.body.appendChild(iframe)
+            
+            const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document
+            if (!iframeDoc) throw new Error('Failed to access iframe')
+            
+            iframeDoc.open()
+            iframeDoc.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <style>
+                        * { margin: 0; padding: 0; box-sizing: border-box; }
+                        body { background: white; padding: 40px; }
+                    </style>
+                </head>
+                <body>${html}</body>
+                </html>
+            `)
+            iframeDoc.close()
+            
+            const container = iframeDoc.body
+            
+            // Wait for images
+            const images = container.getElementsByTagName('img')
+            await Promise.all(
+                Array.from(images).map(img => {
+                    if (img.complete) return Promise.resolve()
+                    return new Promise(resolve => {
+                        img.onload = resolve
+                        img.onerror = resolve
+                    })
+                })
+            )
+            
+            // Convert to canvas
+            const canvas = await html2canvas(container, {
+                scale: 2,
+                useCORS: true,
+                logging: false,
+                backgroundColor: '#ffffff',
+                windowWidth: 800,
+            })
+            
+            // Create PDF
+            const pdf = new jsPDF('p', 'mm', 'a4')
+            const pdfWidth = pdf.internal.pageSize.getWidth()
+            const pdfHeight = pdf.internal.pageSize.getHeight()
+            const maxWidth = pdfWidth - 20
+            const maxHeight = pdfHeight - 20
+            
+            let imgWidth = maxWidth
+            let imgHeight = (canvas.height * imgWidth) / canvas.width
+            
+            if (imgHeight <= maxHeight) {
+                const topMargin = (pdfHeight - imgHeight) / 2
+                pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 10, topMargin, imgWidth, imgHeight)
+            } else {
+                let heightLeft = imgHeight
+                let position = 10
+                pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 10, position, imgWidth, imgHeight)
+                heightLeft -= pdfHeight
+                
+                while (heightLeft > 0) {
+                    position = heightLeft - imgHeight + 10
+                    pdf.addPage()
+                    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 10, position, imgWidth, imgHeight)
+                    heightLeft -= pdfHeight
+                }
+            }
+            
+            // Download PDF
+            pdf.save(`Invoice-${invoiceNumber}.pdf`)
+            
+            // Cleanup
+            document.body.removeChild(iframe)
+        } catch (error) {
+            console.error('Error downloading PDF:', error)
+            alert('Failed to download PDF. Please try again.')
+        } finally {
+            setDownloadingId(null)
+        }
+    }
 
     const handleDelete = async (id: string) => {
         if (!confirm('Are you sure you want to delete this invoice?')) {
@@ -153,11 +265,18 @@ export function InvoicesList({ invoices }: InvoicesListProps) {
                                     </Button>
                                 </Link>
 
-                                <a href={`/api/invoices/${invoice.id}/pdf?mode=preview`} target="_blank" rel="noopener noreferrer">
-                                    <Button variant="outline" size="sm">
+                                <Button 
+                                    variant="outline" 
+                                    size="sm"
+                                    onClick={(e) => handleDownloadPDF(invoice.id, e)}
+                                    disabled={downloadingId === invoice.id}
+                                >
+                                    {downloadingId === invoice.id ? (
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                    ) : (
                                         <Download className="h-4 w-4" />
-                                    </Button>
-                                </a>
+                                    )}
+                                </Button>
 
                                 <Button
                                     variant="outline"
@@ -244,11 +363,18 @@ export function InvoicesList({ invoices }: InvoicesListProps) {
                                         </Button>
                                     </Link>
 
-                                    <a href={`/api/invoices/${invoice.id}/pdf?mode=preview`} target="_blank" rel="noopener noreferrer">
-                                        <Button variant="outline" size="icon">
+                                    <Button 
+                                        variant="outline" 
+                                        size="icon"
+                                        onClick={(e) => handleDownloadPDF(invoice.id, e)}
+                                        disabled={downloadingId === invoice.id}
+                                    >
+                                        {downloadingId === invoice.id ? (
+                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                        ) : (
                                             <Download className="h-4 w-4" />
-                                        </Button>
-                                    </a>
+                                        )}
+                                    </Button>
 
                                     <Button
                                         variant="ghost"
