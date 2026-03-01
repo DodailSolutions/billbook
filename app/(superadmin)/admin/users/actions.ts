@@ -9,13 +9,14 @@ export async function getAllUsers(): Promise<UserWithDetails[]> {
     try {
         const isSuperAdmin = await checkSuperAdminAccess()
         if (!isSuperAdmin) {
+            console.log('User is not super admin')
             return []
         }
 
         const supabase = await createClient()
 
         // Get user profiles with auth users
-        const { data: profiles } = await supabase
+        const { data: profiles, error: profilesError } = await supabase
             .from('user_profiles')
             .select(`
                 *,
@@ -28,26 +29,51 @@ export async function getAllUsers(): Promise<UserWithDetails[]> {
             `)
             .order('created_at', { ascending: false })
 
+        if (profilesError) {
+            console.error('Error fetching user profiles:', profilesError)
+            return []
+        }
+
         if (!profiles) return []
 
         // Get user emails from auth.users (requires admin access)
-        const { data: { users: authUsers } } = await supabase.auth.admin.listUsers()
-
-        // Merge data
-        const usersWithDetails: UserWithDetails[] = profiles.map(profile => {
-            const authUser = authUsers?.find(u => u.id === profile.id)
-            const subscription = profile.user_subscriptions?.[0]
-
-            return {
-                ...profile,
-                email: authUser?.email,
-                subscription: subscription as UserSubscription | undefined
+        try {
+            const { data: { users: authUsers }, error: authError } = await supabase.auth.admin.listUsers()
+            
+            if (authError) {
+                console.error('Error fetching auth users:', authError)
+                // Return profiles without emails if auth fetch fails
+                return profiles.map(profile => ({
+                    ...profile,
+                    email: 'Email unavailable',
+                    subscription: profile.user_subscriptions?.[0] as UserSubscription | undefined
+                }))
             }
-        })
 
-        return usersWithDetails
+            // Merge data
+            const usersWithDetails: UserWithDetails[] = profiles.map(profile => {
+                const authUser = authUsers?.find(u => u.id === profile.id)
+                const subscription = profile.user_subscriptions?.[0]
+
+                return {
+                    ...profile,
+                    email: authUser?.email || 'No email',
+                    subscription: subscription as UserSubscription | undefined
+                }
+            })
+
+            return usersWithDetails
+        } catch (authError) {
+            console.error('Exception fetching auth users:', authError)
+            // Return profiles without emails if auth fetch throws
+            return profiles.map(profile => ({
+                ...profile,
+                email: 'Email unavailable',
+                subscription: profile.user_subscriptions?.[0] as UserSubscription | undefined
+            }))
+        }
     } catch (error) {
-        console.error('Error fetching users:', error)
+        console.error('Error in getAllUsers:', error)
         return []
     }
 }

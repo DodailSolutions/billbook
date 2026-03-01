@@ -7,7 +7,13 @@ import { getAllUsers } from './actions'
 import UserManagementTable from './UserManagementTable'
 
 export default async function UsersManagementPage() {
-    const users = await getAllUsers()
+    let users: any[] = []
+    try {
+        users = await getAllUsers()
+    } catch (error) {
+        console.error('Error loading users:', error)
+        users = []
+    }
 
     const getRoleBadgeColor = (role: string) => {
         switch (role) {
