@@ -15,11 +15,19 @@ interface InvoicesListProps {
 }
 
 const statusColors = {
-    draft: 'bg-gray-100 text-gray-800',
+    draft: 'bg-orange-100 text-orange-800',
     sent: 'bg-blue-100 text-blue-800',
     paid: 'bg-green-100 text-green-800',
     partial: 'bg-yellow-100 text-yellow-800',
     cancelled: 'bg-red-100 text-red-800',
+}
+
+const statusLabels = {
+    draft: 'NOT PAID',
+    sent: 'SENT',
+    paid: 'PAID',
+    partial: 'PARTIAL',
+    cancelled: 'CANCELLED',
 }
 
 export function InvoicesList({ invoices }: InvoicesListProps) {
@@ -85,7 +93,7 @@ export function InvoicesList({ invoices }: InvoicesListProps) {
                                             "inline-block px-2 py-1 rounded-full text-xs font-medium",
                                             statusColors[invoice.status]
                                         )}>
-                                            {invoice.status.toUpperCase()}
+                                            {statusLabels[invoice.status]}
                                         </span>
                                         {invoice.recurring_invoices && invoice.recurring_invoices.length > 0 && (
                                             <span className="inline-block px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
@@ -94,7 +102,16 @@ export function InvoicesList({ invoices }: InvoicesListProps) {
                                         )}
                                     </div>
                                 </div>
-                                <p className="text-lg font-bold text-gray-900">₹{invoice.total.toFixed(2)}</p>
+                                <div className="text-right">
+                                    {invoice.status === 'partial' ? (
+                                        <>
+                                            <p className="text-lg font-bold text-orange-600">₹{(invoice.amount_remaining || (invoice.total - (invoice.amount_paid || 0))).toFixed(2)}</p>
+                                            <p className="text-xs text-gray-500">Remaining</p>
+                                        </>
+                                    ) : (
+                                        <p className="text-lg font-bold text-gray-900">₹{invoice.total.toFixed(2)}</p>
+                                    )}
+                                </div>
                             </div>
                             
                             <div className="space-y-1 text-sm">
@@ -123,7 +140,7 @@ export function InvoicesList({ invoices }: InvoicesListProps) {
                                     disabled={updatingId === invoice.id}
                                     className="flex-1 h-9 rounded-md border border-gray-300 bg-white px-3 text-sm text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    <option value="draft">Draft</option>
+                                    <option value="draft">Not Paid</option>
                                     <option value="sent">Sent</option>
                                     <option value="partial">Partial Payment</option>
                                     <option value="paid">Paid</option>
@@ -162,7 +179,7 @@ export function InvoicesList({ invoices }: InvoicesListProps) {
                                         "px-2 py-1 rounded-full text-xs font-medium",
                                         statusColors[invoice.status]
                                     )}>
-                                        {invoice.status.toUpperCase()}
+                                        {statusLabels[invoice.status]}
                                     </span>
                                     {invoice.recurring_invoices && invoice.recurring_invoices.length > 0 && (
                                         <span className="px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
@@ -185,11 +202,25 @@ export function InvoicesList({ invoices }: InvoicesListProps) {
 
                             <div className="flex items-center gap-4">
                                 <div className="text-right">
-                                    <p className="text-2xl font-bold text-gray-900">₹{invoice.total.toFixed(2)}</p>
-                                    {invoice.gst_percentage > 0 && (
-                                        <p className="text-xs text-gray-500">
-                                            (incl. {invoice.gst_percentage}% GST)
-                                        </p>
+                                    {invoice.status === 'partial' ? (
+                                        <>
+                                            <p className="text-2xl font-bold text-orange-600">₹{(invoice.amount_remaining || (invoice.total - (invoice.amount_paid || 0))).toFixed(2)}</p>
+                                            <p className="text-sm text-gray-600">Remaining to Pay</p>
+                                            {invoice.gst_percentage > 0 && (
+                                                <p className="text-xs text-gray-500">
+                                                    Total: ₹{invoice.total.toFixed(2)} (incl. {invoice.gst_percentage}% GST)
+                                                </p>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <>
+                                            <p className="text-2xl font-bold text-gray-900">₹{invoice.total.toFixed(2)}</p>
+                                            {invoice.gst_percentage > 0 && (
+                                                <p className="text-xs text-gray-500">
+                                                    (incl. {invoice.gst_percentage}% GST)
+                                                </p>
+                                            )}
+                                        </>
                                     )}
                                 </div>
 
@@ -200,7 +231,7 @@ export function InvoicesList({ invoices }: InvoicesListProps) {
                                         disabled={updatingId === invoice.id}
                                         className="flex-1 h-9 rounded-md border border-gray-300 bg-white px-3 text-sm text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
-                                        <option value="draft">Draft</option>
+                                        <option value="draft">Not Paid</option>
                                         <option value="sent">Sent</option>
                                         <option value="partial">Partial Payment</option>
                                         <option value="paid">Paid</option>
