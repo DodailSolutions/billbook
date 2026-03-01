@@ -5,13 +5,41 @@ import { Input } from '@/components/ui/Input'
 import Link from 'next/link'
 import { getAllUsers } from './actions'
 import UserManagementTable from './UserManagementTable'
+import { checkSuperAdminAccess } from '@/lib/admin-auth'
 
 export default async function UsersManagementPage() {
+    // First check if user has access
+    let hasAccess = false
+    try {
+        hasAccess = await checkSuperAdminAccess()
+    } catch (error) {
+        console.error('Error checking access:', error)
+    }
+
+    if (!hasAccess) {
+        return (
+            <div className="min-h-screen p-4 md:p-6 lg:p-8 flex items-center justify-center">
+                <Card className="max-w-md">
+                    <CardHeader>
+                        <CardTitle className="text-red-600">Access Denied</CardTitle>
+                        <CardDescription>
+                            You don't have permission to access this page. Super admin access is required.
+                        </CardDescription>
+                    </CardHeader>
+                </Card>
+            </div>
+        )
+    }
+
+    // Then try to load users
     let users: any[] = []
+    let loadError: string | null = null
+    
     try {
         users = await getAllUsers()
     } catch (error) {
         console.error('Error loading users:', error)
+        loadError = error instanceof Error ? error.message : 'Failed to load users'
         users = []
     }
 
@@ -38,15 +66,33 @@ export default async function UsersManagementPage() {
     }
 
     const stats = {
-        total: users.length,
-        active: users.filter(u => u.status === 'active').length,
-        suspended: users.filter(u => u.status === 'suspended').length,
-        admins: users.filter(u => u.role === 'super_admin' || u.role === 'admin').length
+        total: users?.length || 0,
+        active: users?.filter(u => u?.status === 'active')?.length || 0,
+        suspended: users?.filter(u => u?.status === 'suspended')?.length || 0,
+        admins: users?.filter(u => u?.role === 'super_admin' || u?.role === 'admin')?.length || 0
     }
 
     return (
         <div className="min-h-screen p-4 md:p-6 lg:p-8">
             <div className="max-w-400 mx-auto space-y-6">
+                {/* Error Message */}
+                {loadError && (
+                    <Card className="border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20">
+                        <CardContent className="pt-6">
+                            <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
+                                <Shield className="h-5 w-5" />
+                                <div>
+                                    <div className="font-medium">Failed to Load Users</div>
+                                    <div className="text-sm mt-1">{loadError}</div>
+                                    <div className="text-sm mt-2">
+                                        Try the <Link href="/admin/test" className="underline">diagnostics page</Link> to troubleshoot.
+                                    </div>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
+
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div>
