@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 
 export default async function AdminTestPage() {
-    let status = {
+    const status = {
         isSuperAdmin: false,
         canConnectToSupabase: false,
         userProfilesCount: 0,
