@@ -4,14 +4,53 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/Button'
 import Link from 'next/link'
 import { getAllCoupons } from './actions'
+import { checkSuperAdminAccess } from '@/lib/admin-auth'
 
 export default async function CouponsManagementPage() {
-    const coupons = await getAllCoupons()
+    // Check super admin access
+    let hasAccess = false
+    try {
+        hasAccess = await checkSuperAdminAccess()
+    } catch (error) {
+        console.error('Error checking access:', error)
+    }
+
+    if (!hasAccess) {
+        return (
+            <div className="min-h-screen p-4 md:p-6 lg:p-8 flex items-center justify-center">
+                <Card className="max-w-md">
+                    <CardHeader>
+                        <CardTitle className="text-red-600">Access Denied</CardTitle>
+                        <CardDescription>
+                            You don't have permission to access this page. Super admin access is required.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                            Visit the <Link href="/admin/test" className="text-blue-600 underline">diagnostics page</Link> to check your access level.
+                        </p>
+                    </CardContent>
+                </Card>
+            </div>
+        )
+    }
+
+    // Try to load coupons
+    let coupons: any[] = []
+    let loadError: string | null = null
+    
+    try {
+        coupons = await getAllCoupons()
+    } catch (error) {
+        console.error('Error loading coupons:', error)
+        loadError = error instanceof Error ? error.message : 'Failed to load coupons'
+        coupons = []
+    }
 
     const stats = {
-        total: coupons.length,
-        active: coupons.filter(c => c.is_active).length,
-        totalUses: coupons.reduce((sum, c) => sum + c.uses_count, 0)
+        total: coupons?.length || 0,
+        active: coupons?.filter(c => c?.is_active)?.length || 0,
+        totalUses: coupons?.reduce((sum, c) => sum + (c?.uses_count || 0), 0) || 0
     }
 
     return (
@@ -32,6 +71,24 @@ export default async function CouponsManagementPage() {
                         <Button variant="outline">Back to Dashboard</Button>
                     </Link>
                 </div>
+
+                {/* Error Message */}
+                {loadError && (
+                    <Card className="border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20">
+                        <CardContent className="pt-6">
+                            <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
+                                <Tag className="h-5 w-5" />
+                                <div>
+                                    <div className="font-medium">Failed to Load Coupons</div>
+                                    <div className="text-sm mt-1">{loadError}</div>
+                                    <div className="text-sm mt-2">
+                                        Try the <Link href="/admin/test" className="underline">diagnostics page</Link> to troubleshoot.
+                                    </div>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
 
                 {/* Stats */}
                 <div className="grid gap-4 md:grid-cols-3">
