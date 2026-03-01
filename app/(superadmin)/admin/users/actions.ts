@@ -36,42 +36,32 @@ export async function getAllUsers(): Promise<UserWithDetails[]> {
 
         if (!profiles) return []
 
-        // Get user emails from auth.users (requires admin access)
+        // Try to get user emails from auth.users (requires admin access)
+        // If this fails, we'll return profiles without emails
+        let authUsers: any[] = []
+        
         try {
-            const { data: { users: authUsers }, error: authError } = await supabase.auth.admin.listUsers()
-            
-            if (authError) {
-                console.error('Error fetching auth users:', authError)
-                // Return profiles without emails if auth fetch fails
-                return profiles.map(profile => ({
-                    ...profile,
-                    email: 'Email unavailable',
-                    subscription: profile.user_subscriptions?.[0] as UserSubscription | undefined
-                }))
+            const authResponse = await supabase.auth.admin.listUsers()
+            if (authResponse.data?.users) {
+                authUsers = authResponse.data.users
             }
-
-            // Merge data
-            const usersWithDetails: UserWithDetails[] = profiles.map(profile => {
-                const authUser = authUsers?.find(u => u.id === profile.id)
-                const subscription = profile.user_subscriptions?.[0]
-
-                return {
-                    ...profile,
-                    email: authUser?.email || 'No email',
-                    subscription: subscription as UserSubscription | undefined
-                }
-            })
-
-            return usersWithDetails
         } catch (authError) {
-            console.error('Exception fetching auth users:', authError)
-            // Return profiles without emails if auth fetch throws
-            return profiles.map(profile => ({
-                ...profile,
-                email: 'Email unavailable',
-                subscription: profile.user_subscriptions?.[0] as UserSubscription | undefined
-            }))
+            console.error('Could not fetch auth users (continuing without emails):', authError)
         }
+
+        // Merge data - works with or without auth users
+        const usersWithDetails: UserWithDetails[] = profiles.map(profile => {
+            const authUser = authUsers.find(u => u.id === profile.id)
+            const subscription = profile.user_subscriptions?.[0]
+
+            return {
+                ...profile,
+                email: authUser?.email || profile.business_email || 'Email not available',
+                subscription: subscription as UserSubscription | undefined
+            }
+        })
+
+        return usersWithDetails
     } catch (error) {
         console.error('Error in getAllUsers:', error)
         return []
