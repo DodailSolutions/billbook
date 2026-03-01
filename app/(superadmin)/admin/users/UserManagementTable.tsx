@@ -168,20 +168,6 @@ export default function UserManagementTable({
                                                     <Trash2 className="h-4 w-4" />
                                                     Delete User
                                                 </button>
-
-            {/* Upgrade Modal */}
-            {upgradeModalUser && (
-                <UpgradePlanModal
-                    userId={upgradeModalUser.id}
-                    userEmail={upgradeModalUser.email}
-                    currentPlan={upgradeModalUser.currentPlan}
-                    plans={plans}
-                    onClose={() => setUpgradeModalUser(null)}
-                    onSuccess={() => {
-                        window.location.reload()
-                    }}
-                />
-            )}
                                             </div>
                                         </div>
                                     )}
@@ -195,6 +181,20 @@ export default function UserManagementTable({
                 <div className="text-center py-12 text-gray-500">
                     No users found
                 </div>
+            )}
+            
+            {/* Upgrade Modal */}
+            {upgradeModalUser && (
+                <UpgradePlanModal
+                    userId={upgradeModalUser.id}
+                    userEmail={upgradeModalUser.email}
+                    currentPlan={upgradeModalUser.currentPlan}
+                    plans={plans}
+                    onClose={() => setUpgradeModalUser(null)}
+                    onSuccess={() => {
+                        window.location.reload()
+                    }}
+                />
             )}
         </div>
     )
