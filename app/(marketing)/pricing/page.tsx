@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/server'
 import { PricingCard } from './PricingCard'
 import { CheckoutHandler } from './CheckoutHandler'
 import { PricingToggleSection } from './PricingToggleSection'
+import FounderCircle from './FounderCircle'
 import Script from 'next/script'
 import type { Metadata } from 'next'
 
@@ -103,6 +104,9 @@ export default async function PricingPage() {
           Choose the plan that fits your business needs. Upgrade, downgrade, or cancel anytime.
         </p>
       </section>
+
+      {/* Founder Circle - Limited Early Access */}
+      <FounderCircle />
 
       {/* Pricing Cards */}
       <section className="px-4 sm:px-6 pb-16 sm:pb-24 max-w-7xl mx-auto">

@@ -16,7 +16,7 @@ export function PricingToggleSection({ isAuthenticated, currentPlan }: PricingTo
     <>
       <BillingToggle onToggle={setIsYearly} defaultYearly={false} />
       
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 max-w-7xl mx-auto mb-12">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-7xl mx-auto mb-12">
         {/* Free Plan */}
         <PricingCard
           title="Free"
@@ -118,38 +118,7 @@ export function PricingToggleSection({ isAuthenticated, currentPlan }: PricingTo
           currentPlan={currentPlan}
         />
 
-        {/* Lifetime Pro Plan */}
-        <PricingCard
-          title="Lifetime Professional"
-          price={
-            <>
-              <div className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm mb-1">
-                <span className="line-through">₹15,999</span>
-                <span className="ml-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded font-semibold">38% OFF</span>
-              </div>
-              <div className="flex items-baseline gap-1">
-                <span className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white">₹9,999</span>
-              </div>
-            </>
-          }
-          description="Pay once, use forever"
-          features={[
-            <><strong>Unlimited invoices</strong> forever</>,
-            <><strong>All Professional features</strong></>,
-            "Recurring invoices & reminders",
-            "Custom branding & templates",
-            "Priority lifetime support",
-            "Free future updates",
-            "Single business entity"
-          ]}
-          planId="lifetime"
-          isDeal={true}
-          buttonText="Buy Now"
-          buttonClass="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold shadow-lg"
-          isAuthenticated={isAuthenticated}
-          currentPlan={currentPlan}
-          isLifetime={true}
-        />
+        {/* Lifetime Plan Hidden - Now in Founder Circle Section */}
       </div>
     </>
   )
