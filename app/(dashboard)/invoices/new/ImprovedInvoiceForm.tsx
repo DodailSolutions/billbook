@@ -55,6 +55,9 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
     reverse_charge_applicable: false,
     is_recurring: false,
     notes: '',
+    // Discount
+    discount_type: 'percentage' as 'percentage' | 'flat',
+    discount_value: 0,
     // Payment collection
     mark_as_paid: false,
     payment_amount: 0,
@@ -95,11 +98,19 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
 
   // Calculate totals
   const subtotal = items.reduce((sum, item) => sum + item.amount, 0)
-  const totalCGST = items.reduce((sum, item) => sum + item.cgst, 0)
-  const totalSGST = items.reduce((sum, item) => sum + item.sgst, 0)
-  const totalIGST = items.reduce((sum, item) => sum + item.igst, 0)
+  const discountAmount = formData.discount_type === 'percentage'
+    ? (subtotal * Math.min(formData.discount_value, 100)) / 100
+    : Math.min(formData.discount_value, subtotal)
+  const discountedSubtotal = subtotal - discountAmount
+  const totalCGST = formData.supply_type === 'intra-state'
+    ? items.reduce((sum, item) => sum + (item.amount / subtotal || 0) * discountedSubtotal * item.gst_rate / 200, 0)
+    : 0
+  const totalSGST = totalCGST
+  const totalIGST = formData.supply_type === 'inter-state'
+    ? items.reduce((sum, item) => sum + (item.amount / subtotal || 0) * discountedSubtotal * item.gst_rate / 100, 0)
+    : 0
   const gstPercentage = items.length > 0 ? items[0].gst_rate : 18
-  const total = subtotal + totalCGST + totalSGST + totalIGST
+  const total = discountedSubtotal + totalCGST + totalSGST + totalIGST
 
   // Auto-update payment amount when total changes or mark_as_paid changes
   useEffect(() => {
@@ -200,6 +211,8 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
         supply_type: formData.supply_type,
         reverse_charge_applicable: formData.reverse_charge_applicable,
         notes: formData.notes || undefined,
+        discount_type: formData.discount_type,
+        discount_value: formData.discount_value || undefined,
         items: items.map(item => ({
           description: item.description,
           details: item.details || undefined,
@@ -818,6 +831,50 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
                     </Card>
                   ))}
 
+                  {/* Discount */}
+                  <Card className="border border-dashed border-orange-300 bg-orange-50 dark:bg-orange-50">
+                    <CardContent className="p-4 space-y-3">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-semibold text-orange-800">Discount</span>
+                        <span className="text-xs text-orange-600">(applied on subtotal before GST)</span>
+                      </div>
+                      <div className="flex gap-3 items-end">
+                        <div className="space-y-1">
+                          <label className="text-xs font-medium text-gray-700">Type</label>
+                          <select
+                            value={formData.discount_type}
+                            onChange={(e) => setFormData({...formData, discount_type: e.target.value as 'percentage' | 'flat', discount_value: 0})}
+                            className="px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-900 bg-white focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                          >
+                            <option value="percentage">% Percentage</option>
+                            <option value="flat">₹ Flat Amount</option>
+                          </select>
+                        </div>
+                        <div className="flex-1 space-y-1">
+                          <label className="text-xs font-medium text-gray-700">
+                            {formData.discount_type === 'percentage' ? 'Discount %' : 'Discount Amount (₹)'}
+                          </label>
+                          <Input
+                            type="number"
+                            min="0"
+                            max={formData.discount_type === 'percentage' ? 100 : subtotal}
+                            step="0.01"
+                            placeholder={formData.discount_type === 'percentage' ? 'e.g. 10' : 'e.g. 500'}
+                            value={formData.discount_value || ''}
+                            onChange={(e) => setFormData({...formData, discount_value: parseFloat(e.target.value) || 0})}
+                            className="bg-white"
+                          />
+                        </div>
+                        {discountAmount > 0 && (
+                          <div className="text-right pb-2">
+                            <div className="text-xs text-gray-500">Saving</div>
+                            <div className="text-sm font-bold text-green-600">- ₹{discountAmount.toFixed(2)}</div>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+
                 </CardContent>
               </Card>
             )}
@@ -839,6 +896,9 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
                       <CardContent className="p-4">
                         <div className="text-sm text-blue-600 font-medium">Subtotal</div>
                         <div className="text-2xl font-bold text-blue-900">₹{subtotal.toFixed(2)}</div>
+                        {discountAmount > 0 && (
+                          <div className="text-xs text-green-600 font-medium mt-1">- ₹{discountAmount.toFixed(2)} discount</div>
+                        )}
                       </CardContent>
                     </Card>
 
@@ -1068,6 +1128,15 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
                     <span className="text-gray-600">Subtotal:</span>
                     <span className="font-semibold text-gray-900">₹{subtotal.toFixed(2)}</span>
                   </div>
+
+                  {discountAmount > 0 && (
+                    <div className="flex justify-between text-green-600">
+                      <span>
+                        Discount{formData.discount_type === 'percentage' ? ` (${formData.discount_value}%)` : ''}:
+                      </span>
+                      <span className="font-semibold">- ₹{discountAmount.toFixed(2)}</span>
+                    </div>
+                  )}
                   
                   {formData.supply_type === 'intra-state' ? (
                     <>
@@ -1221,6 +1290,8 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
                       reverse_charge_applicable: false,
                       is_recurring: false,
                       notes: '',
+                      discount_type: 'percentage',
+                      discount_value: 0,
                       mark_as_paid: false,
                       payment_amount: 0,
                       payment_method: '',
