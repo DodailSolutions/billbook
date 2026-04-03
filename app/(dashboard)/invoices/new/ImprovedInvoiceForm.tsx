@@ -1230,6 +1230,7 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
                     setItems([{
                       id: crypto.randomUUID(),
                       description: '',
+                      details: '',
                       hsn_sac_code: '',
                       quantity: 1,
                       unit_price: 0,
