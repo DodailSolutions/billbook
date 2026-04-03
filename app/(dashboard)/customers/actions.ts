@@ -137,4 +137,5 @@ export async function deleteCustomer(id: string) {
     }
 
     revalidatePath('/customers')
+    revalidatePath('/invoices')
 }

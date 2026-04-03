@@ -19,6 +19,7 @@ import html2canvas from 'html2canvas'
 interface InvoiceItem {
   id: string
   description: string
+  details: string
   hsn_sac_code: string
   quantity: number
   unit_price: number
@@ -66,6 +67,7 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
     {
       id: crypto.randomUUID(),
       description: '',
+      details: '',
       hsn_sac_code: '',
       quantity: 1,
       unit_price: 0,
@@ -77,21 +79,19 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
     }
   ])
 
-  // Auto-calculate amounts
+  // Recalculate GST breakdown when supply type changes (not on every items change to avoid infinite loop)
   useEffect(() => {
     setItems(prevItems => prevItems.map(item => {
-      const amount = item.quantity * item.unit_price
-      const gstAmount = (amount * item.gst_rate) / 100
-      
+      const gstAmount = (item.amount * item.gst_rate) / 100
       return {
         ...item,
-        amount,
         cgst: formData.supply_type === 'intra-state' ? gstAmount / 2 : 0,
         sgst: formData.supply_type === 'intra-state' ? gstAmount / 2 : 0,
         igst: formData.supply_type === 'inter-state' ? gstAmount : 0
       }
     }))
-  }, [items, formData.supply_type])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData.supply_type])
 
   // Calculate totals
   const subtotal = items.reduce((sum, item) => sum + item.amount, 0)
@@ -128,6 +128,13 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
       })
     }
 
+    if (step === 3) {
+      if (formData.mark_as_paid) {
+        if (!formData.payment_method) newErrors.payment_method = 'Please select a payment method'
+        if (!formData.payment_amount || formData.payment_amount <= 0) newErrors.payment_amount = 'Payment amount must be greater than 0'
+      }
+    }
+
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -137,6 +144,7 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
     setItems([...items, {
       id: crypto.randomUUID(),
       description: '',
+      details: '',
       hsn_sac_code: '',
       quantity: 1,
       unit_price: 0,
@@ -155,18 +163,28 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
     }
   }
 
-  // Update item
+  // Update item - eagerly calculate amount and GST breakdown
   const updateItem = (id: string, field: keyof InvoiceItem, value: string | number) => {
-    setItems(items.map(item => 
-      item.id === id ? { ...item, [field]: value } : item
-    ))
+    setItems(items.map(item => {
+      if (item.id !== id) return item
+      const updatedItem = { ...item, [field]: value }
+      const amount = updatedItem.quantity * updatedItem.unit_price
+      const gstAmount = (amount * updatedItem.gst_rate) / 100
+      return {
+        ...updatedItem,
+        amount,
+        cgst: formData.supply_type === 'intra-state' ? gstAmount / 2 : 0,
+        sgst: formData.supply_type === 'intra-state' ? gstAmount / 2 : 0,
+        igst: formData.supply_type === 'inter-state' ? gstAmount : 0
+      }
+    }))
   }
 
   // Submit invoice
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (!validateStep(1) || !validateStep(2)) {
+    if (!validateStep(1) || !validateStep(2) || !validateStep(3)) {
       alert('Please fix all errors before submitting')
       return
     }
@@ -184,12 +202,19 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
         notes: formData.notes || undefined,
         items: items.map(item => ({
           description: item.description,
+          details: item.details || undefined,
           quantity: item.quantity,
           unit_price: item.unit_price,
           hsn_sac_code: item.hsn_sac_code || undefined,
           gst_rate: item.gst_rate
         })),
-        is_recurring: formData.is_recurring
+        is_recurring: formData.is_recurring,
+        // Payment collection
+        mark_as_paid: formData.mark_as_paid,
+        payment_amount: formData.mark_as_paid ? formData.payment_amount : undefined,
+        payment_method: formData.mark_as_paid ? (formData.payment_method as 'cash' | 'bank_transfer' | 'upi' | 'card' | 'cheque' | undefined) : undefined,
+        payment_date: formData.mark_as_paid ? formData.payment_date : undefined,
+        payment_notes: formData.mark_as_paid && formData.payment_notes ? formData.payment_notes : undefined,
       }
 
       const result = await createInvoice(invoiceData)
@@ -235,7 +260,8 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
   // Add customer handler
   const handleAddCustomer = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const form = new FormData(e.currentTarget)
+    const formElement = e.currentTarget  // save ref before async (React nullifies currentTarget after dispatch)
+    const form = new FormData(formElement)
     
     try {
       const response = await fetch('/api/customers/create', {
@@ -256,7 +282,7 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
         setCustomers([...customers, data.customer])
         setFormData({...formData, customer_id: data.customer.id})
         setShowAddCustomerModal(false)
-        e.currentTarget.reset()
+        formElement.reset()
       } else {
         alert(data.error || 'Failed to create customer')
       }
@@ -702,6 +728,19 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
                                 {errors[`item-${index}-desc`]}
                               </p>
                             )}
+                          </div>
+
+                          <div className="md:col-span-2 space-y-2">
+                            <label className="text-sm font-semibold text-gray-900">
+                              Item Details <span className="text-gray-400 font-normal">(optional)</span>
+                            </label>
+                            <textarea
+                              placeholder="Add points or explanation about this item/service&#10;• e.g., includes support for 3 months&#10;• e.g., GST exempt under section 12(b)"
+                              value={item.details}
+                              onChange={(e) => updateItem(item.id, 'details', e.target.value)}
+                              rows={3}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-900 bg-white placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-y"
+                            />
                           </div>
 
                           <div className="space-y-2">

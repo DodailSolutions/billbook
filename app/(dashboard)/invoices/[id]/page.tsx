@@ -101,7 +101,7 @@ export default async function InvoiceDetailPage({
 
                     <div className="border rounded-lg overflow-hidden">
                         <table className="w-full">
-                            <thead className="bg-gradient-to-r from-blue-600 to-blue-700">
+                            <thead className="bg-linear-to-r from-blue-600 to-blue-700">
                                 <tr>
                                     <th className="text-left p-3 font-semibold text-white">Description</th>
                                     {invoice.invoice_items.some(item => item.hsn_sac_code) && (

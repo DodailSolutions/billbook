@@ -142,6 +142,7 @@ interface CreateInvoiceData {
     invoice_series_id?: string
     items: Array<{
         description: string
+        details?: string
         quantity: number
         unit_price: number
         hsn_sac_code?: string
@@ -249,6 +250,7 @@ export async function createInvoice(data: CreateInvoiceData) {
             return {
                 invoice_id: invoice.id,
                 description: item.description,
+                item_details: item.details || null,
                 quantity: item.quantity,
                 unit_price: item.unit_price,
                 amount: itemAmount,
