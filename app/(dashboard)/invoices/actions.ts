@@ -223,45 +223,64 @@ export async function createInvoice(data: CreateInvoiceData) {
         const invoice_number = await generateInvoiceNumber(data.invoice_series_id)
 
         // Create invoice with GST breakdown (simplified for compatibility)
-        const { data: invoice, error: invoiceError } = await supabase
+        let invoice: { id: string; total: number; [key: string]: unknown } | null = null
+        const invoicePayload = {
+            user_id: user.id,
+            customer_id: data.customer_id,
+            invoice_number,
+            invoice_date: data.invoice_date,
+            due_date: data.due_date || null,
+            subtotal: rawSubtotal,
+            gst_percentage: data.gst_percentage,
+            gst_amount: gstComponents.totalTax,
+            cgst_amount: gstComponents.cgst,
+            sgst_amount: gstComponents.sgst,
+            igst_amount: gstComponents.igst,
+            supply_type: supplyType,
+            reverse_charge_applicable: reverseChargeApplicable,
+            total: roundOff.roundedAmount,
+            notes: data.notes || null,
+            status: 'draft'
+        }
+
+        // Try inserting with discount columns first, fall back if not migrated
+        const { data: invoiceWithDiscount, error: invoiceErrorWithDiscount } = await supabase
             .from('invoices')
             .insert([{
-                user_id: user.id,
-                customer_id: data.customer_id,
-                invoice_number,
-                invoice_date: data.invoice_date,
-                due_date: data.due_date || null,
-                subtotal: rawSubtotal,
+                ...invoicePayload,
                 discount_amount: discountAmount > 0 ? discountAmount : null,
                 discount_type: discountAmount > 0 ? (data.discount_type || null) : null,
                 discount_value: discountAmount > 0 ? (data.discount_value || null) : null,
-                gst_percentage: data.gst_percentage,
-                gst_amount: gstComponents.totalTax,
-                cgst_amount: gstComponents.cgst,
-                sgst_amount: gstComponents.sgst,
-                igst_amount: gstComponents.igst,
-                supply_type: supplyType,
-                reverse_charge_applicable: reverseChargeApplicable,
-                total: roundOff.roundedAmount,
-                notes: data.notes || null,
-                status: 'draft'
             }])
             .select()
             .single()
 
-        if (invoiceError) {
-            console.error('Error creating invoice:', invoiceError)
-            return { success: false, error: 'Failed to create invoice' }
+        if (invoiceErrorWithDiscount) {
+            // Fallback: insert without discount columns (migration not yet run)
+            const { data: invoiceFallback, error: invoiceError } = await supabase
+                .from('invoices')
+                .insert([invoicePayload])
+                .select()
+                .single()
+            if (invoiceError) {
+                console.error('Error creating invoice:', invoiceError)
+                return { success: false, error: 'Failed to create invoice' }
+            }
+            invoice = invoiceFallback
+        } else {
+            invoice = invoiceWithDiscount
         }
 
+        if (!invoice) return { success: false, error: 'Failed to create invoice' }
+
         // Create invoice items with HSN/SAC and individual tax rates
-        const items = data.items.map(item => {
+        const itemsWithDetails = data.items.map(item => {
             const itemAmount = item.quantity * item.unit_price
             const itemGSTRate = item.gst_rate !== undefined ? item.gst_rate : data.gst_percentage
             const itemGSTComponents = calculateGSTComponents(itemAmount, itemGSTRate, supplyType)
 
             return {
-                invoice_id: invoice.id,
+                invoice_id: invoice!.id,
                 description: item.description,
                 item_details: item.details || null,
                 quantity: item.quantity,
@@ -277,13 +296,21 @@ export async function createInvoice(data: CreateInvoiceData) {
             }
         })
 
+        // Try inserting with item_details, fall back without if column not migrated yet
         const { error: itemsError } = await supabase
             .from('invoice_items')
-            .insert(items)
+            .insert(itemsWithDetails)
 
         if (itemsError) {
-            console.error('Error creating invoice items:', itemsError)
-            return { success: false, error: 'Failed to create invoice items' }
+            // Fallback: strip item_details and retry
+            const itemsCore = itemsWithDetails.map(({ item_details, ...rest }) => rest)
+            const { error: itemsFallbackError } = await supabase
+                .from('invoice_items')
+                .insert(itemsCore)
+            if (itemsFallbackError) {
+                console.error('Error creating invoice items:', itemsFallbackError)
+                return { success: false, error: 'Failed to create invoice items' }
+            }
         }
     
     // Handle payment collection if mark_as_paid is true
