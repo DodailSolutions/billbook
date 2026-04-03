@@ -302,7 +302,7 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
             <tbody>
                 ${invoice.invoice_items.map(item => `
                 <tr>
-                    <td>${item.description}</td>
+                    <td>${item.description}${item.item_details ? `<div style="font-size:${Math.max(9, invoiceFontSize - 2)}px; color:#6b7280; margin-top:4px; white-space:pre-line;">${item.item_details}</div>` : ''}</td>
                     ${invoice.invoice_items.some(i => i.hsn_sac_code) ? `<td>${item.hsn_sac_code || '-'}</td>` : ''}
                     <td class="text-right">${item.quantity}</td>
                     <td class="text-right">₹${item.unit_price.toFixed(2)}</td>

@@ -57,6 +57,7 @@ export interface InvoiceItem {
     id: string
     invoice_id: string
     description: string
+    item_details?: string
     quantity: number
     unit_price: number
     amount: number

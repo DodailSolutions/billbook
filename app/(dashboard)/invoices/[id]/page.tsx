@@ -118,7 +118,12 @@ export default async function InvoiceDetailPage({
                             <tbody>
                                 {invoice.invoice_items.map((item) => (
                                     <tr key={item.id} className="border-t">
-                                        <td className="p-3">{item.description}</td>
+                                        <td className="p-3">
+                                            <div>{item.description}</div>
+                                            {item.item_details && (
+                                                <div className="text-sm text-muted-foreground mt-1 whitespace-pre-line">{item.item_details}</div>
+                                            )}
+                                        </td>
                                         {invoice.invoice_items.some(i => i.hsn_sac_code) && (
                                             <td className="p-3 text-sm text-muted-foreground">{item.hsn_sac_code || '-'}</td>
                                         )}
