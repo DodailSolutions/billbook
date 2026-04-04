@@ -240,7 +240,10 @@ export async function createInvoice(data: CreateInvoiceData) {
             reverse_charge_applicable: reverseChargeApplicable,
             total: roundOff.roundedAmount,
             notes: data.notes || null,
-            status: 'draft'
+            status: 'draft',
+            amount_paid: 0,
+            amount_remaining: roundOff.roundedAmount,
+            is_partial_payment: false
         }
 
         // Try inserting with discount columns first, fall back if not migrated
