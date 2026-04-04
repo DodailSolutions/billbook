@@ -99,6 +99,19 @@ export default async function InvoiceDetailPage({
                         </div>
                     </div>
 
+                    {invoice.invoice_items.length === 0 && (
+                        <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-300 dark:border-orange-700 rounded-lg p-4 flex items-start gap-3">
+                            <span className="text-orange-500 text-xl">⚠️</span>
+                            <div>
+                                <p className="font-semibold text-orange-800 dark:text-orange-300">No items found on this invoice</p>
+                                <p className="text-sm text-orange-700 dark:text-orange-400 mt-1">
+                                    Items may not have saved properly when this invoice was created.
+                                    Please <Link href={`/invoices/${id}/edit`} className="underline font-medium">edit the invoice</Link> and re-add the items.
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
                     <div className="border rounded-lg overflow-hidden">
                         <table className="w-full">
                             <thead className="bg-linear-to-r from-blue-600 to-blue-700">
