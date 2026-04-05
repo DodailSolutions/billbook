@@ -403,9 +403,9 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                     {items.map((item, index) => (
                         <div key={index} className="border rounded-lg p-3 space-y-3">
                             <div className="space-y-2">
-                                <label className="text-xs text-gray-600">Description *</label>
+                                <label className="text-xs text-gray-600">Item Name *</label>
                                 <Input
-                                    placeholder="Item description"
+                                    placeholder="Item name"
                                     value={item.description}
                                     onChange={(e) => updateItem(index, 'description', e.target.value)}
                                     required
