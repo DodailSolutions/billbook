@@ -17,6 +17,7 @@ interface InvoiceFormProps {
 
 interface InvoiceItem {
     description: string
+    details?: string
     quantity: number
     unit_price: number
     hsn_sac_code?: string
@@ -35,12 +36,13 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
     const [items, setItems] = useState<InvoiceItem[]>(
         invoice?.invoice_items.map(item => ({
             description: item.description,
+            details: item.item_details || '',
             quantity: item.quantity,
             unit_price: item.unit_price,
             hsn_sac_code: item.hsn_sac_code,
             hsn_sac_type: item.hsn_sac_type,
             gst_rate: item.gst_rate
-        })) || [{ description: '', quantity: 1, unit_price: 0 }]
+        })) || [{ description: '', details: '', quantity: 1, unit_price: 0 }]
     )
     const [gstPercentage, setGstPercentage] = useState(invoice?.gst_percentage || 18)
     const [supplyType, setSupplyType] = useState<'intra-state' | 'inter-state'>(invoice?.supply_type || 'intra-state')
@@ -185,7 +187,7 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                 supply_type: supplyType,
                 reverse_charge_applicable: reverseCharge,
                 notes: formData.get('notes') as string || undefined,
-                items: items.filter(item => item.description && item.quantity > 0 && item.unit_price > 0),
+                items: items.filter(item => item.description && item.quantity > 0 && item.unit_price > 0).map(item => ({ ...item, details: item.details || undefined })),
                 // Recurring invoice data
                 is_recurring: isRecurring,
                 recurring_frequency: isRecurring ? recurringFrequency : undefined,
@@ -409,6 +411,17 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                                     value={item.description}
                                     onChange={(e) => updateItem(index, 'description', e.target.value)}
                                     required
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-xs text-gray-600">Description <span className="text-gray-400">(optional)</span></label>
+                                <textarea
+                                    placeholder="Additional details, points or notes about this item..."
+                                    value={item.details || ''}
+                                    onChange={(e) => updateItem(index, 'details', e.target.value)}
+                                    rows={2}
+                                    className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
                                 />
                             </div>
 

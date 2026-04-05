@@ -392,6 +392,7 @@ interface UpdateInvoiceData {
     notes?: string
     items: Array<{
         description: string
+        details?: string
         quantity: number
         unit_price: number
         hsn_sac_code?: string
@@ -466,6 +467,7 @@ export async function updateInvoice(id: string, data: UpdateInvoiceData) {
             return {
                 invoice_id: id,
                 description: item.description,
+                item_details: item.details || null,
                 quantity: item.quantity,
                 unit_price: item.unit_price,
                 amount: itemAmount,
@@ -484,8 +486,15 @@ export async function updateInvoice(id: string, data: UpdateInvoiceData) {
             .insert(items)
 
         if (itemsError) {
-            console.error('Error creating invoice items:', itemsError)
-            return { success: false, error: 'Failed to create invoice items' }
+            // Fallback: strip item_details and retry
+            const itemsCore = items.map(({ item_details, ...rest }) => rest)
+            const { error: itemsFallbackError } = await supabase
+                .from('invoice_items')
+                .insert(itemsCore)
+            if (itemsFallbackError) {
+                console.error('Error creating invoice items:', itemsFallbackError)
+                return { success: false, error: 'Failed to create invoice items' }
+            }
         }
 
         revalidatePath('/invoices')
