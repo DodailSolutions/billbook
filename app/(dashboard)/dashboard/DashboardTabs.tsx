@@ -435,28 +435,3 @@ export function DashboardTabs({ stats }: DashboardTabsProps) {
 
 interface DashboardTabsProps {
     stats: DashboardStats
-}
-
-const STATUS_COLORS: Record<string, string> = {
-    paid: '#10b981',
-    pending: '#f59e0b',
-    partial: '#3b82f6',
-    cancelled: '#ef4444',
-}
-
-const statusLabel: Record<string, string> = {
-    paid: 'Paid',
-    sent: 'Pending',
-    draft: 'Draft',
-    partial: 'Partial',
-    cancelled: 'Cancelled',
-}
-
-const statusBadgeClass: Record<string, string> = {
-    paid: 'bg-emerald-100 text-emerald-700',
-    sent: 'bg-amber-100 text-amber-700',
-    draft: 'bg-gray-100 text-gray-600',
-    partial: 'bg-blue-100 text-blue-700',
-    cancelled: 'bg-red-100 text-red-600',
-}
-
