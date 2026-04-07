@@ -54,7 +54,7 @@ export async function getDashboardStats(): Promise<DashboardStats> {
             .select('expense_date, total_amount, expense_categories(category_name)')
             .eq('user_id', user.id)
         if (!expError && exp) {
-            expensesData = exp as ExpenseRow[]
+            expensesData = exp as unknown as ExpenseRow[]
         }
 
         // ── Invoice aggregates ──────────────────────────────────────
