@@ -431,7 +431,3 @@ export function DashboardTabs({ stats }: DashboardTabsProps) {
         </div>
     )
 }
-
-
-interface DashboardTabsProps {
-    stats: DashboardStats
