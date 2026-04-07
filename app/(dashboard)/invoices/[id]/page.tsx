@@ -280,33 +280,40 @@ export default async function InvoiceDetailPage({
                     </div>
                 )}
 
-                {/* Signature & Stamp */}
-                {((invoiceSettings?.show_signature && invoiceSettings?.digital_signature_url?.startsWith('data:image')) ||
-                  (invoiceSettings?.show_stamp && invoiceSettings?.company_stamp_url?.startsWith('data:image'))) && (
-                    <div className="border-t border-gray-200 dark:border-gray-700 px-5 py-5">
-                        <div className="flex justify-end gap-8 items-end">
+                {/* Signature, Stamp & Client Signature — always shown */}
+                <div className="border-t border-gray-200 dark:border-gray-700 px-5 py-5">
+                    <div className="flex justify-between items-end gap-4">
+                        {/* Client signature placeholder */}
+                        <div className="text-center min-w-[160px]">
+                            <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg h-16 mb-2" />
+                            <span className="text-xs text-gray-400">Customer Signature</span>
+                        </div>
+                        {/* Company seal + authorized signatory */}
+                        <div className="flex items-end gap-6">
                             {invoiceSettings?.show_stamp && invoiceSettings?.company_stamp_url?.startsWith('data:image') && (
                                 <div className="flex flex-col items-center gap-1.5">
                                     {/* eslint-disable-next-line @next/next/no-img-element */}
                                     <img src={invoiceSettings.company_stamp_url} alt="Company Stamp"
-                                        className="h-20 w-20 object-contain rounded-full border-2 border-blue-200 dark:border-blue-700 shadow-sm" />
-                                    <span className="text-xs text-gray-500 font-medium">Company Seal</span>
+                                        className="h-24 w-24 object-contain opacity-85" />
+                                    <span className="text-xs text-gray-500">Company Seal</span>
                                 </div>
                             )}
                             {invoiceSettings?.show_signature && invoiceSettings?.digital_signature_url?.startsWith('data:image') && (
-                                <div className="flex flex-col items-center gap-1 border-t-2 border-gray-300 dark:border-gray-600 pt-2 min-w-35">
+                                <div className="flex flex-col items-center gap-1 pt-2">
                                     {/* eslint-disable-next-line @next/next/no-img-element */}
                                     <img src={invoiceSettings.digital_signature_url} alt="Signature"
                                         className="h-12 w-36 object-contain" />
-                                    {invoiceSettings.company_name && (
-                                        <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">{invoiceSettings.company_name}</span>
-                                    )}
-                                    <span className="text-xs text-gray-500">Authorized Signatory</span>
+                                    <div className="border-t-2 border-gray-700 dark:border-gray-400 w-full mt-1 pt-1 text-center">
+                                        {invoiceSettings.company_name && (
+                                            <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 block">{invoiceSettings.company_name}</span>
+                                        )}
+                                        <span className="text-xs text-gray-500">Authorized Signatory</span>
+                                    </div>
                                 </div>
                             )}
                         </div>
                     </div>
-                )}
+                </div>
 
                 {/* Payment Status */}
                 <div className="border-t border-gray-200 dark:border-gray-700 px-5 py-5">

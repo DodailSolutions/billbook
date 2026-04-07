@@ -345,61 +345,41 @@ export function InvoicePreviewPanel({
                     </div>
                 )}
 
-                {/* Payment Instructions */}
-                {settings.payment_instructions && (
-                    <div className="mb-3 pt-3 border-t">
-                        <div 
-                            className="text-xs font-semibold mb-1"
-                            style={{ color: primaryColor }}
-                        >
-                            Payment Instructions:
-                        </div>
-                        <div className="text-xs text-gray-600 whitespace-pre-wrap">
-                            {settings.payment_instructions}
-                        </div>
+                {/* Payment Instructions + QR side by side */}
+                {(settings.payment_instructions || (settings.show_qr_code && settings.payment_qr_code_url?.startsWith('data:image'))) && (
+                    <div className="mb-3 pt-3 border-t flex gap-3 items-start">
+                        {settings.payment_instructions && (
+                            <div className="flex-1">
+                                <div className="text-xs font-semibold mb-1" style={{ color: primaryColor }}>Payment Instructions:</div>
+                                <div className="text-xs text-gray-600 whitespace-pre-wrap">{settings.payment_instructions}</div>
+                            </div>
+                        )}
+                        {settings.show_qr_code && settings.payment_qr_code_url?.startsWith('data:image') && (
+                            <div className="text-center shrink-0">
+                                <div className="text-xs font-semibold mb-1" style={{ color: primaryColor }}>Scan to Pay</div>
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img src={settings.payment_qr_code_url} alt="QR" className="h-20 w-20 object-contain border rounded mx-auto"
+                                    style={{ borderColor: primaryColor }}
+                                    onError={(e) => { e.currentTarget.style.display = 'none' }} />
+                                <div className="text-xs text-gray-400 mt-1">GPay | PhonePe | UPI</div>
+                            </div>
+                        )}
                     </div>
                 )}
 
-                {/* Payment QR Code */}
-                {settings.show_qr_code && settings.payment_qr_code_url && settings.payment_qr_code_url.trim() && settings.payment_qr_code_url.startsWith('data:image') && (
-                    <div className="mb-3 pt-3 border-t">
-                        <div 
-                            className="text-xs font-semibold mb-2 text-center"
-                            style={{ color: primaryColor }}
-                        >
-                            Scan to Pay
-                        </div>
-                        <div className="flex justify-center">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img 
-                                src={settings.payment_qr_code_url} 
-                                alt="Payment QR Code" 
-                                className="h-24 w-24 object-contain border rounded"
-                                style={{ borderColor: primaryColor }}
-                                onError={(e) => { e.currentTarget.style.display = 'none' }}
-                            />
-                        </div>
-                        <div className="text-center text-xs text-gray-500 mt-1">
-                            GPay | PhonePe | Paytm | UPI
-                        </div>
+                {/* Signature, Stamp & Client Signature — always shown */}
+                <div className="flex justify-between items-end gap-4 mt-4 pt-3 border-t border-gray-200">
+                    {/* Client signature placeholder */}
+                    <div className="text-center min-w-[120px]">
+                        <div className="border-2 border-dashed border-gray-300 rounded h-12 mb-1" />
+                        <div className="text-xs text-gray-400">Customer Signature</div>
                     </div>
-                )}
-
-                {/* Footer */}
-                {settings.footer_text && (
-                    <div className="text-center text-gray-400 text-xs mt-3 pt-3 border-t">
-                        {settings.footer_text}
-                    </div>
-                )}
-
-                {/* Signature & Stamp */}
-                {((settings.show_signature && settings.digital_signature_url?.startsWith('data:image')) ||
-                  (settings.show_stamp && settings.company_stamp_url?.startsWith('data:image'))) && (
-                    <div className="flex justify-end items-end gap-6 mt-4 pt-3 border-t border-gray-200">
+                    {/* Company seal + authorized signatory */}
+                    <div className="flex items-end gap-4">
                         {settings.show_stamp && settings.company_stamp_url?.startsWith('data:image') && (
                             <div className="text-center">
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img src={settings.company_stamp_url} alt="Stamp" className="h-14 w-14 object-contain opacity-85 mx-auto"
+                                <img src={settings.company_stamp_url} alt="Stamp" className="h-16 w-16 object-contain opacity-85 mx-auto"
                                     onError={(e) => { e.currentTarget.style.display = 'none' }} />
                                 <div className="text-xs text-gray-500 mt-1">Company Seal</div>
                             </div>
@@ -409,10 +389,17 @@ export function InvoicePreviewPanel({
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img src={settings.digital_signature_url} alt="Signature" className="h-10 w-28 object-contain mx-auto"
                                     onError={(e) => { e.currentTarget.style.display = 'none' }} />
-                                <div className="border-t border-gray-400 mt-1 pt-1 text-xs font-semibold text-gray-700">{settings.company_name}</div>
+                                <div className="border-t-2 border-gray-700 mt-1 pt-1 text-xs font-semibold text-gray-700">{settings.company_name}</div>
                                 <div className="text-xs text-gray-400">Authorized Signatory</div>
                             </div>
                         )}
+                    </div>
+                </div>
+
+                {/* Footer */}
+                {settings.footer_text && (
+                    <div className="text-center text-gray-400 text-xs mt-3 pt-3 border-t">
+                        {settings.footer_text}
                     </div>
                 )}
             </div>

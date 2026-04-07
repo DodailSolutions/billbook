@@ -271,12 +271,16 @@ export default function InvoicePreview({ settings }: InvoicePreviewProps) {
                     </div>
                 )}
 
-                {/* Signature + Stamp: stamp big on left, signature on right */}
-                {((settings.show_signature && settings.digital_signature_url?.startsWith('data:image')) ||
-                  (settings.show_stamp && settings.company_stamp_url?.startsWith('data:image'))) && (
-                    <div className="flex items-end justify-between gap-8 mt-6 pt-4 border-t">
-                        {/* Stamp — left, large */}
-                        {settings.show_stamp && settings.company_stamp_url?.startsWith('data:image') ? (
+                {/* Signature row: customer placeholder left, company stamp+sig right */}
+                <div className="flex items-end justify-between gap-4 mt-6 pt-4 border-t">
+                    {/* Client signature placeholder — always shown */}
+                    <div className="text-center min-w-35">
+                        <div className="border-2 border-dashed border-gray-300 rounded-lg h-14 mb-1" />
+                        <div className="text-xs text-gray-400">Customer Signature</div>
+                    </div>
+                    {/* Company seal + authorized signatory */}
+                    <div className="flex items-end gap-5">
+                        {settings.show_stamp && settings.company_stamp_url?.startsWith('data:image') && (
                             <div className="text-center">
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img src={settings.company_stamp_url} alt="Company Stamp"
@@ -285,9 +289,8 @@ export default function InvoicePreview({ settings }: InvoicePreviewProps) {
                                 />
                                 <div className="text-xs text-gray-400 mt-1">Company Seal</div>
                             </div>
-                        ) : <div />}
-                        {/* Signature — right, with sign-here line */}
-                        {settings.show_signature && settings.digital_signature_url?.startsWith('data:image') ? (
+                        )}
+                        {settings.show_signature && settings.digital_signature_url?.startsWith('data:image') && (
                             <div className="text-center">
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img src={settings.digital_signature_url} alt="Signature"
@@ -297,9 +300,9 @@ export default function InvoicePreview({ settings }: InvoicePreviewProps) {
                                 <div className="border-t-2 border-gray-700 mt-1 pt-1 text-xs font-semibold text-gray-800">{settings.company_name}</div>
                                 <div className="text-xs text-gray-400">Authorized Signatory</div>
                             </div>
-                        ) : <div />}
+                        )}
                     </div>
-                )}
+                </div>
 
                 {/* Footer */}
                 {footer_text && (
