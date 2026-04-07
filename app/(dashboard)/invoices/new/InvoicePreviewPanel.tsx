@@ -368,32 +368,33 @@ export function InvoicePreviewPanel({
                 )}
 
                 {/* Signature, Stamp & Client Signature — always shown */}
-                <div className="flex justify-between items-end gap-4 mt-4 pt-3 border-t border-gray-200">
-                    {/* Client signature placeholder */}
-                    <div className="text-center min-w-[120px]">
+                <div className="flex justify-between items-start gap-4 mt-4 pt-3 border-t border-gray-200">
+                    {/* LEFT: Client signature placeholder */}
+                    <div className="text-center min-w-[110px]">
                         <div className="border-2 border-dashed border-gray-300 rounded h-12 mb-1" />
                         <div className="text-xs text-gray-400">Customer Signature</div>
                     </div>
-                    {/* Company seal + authorized signatory */}
-                    <div className="flex items-end gap-4">
-                        {settings.show_stamp && settings.company_stamp_url?.startsWith('data:image') && (
-                            <div className="text-center">
+                    {/* CENTER: Company seal */}
+                    {settings.show_stamp && settings.company_stamp_url?.startsWith('data:image') && (
+                        <div className="text-center">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={settings.company_stamp_url} alt="Stamp" className="max-h-16 max-w-16 w-auto h-auto object-contain opacity-85 mx-auto"
+                                onError={(e) => { e.currentTarget.style.display = 'none' }} />
+                            <div className="text-xs text-gray-500 mt-1.5 pt-1 border-t border-gray-200">Company Seal</div>
+                        </div>
+                    )}
+                    {/* RIGHT: Authorized signatory */}
+                    {settings.show_signature && settings.digital_signature_url?.startsWith('data:image') && (
+                        <div className="text-center min-w-[110px]">
+                            <div className="h-12 flex items-end justify-center mb-1">
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img src={settings.company_stamp_url} alt="Stamp" className="h-16 w-16 object-contain opacity-85 mx-auto"
+                                <img src={settings.digital_signature_url} alt="Signature" className="max-h-10 max-w-[120px] w-auto h-auto object-contain mx-auto"
                                     onError={(e) => { e.currentTarget.style.display = 'none' }} />
-                                <div className="text-xs text-gray-500 mt-1">Company Seal</div>
                             </div>
-                        )}
-                        {settings.show_signature && settings.digital_signature_url?.startsWith('data:image') && (
-                            <div className="text-center">
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img src={settings.digital_signature_url} alt="Signature" className="h-10 w-28 object-contain mx-auto"
-                                    onError={(e) => { e.currentTarget.style.display = 'none' }} />
-                                <div className="border-t-2 border-gray-700 mt-1 pt-1 text-xs font-semibold text-gray-700">{settings.company_name}</div>
-                                <div className="text-xs text-gray-400">Authorized Signatory</div>
-                            </div>
-                        )}
-                    </div>
+                            <div className="border-t-2 border-gray-700 pt-1 text-xs font-semibold text-gray-700">{settings.company_name}</div>
+                            <div className="text-xs text-gray-400">Authorized Signatory</div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Footer */}

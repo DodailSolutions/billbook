@@ -271,37 +271,38 @@ export default function InvoicePreview({ settings }: InvoicePreviewProps) {
                     </div>
                 )}
 
-                {/* Signature row: customer placeholder left, company stamp+sig right */}
-                <div className="flex items-end justify-between gap-4 mt-6 pt-4 border-t">
-                    {/* Client signature placeholder — always shown */}
+                {/* Signature row: customer left | stamp center | sig right */}
+                <div className="flex items-start justify-between gap-4 mt-6 pt-4 border-t">
+                    {/* LEFT: Client signature placeholder — always shown */}
                     <div className="text-center min-w-35">
                         <div className="border-2 border-dashed border-gray-300 rounded-lg h-14 mb-1" />
                         <div className="text-xs text-gray-400">Customer Signature</div>
                     </div>
-                    {/* Company seal + authorized signatory */}
-                    <div className="flex items-end gap-5">
-                        {settings.show_stamp && settings.company_stamp_url?.startsWith('data:image') && (
-                            <div className="text-center">
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img src={settings.company_stamp_url} alt="Company Stamp"
-                                    className="h-28 w-28 object-contain opacity-85 mx-auto"
-                                    onError={(e) => { e.currentTarget.style.display = 'none' }}
-                                />
-                                <div className="text-xs text-gray-400 mt-1">Company Seal</div>
-                            </div>
-                        )}
-                        {settings.show_signature && settings.digital_signature_url?.startsWith('data:image') && (
-                            <div className="text-center">
+                    {/* CENTER: Company seal */}
+                    {settings.show_stamp && settings.company_stamp_url?.startsWith('data:image') && (
+                        <div className="text-center">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={settings.company_stamp_url} alt="Company Stamp"
+                                className="max-h-28 max-w-28 w-auto h-auto object-contain opacity-85 mx-auto"
+                                onError={(e) => { e.currentTarget.style.display = 'none' }}
+                            />
+                            <div className="text-xs text-gray-400 mt-2 pt-1.5 border-t border-gray-200">Company Seal</div>
+                        </div>
+                    )}
+                    {/* RIGHT: Authorized signatory */}
+                    {settings.show_signature && settings.digital_signature_url?.startsWith('data:image') && (
+                        <div className="text-center min-w-35">
+                            <div className="h-14 flex items-end justify-center mb-1">
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img src={settings.digital_signature_url} alt="Signature"
-                                    className="h-14 w-40 object-contain mx-auto"
+                                    className="max-h-12 max-w-40 w-auto h-auto object-contain mx-auto"
                                     onError={(e) => { e.currentTarget.style.display = 'none' }}
                                 />
-                                <div className="border-t-2 border-gray-700 mt-1 pt-1 text-xs font-semibold text-gray-800">{settings.company_name}</div>
-                                <div className="text-xs text-gray-400">Authorized Signatory</div>
                             </div>
-                        )}
-                    </div>
+                            <div className="border-t-2 border-gray-700 pt-1 text-xs font-semibold text-gray-800">{settings.company_name}</div>
+                            <div className="text-xs text-gray-400">Authorized Signatory</div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Footer */}

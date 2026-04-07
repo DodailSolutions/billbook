@@ -415,28 +415,26 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
         </div>
         ` : ''}
 
-        <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; margin-top: 36px; padding-top: 16px; border-top: 1px solid #e5e7eb; page-break-inside: avoid;">
-            <!-- Client signature placeholder — always shown -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-top: 36px; padding-top: 16px; border-top: 1px solid #e5e7eb; page-break-inside: avoid;">
             <div style="text-align: center; min-width: 160px;">
-                <div style="border: 1.5px dashed #d1d5db; border-radius: 6px; height: 60px; margin-bottom: 6px;"></div>
+                <div style="border: 1.5px dashed #d1d5db; border-radius: 6px; height: 65px; margin-bottom: 8px;"></div>
                 <div style="font-size: 11px; color: #6b7280;">Customer Signature</div>
             </div>
-            <!-- Company seal + authorized signatory -->
-            <div style="display: flex; gap: 32px; align-items: flex-end;">
-                ${showStamp && companyStampUrl && companyStampUrl.startsWith('data:image') ? `
-                <div style="text-align: center;">
-                    <img src="${companyStampUrl}" alt="Company Stamp" style="height: 110px; width: 110px; object-fit: contain; opacity: 0.85;" onerror="this.style.display='none'" />
-                    <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">Company Seal</div>
-                </div>
-                ` : ''}
-                ${showSignature && digitalSignatureUrl && digitalSignatureUrl.startsWith('data:image') ? `
-                <div style="text-align: center;">
-                    <img src="${digitalSignatureUrl}" alt="Signature" style="height: 70px; width: 180px; object-fit: contain;" onerror="this.style.display='none'" />
-                    <div style="border-top: 2px solid #374151; margin-top: 4px; padding-top: 4px; font-size: 11px; color: #374151; font-weight: 600;">${companyName}</div>
-                    <div style="font-size: 10px; color: #6b7280;">Authorized Signatory</div>
-                </div>
-                ` : ''}
+            ${showStamp && companyStampUrl && companyStampUrl.startsWith('data:image') ? `
+            <div style="text-align: center;">
+                <img src="${companyStampUrl}" alt="Company Stamp" style="max-height: 110px; max-width: 120px; width: auto; height: auto; object-fit: contain; opacity: 0.85; display: block; margin: 0 auto;" onerror="this.style.display='none'" />
+                <div style="font-size: 11px; color: #6b7280; margin-top: 8px; padding-top: 6px; border-top: 1px solid #e5e7eb;">Company Seal</div>
             </div>
+            ` : ''}
+            ${showSignature && digitalSignatureUrl && digitalSignatureUrl.startsWith('data:image') ? `
+            <div style="text-align: center; min-width: 170px;">
+                <div style="height: 65px; display: flex; align-items: flex-end; justify-content: center; margin-bottom: 8px;">
+                    <img src="${digitalSignatureUrl}" alt="Signature" style="max-height: 65px; max-width: 190px; width: auto; height: auto; object-fit: contain;" onerror="this.style.display='none'" />
+                </div>
+                <div style="border-top: 2px solid #374151; padding-top: 5px; font-size: 11px; color: #374151; font-weight: 600;">${companyName}</div>
+                <div style="font-size: 10px; color: #6b7280; margin-top: 2px;">Authorized Signatory</div>
+            </div>
+            ` : ''}
         </div>
 
         ${footerText ? `
