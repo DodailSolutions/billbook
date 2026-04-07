@@ -82,6 +82,11 @@ export async function saveInvoiceSettings(settings: InvoiceSettings) {
             throw new Error('Not authenticated')
         }
 
+        // Strip undefined values so Supabase doesn't complain about unknown/missing columns
+        const cleanSettings = Object.fromEntries(
+            Object.entries(settings).filter(([, v]) => v !== undefined)
+        )
+
         // Check if settings exist
         const existing = await getInvoiceSettings()
 
@@ -90,7 +95,7 @@ export async function saveInvoiceSettings(settings: InvoiceSettings) {
             const { error } = await supabase
                 .from('invoice_settings')
                 .update({
-                    ...settings,
+                    ...cleanSettings,
                     updated_at: new Date().toISOString()
                 })
                 .eq('user_id', user.id)
@@ -105,7 +110,7 @@ export async function saveInvoiceSettings(settings: InvoiceSettings) {
                 .from('invoice_settings')
                 .insert([{
                     user_id: user.id,
-                    ...settings
+                    ...cleanSettings
                 }])
 
             if (error) {
