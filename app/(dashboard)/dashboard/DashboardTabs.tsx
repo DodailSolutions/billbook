@@ -32,7 +32,7 @@ interface DashboardTabsProps {
 const PIE_COLORS: Record<string, string> = {
     Paid: '#10b981',
     Pending: '#f59e0b',
-    Partial: '#3b82f6',
+    'Part Payment': '#3b82f6',
     Cancelled: '#ef4444',
 }
 
@@ -102,7 +102,7 @@ export function DashboardTabs({ stats }: DashboardTabsProps) {
     const pieData = [
         { name: 'Paid', value: stats.paidInvoices },
         { name: 'Pending', value: stats.pendingInvoices },
-        { name: 'Partial', value: stats.partialInvoices },
+        { name: 'Part Payment', value: stats.partialInvoices },
         { name: 'Cancelled', value: stats.cancelledInvoices },
     ].filter(d => d.value > 0)
 
@@ -224,6 +224,7 @@ export function DashboardTabs({ stats }: DashboardTabsProps) {
                         </Card>
                     </div>
 
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     <Card className="bg-white rounded-2xl shadow-sm border border-gray-100">
                         <CardHeader className="pb-2">
                             <CardTitle className="text-base font-semibold text-gray-800">Revenue vs Expenses</CardTitle>
@@ -290,6 +291,7 @@ export function DashboardTabs({ stats }: DashboardTabsProps) {
                             )}
                         </CardContent>
                     </Card>
+                    </div>
                 </>
             )}
 
