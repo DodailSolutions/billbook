@@ -351,7 +351,7 @@ export function DashboardTabs({ stats }: DashboardTabsProps) {
                                                     <Cell key={i} fill={CLIENT_COLORS[i % CLIENT_COLORS.length]} />
                                                 ))}
                                             </Pie>
-                                            <Tooltip formatter={(value: number) => [formatINR(value), 'Revenue']} />
+                                            <Tooltip formatter={(value) => [formatINR(Number(value)), 'Revenue']} />
                                         </PieChart>
                                     </ResponsiveContainer>
                                 )}
