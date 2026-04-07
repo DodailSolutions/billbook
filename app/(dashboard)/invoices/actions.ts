@@ -390,6 +390,8 @@ interface UpdateInvoiceData {
     supply_type?: 'intra-state' | 'inter-state'
     reverse_charge_applicable?: boolean
     notes?: string
+    discount_type?: 'percentage' | 'flat'
+    discount_value?: number
     items: Array<{
         description: string
         details?: string
@@ -414,21 +416,29 @@ export async function updateInvoice(id: string, data: UpdateInvoiceData) {
         const reverseChargeApplicable = data.reverse_charge_applicable || false
 
         // Calculate totals with proper GST breakdown
-        const subtotal = data.items.reduce((sum, item) => {
+        const rawSubtotal = data.items.reduce((sum, item) => {
             return sum + (item.quantity * item.unit_price)
         }, 0)
+
+        // Apply discount before GST
+        const discountAmount = data.discount_value && data.discount_value > 0
+            ? data.discount_type === 'percentage'
+                ? (rawSubtotal * Math.min(data.discount_value, 100)) / 100
+                : Math.min(data.discount_value, rawSubtotal)
+            : 0
+        const subtotal = rawSubtotal - discountAmount
 
         // Calculate GST components based on supply type
         const gstComponents = calculateGSTComponents(subtotal, data.gst_percentage, supplyType)
 
-        // Update invoice with full GST breakdown
-        const { error: invoiceError } = await supabase
+        // Try update with discount columns first, fall back if not migrated
+        const { error: invoiceErrorWithDiscount } = await supabase
             .from('invoices')
             .update({
                 customer_id: data.customer_id,
                 invoice_date: data.invoice_date,
                 due_date: data.due_date || null,
-                subtotal,
+                subtotal: rawSubtotal,
                 gst_percentage: data.gst_percentage,
                 gst_amount: gstComponents.totalTax,
                 cgst_amount: gstComponents.cgst,
@@ -438,13 +448,38 @@ export async function updateInvoice(id: string, data: UpdateInvoiceData) {
                 reverse_charge_applicable: reverseChargeApplicable,
                 total: gstComponents.totalAmount,
                 notes: data.notes || null,
+                discount_amount: discountAmount > 0 ? discountAmount : null,
+                discount_type: discountAmount > 0 ? (data.discount_type || null) : null,
+                discount_value: discountAmount > 0 ? (data.discount_value || null) : null,
             })
             .eq('id', id)
             .eq('user_id', user.id)
 
-        if (invoiceError) {
-            console.error('Error updating invoice:', invoiceError)
-            return { success: false, error: 'Failed to update invoice' }
+        if (invoiceErrorWithDiscount) {
+            // Fallback: update without discount columns
+            const { error: invoiceError } = await supabase
+                .from('invoices')
+                .update({
+                    customer_id: data.customer_id,
+                    invoice_date: data.invoice_date,
+                    due_date: data.due_date || null,
+                    subtotal: rawSubtotal,
+                    gst_percentage: data.gst_percentage,
+                    gst_amount: gstComponents.totalTax,
+                    cgst_amount: gstComponents.cgst,
+                    sgst_amount: gstComponents.sgst,
+                    igst_amount: gstComponents.igst,
+                    supply_type: supplyType,
+                    reverse_charge_applicable: reverseChargeApplicable,
+                    total: gstComponents.totalAmount,
+                    notes: data.notes || null,
+                })
+                .eq('id', id)
+                .eq('user_id', user.id)
+            if (invoiceError) {
+                console.error('Error updating invoice:', invoiceError)
+                return { success: false, error: 'Failed to update invoice' }
+            }
         }
 
         // Delete existing items

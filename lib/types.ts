@@ -38,6 +38,9 @@ export interface Invoice {
     amount_paid?: number
     amount_remaining?: number
     is_partial_payment?: boolean
+    discount_type?: 'percentage' | 'flat'
+    discount_value?: number
+    discount_amount?: number
     created_at: string
     updated_at: string
 }

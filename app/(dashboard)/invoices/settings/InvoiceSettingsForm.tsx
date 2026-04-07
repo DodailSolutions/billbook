@@ -49,6 +49,40 @@ export default function InvoiceSettingsForm({ initialSettings, onPreviewUpdate }
     const [qrCodeUrl, setQrCodeUrl] = useState(initialSettings?.payment_qr_code_url || '')
     const [qrCodePreview, setQrCodePreview] = useState(initialSettings?.payment_qr_code_url || '')
     const [showQrCode, setShowQrCode] = useState(initialSettings?.show_qr_code ?? true)
+    const [signatureUrl, setSignatureUrl] = useState(initialSettings?.digital_signature_url || '')
+    const [signaturePreview, setSignaturePreview] = useState(initialSettings?.digital_signature_url || '')
+    const [showSignature, setShowSignature] = useState(initialSettings?.show_signature ?? true)
+    const [stampUrl, setStampUrl] = useState(initialSettings?.company_stamp_url || '')
+    const [stampPreview, setStampPreview] = useState(initialSettings?.company_stamp_url || '')
+    const [showStamp, setShowStamp] = useState(initialSettings?.show_stamp ?? true)
+
+    const handleSignatureUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (!file) return
+        if (!file.type.startsWith('image/')) { alert('Please upload an image file'); return }
+        if (file.size > 2 * 1024 * 1024) { alert('Image size should be less than 2MB'); return }
+        const reader = new FileReader()
+        reader.onloadend = () => {
+            const base64 = reader.result as string
+            setSignatureUrl(base64)
+            setSignaturePreview(base64)
+        }
+        reader.readAsDataURL(file)
+    }
+
+    const handleStampUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (!file) return
+        if (!file.type.startsWith('image/')) { alert('Please upload an image file'); return }
+        if (file.size > 2 * 1024 * 1024) { alert('Image size should be less than 2MB'); return }
+        const reader = new FileReader()
+        reader.onloadend = () => {
+            const base64 = reader.result as string
+            setStampUrl(base64)
+            setStampPreview(base64)
+        }
+        reader.readAsDataURL(file)
+    }
 
     const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
@@ -159,6 +193,8 @@ export default function InvoiceSettingsForm({ initialSettings, onPreviewUpdate }
             // Normalize empty strings to undefined and validate base64 strings
             const normalizedLogoUrl = logoUrl && logoUrl.trim() && logoUrl.startsWith('data:image') ? logoUrl : undefined
             const normalizedQrCodeUrl = qrCodeUrl && qrCodeUrl.trim() && qrCodeUrl.startsWith('data:image') ? qrCodeUrl : undefined
+            const normalizedSignatureUrl = signatureUrl && signatureUrl.trim() && signatureUrl.startsWith('data:image') ? signatureUrl : undefined
+            const normalizedStampUrl = stampUrl && stampUrl.trim() && stampUrl.startsWith('data:image') ? stampUrl : undefined
 
             await saveInvoiceSettings({
                 company_name: companyName || undefined,
@@ -189,7 +225,11 @@ export default function InvoiceSettingsForm({ initialSettings, onPreviewUpdate }
                 show_company_details: showCompanyDetails,
                 show_gstin: showGstin,
                 payment_qr_code_url: normalizedQrCodeUrl,
-                show_qr_code: showQrCode
+                show_qr_code: showQrCode,
+                digital_signature_url: normalizedSignatureUrl,
+                show_signature: showSignature,
+                company_stamp_url: normalizedStampUrl,
+                show_stamp: showStamp
             })
 
             alert('Invoice settings saved successfully!')
@@ -892,6 +932,101 @@ export default function InvoiceSettingsForm({ initialSettings, onPreviewUpdate }
                             onChange={(e) => setFooterText(e.target.value)}
                             placeholder="Thank you for your business!"
                         />
+                    </div>
+                </div>
+            </Card>
+
+            {/* Digital Signature & Stamp */}
+            <Card className="border-2 border-gray-200 bg-white dark:bg-slate-800 shadow-sm">
+                <div className="p-6 space-y-6">
+                    <div className="flex items-center gap-3 mb-4 pb-4 border-b border-gray-200">
+                        <div className="h-10 w-10 rounded-lg bg-linear-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-sm">
+                            <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-bold" style={{ color: 'var(--foreground)' }}>Digital Signature &amp; Stamp</h2>
+                            <p className="text-xs text-gray-500 mt-0.5">Upload your signature and company stamp to appear on invoices</p>
+                        </div>
+                    </div>
+
+                    {/* Digital Signature */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Digital Signature
+                        </label>
+                        <p className="text-xs text-gray-500 mb-3">Upload a PNG/JPG of your handwritten signature (transparent background recommended)</p>
+                        <div className="flex items-start gap-4">
+                            {signaturePreview ? (
+                                <div className="relative">
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img src={signaturePreview} alt="Signature" className="h-20 w-48 object-contain border-2 border-dashed border-violet-300 rounded-lg bg-gray-50 p-1" />
+                                    <button type="button" onClick={() => { setSignatureUrl(''); setSignaturePreview('') }}
+                                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors">
+                                        <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="h-20 w-48 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center bg-gray-50 gap-1">
+                                    <svg className="h-7 w-7 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                    </svg>
+                                    <span className="text-xs text-gray-400">No signature</span>
+                                </div>
+                            )}
+                            <div className="flex-1">
+                                <input type="file" accept="image/*" onChange={handleSignatureUpload}
+                                    className="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100 file:cursor-pointer cursor-pointer" />
+                                <p className="text-xs text-gray-500 mt-2">PNG with transparent background works best. Max 2MB.</p>
+                                {signaturePreview && (
+                                    <label className="flex items-center gap-2 mt-3 cursor-pointer">
+                                        <input type="checkbox" checked={showSignature} onChange={(e) => setShowSignature(e.target.checked)}
+                                            className="w-4 h-4 text-violet-600 border-gray-300 rounded focus:ring-violet-500" />
+                                        <span className="text-sm text-gray-700">Show signature on invoices</span>
+                                    </label>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Company Stamp */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Company Stamp / Seal
+                        </label>
+                        <p className="text-xs text-gray-500 mb-3">Upload your official company stamp or seal image</p>
+                        <div className="flex items-start gap-4">
+                            {stampPreview ? (
+                                <div className="relative">
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img src={stampPreview} alt="Company Stamp" className="h-24 w-24 object-contain border-2 border-dashed border-blue-300 rounded-full bg-gray-50 p-1" />
+                                    <button type="button" onClick={() => { setStampUrl(''); setStampPreview('') }}
+                                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors">
+                                        <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="h-24 w-24 border-2 border-dashed border-gray-300 rounded-full flex flex-col items-center justify-center bg-gray-50 gap-1">
+                                    <svg className="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                    </svg>
+                                    <span className="text-xs text-gray-400">No stamp</span>
+                                </div>
+                            )}
+                            <div className="flex-1">
+                                <input type="file" accept="image/*" onChange={handleStampUpload}
+                                    className="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 file:cursor-pointer cursor-pointer" />
+                                <p className="text-xs text-gray-500 mt-2">PNG with transparent background recommended. Max 2MB.</p>
+                                {stampPreview && (
+                                    <label className="flex items-center gap-2 mt-3 cursor-pointer">
+                                        <input type="checkbox" checked={showStamp} onChange={(e) => setShowStamp(e.target.checked)}
+                                            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
+                                        <span className="text-sm text-gray-700">Show stamp on invoices</span>
+                                    </label>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </Card>

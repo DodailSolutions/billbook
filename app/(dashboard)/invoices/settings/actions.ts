@@ -35,6 +35,10 @@ export interface InvoiceSettings {
     show_gstin?: boolean
     payment_qr_code_url?: string
     show_qr_code?: boolean
+    digital_signature_url?: string
+    show_signature?: boolean
+    company_stamp_url?: string
+    show_stamp?: boolean
 }
 
 export async function getInvoiceSettings(): Promise<InvoiceSettings | null> {

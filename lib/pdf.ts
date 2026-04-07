@@ -36,6 +36,10 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
     const showLogo = settings?.show_logo ?? true
     const paymentQrCodeUrl = settings?.payment_qr_code_url || ''
     const showQrCode = settings?.show_qr_code ?? true
+    const digitalSignatureUrl = settings?.digital_signature_url || ''
+    const showSignature = settings?.show_signature ?? true
+    const companyStampUrl = settings?.company_stamp_url || ''
+    const showStamp = settings?.show_stamp ?? true
     
     // Generate HTML for PDF
     const html = `
@@ -319,6 +323,12 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
                     <span>Subtotal:</span>
                     <span>₹${invoice.subtotal.toFixed(2)}</span>
                 </div>
+                ${invoice.discount_amount && invoice.discount_amount > 0 ? `
+                <div class="total-row" style="color: #f97316; font-weight: 600;">
+                    <span>Discount (${invoice.discount_type === 'percentage' ? `${invoice.discount_value}%` : 'Flat'}):</span>
+                    <span>-₹${invoice.discount_amount.toFixed(2)}</span>
+                </div>
+                ` : ''}
                 ${invoice.gst_percentage > 0 ? `
                     ${invoice.supply_type === 'intra-state' ? `
                     <div class="total-row">
@@ -393,7 +403,25 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
             <div class="notes-content">${termsAndConditions}</div>
         </div>
         ` : ''}
-        
+
+        ${(showSignature && digitalSignatureUrl && digitalSignatureUrl.startsWith('data:image')) || (showStamp && companyStampUrl && companyStampUrl.startsWith('data:image')) ? `
+        <div style="display: flex; justify-content: flex-end; align-items: flex-end; gap: 40px; margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+            ${showStamp && companyStampUrl && companyStampUrl.startsWith('data:image') ? `
+            <div style="text-align: center;">
+                <img src="${companyStampUrl}" alt="Company Stamp" style="height: 90px; width: 90px; object-fit: contain; opacity: 0.85;" onerror="this.style.display='none'" />
+                <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">Company Seal</div>
+            </div>
+            ` : ''}
+            ${showSignature && digitalSignatureUrl && digitalSignatureUrl.startsWith('data:image') ? `
+            <div style="text-align: center;">
+                <img src="${digitalSignatureUrl}" alt="Signature" style="height: 60px; width: 160px; object-fit: contain;" onerror="this.style.display='none'" />
+                <div style="border-top: 1.5px solid #374151; margin-top: 4px; padding-top: 4px; font-size: 11px; color: #374151; font-weight: 600;">${companyName}</div>
+                <div style="font-size: 10px; color: #6b7280;">Authorized Signatory</div>
+            </div>
+            ` : ''}
+        </div>
+        ` : ''}
+
         ${footerText ? `
         <div class="notes-section" style="text-align: center; color: #9ca3af; font-size: 12px;">
             ${footerText}

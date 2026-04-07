@@ -1,9 +1,9 @@
 import Link from "next/link"
-import { ArrowLeft, Pencil, RefreshCw } from "lucide-react"
+import { ArrowLeft, Pencil, RefreshCw, CheckCircle2, Clock, XCircle, AlertCircle, Building2, User2, CalendarDays, Hash } from "lucide-react"
 import { notFound } from "next/navigation"
 import { Button } from "@/components/ui/Button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card"
 import { getInvoice } from "../actions"
+import { getInvoiceSettings } from "../settings/actions"
 import { DownloadPDFButton } from "./DownloadPDFButton"
 import { ShareInvoiceButton } from "./ShareInvoiceButton"
 import { MarkAsPaidButton } from "./MarkAsPaidButton"
@@ -17,7 +17,10 @@ export default async function InvoiceDetailPage({
     params: Promise<{ id: string }>
 }) {
     const { id } = await params
-    const invoice = await getInvoice(id)
+    const [invoice, invoiceSettings] = await Promise.all([
+        getInvoice(id),
+        getInvoiceSettings()
+    ])
 
     if (!invoice) {
         notFound()
@@ -28,23 +31,32 @@ export default async function InvoiceDetailPage({
     const amountPaid = invoice.amount_paid ?? 0
     const amountRemaining = invoice.amount_remaining ?? (invoice.total - amountPaid)
 
+    const statusConfig = {
+        paid: { label: 'Paid', icon: CheckCircle2, bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-700 dark:text-green-300', border: 'border-green-300 dark:border-green-700' },
+        pending: { label: 'Pending', icon: Clock, bg: 'bg-yellow-100 dark:bg-yellow-900/30', text: 'text-yellow-700 dark:text-yellow-300', border: 'border-yellow-300 dark:border-yellow-700' },
+        cancelled: { label: 'Cancelled', icon: XCircle, bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-700 dark:text-red-300', border: 'border-red-300 dark:border-red-700' },
+        partial: { label: 'Partial', icon: AlertCircle, bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-700 dark:text-blue-300', border: 'border-blue-300 dark:border-blue-700' },
+    }
+    const currentStatus = hasPartialPayment ? 'partial' : (invoice.status as keyof typeof statusConfig) || 'pending'
+    const status = statusConfig[currentStatus] || statusConfig.pending
+    const StatusIcon = status.icon
+
     return (
-        <div className="space-y-4 max-w-4xl mx-auto">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="space-y-5 max-w-4xl mx-auto">
+            {/* Top nav bar */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <Link href="/invoices">
-                    <Button variant="ghost" className="gap-2">
-                        <ArrowLeft className="h-4 w-4" />
-                        <span>Back to Invoices</span>
+                    <Button variant="ghost" size="sm" className="gap-2 text-gray-600 hover:text-gray-900">
+                        <ArrowLeft className="h-4 w-4" />Back
                     </Button>
                 </Link>
                 <div className="flex flex-wrap gap-2">
                     <Link href={`/invoices/recurring/new?fromInvoice=${id}`}>
-                        <Button variant="outline" className="gap-2">
-                            <RefreshCw className="h-4 w-4" />
-                            <span>Make Recurring</span>
+                        <Button variant="outline" size="sm" className="gap-1.5 rounded-lg text-gray-700">
+                            <RefreshCw className="h-3.5 w-3.5" />Recurring
                         </Button>
                     </Link>
-                    <ShareInvoiceButton 
+                    <ShareInvoiceButton
                         invoiceId={id}
                         invoiceNumber={invoice.invoice_number}
                         customerName={invoice.customer.name}
@@ -52,247 +64,323 @@ export default async function InvoiceDetailPage({
                         total={invoice.total}
                     />
                     <Link href={`/invoices/${id}/edit`}>
-                        <Button variant="outline" className="gap-2">
-                            <Pencil className="h-4 w-4" />
-                            <span>Edit</span>
+                        <Button variant="outline" size="sm" className="gap-1.5 rounded-lg">
+                            <Pencil className="h-3.5 w-3.5" />Edit
                         </Button>
                     </Link>
                     <DownloadPDFButton invoiceId={id} />
                 </div>
             </div>
 
-            <Card>
-                <CardHeader className="border-b">
+            {/* Invoice Card */}
+            <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+
+                {/* Invoice Header Band */}
+                <div className="bg-linear-to-r from-blue-600 to-indigo-700 px-6 py-5">
                     <div className="flex items-start justify-between">
                         <div>
-                            <CardTitle className="text-3xl mb-2">INVOICE</CardTitle>
-                            <p className="text-sm text-muted-foreground">
-                                Invoice Number: <span className="font-semibold text-foreground">{invoice.invoice_number}</span>
-                            </p>
+                            <p className="text-blue-200 text-xs font-semibold uppercase tracking-widest mb-1">Tax Invoice</p>
+                            <h1 className="text-white text-3xl font-bold tracking-tight">INVOICE</h1>
                         </div>
                         <div className="text-right">
-                            <p className="text-sm text-muted-foreground">Date</p>
-                            <p className="font-semibold">{formatDate(invoice.invoice_date)}</p>
-                            {invoice.due_date && (
-                                <>
-                                    <p className="text-sm text-muted-foreground mt-2">Due Date</p>
-                                    <p className="font-semibold">{formatDate(invoice.due_date)}</p>
-                                </>
+                            <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${status.bg} ${status.text} ${status.border} border`}>
+                                <StatusIcon className="h-3.5 w-3.5" />
+                                {status.label}
+                            </div>
+                            <p className="text-white text-2xl font-bold mt-2">₹{invoice.total.toFixed(2)}</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Invoice Meta */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-0 border-b border-gray-200 dark:border-gray-700 divide-x divide-gray-200 dark:divide-gray-700">
+                    <div className="px-4 py-3">
+                        <p className="text-xs text-gray-500 flex items-center gap-1 mb-1"><Hash className="h-3 w-3" />Invoice #</p>
+                        <p className="text-sm font-bold text-gray-900 dark:text-white">{invoice.invoice_number}</p>
+                    </div>
+                    <div className="px-4 py-3">
+                        <p className="text-xs text-gray-500 flex items-center gap-1 mb-1"><CalendarDays className="h-3 w-3" />Invoice Date</p>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white">{formatDate(invoice.invoice_date)}</p>
+                    </div>
+                    {invoice.due_date && (
+                        <div className="px-4 py-3">
+                            <p className="text-xs text-gray-500 flex items-center gap-1 mb-1"><CalendarDays className="h-3 w-3" />Due Date</p>
+                            <p className="text-sm font-semibold text-gray-900 dark:text-white">{formatDate(invoice.due_date)}</p>
+                        </div>
+                    )}
+                    {invoice.supply_type && (
+                        <div className="px-4 py-3">
+                            <p className="text-xs text-gray-500 mb-1">Supply Type</p>
+                            <p className="text-sm font-semibold text-gray-900 dark:text-white capitalize">{invoice.supply_type.replace('-', ' ')}</p>
+                        </div>
+                    )}
+                </div>
+
+                {/* Bill To / Bill From */}
+                <div className="grid md:grid-cols-2 gap-0 divide-y md:divide-y-0 md:divide-x divide-gray-200 dark:divide-gray-700 border-b border-gray-200 dark:border-gray-700">
+                    <div className="px-5 py-4">
+                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                            <User2 className="h-3.5 w-3.5" />Bill To
+                        </p>
+                        <div className="space-y-0.5">
+                            <p className="font-bold text-gray-900 dark:text-white">{invoice.customer.name}</p>
+                            {invoice.customer.email && <p className="text-sm text-gray-600 dark:text-gray-400">{invoice.customer.email}</p>}
+                            {invoice.customer.phone && <p className="text-sm text-gray-600 dark:text-gray-400">{invoice.customer.phone}</p>}
+                            {invoice.customer.address && <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{invoice.customer.address}</p>}
+                            {invoice.customer.gstin && (
+                                <p className="text-xs text-gray-500 font-mono mt-1 bg-gray-100 dark:bg-gray-800 rounded px-2 py-0.5 inline-block">
+                                    GSTIN: {invoice.customer.gstin}
+                                </p>
                             )}
                         </div>
                     </div>
-                </CardHeader>
-
-                <CardContent className="p-6 space-y-6">
-                    <div className="grid md:grid-cols-2 gap-6">
-                        <div>
-                            <h3 className="font-semibold mb-2">Bill To:</h3>
-                            <div className="text-sm space-y-1">
-                                <p className="font-medium">{invoice.customer.name}</p>
-                                {invoice.customer.email && <p>{invoice.customer.email}</p>}
-                                {invoice.customer.phone && <p>{invoice.customer.phone}</p>}
-                                {invoice.customer.address && <p className="text-muted-foreground">{invoice.customer.address}</p>}
-                                {invoice.customer.gstin && (
-                                    <p className="text-muted-foreground">GSTIN: {invoice.customer.gstin}</p>
+                    {invoiceSettings?.company_name && (
+                        <div className="px-5 py-4">
+                            <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                                <Building2 className="h-3.5 w-3.5" />From
+                            </p>
+                            <div className="space-y-0.5">
+                                <p className="font-bold text-gray-900 dark:text-white">{invoiceSettings.company_name}</p>
+                                {invoiceSettings.company_email && <p className="text-sm text-gray-600 dark:text-gray-400">{invoiceSettings.company_email}</p>}
+                                {invoiceSettings.company_phone && <p className="text-sm text-gray-600 dark:text-gray-400">{invoiceSettings.company_phone}</p>}
+                                {invoiceSettings.company_address && <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{invoiceSettings.company_address}</p>}
+                                {invoiceSettings.company_gstin && (
+                                    <p className="text-xs text-gray-500 font-mono mt-1 bg-gray-100 dark:bg-gray-800 rounded px-2 py-0.5 inline-block">
+                                        GSTIN: {invoiceSettings.company_gstin}
+                                    </p>
                                 )}
                             </div>
                         </div>
-                    </div>
-
-                    {invoice.invoice_items.length === 0 && (
-                        <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-300 dark:border-orange-700 rounded-lg p-4 flex items-start gap-3">
-                            <span className="text-orange-500 text-xl">⚠️</span>
-                            <div>
-                                <p className="font-semibold text-orange-800 dark:text-orange-300">No items found on this invoice</p>
-                                <p className="text-sm text-orange-700 dark:text-orange-400 mt-1">
-                                    Items may not have saved properly when this invoice was created.
-                                    Please <Link href={`/invoices/${id}/edit`} className="underline font-medium">edit the invoice</Link> and re-add the items.
-                                </p>
-                            </div>
-                        </div>
                     )}
+                </div>
 
-                    <div className="border rounded-lg overflow-hidden">
-                        <table className="w-full">
-                            <thead className="bg-linear-to-r from-blue-600 to-blue-700">
-                                <tr>
-                                    <th className="text-left p-3 font-semibold text-white">Description</th>
+                {/* Items Warning */}
+                {invoice.invoice_items.length === 0 && (
+                    <div className="mx-5 my-4 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-700 rounded-xl p-4 flex items-start gap-3">
+                        <span className="text-orange-500 text-xl mt-0.5">⚠️</span>
+                        <div>
+                            <p className="font-semibold text-orange-800 dark:text-orange-300">No items on this invoice</p>
+                            <p className="text-sm text-orange-700 dark:text-orange-400 mt-0.5">
+                                <Link href={`/invoices/${id}/edit`} className="underline font-medium">Edit the invoice</Link> to re-add items.
+                            </p>
+                        </div>
+                    </div>
+                )}
+
+                {/* Items Table */}
+                {invoice.invoice_items.length > 0 && (
+                <div className="px-5 py-4">
+                    <div className="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
+                        <table className="w-full text-sm">
+                            <thead>
+                                <tr className="bg-gray-50 dark:bg-gray-800 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                                    <th className="text-left px-4 py-3">Item</th>
                                     {invoice.invoice_items.some(item => item.hsn_sac_code) && (
-                                        <th className="text-left p-3 font-semibold text-white">HSN/SAC</th>
+                                        <th className="text-left px-3 py-3">HSN/SAC</th>
                                     )}
-                                    <th className="text-right p-3 font-semibold text-white">Qty</th>
-                                    <th className="text-right p-3 font-semibold text-white">Price</th>
-                                    <th className="text-right p-3 font-semibold text-white">Amount</th>
+                                    <th className="text-right px-3 py-3">Qty</th>
+                                    <th className="text-right px-3 py-3">Rate</th>
                                     {invoice.invoice_items.some(item => item.gst_rate) && (
-                                        <th className="text-right p-3 font-semibold text-white">GST</th>
+                                        <th className="text-right px-3 py-3">GST</th>
                                     )}
+                                    <th className="text-right px-4 py-3">Amount</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                {invoice.invoice_items.map((item) => (
-                                    <tr key={item.id} className="border-t">
-                                        <td className="p-3">
-                                            <div>{item.description}</div>
+                            <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                                {invoice.invoice_items.map((item, idx) => (
+                                    <tr key={item.id} className={idx % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50/50 dark:bg-gray-800/30'}>
+                                        <td className="px-4 py-3">
+                                            <div className="font-medium text-gray-900 dark:text-white">{item.description}</div>
                                             {item.item_details && (
-                                                <div className="text-sm text-muted-foreground mt-1 whitespace-pre-line">{item.item_details}</div>
+                                                <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 whitespace-pre-line">{item.item_details}</div>
                                             )}
                                         </td>
                                         {invoice.invoice_items.some(i => i.hsn_sac_code) && (
-                                            <td className="p-3 text-sm text-muted-foreground">{item.hsn_sac_code || '-'}</td>
+                                            <td className="px-3 py-3 text-gray-500 font-mono text-xs">{item.hsn_sac_code || '—'}</td>
                                         )}
-                                        <td className="text-right p-3">{item.quantity}</td>
-                                        <td className="text-right p-3">₹{item.unit_price.toFixed(2)}</td>
-                                        <td className="text-right p-3">₹{item.amount.toFixed(2)}</td>
+                                        <td className="text-right px-3 py-3 text-gray-700 dark:text-gray-300">{item.quantity}</td>
+                                        <td className="text-right px-3 py-3 text-gray-700 dark:text-gray-300">₹{item.unit_price.toFixed(2)}</td>
                                         {invoice.invoice_items.some(i => i.gst_rate) && (
-                                            <td className="text-right p-3 text-sm">
+                                            <td className="text-right px-3 py-3 text-gray-500 text-xs">
                                                 {item.gst_rate ? `${item.gst_rate}%` : `${invoice.gst_percentage}%`}
                                             </td>
                                         )}
+                                        <td className="text-right px-4 py-3 font-semibold text-gray-900 dark:text-white">₹{item.amount.toFixed(2)}</td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
                     </div>
+                </div>
+                )}
 
+                {/* Totals */}
+                <div className="px-5 pb-5">
                     <div className="flex justify-end">
-                        <div className="w-80 space-y-2">
-                            <div className="flex justify-between text-sm">
-                                <span>Subtotal:</span>
-                                <span className="font-medium">₹{invoice.subtotal.toFixed(2)}</span>
-                            </div>
-                            {invoice.gst_percentage > 0 && (
-                                <>
-                                    {invoice.supply_type === 'intra-state' ? (
+                        <div className="w-72 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                            <div className="px-4 py-3 space-y-2">
+                                <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                                    <span>Subtotal</span>
+                                    <span className="font-medium text-gray-900 dark:text-white">₹{invoice.subtotal.toFixed(2)}</span>
+                                </div>
+                                {invoice.discount_amount && invoice.discount_amount > 0 ? (
+                                    <div className="flex justify-between text-sm text-orange-600 dark:text-orange-400">
+                                        <span>Discount ({invoice.discount_type === 'percentage' ? `${invoice.discount_value}%` : 'Flat'})</span>
+                                        <span className="font-semibold">-₹{invoice.discount_amount.toFixed(2)}</span>
+                                    </div>
+                                ) : null}
+                                {invoice.gst_percentage > 0 && (
+                                    invoice.supply_type === 'intra-state' ? (
                                         <>
-                                            <div className="flex justify-between text-sm">
-                                                <span>CGST ({(invoice.gst_percentage / 2).toFixed(2)}%):</span>
-                                                <span className="font-medium">₹{(invoice.cgst_amount || 0).toFixed(2)}</span>
+                                            <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                                                <span>CGST ({(invoice.gst_percentage / 2).toFixed(2)}%)</span>
+                                                <span className="font-medium text-gray-900 dark:text-white">₹{(invoice.cgst_amount || 0).toFixed(2)}</span>
                                             </div>
-                                            <div className="flex justify-between text-sm">
-                                                <span>SGST ({(invoice.gst_percentage / 2).toFixed(2)}%):</span>
-                                                <span className="font-medium">₹{(invoice.sgst_amount || 0).toFixed(2)}</span>
+                                            <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                                                <span>SGST ({(invoice.gst_percentage / 2).toFixed(2)}%)</span>
+                                                <span className="font-medium text-gray-900 dark:text-white">₹{(invoice.sgst_amount || 0).toFixed(2)}</span>
                                             </div>
                                         </>
                                     ) : (
-                                        <div className="flex justify-between text-sm">
-                                            <span>IGST ({invoice.gst_percentage}%):</span>
-                                            <span className="font-medium">₹{(invoice.igst_amount || 0).toFixed(2)}</span>
+                                        <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                                            <span>IGST ({invoice.gst_percentage}%)</span>
+                                            <span className="font-medium text-gray-900 dark:text-white">₹{(invoice.igst_amount || 0).toFixed(2)}</span>
                                         </div>
-                                    )}
-                                </>
-                            )}
-                            {invoice.reverse_charge_applicable && (
-                                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded p-2 text-xs text-red-600 dark:text-red-400 font-medium">
-                                    ⚠️ Reverse Charge Applicable
-                                </div>
-                            )}
-                            <div className="flex justify-between text-lg font-bold border-t pt-2">
-                                <span>Total:</span>
-                                <span>₹{invoice.total.toFixed(2)}</span>
+                                    )
+                                )}
+                                {invoice.reverse_charge_applicable && (
+                                    <div className="text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 rounded-lg px-3 py-1.5 font-medium">
+                                        ⚠️ Reverse Charge Applicable
+                                    </div>
+                                )}
+                            </div>
+                            <div className="bg-blue-600 dark:bg-blue-700 px-4 py-3 flex justify-between items-center">
+                                <span className="text-white font-bold">Total</span>
+                                <span className="text-white text-xl font-bold">₹{invoice.total.toFixed(2)}</span>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    {invoice.notes && (
-                        <div className="border-t pt-4">
-                            <h3 className="font-semibold mb-2">Notes:</h3>
-                            <p className="text-sm text-muted-foreground whitespace-pre-wrap">{invoice.notes}</p>
+                {/* Notes */}
+                {invoice.notes && (
+                    <div className="border-t border-gray-200 dark:border-gray-700 px-5 py-4">
+                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1.5">Notes</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">{invoice.notes}</p>
+                    </div>
+                )}
+
+                {/* Bank Details */}
+                {invoiceSettings?.payment_instructions && (
+                    <div className="border-t border-gray-200 dark:border-gray-700 px-5 py-4 bg-blue-50/40 dark:bg-blue-900/10">
+                        <p className="text-xs font-semibold text-blue-700 dark:text-blue-400 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
+                            🏦 Bank / Payment Details
+                        </p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">{invoiceSettings.payment_instructions}</p>
+                    </div>
+                )}
+
+                {/* Signature & Stamp */}
+                {((invoiceSettings?.show_signature && invoiceSettings?.digital_signature_url?.startsWith('data:image')) ||
+                  (invoiceSettings?.show_stamp && invoiceSettings?.company_stamp_url?.startsWith('data:image'))) && (
+                    <div className="border-t border-gray-200 dark:border-gray-700 px-5 py-5">
+                        <div className="flex justify-end gap-8 items-end">
+                            {invoiceSettings?.show_stamp && invoiceSettings?.company_stamp_url?.startsWith('data:image') && (
+                                <div className="flex flex-col items-center gap-1.5">
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img src={invoiceSettings.company_stamp_url} alt="Company Stamp"
+                                        className="h-20 w-20 object-contain rounded-full border-2 border-blue-200 dark:border-blue-700 shadow-sm" />
+                                    <span className="text-xs text-gray-500 font-medium">Company Seal</span>
+                                </div>
+                            )}
+                            {invoiceSettings?.show_signature && invoiceSettings?.digital_signature_url?.startsWith('data:image') && (
+                                <div className="flex flex-col items-center gap-1 border-t-2 border-gray-300 dark:border-gray-600 pt-2 min-w-35">
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img src={invoiceSettings.digital_signature_url} alt="Signature"
+                                        className="h-12 w-36 object-contain" />
+                                    {invoiceSettings.company_name && (
+                                        <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">{invoiceSettings.company_name}</span>
+                                    )}
+                                    <span className="text-xs text-gray-500">Authorized Signatory</span>
+                                </div>
+                            )}
                         </div>
-                    )}
+                    </div>
+                )}
 
-                    {/* Payment Status */}
-                    <div className="border-t pt-6">
-                        {isPaid ? (
-                            <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
-                                        <svg className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    </div>
-                                    <div className="flex-1">
-                                        <p className="font-semibold text-green-800 dark:text-green-300">Payment Received</p>
-                                        <p className="text-sm text-green-600">
-                                            {hasPartialPayment && `Received in ${invoice.amount_paid && invoice.total ? Math.ceil(amountPaid / (invoice.total / 10)) : 'multiple'} payment(s) - `}
-                                            {invoice.payment_method && `Via ${invoice.payment_method.replace('_', ' ')}`}
-                                            {invoice.paid_at && ` on ${formatDate(invoice.paid_at)}`}
-                                        </p>
-                                        {invoice.payment_notes && (
-                                            <p className="text-xs text-green-600 mt-1">
-                                                {invoice.payment_notes}
-                                            </p>
-                                        )}
-                                    </div>
+                {/* Payment Status */}
+                <div className="border-t border-gray-200 dark:border-gray-700 px-5 py-5">
+                    {isPaid ? (
+                        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-xl p-4">
+                            <div className="flex items-center gap-3">
+                                <div className="h-10 w-10 rounded-full bg-green-100 dark:bg-green-900/50 flex items-center justify-center">
+                                    <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />
+                                </div>
+                                <div className="flex-1">
+                                    <p className="font-bold text-green-800 dark:text-green-300">Payment Received ✓</p>
+                                    <p className="text-sm text-green-600 dark:text-green-400">
+                                        {invoice.payment_method && `Via ${invoice.payment_method.replace('_', ' ')}`}
+                                        {invoice.paid_at && ` · ${formatDate(invoice.paid_at)}`}
+                                    </p>
+                                    {invoice.payment_notes && (
+                                        <p className="text-xs text-green-600 dark:text-green-400 mt-0.5">{invoice.payment_notes}</p>
+                                    )}
                                 </div>
                             </div>
-                        ) : hasPartialPayment ? (
-                            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                                <div className="flex items-center justify-between mb-3">
+                        </div>
+                    ) : hasPartialPayment ? (
+                        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-xl p-4 space-y-4">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="font-bold text-blue-800 dark:text-blue-300">Partial Payment Received</p>
+                                    <p className="text-sm text-blue-600 dark:text-blue-400">{((amountPaid / invoice.total) * 100).toFixed(1)}% paid</p>
+                                </div>
+                            </div>
+                            <div className="space-y-1.5 text-sm">
+                                <div className="flex justify-between text-gray-600 dark:text-gray-400">
+                                    <span>Total</span><span className="font-semibold text-gray-900 dark:text-white">₹{invoice.total.toFixed(2)}</span>
+                                </div>
+                                <div className="flex justify-between text-green-600 dark:text-green-400">
+                                    <span>Paid</span><span className="font-semibold">₹{amountPaid.toFixed(2)}</span>
+                                </div>
+                                <div className="flex justify-between text-blue-700 dark:text-blue-300 font-bold border-t border-blue-200 dark:border-blue-700 pt-1.5">
+                                    <span>Remaining</span><span>₹{amountRemaining.toFixed(2)}</span>
+                                </div>
+                            </div>
+                            <div className="w-full bg-blue-200 dark:bg-blue-900 rounded-full h-2">
+                                <div className="bg-blue-600 h-2 rounded-full" style={{ width: `${Math.min((amountPaid / invoice.total) * 100, 100)}%` }} />
+                            </div>
+                            <div className="flex gap-2">
+                                <PartialPaymentButton invoiceId={invoice.id} invoiceNumber={invoice.invoice_number}
+                                    totalAmount={invoice.total} amountPaid={amountPaid} amountRemaining={amountRemaining} />
+                                <MarkAsPaidButton invoiceId={invoice.id} invoiceNumber={invoice.invoice_number} />
+                            </div>
+                        </div>
+                    ) : invoice.status === 'cancelled' ? (
+                        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-xl p-4 flex items-center gap-3">
+                            <XCircle className="h-6 w-6 text-red-500" />
+                            <p className="font-semibold text-red-800 dark:text-red-300">This invoice has been cancelled</p>
+                        </div>
+                    ) : (
+                        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-xl p-4">
+                            <div className="flex items-center justify-between gap-3">
+                                <div className="flex items-center gap-3">
+                                    <Clock className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
                                     <div>
-                                        <p className="font-semibold text-blue-800 dark:text-blue-300">Partial Payment Received</p>
-                                        <p className="text-sm text-blue-600">
-                                            {((amountPaid / invoice.total) * 100).toFixed(1)}% paid
-                                        </p>
+                                        <p className="font-bold text-yellow-800 dark:text-yellow-300">Payment Pending</p>
+                                        <p className="text-sm text-yellow-600 dark:text-yellow-400">₹{invoice.total.toFixed(2)} due</p>
                                     </div>
-                                </div>
-                                <div className="space-y-2 mb-4">
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-gray-600">Total Amount:</span>
-                                        <span className="font-semibold">₹{invoice.total.toFixed(2)}</span>
-                                    </div>
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-gray-600">Amount Paid:</span>
-                                        <span className="font-semibold text-green-600">₹{amountPaid.toFixed(2)}</span>
-                                    </div>
-                                    <div className="flex justify-between text-sm pt-2 border-t border-blue-200 dark:border-blue-800">
-                                        <span className="text-gray-600 font-medium">Amount Remaining:</span>
-                                        <span className="font-bold text-blue-600">₹{amountRemaining.toFixed(2)}</span>
-                                    </div>
-                                </div>
-                                <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
-                                    <div 
-                                        className="bg-blue-600 h-2 rounded-full transition-all"
-                                        style={{ width: `${(amountPaid / invoice.total) * 100}%` }}
-                                    ></div>
                                 </div>
                                 <div className="flex gap-2">
-                                    <PartialPaymentButton 
-                                        invoiceId={invoice.id} 
-                                        invoiceNumber={invoice.invoice_number}
-                                        totalAmount={invoice.total}
-                                        amountPaid={amountPaid}
-                                        amountRemaining={amountRemaining}
-                                    />
+                                    <PartialPaymentButton invoiceId={invoice.id} invoiceNumber={invoice.invoice_number}
+                                        totalAmount={invoice.total} amountPaid={amountPaid} amountRemaining={amountRemaining} />
                                     <MarkAsPaidButton invoiceId={invoice.id} invoiceNumber={invoice.invoice_number} />
                                 </div>
                             </div>
-                        ) : invoice.status === 'cancelled' ? (
-                            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-                                <p className="font-semibold text-red-800 dark:text-red-300">This invoice has been cancelled</p>
-                            </div>
-                        ) : (
-                            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="font-semibold text-yellow-800 dark:text-yellow-300">Payment Pending</p>
-                                        <p className="text-sm text-yellow-600 dark:text-yellow-400">Customer can pay via cash or QR code</p>
-                                    </div>
-                                    <div className="flex gap-2">
-                                        <PartialPaymentButton 
-                                            invoiceId={invoice.id} 
-                                            invoiceNumber={invoice.invoice_number}
-                                            totalAmount={invoice.total}
-                                            amountPaid={amountPaid}
-                                            amountRemaining={amountRemaining}
-                                        />
-                                        <MarkAsPaidButton invoiceId={invoice.id} invoiceNumber={invoice.invoice_number} />
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </CardContent>
-            </Card>
+                        </div>
+                    )}
+                </div>
+            </div>
 
             {/* Payment History */}
             {(hasPartialPayment || isPaid) && (

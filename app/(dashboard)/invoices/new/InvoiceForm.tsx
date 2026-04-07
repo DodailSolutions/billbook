@@ -54,6 +54,10 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
     const [savedItems, setSavedItems] = useState<Array<InvoiceItem & { id: string; name: string }>>([])
     const [itemName, setItemName] = useState('')
     
+    // Discount
+    const [discountType, setDiscountType] = useState<'percentage' | 'flat'>(invoice?.discount_type || 'percentage')
+    const [discountValue, setDiscountValue] = useState(invoice?.discount_value || 0)
+
     // Recurring invoice settings
     const [isRecurring, setIsRecurring] = useState(false)
     const [recurringFrequency, setRecurringFrequency] = useState<'monthly' | 'yearly'>('monthly')
@@ -164,12 +168,24 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
         return items.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0)
     }
 
+    const calculateDiscount = () => {
+        const sub = calculateSubtotal()
+        if (!discountValue || discountValue <= 0) return 0
+        return discountType === 'percentage'
+            ? (sub * Math.min(discountValue, 100)) / 100
+            : Math.min(discountValue, sub)
+    }
+
+    const calculateDiscountedSubtotal = () => {
+        return calculateSubtotal() - calculateDiscount()
+    }
+
     const calculateGST = () => {
-        return (calculateSubtotal() * gstPercentage) / 100
+        return (calculateDiscountedSubtotal() * gstPercentage) / 100
     }
 
     const calculateTotal = () => {
-        return calculateSubtotal() + calculateGST()
+        return calculateDiscountedSubtotal() + calculateGST()
     }
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -187,6 +203,8 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                 supply_type: supplyType,
                 reverse_charge_applicable: reverseCharge,
                 notes: formData.get('notes') as string || undefined,
+                discount_type: discountValue > 0 ? discountType : undefined,
+                discount_value: discountValue > 0 ? discountValue : undefined,
                 items: items.filter(item => item.description && item.quantity > 0 && item.unit_price > 0).map(item => ({ ...item, details: item.details || undefined })),
                 // Recurring invoice data
                 is_recurring: isRecurring,
@@ -222,43 +240,54 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
     }
 
     return (
-        <>{/* Header with Simplified View Toggle */}
-            <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
+        <>{/* Header */}
+            <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
                 <div className="flex items-center gap-3">
-                    <FileText className="w-6 h-6 text-gray-700 dark:text-gray-300" />
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                        {mode === 'edit' ? 'Edit Invoice' : 'New Invoice'}
-                    </h2>
+                    <div className="h-10 w-10 rounded-xl bg-linear-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-sm">
+                        <FileText className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                        <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                            {mode === 'edit' ? 'Edit Invoice' : 'New Invoice'}
+                        </h2>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                            {mode === 'edit' ? 'Update invoice details below' : 'Fill in the details to create a new invoice'}
+                        </p>
+                    </div>
                 </div>
-                <div className="flex items-center gap-3">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Use Simplified View
-                    </span>
+                <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-full px-3 py-1.5">
+                    <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Simplified</span>
                     <button
                         type="button"
                         onClick={() => setSimplifiedView(!simplifiedView)}
-                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                        className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
                             simplifiedView ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
                         }`}
                     >
-                        <span
-                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                                simplifiedView ? 'translate-x-6' : 'translate-x-1'
-                            }`}
-                        />
+                        <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform shadow ${
+                            simplifiedView ? 'translate-x-5' : 'translate-x-1'
+                        }`} />
                     </button>
                 </div>
             </div>
 
-            
             <div className="grid lg:grid-cols-3 gap-6">
-                {/* Form Section - Takes 2 columns */}
-                <div className="lg:col-span-2">
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                        <label htmlFor="customer_id" className="text-sm font-medium">
-                            Customer <span className="text-destructive">*</span>
+                {/* Form Section */}
+                <div className="lg:col-span-2 space-y-5">
+                    <form onSubmit={handleSubmit} className="space-y-5">
+
+                {/* Section: Customer & Dates */}
+                <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm overflow-hidden">
+                    <div className="bg-linear-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                            <span className="h-5 w-5 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xs font-bold">1</span>
+                            Customer &amp; Invoice Details
+                        </h3>
+                    </div>
+                    <div className="p-4 grid gap-4 md:grid-cols-2">
+                    <div className="space-y-1.5">
+                        <label htmlFor="customer_id" className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">
+                            Customer <span className="text-red-500">*</span>
                         </label>
                         <div className="flex gap-2">
                             <select
@@ -267,132 +296,92 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                                 required
                                 value={selectedCustomerId}
                                 onChange={(e) => setSelectedCustomerId(e.target.value)}
-                                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                                className="flex h-9 w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                             >
-                                <option value="">Select a customer</option>
+                                <option value="">Select a customer…</option>
                                 {customers.map((customer) => (
-                                    <option key={customer.id} value={customer.id}>
-                                        {customer.name}
-                                    </option>
+                                    <option key={customer.id} value={customer.id}>{customer.name}</option>
                                 ))}
                             </select>
-                            <Button
-                                type="button"
-                                onClick={() => setShowAddCustomerModal(true)}
-                                variant="outline"
-                                size="sm"
-                                className="gap-2 whitespace-nowrap"
-                            >
-                                <Plus className="h-4 w-4" />
-                                Add
+                            <Button type="button" onClick={() => setShowAddCustomerModal(true)} variant="outline" size="sm" className="gap-1.5 whitespace-nowrap rounded-lg border-dashed border-blue-300 text-blue-600 hover:bg-blue-50">
+                                <Plus className="h-3.5 w-3.5" />Add
                             </Button>
                         </div>
                     </div>
 
-                <div className="space-y-2">
-                    <label htmlFor="invoice_date" className="text-sm font-medium">
-                        Invoice Date <span className="text-destructive">*</span>
-                    </label>
-                    <Input
-                        id="invoice_date"
-                        name="invoice_date"
-                        type="date"
-                        value={invoiceDate}
-                        onChange={(e) => setInvoiceDate(e.target.value)}
-                        required
-                    />
-                </div>
+                    <div className="space-y-1.5">
+                        <label htmlFor="invoice_date" className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">
+                            Invoice Date <span className="text-red-500">*</span>
+                        </label>
+                        <Input id="invoice_date" name="invoice_date" type="date" value={invoiceDate}
+                            onChange={(e) => setInvoiceDate(e.target.value)} required
+                            className="rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500" />
+                    </div>
 
-                <div className="space-y-2">
-                    <label htmlFor="due_date" className="text-sm font-medium">
-                        Due Date
-                    </label>
-                    <Input
-                        id="due_date"
-                        name="due_date"
-                        type="date"
-                        value={dueDate}
-                        onChange={(e) => setDueDate(e.target.value)}
-                    />
-                </div>
+                    <div className="space-y-1.5">
+                        <label htmlFor="due_date" className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Due Date</label>
+                        <Input id="due_date" name="due_date" type="date" value={dueDate}
+                            onChange={(e) => setDueDate(e.target.value)}
+                            className="rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500" />
+                    </div>
 
-                <div className="space-y-2">
-                    <label htmlFor="gst_percentage" className="text-sm font-medium">
-                        GST Percentage
-                    </label>
-                    <Input
-                        id="gst_percentage"
-                        type="number"
-                        min="0"
-                        max="100"
-                        step="0.01"
-                        value={gstPercentage}
-                        onChange={(e) => setGstPercentage(parseFloat(e.target.value) || 0)}
-                    />
-                </div>
-
-                <div className="space-y-2">
-                    <label htmlFor="supply_type" className="text-sm font-medium">
-                        Supply Type
-                    </label>
-                    <select
-                        id="supply_type"
-                        value={supplyType}
-                        onChange={(e) => setSupplyType(e.target.value as 'intra-state' | 'inter-state')}
-                        className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                    >
-                        <option value="intra-state">Intra-State (CGST + SGST)</option>
-                        <option value="inter-state">Inter-State (IGST)</option>
-                    </select>
-                    <p className="text-xs text-gray-600">
-                        {supplyType === 'intra-state' ? 'GST split into CGST and SGST (50% each)' : 'Full GST amount as IGST'}
-                    </p>
-                </div>
-
-                <div className="space-y-2 flex items-center gap-2">
-                    <input
-                        id="reverse_charge"
-                        type="checkbox"
-                        checked={reverseCharge}
-                        onChange={(e) => setReverseCharge(e.target.checked)}
-                        className="w-4 h-4 rounded border-gray-300"
-                    />
-                    <label htmlFor="reverse_charge" className="text-sm font-medium flex items-center gap-1">
-                        Reverse Charge Applicable
-                        <div title="Check if RCM applies (unregistered supplier, specific services, etc.)">
-                            <Info className="h-4 w-4 text-gray-500" />
+                    <div className="space-y-1.5">
+                        <label htmlFor="gst_percentage" className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">GST %</label>
+                        <div className="relative flex items-center">
+                            <Input id="gst_percentage" type="number" min="0" max="100" step="0.01"
+                                value={gstPercentage} onChange={(e) => setGstPercentage(parseFloat(e.target.value) || 0)}
+                                className="rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 pr-8" />
+                            <span className="absolute right-3 text-gray-400 text-sm font-bold">%</span>
                         </div>
-                    </label>
-                </div>
-            </div>
+                    </div>
 
-            <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold">Items</h3>
-                    <Button type="button" onClick={addItem} variant="outline" size="sm" className="gap-2">
-                        <Plus className="h-4 w-4" />
-                        Add Item
-                    </Button>
+                    <div className="space-y-1.5">
+                        <label htmlFor="supply_type" className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Supply Type</label>
+                        <select id="supply_type" value={supplyType}
+                            onChange={(e) => setSupplyType(e.target.value as 'intra-state' | 'inter-state')}
+                            className="flex h-9 w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="intra-state">🏠 Intra-State (CGST + SGST)</option>
+                            <option value="inter-state">🌏 Inter-State (IGST)</option>
+                        </select>
+                    </div>
+
+                    <div className="flex items-center gap-3 pt-1">
+                        <input id="reverse_charge" type="checkbox" checked={reverseCharge}
+                            onChange={(e) => setReverseCharge(e.target.checked)}
+                            className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                        <label htmlFor="reverse_charge" className="text-sm text-gray-700 dark:text-gray-300 flex items-center gap-1 cursor-pointer">
+                            Reverse Charge (RCM)
+                            <span title="Check if RCM applies (unregistered supplier, specific services, etc.)">
+                                <Info className="h-3.5 w-3.5 text-gray-400" />
+                            </span>
+                        </label>
+                    </div>
+                    </div>
                 </div>
+
+                {/* Section: Items */}
+                <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm overflow-hidden">
+                    <div className="bg-linear-to-r from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                            <span className="h-5 w-5 rounded-full bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400 flex items-center justify-center text-xs font-bold">2</span>
+                            Items
+                        </h3>
+                        <Button type="button" onClick={addItem} size="sm" className="gap-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg h-8 text-xs px-3">
+                            <Plus className="h-3.5 w-3.5" /> Add Item
+                        </Button>
+                    </div>
+                    <div className="p-4 space-y-3">
 
                 {savedItems.length > 0 && (
                     <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
-                        <p className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">Saved Items</p>
+                        <p className="text-xs font-semibold text-blue-700 dark:text-blue-300 mb-2">📦 Saved Items — click to add</p>
                         <div className="flex flex-wrap gap-2">
                             {savedItems.map((savedItem) => (
-                                <div key={savedItem.id} className="flex items-center gap-2 bg-white px-3 py-1 rounded border border-blue-200 dark:border-blue-700 text-sm">
-                                    <button
-                                        type="button"
-                                        onClick={() => addSavedItem(savedItem)}
-                                        className="text-blue-600 hover:underline font-medium"
-                                    >
+                                <div key={savedItem.id} className="flex items-center gap-1.5 bg-white dark:bg-blue-900/30 px-2.5 py-1 rounded-full border border-blue-200 dark:border-blue-700 text-xs">
+                                    <button type="button" onClick={() => addSavedItem(savedItem)} className="text-blue-600 hover:text-blue-800 font-medium">
                                         + {savedItem.name}
                                     </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => deleteSavedItem(savedItem.id)}
-                                        className="text-red-500 hover:text-red-700"
-                                    >
+                                    <button type="button" onClick={() => deleteSavedItem(savedItem.id)} className="text-red-400 hover:text-red-600">
                                         <X className="h-3 w-3" />
                                     </button>
                                 </div>
@@ -401,254 +390,223 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                     </div>
                 )}
 
-                <div className="space-y-3">
-                    {items.map((item, index) => (
-                        <div key={index} className="border rounded-lg p-3 space-y-3">
-                            <div className="space-y-2">
-                                <label className="text-xs text-gray-600">Item Name *</label>
-                                <Input
-                                    placeholder="Item name"
+                {items.map((item, index) => (
+                    <div key={index} className="border border-gray-200 dark:border-gray-700 rounded-xl p-3 space-y-3 bg-gray-50 dark:bg-gray-800/50 hover:border-blue-200 dark:hover:border-blue-800 transition-colors">
+                        <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1 space-y-1.5">
+                                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Item Name *</label>
+                                <Input placeholder="e.g. Website Development, Product name…"
                                     value={item.description}
                                     onChange={(e) => updateItem(index, 'description', e.target.value)}
-                                    required
-                                />
+                                    required className="rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 font-medium" />
                             </div>
+                            <button type="button" onClick={() => removeItem(index)} disabled={items.length === 1}
+                                className="mt-6 p-1.5 rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
+                                <Trash2 className="h-4 w-4" />
+                            </button>
+                        </div>
 
-                            <div className="space-y-2">
-                                <label className="text-xs text-gray-600">Description <span className="text-gray-400">(optional)</span></label>
-                                <textarea
-                                    placeholder="Additional details, points or notes about this item..."
-                                    value={item.details || ''}
-                                    onChange={(e) => updateItem(index, 'details', e.target.value)}
-                                    rows={2}
-                                    className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
-                                />
+                        <div className="space-y-1.5">
+                            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Description <span className="font-normal normal-case text-gray-400">(optional)</span></label>
+                            <textarea placeholder="Additional details, notes about this item…"
+                                value={item.details || ''}
+                                onChange={(e) => updateItem(index, 'details', e.target.value)}
+                                rows={2}
+                                className="flex w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm shadow-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none" />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Qty *</label>
+                                <Input type="number" placeholder="1" min="0" step="0.01"
+                                    value={item.quantity} onChange={(e) => updateItem(index, 'quantity', parseFloat(e.target.value) || 0)}
+                                    required className="rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500" />
                             </div>
-
-                            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-                                <div className="space-y-2">
-                                    <label className="text-xs text-gray-600">Qty *</label>
-                                    <Input
-                                        type="number"
-                                        placeholder="Qty"
-                                        min="0"
-                                        step="0.01"
-                                        value={item.quantity}
-                                        onChange={(e) => updateItem(index, 'quantity', parseFloat(e.target.value) || 0)}
-                                        required
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs text-gray-600">Price *</label>
-                                    <Input
-                                        type="number"
-                                        placeholder="Price"
-                                        min="0"
-                                        step="0.01"
-                                        value={item.unit_price}
-                                        onChange={(e) => updateItem(index, 'unit_price', parseFloat(e.target.value) || 0)}
-                                        required
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs text-gray-600">HSN/SAC</label>
-                                    <Input
-                                        placeholder="HSN/SAC Code"
-                                        maxLength={6}
-                                        value={item.hsn_sac_code || ''}
-                                        onChange={(e) => updateItem(index, 'hsn_sac_code', e.target.value)}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs text-gray-600">Type</label>
-                                    <select
-                                        value={item.hsn_sac_type || 'SAC'}
-                                        onChange={(e) => updateItem(index, 'hsn_sac_type', e.target.value as 'HSN' | 'SAC')}
-                                        className="flex h-9 w-full rounded-md border border-input bg-transparent px-2 py-1 text-xs shadow-sm"
-                                    >
-                                        <option value="SAC">SAC (Service)</option>
-                                        <option value="HSN">HSN (Goods)</option>
-                                    </select>
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Price *</label>
+                                <div className="relative flex items-center">
+                                    <span className="absolute left-3 text-gray-400 text-sm">₹</span>
+                                    <Input type="number" placeholder="0" min="0" step="0.01"
+                                        value={item.unit_price} onChange={(e) => updateItem(index, 'unit_price', parseFloat(e.target.value) || 0)}
+                                        required className="rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 pl-7" />
                                 </div>
                             </div>
-
-                            <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-                                <div className="space-y-2">
-                                    <label className="text-xs text-gray-600">GST Rate (%)</label>
-                                    <Input
-                                        type="number"
-                                        placeholder="GST %"
-                                        min="0"
-                                        max="100"
-                                        step="0.01"
-                                        value={item.gst_rate !== undefined ? item.gst_rate : gstPercentage}
-                                        onChange={(e) => {
-                                            const value = e.target.value === '' ? gstPercentage : parseFloat(e.target.value)
-                                            updateItem(index, 'gst_rate', value)
-                                        }}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs text-gray-600">Item Total</label>
-                                    <div className="flex items-center h-9 rounded-md border border-input bg-muted px-3">
-                                        <span className="text-sm font-medium">₹{(item.quantity * item.unit_price).toFixed(2)}</span>
-                                    </div>
-                                </div>
-                                <div className="flex items-end gap-2">
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => saveCurrentItem(index)}
-                                        className="flex-1 h-9 text-xs"
-                                    >
-                                        Save for Later
-                                    </Button>
-                                    <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() => removeItem(index)}
-                                        disabled={items.length === 1}
-                                        className="text-destructive hover:text-destructive h-9"
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                </div>
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">HSN/SAC</label>
+                                <Input placeholder="Code" maxLength={6}
+                                    value={item.hsn_sac_code || ''}
+                                    onChange={(e) => updateItem(index, 'hsn_sac_code', e.target.value)}
+                                    className="rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500" />
+                            </div>
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">GST %</label>
+                                <Input type="number" placeholder="%" min="0" max="100" step="0.01"
+                                    value={item.gst_rate !== undefined ? item.gst_rate : gstPercentage}
+                                    onChange={(e) => updateItem(index, 'gst_rate', e.target.value === '' ? gstPercentage : parseFloat(e.target.value))}
+                                    className="rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500" />
                             </div>
                         </div>
-                    ))}
-                </div>
-            </div>
 
-            <div className="border-t pt-4">
-                <div className="space-y-2 max-w-xs ml-auto">
-                    <div className="flex justify-between text-sm">
-                        <span>Subtotal:</span>
-                        <span className="font-medium">₹{calculateSubtotal().toFixed(2)}</span>
+                        <div className="flex items-center justify-between pt-1 border-t border-gray-200 dark:border-gray-700">
+                            <div className="flex items-center gap-2">
+                                <select value={item.hsn_sac_type || 'SAC'}
+                                    onChange={(e) => updateItem(index, 'hsn_sac_type', e.target.value as 'HSN' | 'SAC')}
+                                    className="h-7 rounded-md border border-gray-200 dark:border-gray-700 bg-transparent px-2 text-xs text-gray-500">
+                                    <option value="SAC">SAC (Service)</option>
+                                    <option value="HSN">HSN (Goods)</option>
+                                </select>
+                                <Button type="button" variant="outline" size="sm" onClick={() => saveCurrentItem(index)}
+                                    className="h-7 text-xs rounded-md border-dashed gap-1 text-gray-500 hover:text-gray-700">
+                                    💾 Save
+                                </Button>
+                            </div>
+                            <div className="font-semibold text-sm px-3 py-1.5 rounded-lg border"
+                                style={{ background: '#eff6ff', color: '#1d4ed8', borderColor: '#bfdbfe' }}>
+                                ₹{(item.quantity * item.unit_price).toFixed(2)}
+                            </div>
+                        </div>
                     </div>
-                    <div className="flex justify-between text-sm">
-                        <span>GST ({gstPercentage}%):</span>
-                        <span className="font-medium">₹{calculateGST().toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between text-lg font-bold border-t pt-2">
-                        <span>Total:</span>
-                        <span>₹{calculateTotal().toFixed(2)}</span>
+                ))}
                     </div>
                 </div>
-            </div>
 
-            <div className="space-y-2">
-                <label htmlFor="notes" className="text-sm font-medium">
-                    Notes
-                </label>
-                <textarea
-                    id="notes"
-                    name="notes"
-                    rows={3}
-                    placeholder="Additional notes or terms..."
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                />
-            </div>
+                {/* Section: Discount & Totals */}
+                <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm overflow-hidden">
+                    <div className="bg-linear-to-r from-orange-50 to-amber-50 dark:from-orange-950/30 dark:to-amber-950/30 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                            <span className="h-5 w-5 rounded-full bg-orange-100 dark:bg-orange-900/50 text-orange-600 dark:text-orange-400 flex items-center justify-center text-xs font-bold">3</span>
+                            Discount &amp; Summary
+                        </h3>
+                    </div>
+                    <div className="p-4">
+                        {/* Discount Input */}
+                        <div className="mb-4">
+                            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 block">Discount <span className="font-normal normal-case text-gray-400">(optional)</span></label>
+                            <div className="flex gap-2">
+                                <select value={discountType} onChange={(e) => setDiscountType(e.target.value as 'percentage' | 'flat')}
+                                    className="h-9 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-2 text-sm font-medium text-gray-700 dark:text-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-400 min-w-20">
+                                    <option value="percentage">% Off</option>
+                                    <option value="flat">₹ Flat</option>
+                                </select>
+                                <div className="relative flex-1">
+                                    <input type="number" min="0" step="0.01"
+                                        placeholder={discountType === 'percentage' ? 'e.g. 10' : 'e.g. 500'}
+                                        value={discountValue || ''}
+                                        onChange={(e) => setDiscountValue(parseFloat(e.target.value) || 0)}
+                                        className="flex h-9 w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400" />
+                                    {discountValue > 0 && (
+                                        <button type="button" onClick={() => setDiscountValue(0)}
+                                            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500">
+                                            <X className="h-3.5 w-3.5" />
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                            {discountValue > 0 && (
+                                <div className="mt-2 flex items-center gap-1.5 text-xs text-orange-600 dark:text-orange-400 font-medium">
+                                    <span className="inline-flex items-center gap-1 bg-orange-50 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-700 rounded-full px-2 py-0.5">
+                                        🏷️ Saving ₹{calculateDiscount().toFixed(2)} ({discountType === 'percentage' ? `${discountValue}%` : 'flat discount'})
+                                    </span>
+                                </div>
+                            )}
+                        </div>
 
-            {/* Recurring Invoice Section */}
-            <div className="border-t pt-6 space-y-4">
-                <div className="flex items-center gap-3">
-                    <input
-                        id="is_recurring"
-                        type="checkbox"
-                        checked={isRecurring}
-                        onChange={(e) => setIsRecurring(e.target.checked)}
-                        className="w-4 h-4 rounded border-gray-300"
-                    />
-                    <label htmlFor="is_recurring" className="text-sm font-medium flex items-center gap-2">
-                        🔄 Make this a Recurring Invoice
-                        <span className="text-xs text-gray-500 font-normal">(Auto-generate invoices on schedule)</span>
-                    </label>
+                        {/* Summary */}
+                        <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 space-y-2.5 border border-gray-200 dark:border-gray-700">
+                            <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                                <span>Subtotal</span>
+                                <span className="font-medium text-gray-900 dark:text-white">₹{calculateSubtotal().toFixed(2)}</span>
+                            </div>
+                            {discountValue > 0 && (
+                                <div className="flex justify-between text-sm text-orange-600 dark:text-orange-400">
+                                    <span>Discount ({discountType === 'percentage' ? `${discountValue}%` : 'Flat'})</span>
+                                    <span className="font-semibold">-₹{calculateDiscount().toFixed(2)}</span>
+                                </div>
+                            )}
+                            <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                                <span>GST ({gstPercentage}%)</span>
+                                <span className="font-medium text-gray-900 dark:text-white">₹{calculateGST().toFixed(2)}</span>
+                            </div>
+                            <div className="flex justify-between items-center pt-2.5 border-t-2 border-blue-200 dark:border-blue-800 mt-1">
+                                <span className="text-base font-bold text-gray-900 dark:text-white">Total</span>
+                                <span className="text-xl font-bold text-blue-600 dark:text-blue-400">₹{calculateTotal().toFixed(2)}</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
+                {/* Section: Notes */}
+                <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm overflow-hidden">
+                    <div className="bg-linear-to-r from-gray-50 to-slate-50 dark:from-gray-900/50 dark:to-slate-900/50 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                            <span className="h-5 w-5 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 flex items-center justify-center text-xs font-bold">4</span>
+                            Notes
+                        </h3>
+                    </div>
+                    <div className="p-4">
+                        <textarea id="notes" name="notes" rows={3}
+                            placeholder="Additional notes, terms, or payment instructions for this specific invoice…"
+                            value={notes} onChange={(e) => setNotes(e.target.value)}
+                            className="flex w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm shadow-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none" />
+                    </div>
+                </div>
+
+                {/* Recurring Invoice Section */}
+                <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm overflow-hidden">
+                    <div className="px-4 py-3 flex items-center gap-3">
+                        <input id="is_recurring" type="checkbox" checked={isRecurring}
+                            onChange={(e) => setIsRecurring(e.target.checked)}
+                            className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                        <label htmlFor="is_recurring" className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2 cursor-pointer">
+                            🔄 Make this a Recurring Invoice
+                            <span className="text-xs text-gray-400 font-normal">(Auto-generate on schedule)</span>
+                        </label>
+                    </div>
 
                 {isRecurring && (
-                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 space-y-4">
+                    <div className="bg-blue-50 dark:bg-blue-900/20 border-t border-blue-200 dark:border-blue-700 p-4 space-y-4">
                         <div className="grid gap-4 md:grid-cols-2">
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                                    Billing Frequency *
-                                </label>
-                                <select
-                                    value={recurringFrequency}
-                                    onChange={(e) => setRecurringFrequency(e.target.value as 'monthly' | 'yearly')}
-                                    className="flex h-9 w-full rounded-md border border-input bg-white px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                                >
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-semibold text-blue-700 dark:text-blue-300 uppercase tracking-wide">Frequency *</label>
+                                <select value={recurringFrequency} onChange={(e) => setRecurringFrequency(e.target.value as 'monthly' | 'yearly')}
+                                    className="flex h-9 w-full rounded-lg border border-blue-200 dark:border-blue-700 bg-white dark:bg-blue-900/30 px-3 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                                     <option value="monthly">📅 Monthly</option>
                                     <option value="yearly">📆 Yearly</option>
                                 </select>
                             </div>
-
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                                    Start Date *
-                                </label>
-                                <Input
-                                    type="date"
-                                    value={recurringStartDate}
-                                    onChange={(e) => setRecurringStartDate(e.target.value)}
-                                    required={isRecurring}
-                                />
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-semibold text-blue-700 dark:text-blue-300 uppercase tracking-wide">Start Date *</label>
+                                <Input type="date" value={recurringStartDate} onChange={(e) => setRecurringStartDate(e.target.value)} required={isRecurring} />
                             </div>
-
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                                    End Date (Optional)
-                                </label>
-                                <Input
-                                    type="date"
-                                    value={recurringEndDate}
-                                    onChange={(e) => setRecurringEndDate(e.target.value)}
-                                    min={recurringStartDate}
-                                />
-                                <p className="text-xs text-blue-700 dark:text-blue-300">
-                                    Leave empty for indefinite billing
-                                </p>
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-semibold text-blue-700 dark:text-blue-300 uppercase tracking-wide">End Date (Optional)</label>
+                                <Input type="date" value={recurringEndDate} onChange={(e) => setRecurringEndDate(e.target.value)} min={recurringStartDate} />
+                                <p className="text-xs text-blue-600">Leave empty for indefinite</p>
                             </div>
-
                             {nextBillingDate && (
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                                        📊 Next Billing Date
-                                    </label>
-                                    <div className="flex h-9 items-center rounded-md border border-blue-300 dark:border-blue-700 bg-blue-100 dark:bg-blue-900/40 px-3">
-                                        <span className="text-sm font-semibold text-blue-900 dark:text-blue-100">
-                                            {new Date(nextBillingDate).toLocaleDateString('en-US', { 
-                                                year: 'numeric', 
-                                                month: 'long', 
-                                                day: 'numeric' 
-                                            })}
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-semibold text-blue-700 dark:text-blue-300 uppercase tracking-wide">Next Billing</label>
+                                    <div className="flex h-9 items-center rounded-lg border border-blue-300 bg-blue-100 dark:bg-blue-900/40 px-3">
+                                        <span className="text-sm font-semibold text-blue-800 dark:text-blue-200">
+                                            {new Date(nextBillingDate).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' })}
                                         </span>
                                     </div>
                                 </div>
                             )}
                         </div>
-
-                        <div className="bg-blue-100 dark:bg-blue-900/40 border border-blue-300 dark:border-blue-700 rounded p-3">
-                            <p className="text-sm text-blue-900 dark:text-blue-100">
-                                <strong>ℹ️ How it works:</strong> This invoice will be automatically generated {recurringFrequency === 'monthly' ? 'every month' : 'every year'} starting from {new Date(recurringStartDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}. You&apos;ll receive reminders before each billing date.
-                            </p>
-                        </div>
                     </div>
                 )}
-            </div>
+                </div>
 
-            <div className="flex gap-2 pt-4">
-                <Button type="submit" disabled={isSubmitting} className="flex-1">
-                    {isSubmitting
-                        ? mode === 'edit' ? 'Updating...' : 'Creating...'
-                        : mode === 'edit' ? 'Update Invoice' : 'Create Invoice'
-                    }
-                </Button>
-            </div>
-        </form>
+                <div className="flex gap-3 pt-2">
+                    <Button type="submit" disabled={isSubmitting}
+                        className="flex-1 h-11 text-base font-semibold rounded-xl bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-md hover:shadow-lg transition-all">
+                        {isSubmitting
+                            ? (mode === 'edit' ? '⏳ Updating…' : '⏳ Creating…')
+                            : (mode === 'edit' ? '✅ Update Invoice' : '🚀 Create Invoice')}
+                    </Button>
+                </div>
+            </form>
                 </div>
 
                 {/* Preview Section - Takes 1 column */}
@@ -669,53 +627,44 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
 
         {/* Add Customer Modal */}
         {showAddCustomerModal && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
-                    <div className="flex items-center justify-between p-6 border-b">
-                        <h2 className="text-lg font-semibold">Add New Customer</h2>
-                        <button
-                            onClick={() => setShowAddCustomerModal(false)}
-                            className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
-                        >
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-gray-700 overflow-hidden">
+                    <div className="bg-linear-to-r from-blue-600 to-indigo-600 px-6 py-4 flex items-center justify-between">
+                        <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                            <Plus className="h-5 w-5" /> Add New Customer
+                        </h2>
+                        <button onClick={() => setShowAddCustomerModal(false)} className="text-white/80 hover:text-white transition-colors">
                             <X className="h-5 w-5" />
                         </button>
                     </div>
                     <form onSubmit={handleAddCustomer} className="p-6 space-y-4">
-                        <div className="space-y-2">
-                            <label htmlFor="cust-name" className="text-sm font-medium">Name *</label>
-                            <Input id="cust-name" name="name" required />
+                        <div className="space-y-1.5">
+                            <label htmlFor="cust-name" className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Name <span className="text-red-500">*</span></label>
+                            <Input id="cust-name" name="name" required placeholder="Customer or company name" className="rounded-lg" />
                         </div>
-                        <div className="space-y-2">
-                            <label htmlFor="cust-email" className="text-sm font-medium">Email</label>
-                            <Input id="cust-email" name="email" type="email" />
+                        <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-1.5">
+                                <label htmlFor="cust-email" className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Email</label>
+                                <Input id="cust-email" name="email" type="email" placeholder="email@example.com" className="rounded-lg" />
+                            </div>
+                            <div className="space-y-1.5">
+                                <label htmlFor="cust-phone" className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Phone</label>
+                                <Input id="cust-phone" name="phone" type="tel" placeholder="+91 XXXXX XXXXX" className="rounded-lg" />
+                            </div>
                         </div>
-                        <div className="space-y-2">
-                            <label htmlFor="cust-phone" className="text-sm font-medium">Phone</label>
-                            <Input id="cust-phone" name="phone" type="tel" />
+                        <div className="space-y-1.5">
+                            <label htmlFor="cust-gstin" className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">GSTIN</label>
+                            <Input id="cust-gstin" name="gstin" maxLength={15} placeholder="22AAAA0000A1Z5" className="rounded-lg font-mono" />
                         </div>
-                        <div className="space-y-2">
-                            <label htmlFor="cust-gstin" className="text-sm font-medium">GSTIN</label>
-                            <Input id="cust-gstin" name="gstin" maxLength={15} />
+                        <div className="space-y-1.5">
+                            <label htmlFor="cust-address" className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Address</label>
+                            <textarea id="cust-address" name="address" rows={2}
+                                placeholder="Street, City, State, PIN"
+                                className="flex w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm shadow-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none" />
                         </div>
-                        <div className="space-y-2">
-                            <label htmlFor="cust-address" className="text-sm font-medium">Address</label>
-                            <textarea
-                                id="cust-address"
-                                name="address"
-                                rows={2}
-                                className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm"
-                            />
-                        </div>
-                        <div className="flex gap-2 pt-4">
-                            <Button type="submit" className="flex-1">Add Customer</Button>
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() => setShowAddCustomerModal(false)}
-                                className="flex-1"
-                            >
-                                Cancel
-                            </Button>
+                        <div className="flex gap-3 pt-2">
+                            <Button type="submit" className="flex-1 rounded-lg bg-blue-600 hover:bg-blue-700">Add Customer</Button>
+                            <Button type="button" variant="outline" onClick={() => setShowAddCustomerModal(false)} className="flex-1 rounded-lg">Cancel</Button>
                         </div>
                     </form>
                 </div>

@@ -6,6 +6,7 @@ import type { Customer } from '@/lib/types'
 
 interface InvoiceItem {
     description: string
+    details?: string
     quantity: number
     unit_price: number
     hsn_sac_code?: string
@@ -40,6 +41,10 @@ interface InvoiceSettings {
     show_logo: boolean
     payment_qr_code_url?: string
     show_qr_code?: boolean
+    digital_signature_url?: string
+    show_signature?: boolean
+    company_stamp_url?: string
+    show_stamp?: boolean
 }
 
 interface InvoicePreviewPanelProps {
@@ -255,7 +260,12 @@ export function InvoicePreviewPanel({
                             <tbody>
                                 {items.filter(item => item.description).map((item, idx) => (
                                     <tr key={idx} className="border-b border-gray-200">
-                                        <td className="p-2 text-gray-700">{item.description}</td>
+                                        <td className="p-2 text-gray-700">
+                                            <div>{item.description}</div>
+                                            {item.details && (
+                                                <div className="text-xs text-gray-400 mt-0.5 whitespace-pre-line">{item.details}</div>
+                                            )}
+                                        </td>
                                         {items.some(i => i.hsn_sac_code) && (
                                             <td className="p-2 text-gray-500">{item.hsn_sac_code || '-'}</td>
                                         )}
@@ -379,6 +389,30 @@ export function InvoicePreviewPanel({
                 {settings.footer_text && (
                     <div className="text-center text-gray-400 text-xs mt-3 pt-3 border-t">
                         {settings.footer_text}
+                    </div>
+                )}
+
+                {/* Signature & Stamp */}
+                {((settings.show_signature && settings.digital_signature_url?.startsWith('data:image')) ||
+                  (settings.show_stamp && settings.company_stamp_url?.startsWith('data:image'))) && (
+                    <div className="flex justify-end items-end gap-6 mt-4 pt-3 border-t border-gray-200">
+                        {settings.show_stamp && settings.company_stamp_url?.startsWith('data:image') && (
+                            <div className="text-center">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img src={settings.company_stamp_url} alt="Stamp" className="h-14 w-14 object-contain opacity-85 mx-auto"
+                                    onError={(e) => { e.currentTarget.style.display = 'none' }} />
+                                <div className="text-xs text-gray-500 mt-1">Company Seal</div>
+                            </div>
+                        )}
+                        {settings.show_signature && settings.digital_signature_url?.startsWith('data:image') && (
+                            <div className="text-center">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img src={settings.digital_signature_url} alt="Signature" className="h-10 w-28 object-contain mx-auto"
+                                    onError={(e) => { e.currentTarget.style.display = 'none' }} />
+                                <div className="border-t border-gray-400 mt-1 pt-1 text-xs font-semibold text-gray-700">{settings.company_name}</div>
+                                <div className="text-xs text-gray-400">Authorized Signatory</div>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>
