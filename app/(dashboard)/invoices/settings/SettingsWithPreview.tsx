@@ -45,6 +45,10 @@ export default function SettingsWithPreview({ initialSettings }: SettingsWithPre
         show_logo: initialSettings?.show_logo ?? true,
         payment_qr_code_url: normalizeImageUrl(initialSettings?.payment_qr_code_url),
         show_qr_code: initialSettings?.show_qr_code ?? true,
+        digital_signature_url: normalizeImageUrl(initialSettings?.digital_signature_url),
+        show_signature: initialSettings?.show_signature ?? true,
+        company_stamp_url: normalizeImageUrl(initialSettings?.company_stamp_url),
+        show_stamp: initialSettings?.show_stamp ?? true,
     })
 
     return (

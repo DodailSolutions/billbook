@@ -30,6 +30,10 @@ interface InvoicePreviewProps {
         show_logo: boolean
         payment_qr_code_url?: string
         show_qr_code?: boolean
+        digital_signature_url?: string
+        show_signature?: boolean
+        company_stamp_url?: string
+        show_stamp?: boolean
     }
 }
 
@@ -203,49 +207,44 @@ export default function InvoicePreview({ settings }: InvoicePreviewProps) {
                     </div>
                 </div>
 
-                {/* Payment Instructions */}
-                {payment_instructions && (
+                {/* Payment Instructions + QR side by side */}
+                {(payment_instructions || (settings.show_qr_code && settings.payment_qr_code_url?.startsWith('data:image'))) && (
                     <div className="mb-6 pt-4 border-t">
-                        <div 
-                            className="text-sm font-semibold mb-2"
-                            style={{ color: primary_color }}
-                        >
-                            Payment Instructions:
-                        </div>
-                        <div 
-                            className="whitespace-pre-wrap"
-                            style={{
-                                fontFamily: settings.terms_font_family || 'Arial',
-                                fontSize: `${settings.terms_font_size || 12}px`,
-                                color: '#6b7280'
-                            }}
-                        >
-                            {payment_instructions}
-                        </div>
-                    </div>
-                )}
-
-                {/* Payment QR Code */}
-                {settings.show_qr_code && settings.payment_qr_code_url && settings.payment_qr_code_url.trim() && settings.payment_qr_code_url.startsWith('data:image') && (
-                    <div className="mb-6 pt-4 border-t">
-                        <div 
-                            className="text-sm font-semibold mb-3 text-center"
-                            style={{ color: primary_color }}
-                        >
-                            Scan to Pay
-                        </div>
-                        <div className="flex justify-center">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img 
-                                src={settings.payment_qr_code_url} 
-                                alt="Payment QR Code" 
-                                className="h-32 w-32 object-contain border-2 rounded-lg"
-                                style={{ borderColor: primary_color }}
-                                onError={(e) => { e.currentTarget.style.display = 'none' }}
-                            />
-                        </div>
-                        <div className="text-center text-xs text-gray-500 mt-2">
-                            GPay | PhonePe | Paytm | UPI
+                        <div className="flex gap-4 items-start">
+                            {payment_instructions && (
+                                <div className="flex-1">
+                                    <div
+                                        className="text-sm font-semibold mb-2"
+                                        style={{ color: primary_color }}
+                                    >
+                                        Payment Instructions:
+                                    </div>
+                                    <div
+                                        className="whitespace-pre-wrap"
+                                        style={{
+                                            fontFamily: settings.terms_font_family || 'Arial',
+                                            fontSize: `${settings.terms_font_size || 12}px`,
+                                            color: '#6b7280'
+                                        }}
+                                    >
+                                        {payment_instructions}
+                                    </div>
+                                </div>
+                            )}
+                            {settings.show_qr_code && settings.payment_qr_code_url?.startsWith('data:image') && (
+                                <div className="text-center shrink-0">
+                                    <div className="text-xs font-semibold mb-1" style={{ color: primary_color }}>Scan to Pay</div>
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img
+                                        src={settings.payment_qr_code_url}
+                                        alt="Payment QR Code"
+                                        className="h-24 w-24 object-contain border-2 rounded-lg"
+                                        style={{ borderColor: primary_color }}
+                                        onError={(e) => { e.currentTarget.style.display = 'none' }}
+                                    />
+                                    <div className="text-xs text-gray-400 mt-1">GPay | PhonePe | UPI</div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}
@@ -269,6 +268,34 @@ export default function InvoicePreview({ settings }: InvoicePreviewProps) {
                         >
                             {terms_and_conditions}
                         </div>
+                    </div>
+                )}
+
+                {/* Signature + Stamp side by side */}
+                {((settings.show_signature && settings.digital_signature_url?.startsWith('data:image')) ||
+                  (settings.show_stamp && settings.company_stamp_url?.startsWith('data:image'))) && (
+                    <div className="flex items-end justify-end gap-8 mt-6 pt-4 border-t">
+                        {settings.show_stamp && settings.company_stamp_url?.startsWith('data:image') && (
+                            <div className="text-center">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img src={settings.company_stamp_url} alt="Company Stamp"
+                                    className="h-16 w-16 object-contain opacity-85 mx-auto"
+                                    onError={(e) => { e.currentTarget.style.display = 'none' }}
+                                />
+                                <div className="text-xs text-gray-400 mt-1">Company Seal</div>
+                            </div>
+                        )}
+                        {settings.show_signature && settings.digital_signature_url?.startsWith('data:image') && (
+                            <div className="text-center">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img src={settings.digital_signature_url} alt="Signature"
+                                    className="h-10 w-32 object-contain mx-auto"
+                                    onError={(e) => { e.currentTarget.style.display = 'none' }}
+                                />
+                                <div className="border-t border-gray-700 mt-1 pt-1 text-xs font-semibold text-gray-700">{settings.company_name}</div>
+                                <div className="text-xs text-gray-400">Authorized Signatory</div>
+                            </div>
+                        )}
                     </div>
                 )}
 

@@ -173,6 +173,10 @@ export default function InvoiceSettingsForm({ initialSettings, onPreviewUpdate }
                 company_font_weight: companyFontWeight,
                 invoice_font_family: invoiceFontFamily,
                 invoice_font_size: invoiceFontSize,
+                digital_signature_url: signaturePreview,
+                show_signature: showSignature,
+                company_stamp_url: stampPreview,
+                show_stamp: showStamp,
             })
         }
     }, [
@@ -182,7 +186,8 @@ export default function InvoiceSettingsForm({ initialSettings, onPreviewUpdate }
         companyFontFamily, companyFontSize, companyNameColor, companyFontWeight,
         companyDetailsFontFamily, companyDetailsFontSize, companyDetailsColor,
         termsFontFamily, termsFontSize,
-        invoiceFontFamily, invoiceFontSize, qrCodePreview, showQrCode, onPreviewUpdate
+        invoiceFontFamily, invoiceFontSize, qrCodePreview, showQrCode,
+        signaturePreview, showSignature, stampPreview, showStamp, onPreviewUpdate
     ])
 
     const handleSubmit = async (e: React.FormEvent) => {
