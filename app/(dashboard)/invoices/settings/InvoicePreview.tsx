@@ -271,31 +271,33 @@ export default function InvoicePreview({ settings }: InvoicePreviewProps) {
                     </div>
                 )}
 
-                {/* Signature + Stamp side by side */}
+                {/* Signature + Stamp: stamp big on left, signature on right */}
                 {((settings.show_signature && settings.digital_signature_url?.startsWith('data:image')) ||
                   (settings.show_stamp && settings.company_stamp_url?.startsWith('data:image'))) && (
-                    <div className="flex items-end justify-end gap-8 mt-6 pt-4 border-t">
-                        {settings.show_stamp && settings.company_stamp_url?.startsWith('data:image') && (
+                    <div className="flex items-end justify-between gap-8 mt-6 pt-4 border-t">
+                        {/* Stamp — left, large */}
+                        {settings.show_stamp && settings.company_stamp_url?.startsWith('data:image') ? (
                             <div className="text-center">
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img src={settings.company_stamp_url} alt="Company Stamp"
-                                    className="h-16 w-16 object-contain opacity-85 mx-auto"
+                                    className="h-28 w-28 object-contain opacity-85 mx-auto"
                                     onError={(e) => { e.currentTarget.style.display = 'none' }}
                                 />
                                 <div className="text-xs text-gray-400 mt-1">Company Seal</div>
                             </div>
-                        )}
-                        {settings.show_signature && settings.digital_signature_url?.startsWith('data:image') && (
+                        ) : <div />}
+                        {/* Signature — right, with sign-here line */}
+                        {settings.show_signature && settings.digital_signature_url?.startsWith('data:image') ? (
                             <div className="text-center">
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img src={settings.digital_signature_url} alt="Signature"
-                                    className="h-10 w-32 object-contain mx-auto"
+                                    className="h-14 w-40 object-contain mx-auto"
                                     onError={(e) => { e.currentTarget.style.display = 'none' }}
                                 />
-                                <div className="border-t border-gray-700 mt-1 pt-1 text-xs font-semibold text-gray-700">{settings.company_name}</div>
+                                <div className="border-t-2 border-gray-700 mt-1 pt-1 text-xs font-semibold text-gray-800">{settings.company_name}</div>
                                 <div className="text-xs text-gray-400">Authorized Signatory</div>
                             </div>
-                        )}
+                        ) : <div />}
                     </div>
                 )}
 

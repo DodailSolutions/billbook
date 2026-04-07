@@ -416,20 +416,20 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
         ` : ''}
 
         ${(showSignature && digitalSignatureUrl && digitalSignatureUrl.startsWith('data:image')) || (showStamp && companyStampUrl && companyStampUrl.startsWith('data:image')) ? `
-        <div style="display: flex; justify-content: flex-end; align-items: flex-end; gap: 40px; margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 40px; margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e7eb; page-break-inside: avoid;">
             ${showStamp && companyStampUrl && companyStampUrl.startsWith('data:image') ? `
             <div style="text-align: center;">
-                <img src="${companyStampUrl}" alt="Company Stamp" style="height: 90px; width: 90px; object-fit: contain; opacity: 0.85;" onerror="this.style.display='none'" />
+                <img src="${companyStampUrl}" alt="Company Stamp" style="height: 110px; width: 110px; object-fit: contain; opacity: 0.85;" onerror="this.style.display='none'" />
                 <div style="font-size: 11px; color: #6b7280; margin-top: 4px;">Company Seal</div>
             </div>
-            ` : ''}
+            ` : '<div></div>'}
             ${showSignature && digitalSignatureUrl && digitalSignatureUrl.startsWith('data:image') ? `
             <div style="text-align: center;">
-                <img src="${digitalSignatureUrl}" alt="Signature" style="height: 60px; width: 160px; object-fit: contain;" onerror="this.style.display='none'" />
-                <div style="border-top: 1.5px solid #374151; margin-top: 4px; padding-top: 4px; font-size: 11px; color: #374151; font-weight: 600;">${companyName}</div>
+                <img src="${digitalSignatureUrl}" alt="Signature" style="height: 70px; width: 180px; object-fit: contain;" onerror="this.style.display='none'" />
+                <div style="border-top: 2px solid #374151; margin-top: 4px; padding-top: 4px; font-size: 11px; color: #374151; font-weight: 600;">${companyName}</div>
                 <div style="font-size: 10px; color: #6b7280;">Authorized Signatory</div>
             </div>
-            ` : ''}
+            ` : '<div></div>'}
         </div>
         ` : ''}
 
