@@ -58,7 +58,7 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
         body {
             font-family: '${invoiceFontFamily}', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             font-size: ${invoiceFontSize}px;
-            padding: 40px;
+            padding: 28px 36px;
             color: #1a1a1a;
             background: white;
         }
@@ -154,7 +154,8 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
         .items-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 30px;
+            margin-bottom: 16px;
+            page-break-inside: auto;
         }
         .items-table thead {
             background: linear-gradient(135deg, ${primaryColor}, ${secondaryColor});
@@ -184,7 +185,8 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
         .totals-section {
             display: flex;
             justify-content: flex-end;
-            margin-bottom: 40px;
+            margin-bottom: 16px;
+            page-break-inside: avoid;
         }
         .totals {
             width: 300px;
@@ -209,8 +211,9 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
         }
         .notes-section {
             border-top: 1px solid #e5e7eb;
-            padding-top: 20px;
-            margin-bottom: 20px;
+            padding-top: 14px;
+            margin-bottom: 14px;
+            page-break-inside: avoid;
         }
         .notes-title {
             font-size: ${invoiceFontSize + 2}px;
@@ -378,22 +381,30 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
         </div>
         ` : ''}
         
-        ${paymentInstructions ? `
-        <div class="notes-section">
+        ${(paymentInstructions || (showQrCode && paymentQrCodeUrl && paymentQrCodeUrl.startsWith('data:image'))) ? `
+        <div class="notes-section" style="page-break-inside: avoid;">
+            ${paymentInstructions && (showQrCode && paymentQrCodeUrl && paymentQrCodeUrl.startsWith('data:image')) ? `
+            <div style="display: flex; gap: 24px; align-items: flex-start;">
+                <div style="flex: 1;">
+                    <div class="notes-title">Payment Instructions:</div>
+                    <div class="notes-content">${paymentInstructions}</div>
+                </div>
+                <div style="text-align: center; min-width: 150px;">
+                    <div class="notes-title" style="text-align: center; margin-bottom: 8px;">Scan to Pay</div>
+                    <img src="${paymentQrCodeUrl}" alt="Payment QR Code" style="height: 120px; width: 120px; object-fit: contain; border: 2px solid ${primaryColor}; border-radius: 8px;" onerror="this.style.display='none'" />
+                    <div style="color: #6b7280; font-size: 11px; margin-top: 6px;">GPay | PhonePe | Paytm | UPI</div>
+                </div>
+            </div>
+            ` : paymentInstructions ? `
             <div class="notes-title">Payment Instructions:</div>
             <div class="notes-content">${paymentInstructions}</div>
-        </div>
-        ` : ''}
-        
-        ${showQrCode && paymentQrCodeUrl && paymentQrCodeUrl.trim() && paymentQrCodeUrl.startsWith('data:image') ? `
-        <div class="notes-section" style="text-align: center;">
-            <div class="notes-title" style="text-align: center; margin-bottom: 12px;">Scan to Pay</div>
-            <div style="display: flex; justify-content: center; margin-bottom: 8px;">
-                <img src="${paymentQrCodeUrl}" alt="Payment QR Code" style="height: 128px; width: 128px; object-fit: contain; border: 2px solid ${primaryColor}; border-radius: 8px;" onerror="this.style.display='none'" />
+            ` : `
+            <div style="text-align: center;">
+                <div class="notes-title" style="text-align: center; margin-bottom: 8px;">Scan to Pay</div>
+                <img src="${paymentQrCodeUrl}" alt="Payment QR Code" style="height: 120px; width: 120px; object-fit: contain; border: 2px solid ${primaryColor}; border-radius: 8px;" onerror="this.style.display='none'" />
+                <div style="color: #6b7280; font-size: 11px; margin-top: 6px;">GPay | PhonePe | Paytm | UPI</div>
             </div>
-            <div style="color: #6b7280; font-size: 12px;">
-                GPay | PhonePe | Paytm | UPI
-            </div>
+            `}
         </div>
         ` : ''}
         

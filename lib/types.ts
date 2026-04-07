@@ -93,11 +93,34 @@ export interface InvoiceSequence {
     updated_at: string
 }
 
+export interface MonthlyData {
+    month: string
+    revenue: number
+    invoiceCount: number
+    paid: number
+    pending: number
+    partial: number
+}
+
+export interface RecentInvoice {
+    id: string
+    invoice_number: string
+    customer_name: string
+    total: number
+    status: string
+    invoice_date: string
+}
+
 export interface DashboardStats {
     totalRevenue: number
     totalInvoices: number
     paidInvoices: number
     pendingInvoices: number
+    partialInvoices: number
+    cancelledInvoices: number
+    outstandingAmount: number
+    monthlyData: MonthlyData[]
+    recentInvoices: RecentInvoice[]
 }
 
 export interface RecurringInvoice {
