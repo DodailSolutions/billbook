@@ -460,4 +460,3 @@ const statusBadgeClass: Record<string, string> = {
     cancelled: 'bg-red-100 text-red-600',
 }
 
-function formatINR
