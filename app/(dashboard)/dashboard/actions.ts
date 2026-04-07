@@ -62,18 +62,25 @@ export async function getDashboardStats(): Promise<DashboardStats> {
         const getName = (inv: any) => (inv.customers as { name: string } | null)?.name || 'Unknown'
 
         const paidInvs = invoices.filter(inv => inv.status === 'paid')
-        const totalRevenue = paidInvs.reduce((sum, inv) => sum + (inv.total || 0), 0)
+        const partialInvs = invoices.filter(inv => inv.status === 'partial')
+        // Total revenue = fully paid invoices + amounts already collected on partial invoices
+        const totalRevenue =
+            paidInvs.reduce((sum, inv) => sum + (inv.total || 0), 0) +
+            partialInvs.reduce((sum, inv) => sum + (inv.amount_paid || 0), 0)
         const paidInvoices = paidInvs.length
         const pendingInvoices = invoices.filter(inv => inv.status === 'sent' || inv.status === 'draft').length
-        const partialInvoices = invoices.filter(inv => inv.status === 'partial').length
+        const partialInvoices = partialInvs.length
         const cancelledInvoices = invoices.filter(inv => inv.status === 'cancelled').length
 
         const outstandingAmount = invoices
             .filter(inv => inv.status !== 'paid' && inv.status !== 'cancelled')
             .reduce((sum, inv) => sum + ((inv.total || 0) - (inv.amount_paid || 0)), 0)
 
-        const avgInvoiceValue = paidInvoices > 0 ? Math.round(totalRevenue / paidInvoices) : 0
-        const collectionRate = invoices.length > 0 ? Math.round((paidInvoices / invoices.length) * 100) : 0
+        const nonCancelledInvs = invoices.filter(i => i.status !== 'cancelled')
+        const avgInvoiceValue = nonCancelledInvs.length > 0
+            ? Math.round(nonCancelledInvs.reduce((s, i) => s + (i.total || 0), 0) / nonCancelledInvs.length)
+            : 0
+        const collectionRate = invoices.length > 0 ? Math.round(((paidInvoices + partialInvoices) / invoices.length) * 100) : 0
 
         // Average payment time (days) — invoice_date → updated_at for paid invoices
         let avgPaymentTime = 0
@@ -87,12 +94,12 @@ export async function getDashboardStats(): Promise<DashboardStats> {
             avgPaymentTime = Math.round(totalDays / paidWithDates.length)
         }
 
-        // ── Top clients (all non-cancelled invoices) ──────────────
+        // ── Top clients (all non-cancelled invoices, use amount_paid for partial) ──────────────
         const clientMap = new Map<string, { revenue: number; invoiceCount: number }>()
         for (const inv of invoices.filter(i => i.status !== 'cancelled')) {
             const name = getName(inv)
             const existing = clientMap.get(name) || { revenue: 0, invoiceCount: 0 }
-            existing.revenue += inv.total || 0
+            existing.revenue += inv.status === 'partial' ? (inv.amount_paid || 0) : (inv.total || 0)
             existing.invoiceCount++
             clientMap.set(name, existing)
         }
