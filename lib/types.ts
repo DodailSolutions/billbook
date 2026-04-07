@@ -96,6 +96,7 @@ export interface InvoiceSequence {
 export interface MonthlyData {
     month: string
     revenue: number
+    expenses: number
     invoiceCount: number
     paid: number
     pending: number
@@ -111,16 +112,36 @@ export interface RecentInvoice {
     invoice_date: string
 }
 
+export interface TopClient {
+    name: string
+    revenue: number
+    invoiceCount: number
+}
+
+export interface ExpenseCategory {
+    name: string
+    amount: number
+    percentage: number
+    color: string
+}
+
 export interface DashboardStats {
     totalRevenue: number
+    totalExpenses: number
+    netProfit: number
     totalInvoices: number
     paidInvoices: number
     pendingInvoices: number
     partialInvoices: number
     cancelledInvoices: number
     outstandingAmount: number
+    avgInvoiceValue: number
+    avgPaymentTime: number
+    collectionRate: number
     monthlyData: MonthlyData[]
     recentInvoices: RecentInvoice[]
+    topClients: TopClient[]
+    expenseBreakdown: ExpenseCategory[]
 }
 
 export interface RecurringInvoice {
