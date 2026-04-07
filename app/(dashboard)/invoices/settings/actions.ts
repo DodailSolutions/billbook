@@ -73,6 +73,17 @@ export async function getInvoiceSettings(): Promise<InvoiceSettings | null> {
     }
 }
 
+// Columns added in optional migrations — safe to drop if the DB hasn't been migrated yet
+const MIGRATION_COLUMNS = [
+    'payment_qr_code_url', 'show_qr_code',
+    'digital_signature_url', 'show_signature',
+    'company_stamp_url', 'show_stamp',
+]
+
+function withoutMigrationColumns(data: Record<string, unknown>) {
+    return Object.fromEntries(Object.entries(data).filter(([k]) => !MIGRATION_COLUMNS.includes(k)))
+}
+
 export async function saveInvoiceSettings(settings: InvoiceSettings) {
     try {
         const supabase = await createClient()
@@ -82,36 +93,49 @@ export async function saveInvoiceSettings(settings: InvoiceSettings) {
             throw new Error('Not authenticated')
         }
 
-        // Strip undefined values so Supabase doesn't complain about unknown/missing columns
+        // Strip undefined/null so Supabase doesn't receive unknown keys
         const cleanSettings = Object.fromEntries(
-            Object.entries(settings).filter(([, v]) => v !== undefined)
+            Object.entries(settings).filter(([, v]) => v !== undefined && v !== null)
         )
 
-        // Check if settings exist
         const existing = await getInvoiceSettings()
 
         if (existing) {
-            // Update existing settings
-            const { error } = await supabase
+            const payload = { ...cleanSettings, updated_at: new Date().toISOString() }
+            let { error } = await supabase
                 .from('invoice_settings')
-                .update({
-                    ...cleanSettings,
-                    updated_at: new Date().toISOString()
-                })
+                .update(payload)
                 .eq('user_id', user.id)
+
+            // PostgreSQL "column does not exist" (42703) — migration hasn't been run yet
+            // Retry with only the original base columns
+            if (error?.code === '42703') {
+                console.warn('Falling back to base columns (migration not yet applied):', error.message)
+                const fallback = { ...withoutMigrationColumns(payload), updated_at: new Date().toISOString() }
+                const { error: e2 } = await supabase
+                    .from('invoice_settings')
+                    .update(fallback)
+                    .eq('user_id', user.id)
+                error = e2 ?? null
+            }
 
             if (error) {
                 console.error('Error updating invoice settings:', error)
                 throw new Error('Failed to update invoice settings')
             }
         } else {
-            // Create new settings
-            const { error } = await supabase
+            const payload = { user_id: user.id, ...cleanSettings }
+            let { error } = await supabase
                 .from('invoice_settings')
-                .insert([{
-                    user_id: user.id,
-                    ...cleanSettings
-                }])
+                .insert([payload])
+
+            if (error?.code === '42703') {
+                console.warn('Falling back to base columns (migration not yet applied):', error.message)
+                const { error: e2 } = await supabase
+                    .from('invoice_settings')
+                    .insert([{ user_id: user.id, ...withoutMigrationColumns(cleanSettings) }])
+                error = e2 ?? null
+            }
 
             if (error) {
                 console.error('Error creating invoice settings:', error)
