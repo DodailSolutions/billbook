@@ -33,14 +33,15 @@ export function MarkAsPaidButton({ invoiceId, invoiceNumber }: MarkAsPaidButtonP
             })
 
             if (!response.ok) {
-                throw new Error('Failed to mark invoice as paid')
+                const data = await response.json().catch(() => ({}))
+                throw new Error(data.error || 'Failed to mark invoice as paid')
             }
 
             router.refresh()
             setIsOpen(false)
         } catch (error) {
             console.error('Error marking invoice as paid:', error)
-            alert('Failed to mark invoice as paid')
+            alert(error instanceof Error ? error.message : 'Failed to mark invoice as paid')
         } finally {
             setIsSubmitting(false)
         }

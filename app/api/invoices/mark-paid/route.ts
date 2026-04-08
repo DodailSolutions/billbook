@@ -48,6 +48,7 @@ export async function POST(request: Request) {
             .eq('user_id', user.id)
 
         if (coreError) {
+            console.error('Core update error:', coreError)
             // amount_paid etc. may not exist yet — fall back to just status
             const { error: minimalError } = await supabase
                 .from('invoices')
@@ -56,13 +57,16 @@ export async function POST(request: Request) {
                 .eq('user_id', user.id)
             if (minimalError) {
                 console.error('Error updating invoice status:', minimalError)
-                return NextResponse.json({ error: 'Failed to update invoice' }, { status: 500 })
+                return NextResponse.json(
+                    { error: `Failed to update invoice: ${minimalError.message} (code: ${minimalError.code})` },
+                    { status: 500 }
+                )
             }
         }
 
         // Phase 2: update optional columns (exist after invoice-payment-method migration)
         // Errors here are non-fatal — core status is already saved above
-        await supabase
+        const { error: phase2Error } = await supabase
             .from('invoices')
             .update({
                 payment_method: paymentMethod,
@@ -71,6 +75,10 @@ export async function POST(request: Request) {
             })
             .eq('id', invoiceId)
             .eq('user_id', user.id)
+
+        if (phase2Error) {
+            console.error('Phase 2 update error (non-fatal):', phase2Error)
+        }
 
         revalidatePath('/invoices')
         revalidatePath(`/invoices/${invoiceId}`)
