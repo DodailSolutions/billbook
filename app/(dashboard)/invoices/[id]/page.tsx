@@ -291,12 +291,12 @@ export default async function InvoiceDetailPage({
                         {/* CENTER: Company seal */}
                         {invoiceSettings?.show_stamp && invoiceSettings?.company_stamp_url?.startsWith('data:image') && (
                             <div className="text-center min-w-[120px]">
-                                <div className="h-16 flex items-center justify-center mb-1">
+                                <div className="h-20 w-20 mx-auto mb-2 rounded-full overflow-hidden border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-100">
                                     {/* eslint-disable-next-line @next/next/no-img-element */}
                                     <img src={invoiceSettings.company_stamp_url} alt="Company Stamp"
-                                        className="max-h-20 max-w-[120px] w-auto h-auto object-contain mix-blend-multiply dark:mix-blend-normal opacity-90 mx-auto" />
+                                        className="w-full h-full object-cover" />
                                 </div>
-                                <div className="border-t border-gray-300 dark:border-gray-600 pt-1.5 mt-1">
+                                <div className="border-t border-gray-300 dark:border-gray-600 pt-1.5">
                                     <span className="text-xs text-gray-500">Company Seal</span>
                                 </div>
                             </div>

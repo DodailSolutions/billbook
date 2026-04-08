@@ -281,10 +281,10 @@ export default function InvoicePreview({ settings }: InvoicePreviewProps) {
                     {/* CENTER: Company seal */}
                     {settings.show_stamp && settings.company_stamp_url?.startsWith('data:image') && (
                         <div className="text-center min-w-[100px]">
-                            <div className="h-14 flex items-center justify-center mb-1">
+                            <div className="h-16 w-16 mx-auto mb-2 rounded-full overflow-hidden border border-gray-200 bg-white">
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img src={settings.company_stamp_url} alt="Company Stamp"
-                                    className="max-h-20 max-w-[110px] w-auto h-auto object-contain mix-blend-multiply opacity-90 mx-auto"
+                                    className="w-full h-full object-cover"
                                     onError={(e) => { e.currentTarget.style.display = 'none' }}
                                 />
                             </div>
