@@ -35,15 +35,11 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Invoice not found' }, { status: 404 })
         }
 
-        // Update invoice status and amounts
-        // Try full update first (needs invoice-payment-method + partial-payment migrations)
-        const { error: updateError } = await supabase
+        // Phase 1: update core status + amount columns (exist after partial-payment migration)
+        const { error: coreError } = await supabase
             .from('invoices')
             .update({
                 status: 'paid',
-                payment_method: paymentMethod,
-                payment_notes: paymentNotes || null,
-                paid_at: new Date().toISOString(),
                 amount_paid: invoice.total,
                 amount_remaining: 0,
                 is_partial_payment: false,
@@ -51,27 +47,30 @@ export async function POST(request: Request) {
             .eq('id', invoiceId)
             .eq('user_id', user.id)
 
-        if (updateError) {
-            // Column might not exist — fall back to minimal update
-            const isColumnError = updateError.code === '42703' || updateError.message?.includes('column') || updateError.message?.includes('does not exist')
-            if (isColumnError) {
-                const { error: fallbackError } = await supabase
-                    .from('invoices')
-                    .update({ status: 'paid' })
-                    .eq('id', invoiceId)
-                    .eq('user_id', user.id)
-                if (fallbackError) {
-                    console.error('Error updating invoice (fallback):', fallbackError)
-                    return NextResponse.json({ error: 'Failed to update invoice' }, { status: 500 })
-                }
-            } else {
-                console.error('Error updating invoice:', updateError)
-                return NextResponse.json(
-                    { error: 'Failed to update invoice' },
-                    { status: 500 }
-                )
+        if (coreError) {
+            // amount_paid etc. may not exist yet — fall back to just status
+            const { error: minimalError } = await supabase
+                .from('invoices')
+                .update({ status: 'paid' })
+                .eq('id', invoiceId)
+                .eq('user_id', user.id)
+            if (minimalError) {
+                console.error('Error updating invoice status:', minimalError)
+                return NextResponse.json({ error: 'Failed to update invoice' }, { status: 500 })
             }
         }
+
+        // Phase 2: update optional columns (exist after invoice-payment-method migration)
+        // Errors here are non-fatal — core status is already saved above
+        await supabase
+            .from('invoices')
+            .update({
+                payment_method: paymentMethod,
+                payment_notes: paymentNotes || null,
+                paid_at: new Date().toISOString(),
+            })
+            .eq('id', invoiceId)
+            .eq('user_id', user.id)
 
         revalidatePath('/invoices')
         revalidatePath(`/invoices/${invoiceId}`)

@@ -76,58 +76,43 @@ export async function POST(request: Request) {
             payment = paymentData
         }
 
-        // Build the minimal safe update (columns guaranteed to exist after partial-payment migration)
-        const baseUpdate: Record<string, unknown> = {
-            status: isFullyPaid ? 'paid' : 'partial',
-        }
-
-        // Try the full update first (requires invoice-payment-method migration for paid_at etc.)
-        const fullUpdate: Record<string, unknown> = {
-            ...baseUpdate,
-            amount_paid: newAmountPaid,
-            amount_remaining: newAmountRemaining,
-            is_partial_payment: !isFullyPaid && newAmountPaid > 0,
-            ...(isFullyPaid ? {
-                paid_at: new Date().toISOString(),
-                payment_method: paymentMethod,
-                payment_notes: paymentNotes,
-            } : {}),
-        }
-
-        const { error: updateError } = await supabase
+        // Phase 1: update amounts + status (exist after partial-payment migration)
+        const { error: coreError } = await supabase
             .from('invoices')
-            .update(fullUpdate)
+            .update({
+                status: isFullyPaid ? 'paid' : 'partial',
+                amount_paid: newAmountPaid,
+                amount_remaining: newAmountRemaining,
+                is_partial_payment: !isFullyPaid && newAmountPaid > 0,
+            })
             .eq('id', invoiceId)
             .eq('user_id', user.id)
 
-        if (updateError) {
-            // Column doesn't exist → strip optional columns and retry with just status
-            const isColumnError = updateError.code === '42703' || updateError.message?.includes('column') || updateError.message?.includes('does not exist')
-            // Check constraint violation (e.g. 'partial' status not allowed yet)
-            const isConstraintError = updateError.code === '23514' || updateError.message?.includes('check constraint') || updateError.message?.includes('violates')
-
-            if (isColumnError || isConstraintError) {
-                // Fallback: only update status field (always exists)
-                const fallbackUpdate: Record<string, unknown> = { status: isFullyPaid ? 'paid' : 'sent' }
-                if (!isColumnError) {
-                    // Columns exist but constraint issue — still safe to update amounts
-                    fallbackUpdate.amount_paid = newAmountPaid
-                    fallbackUpdate.amount_remaining = newAmountRemaining
-                    fallbackUpdate.is_partial_payment = !isFullyPaid && newAmountPaid > 0
-                }
-                const { error: fallbackError } = await supabase
-                    .from('invoices')
-                    .update(fallbackUpdate)
-                    .eq('id', invoiceId)
-                    .eq('user_id', user.id)
-                if (fallbackError) {
-                    console.error('Invoice fallback update error:', fallbackError)
-                    // Payment was still recorded — don't return an error to the user
-                }
-            } else {
-                console.error('Invoice update error:', updateError)
-                return NextResponse.json({ error: 'Failed to update invoice after payment' }, { status: 500 })
+        if (coreError) {
+            // amount_paid etc. may not exist — fall back to just status
+            const { error: minimalError } = await supabase
+                .from('invoices')
+                .update({ status: isFullyPaid ? 'paid' : 'sent' })
+                .eq('id', invoiceId)
+                .eq('user_id', user.id)
+            if (minimalError) {
+                console.error('Invoice core update error:', minimalError)
+                // Payment record was inserted — don't surface as an error to user
             }
+        }
+
+        // Phase 2: update optional columns when fully paid (exists after invoice-payment-method migration)
+        // Errors here are non-fatal
+        if (isFullyPaid) {
+            await supabase
+                .from('invoices')
+                .update({
+                    paid_at: new Date().toISOString(),
+                    payment_method: paymentMethod,
+                    payment_notes: paymentNotes,
+                })
+                .eq('id', invoiceId)
+                .eq('user_id', user.id)
         }
 
         return NextResponse.json({ 
