@@ -23,14 +23,29 @@ export async function POST(request: Request) {
             )
         }
 
-        // Update invoice status
+        // Fetch the invoice to get total amount
+        const { data: invoice, error: fetchError } = await supabase
+            .from('invoices')
+            .select('total')
+            .eq('id', invoiceId)
+            .eq('user_id', user.id)
+            .single()
+
+        if (fetchError || !invoice) {
+            return NextResponse.json({ error: 'Invoice not found' }, { status: 404 })
+        }
+
+        // Update invoice status and amounts
         const { error: updateError } = await supabase
             .from('invoices')
             .update({
                 status: 'paid',
                 payment_method: paymentMethod,
                 payment_notes: paymentNotes || null,
-                paid_at: new Date().toISOString()
+                paid_at: new Date().toISOString(),
+                amount_paid: invoice.total,
+                amount_remaining: 0,
+                is_partial_payment: false,
             })
             .eq('id', invoiceId)
             .eq('user_id', user.id)

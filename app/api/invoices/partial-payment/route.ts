@@ -44,8 +44,14 @@ export async function POST(request: Request) {
             }, { status: 400 })
         }
 
-        // Insert payment record
-        const { data: payment, error: paymentError } = await supabase
+        // Calculate new amounts
+        const newAmountPaid = (invoice.amount_paid ?? 0) + amount
+        const newAmountRemaining = Math.max(0, invoice.total - newAmountPaid)
+        const isFullyPaid = newAmountPaid >= invoice.total
+
+        // Try to insert into invoice_payments table (requires partial-payment migration)
+        let payment = null
+        const { data: paymentData, error: paymentError } = await supabase
             .from('invoice_payments')
             .insert({
                 invoice_id: invoiceId,
@@ -59,22 +65,64 @@ export async function POST(request: Request) {
             .single()
 
         if (paymentError) {
-            console.error('Payment insert error:', paymentError)
-            return NextResponse.json({ error: 'Failed to record payment' }, { status: 500 })
+            // If the table doesn't exist, fall through to direct invoice update
+            const tableNotFound = paymentError.code === '42P01' || paymentError.message?.includes('does not exist')
+            if (!tableNotFound) {
+                console.error('Payment insert error:', paymentError)
+                return NextResponse.json({ error: 'Failed to record payment: ' + paymentError.message }, { status: 500 })
+            }
+            console.warn('invoice_payments table not found — recording payment directly on invoice')
+        } else {
+            payment = paymentData
         }
 
-        // The database trigger will automatically update the invoice amounts and status
-        // But we'll also update paid_at if this completes the payment
-        const newAmountPaid = (invoice.amount_paid ?? 0) + amount
-        if (newAmountPaid >= invoice.total) {
-            await supabase
-                .from('invoices')
-                .update({ 
-                    paid_at: new Date().toISOString(),
-                    payment_method: paymentMethod,
-                    payment_notes: paymentNotes
-                })
-                .eq('id', invoiceId)
+        // Update invoice amounts and status directly (handles both with/without trigger)
+        const invoiceUpdate: Record<string, unknown> = {
+            amount_paid: newAmountPaid,
+            amount_remaining: newAmountRemaining,
+            is_partial_payment: !isFullyPaid && newAmountPaid > 0,
+            updated_at: new Date().toISOString(),
+        }
+
+        if (isFullyPaid) {
+            invoiceUpdate.status = 'paid'
+            invoiceUpdate.paid_at = new Date().toISOString()
+            invoiceUpdate.payment_method = paymentMethod
+            invoiceUpdate.payment_notes = paymentNotes
+        } else {
+            // Only set status to 'partial' if supported (migration may not have been run)
+            // Try it, log error if constraint fails but don't block the payment
+            invoiceUpdate.status = 'partial'
+        }
+
+        const { error: updateError } = await supabase
+            .from('invoices')
+            .update(invoiceUpdate)
+            .eq('id', invoiceId)
+            .eq('user_id', user.id)
+
+        if (updateError) {
+            // If 'partial' status violates constraint, retry without changing status
+            if (updateError.code === '23514' || updateError.message?.includes('check constraint')) {
+                const { error: retryError } = await supabase
+                    .from('invoices')
+                    .update({
+                        amount_paid: newAmountPaid,
+                        amount_remaining: newAmountRemaining,
+                        is_partial_payment: !isFullyPaid && newAmountPaid > 0,
+                        updated_at: new Date().toISOString(),
+                        ...(isFullyPaid ? { status: 'paid', paid_at: new Date().toISOString(), payment_method: paymentMethod, payment_notes: paymentNotes } : {})
+                    })
+                    .eq('id', invoiceId)
+                    .eq('user_id', user.id)
+                if (retryError) {
+                    console.error('Invoice update retry error:', retryError)
+                    return NextResponse.json({ error: 'Failed to update invoice after payment' }, { status: 500 })
+                }
+            } else {
+                console.error('Invoice update error:', updateError)
+                return NextResponse.json({ error: 'Failed to update invoice after payment' }, { status: 500 })
+            }
         }
 
         return NextResponse.json({ 
