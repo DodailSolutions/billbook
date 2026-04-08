@@ -36,6 +36,7 @@ export async function POST(request: Request) {
         }
 
         // Update invoice status and amounts
+        // Try full update first (needs invoice-payment-method + partial-payment migrations)
         const { error: updateError } = await supabase
             .from('invoices')
             .update({
@@ -51,11 +52,25 @@ export async function POST(request: Request) {
             .eq('user_id', user.id)
 
         if (updateError) {
-            console.error('Error updating invoice:', updateError)
-            return NextResponse.json(
-                { error: 'Failed to update invoice' },
-                { status: 500 }
-            )
+            // Column might not exist — fall back to minimal update
+            const isColumnError = updateError.code === '42703' || updateError.message?.includes('column') || updateError.message?.includes('does not exist')
+            if (isColumnError) {
+                const { error: fallbackError } = await supabase
+                    .from('invoices')
+                    .update({ status: 'paid' })
+                    .eq('id', invoiceId)
+                    .eq('user_id', user.id)
+                if (fallbackError) {
+                    console.error('Error updating invoice (fallback):', fallbackError)
+                    return NextResponse.json({ error: 'Failed to update invoice' }, { status: 500 })
+                }
+            } else {
+                console.error('Error updating invoice:', updateError)
+                return NextResponse.json(
+                    { error: 'Failed to update invoice' },
+                    { status: 500 }
+                )
+            }
         }
 
         revalidatePath('/invoices')

@@ -76,48 +76,53 @@ export async function POST(request: Request) {
             payment = paymentData
         }
 
-        // Update invoice amounts and status directly (handles both with/without trigger)
-        const invoiceUpdate: Record<string, unknown> = {
+        // Build the minimal safe update (columns guaranteed to exist after partial-payment migration)
+        const baseUpdate: Record<string, unknown> = {
+            status: isFullyPaid ? 'paid' : 'partial',
+        }
+
+        // Try the full update first (requires invoice-payment-method migration for paid_at etc.)
+        const fullUpdate: Record<string, unknown> = {
+            ...baseUpdate,
             amount_paid: newAmountPaid,
             amount_remaining: newAmountRemaining,
             is_partial_payment: !isFullyPaid && newAmountPaid > 0,
-            updated_at: new Date().toISOString(),
-        }
-
-        if (isFullyPaid) {
-            invoiceUpdate.status = 'paid'
-            invoiceUpdate.paid_at = new Date().toISOString()
-            invoiceUpdate.payment_method = paymentMethod
-            invoiceUpdate.payment_notes = paymentNotes
-        } else {
-            // Only set status to 'partial' if supported (migration may not have been run)
-            // Try it, log error if constraint fails but don't block the payment
-            invoiceUpdate.status = 'partial'
+            ...(isFullyPaid ? {
+                paid_at: new Date().toISOString(),
+                payment_method: paymentMethod,
+                payment_notes: paymentNotes,
+            } : {}),
         }
 
         const { error: updateError } = await supabase
             .from('invoices')
-            .update(invoiceUpdate)
+            .update(fullUpdate)
             .eq('id', invoiceId)
             .eq('user_id', user.id)
 
         if (updateError) {
-            // If 'partial' status violates constraint, retry without changing status
-            if (updateError.code === '23514' || updateError.message?.includes('check constraint')) {
-                const { error: retryError } = await supabase
+            // Column doesn't exist → strip optional columns and retry with just status
+            const isColumnError = updateError.code === '42703' || updateError.message?.includes('column') || updateError.message?.includes('does not exist')
+            // Check constraint violation (e.g. 'partial' status not allowed yet)
+            const isConstraintError = updateError.code === '23514' || updateError.message?.includes('check constraint') || updateError.message?.includes('violates')
+
+            if (isColumnError || isConstraintError) {
+                // Fallback: only update status field (always exists)
+                const fallbackUpdate: Record<string, unknown> = { status: isFullyPaid ? 'paid' : 'sent' }
+                if (!isColumnError) {
+                    // Columns exist but constraint issue — still safe to update amounts
+                    fallbackUpdate.amount_paid = newAmountPaid
+                    fallbackUpdate.amount_remaining = newAmountRemaining
+                    fallbackUpdate.is_partial_payment = !isFullyPaid && newAmountPaid > 0
+                }
+                const { error: fallbackError } = await supabase
                     .from('invoices')
-                    .update({
-                        amount_paid: newAmountPaid,
-                        amount_remaining: newAmountRemaining,
-                        is_partial_payment: !isFullyPaid && newAmountPaid > 0,
-                        updated_at: new Date().toISOString(),
-                        ...(isFullyPaid ? { status: 'paid', paid_at: new Date().toISOString(), payment_method: paymentMethod, payment_notes: paymentNotes } : {})
-                    })
+                    .update(fallbackUpdate)
                     .eq('id', invoiceId)
                     .eq('user_id', user.id)
-                if (retryError) {
-                    console.error('Invoice update retry error:', retryError)
-                    return NextResponse.json({ error: 'Failed to update invoice after payment' }, { status: 500 })
+                if (fallbackError) {
+                    console.error('Invoice fallback update error:', fallbackError)
+                    // Payment was still recorded — don't return an error to the user
                 }
             } else {
                 console.error('Invoice update error:', updateError)
