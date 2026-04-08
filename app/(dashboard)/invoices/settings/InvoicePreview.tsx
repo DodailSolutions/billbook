@@ -280,13 +280,15 @@ export default function InvoicePreview({ settings }: InvoicePreviewProps) {
                     </div>
                     {/* CENTER: Company seal */}
                     {settings.show_stamp && settings.company_stamp_url?.startsWith('data:image') && (
-                        <div className="text-center">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={settings.company_stamp_url} alt="Company Stamp"
-                                className="max-h-28 max-w-28 w-auto h-auto object-contain opacity-85 mx-auto"
-                                onError={(e) => { e.currentTarget.style.display = 'none' }}
-                            />
-                            <div className="text-xs text-gray-400 mt-2 pt-1.5 border-t border-gray-200">Company Seal</div>
+                        <div className="text-center min-w-[100px]">
+                            <div className="h-14 flex items-center justify-center mb-1">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img src={settings.company_stamp_url} alt="Company Stamp"
+                                    className="max-h-20 max-w-[110px] w-auto h-auto object-contain mix-blend-multiply opacity-90 mx-auto"
+                                    onError={(e) => { e.currentTarget.style.display = 'none' }}
+                                />
+                            </div>
+                            <div className="border-t border-gray-300 pt-1.5 text-xs text-gray-400">Company Seal</div>
                         </div>
                     )}
                     {/* RIGHT: Authorized signatory */}

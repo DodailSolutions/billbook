@@ -376,11 +376,13 @@ export function InvoicePreviewPanel({
                     </div>
                     {/* CENTER: Company seal */}
                     {settings.show_stamp && settings.company_stamp_url?.startsWith('data:image') && (
-                        <div className="text-center">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={settings.company_stamp_url} alt="Stamp" className="max-h-16 max-w-16 w-auto h-auto object-contain opacity-85 mx-auto"
-                                onError={(e) => { e.currentTarget.style.display = 'none' }} />
-                            <div className="text-xs text-gray-500 mt-1.5 pt-1 border-t border-gray-200">Company Seal</div>
+                        <div className="text-center min-w-[90px]">
+                            <div className="h-12 flex items-center justify-center mb-1">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img src={settings.company_stamp_url} alt="Stamp" className="max-h-16 max-w-[100px] w-auto h-auto object-contain mix-blend-multiply opacity-90 mx-auto"
+                                    onError={(e) => { e.currentTarget.style.display = 'none' }} />
+                            </div>
+                            <div className="border-t border-gray-300 pt-1 text-xs text-gray-500">Company Seal</div>
                         </div>
                     )}
                     {/* RIGHT: Authorized signatory */}
