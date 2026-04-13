@@ -4,7 +4,7 @@ import { notFound } from "next/navigation"
 import { Button } from "@/components/ui/Button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card"
 import { Input } from "@/components/ui/Input"
-import { getSavedItem, updateSavedItem } from "../../actions"
+import { getSavedItem, updateSavedItem } from "../actions"
 
 export default async function EditItemPage({
     params,
