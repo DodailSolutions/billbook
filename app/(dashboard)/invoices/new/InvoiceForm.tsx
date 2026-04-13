@@ -1,18 +1,20 @@
 'use client'
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { Plus, Trash2, Info, X, FileText } from "lucide-react"
 import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
 import { createInvoice, updateInvoice } from "../actions"
-import type { Customer, InvoiceWithDetails } from "@/lib/types"
+import { saveItemFromInvoice, deleteSavedItem as deleteSavedItemAction } from "../../items/actions"
+import type { Customer, InvoiceWithDetails, SavedItem } from "@/lib/types"
 import { InvoicePreviewPanel } from "./InvoicePreviewPanel"
 
 interface InvoiceFormProps {
     customers: Customer[]
     invoice?: InvoiceWithDetails
     mode?: 'create' | 'edit'
+    savedItems?: SavedItem[]
 }
 
 interface InvoiceItem {
@@ -25,8 +27,9 @@ interface InvoiceItem {
     gst_rate?: number
 }
 
-export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'create' }: InvoiceFormProps) {
+export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'create', savedItems = [] }: InvoiceFormProps) {
     const router = useRouter()
+    const [, startTransition] = useTransition()
     const [customers, setCustomers] = useState<Customer[]>(initialCustomers)
     const [selectedCustomerId, setSelectedCustomerId] = useState(invoice?.customer_id || '')
     const [invoiceDate, setInvoiceDate] = useState(invoice?.invoice_date || new Date().toISOString().split('T')[0])
@@ -51,8 +54,8 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
     const [showAddCustomerModal, setShowAddCustomerModal] = useState(false)
     const [showSaveItemModal, setShowSaveItemModal] = useState(false)
     const [savedItemToSave, setSavedItemToSave] = useState<InvoiceItem | null>(null)
-    const [savedItems, setSavedItems] = useState<Array<InvoiceItem & { id: string; name: string }>>([])
     const [itemName, setItemName] = useState('')
+    const [isSavingItem, setIsSavingItem] = useState(false)
     
     // Discount
     const [discountType, setDiscountType] = useState<'percentage' | 'flat'>(invoice?.discount_type || 'percentage')
@@ -97,8 +100,16 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
         setItems(newItems)
     }
 
-    const addSavedItem = (savedItem: InvoiceItem) => {
-        setItems([...items, { ...savedItem }])
+    const addSavedItem = (savedItem: SavedItem) => {
+        setItems([...items, {
+            description: savedItem.description,
+            details: savedItem.item_details || '',
+            quantity: savedItem.default_quantity,
+            unit_price: savedItem.unit_price,
+            hsn_sac_code: savedItem.hsn_sac_code,
+            hsn_sac_type: savedItem.hsn_sac_type,
+            gst_rate: savedItem.gst_rate,
+        }])
     }
 
     const saveCurrentItem = (itemIndex: number) => {
@@ -106,26 +117,41 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
         setShowSaveItemModal(true)
     }
 
-    const handleSaveItem = () => {
-        if (savedItemToSave && itemName.trim()) {
-            const newSaved = {
-                ...savedItemToSave,
-                id: Date.now().toString(),
-                name: itemName
-            }
-            const updated = [...savedItems, newSaved]
-            setSavedItems(updated)
-            localStorage.setItem('savedInvoiceItems', JSON.stringify(updated))
+    const handleSaveItem = async () => {
+        if (!savedItemToSave || !itemName.trim()) return
+        setIsSavingItem(true)
+        try {
+            await saveItemFromInvoice({
+                name: itemName.trim(),
+                description: savedItemToSave.description,
+                item_details: savedItemToSave.details || undefined,
+                unit_price: savedItemToSave.unit_price,
+                default_quantity: savedItemToSave.quantity,
+                hsn_sac_code: savedItemToSave.hsn_sac_code,
+                hsn_sac_type: savedItemToSave.hsn_sac_type,
+                gst_rate: savedItemToSave.gst_rate,
+            })
             setItemName('')
             setShowSaveItemModal(false)
             setSavedItemToSave(null)
+            startTransition(() => router.refresh())
+        } catch (err) {
+            console.error('Failed to save item:', err)
+            alert('Failed to save item. Please try again.')
+        } finally {
+            setIsSavingItem(false)
         }
     }
 
     const deleteSavedItem = (id: string) => {
-        const updated = savedItems.filter(item => item.id !== id)
-        setSavedItems(updated)
-        localStorage.setItem('savedInvoiceItems', JSON.stringify(updated))
+        startTransition(async () => {
+            try {
+                await deleteSavedItemAction(id)
+                router.refresh()
+            } catch (err) {
+                console.error('Failed to delete saved item:', err)
+            }
+        })
     }
 
     const handleAddCustomer = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -702,7 +728,9 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                             </div>
                         )}
                         <div className="flex gap-2 pt-4">
-                            <Button onClick={handleSaveItem} className="flex-1">Save Item</Button>
+                            <Button onClick={handleSaveItem} disabled={isSavingItem} className="flex-1">
+                                {isSavingItem ? 'Saving…' : 'Save Item'}
+                            </Button>
                             <Button
                                 variant="outline"
                                 onClick={() => setShowSaveItemModal(false)}

@@ -1,3 +1,18 @@
+export interface SavedItem {
+    id: string
+    user_id: string
+    name: string
+    description: string
+    item_details?: string
+    unit_price: number
+    default_quantity: number
+    hsn_sac_code?: string
+    hsn_sac_type?: 'HSN' | 'SAC'
+    gst_rate?: number
+    created_at: string
+    updated_at: string
+}
+
 export interface Customer {
     id: string
     user_id: string

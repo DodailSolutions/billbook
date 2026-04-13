@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
@@ -12,7 +12,8 @@ import {
   Sparkles, Shield, Clock, X, UserPlus, Download, CheckCircle
 } from 'lucide-react'
 import { createInvoice } from '../actions'
-import type { Customer } from '@/lib/types'
+import { saveItemFromInvoice, deleteSavedItem as deleteSavedItemAction } from '../../items/actions'
+import type { Customer, SavedItem } from '@/lib/types'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
 
@@ -32,10 +33,12 @@ interface InvoiceItem {
 
 interface ImprovedInvoiceFormProps {
   customers: Customer[]
+  savedItems?: SavedItem[]
 }
 
-export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInvoiceFormProps) {
+export function ImprovedInvoiceForm({ customers: initialCustomers, savedItems = [] }: ImprovedInvoiceFormProps) {
   const router = useRouter()
+  const [, startTransition] = useTransition()
   const [currentStep, setCurrentStep] = useState(1)
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -45,6 +48,10 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [createdInvoiceId, setCreatedInvoiceId] = useState<string | null>(null)
   const [isDownloading, setIsDownloading] = useState(false)
+  const [showSaveItemModal, setShowSaveItemModal] = useState(false)
+  const [savedItemToSave, setSavedItemToSave] = useState<InvoiceItem | null>(null)
+  const [itemName, setItemName] = useState('')
+  const [isSavingItem, setIsSavingItem] = useState(false)
 
   // Form state
   const [formData, setFormData] = useState({
@@ -165,6 +172,65 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
       sgst: 0,
       igst: 0
     }])
+  }
+
+  // Add a saved item as a new line item
+  const addSavedItemToForm = (savedItem: SavedItem) => {
+    const gstAmount = savedItem.default_quantity * savedItem.unit_price * (savedItem.gst_rate ?? 18) / 100
+    setItems([...items, {
+      id: crypto.randomUUID(),
+      description: savedItem.description,
+      details: savedItem.item_details || '',
+      hsn_sac_code: savedItem.hsn_sac_code || '',
+      quantity: savedItem.default_quantity,
+      unit_price: savedItem.unit_price,
+      gst_rate: savedItem.gst_rate ?? 18,
+      amount: savedItem.default_quantity * savedItem.unit_price,
+      cgst: formData.supply_type === 'intra-state' ? gstAmount / 2 : 0,
+      sgst: formData.supply_type === 'intra-state' ? gstAmount / 2 : 0,
+      igst: formData.supply_type === 'inter-state' ? gstAmount : 0,
+    }])
+  }
+
+  const saveCurrentItem = (item: InvoiceItem) => {
+    setSavedItemToSave(item)
+    setShowSaveItemModal(true)
+  }
+
+  const handleSaveItem = async () => {
+    if (!savedItemToSave || !itemName.trim()) return
+    setIsSavingItem(true)
+    try {
+      await saveItemFromInvoice({
+        name: itemName.trim(),
+        description: savedItemToSave.description,
+        item_details: savedItemToSave.details || undefined,
+        unit_price: savedItemToSave.unit_price,
+        default_quantity: savedItemToSave.quantity,
+        hsn_sac_code: savedItemToSave.hsn_sac_code || undefined,
+        gst_rate: savedItemToSave.gst_rate,
+      })
+      setItemName('')
+      setShowSaveItemModal(false)
+      setSavedItemToSave(null)
+      startTransition(() => router.refresh())
+    } catch (err) {
+      console.error('Failed to save item:', err)
+      alert('Failed to save item. Please try again.')
+    } finally {
+      setIsSavingItem(false)
+    }
+  }
+
+  const handleDeleteSavedItem = (id: string) => {
+    startTransition(async () => {
+      try {
+        await deleteSavedItemAction(id)
+        router.refresh()
+      } catch (err) {
+        console.error('Failed to delete saved item:', err)
+      }
+    })
   }
 
   // Remove item
@@ -705,6 +771,33 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
                 </CardHeader>
                 <CardContent className="p-6 space-y-4">
                   
+                  {/* Saved items chips */}
+                  {savedItems.length > 0 && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                      <p className="text-xs font-semibold text-blue-700 mb-2">📦 Saved Items — click to add</p>
+                      <div className="flex flex-wrap gap-2">
+                        {savedItems.map((savedItem) => (
+                          <div key={savedItem.id} className="flex items-center gap-1.5 bg-white px-2.5 py-1 rounded-full border border-blue-200 text-xs">
+                            <button
+                              type="button"
+                              onClick={() => addSavedItemToForm(savedItem)}
+                              className="text-blue-600 hover:text-blue-800 font-medium"
+                            >
+                              + {savedItem.name}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteSavedItem(savedItem.id)}
+                              className="text-red-400 hover:text-red-600"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   {items.map((item, index) => (
                     <Card key={item.id} className="border-2 border-gray-200 hover:border-blue-200 transition-colors bg-white dark:bg-white dark:border-gray-200">
                       <CardContent className="p-4 space-y-4">
@@ -825,6 +918,18 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
                               className="bg-gray-50 font-semibold"
                             />
                           </div>
+                        </div>
+
+                        <div className="flex justify-end pt-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => saveCurrentItem(item)}
+                            className="text-xs gap-1 border-dashed text-gray-500 hover:text-gray-700"
+                          >
+                            💾 Save for later
+                          </Button>
                         </div>
 
                       </CardContent>
@@ -1230,6 +1335,46 @@ export function ImprovedInvoiceForm({ customers: initialCustomers }: ImprovedInv
                 </Button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Save Item Modal */}
+      {showSaveItemModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+            <div className="flex items-center justify-between p-6 border-b">
+              <h2 className="text-lg font-semibold">Save Item for Later</h2>
+              <button onClick={() => setShowSaveItemModal(false)} className="text-gray-500 hover:text-gray-700">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="space-y-2">
+                <label htmlFor="saved-item-name" className="text-sm font-medium">Item Label *</label>
+                <Input
+                  id="saved-item-name"
+                  value={itemName}
+                  onChange={(e) => setItemName(e.target.value)}
+                  placeholder="e.g., Web Design Service, Monthly Retainer"
+                />
+              </div>
+              {savedItemToSave && (
+                <div className="bg-gray-50 p-3 rounded text-sm space-y-1">
+                  <p><span className="font-medium">Description:</span> {savedItemToSave.description}</p>
+                  <p><span className="font-medium">Price:</span> ₹{savedItemToSave.unit_price.toFixed(2)}</p>
+                  <p><span className="font-medium">Qty:</span> {savedItemToSave.quantity}</p>
+                </div>
+              )}
+              <div className="flex gap-2 pt-4">
+                <Button onClick={handleSaveItem} disabled={isSavingItem} className="flex-1">
+                  {isSavingItem ? 'Saving…' : 'Save Item'}
+                </Button>
+                <Button variant="outline" onClick={() => setShowSaveItemModal(false)} className="flex-1">
+                  Cancel
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       )}

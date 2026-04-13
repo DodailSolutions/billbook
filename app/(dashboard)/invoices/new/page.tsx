@@ -3,12 +3,14 @@ import { ArrowLeft, AlertTriangle } from "lucide-react"
 import { Button } from "@/components/ui/Button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card"
 import { getCustomers } from "../../customers/actions"
+import { getSavedItems } from "../../items/actions"
 import { ImprovedInvoiceForm } from "./ImprovedInvoiceForm"
 import { checkInvoiceLimit } from '@/lib/plan-utils'
 
 export default async function NewInvoicePage() {
-    const [customers, limitStatus] = await Promise.all([
+    const [customers, savedItems, limitStatus] = await Promise.all([
         getCustomers(),
+        getSavedItems(),
         checkInvoiceLimit()
     ])
 
@@ -71,7 +73,7 @@ export default async function NewInvoicePage() {
 
     return (
         <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50">
-            <ImprovedInvoiceForm customers={customers} />
+            <ImprovedInvoiceForm customers={customers} savedItems={savedItems} />
         </div>
     )
 }

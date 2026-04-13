@@ -5,7 +5,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { LayoutDashboard, FileText, Users, RefreshCw, Bell, Settings, User, Bot, UserCog, FileBarChart, HelpCircle, MessageCircle, Briefcase, UserPlus, ChevronLeft, ChevronRight } from "lucide-react"
+import { LayoutDashboard, FileText, Users, RefreshCw, Bell, Settings, User, Bot, UserCog, FileBarChart, HelpCircle, MessageCircle, Briefcase, UserPlus, ChevronLeft, ChevronRight, Package } from "lucide-react"
 import { SignOutButton } from "./SignOutButton"
 import { PlanBanner } from "./PlanBanner"
 import { getMyCAProfile } from "@/lib/ca-profile-actions"
@@ -53,6 +53,12 @@ export function Sidebar() {
             icon: Users,
             href: '/customers',
             color: "text-pink-700",
+        },
+        {
+            label: 'Items',
+            icon: Package,
+            href: '/items',
+            color: "text-teal-500",
         },
         {
             label: 'AI Accountant',
