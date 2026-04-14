@@ -18,10 +18,9 @@ interface PricingOption {
 interface PurchaseAddonModalProps {
   isLifetimePlan: boolean
   currentSlots: number
-  onSuccess: () => void
 }
 
-export function PurchaseAddonModal({ isLifetimePlan, currentSlots, onSuccess }: PurchaseAddonModalProps) {
+export function PurchaseAddonModal({ isLifetimePlan, currentSlots }: PurchaseAddonModalProps) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [pricing, setPricing] = useState<PricingOption[]>([])
@@ -108,7 +107,7 @@ export function PurchaseAddonModal({ isLifetimePlan, currentSlots, onSuccess }: 
 
           if (verifyResponse.ok) {
             setOpen(false)
-            onSuccess()
+            window.location.reload()
           } else {
             throw new Error(verifyData.error || 'Payment verification failed')
           }

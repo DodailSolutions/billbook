@@ -132,7 +132,6 @@ export default async function TeamMembersPage() {
               <PurchaseAddonModal
                 isLifetimePlan={isLifetimePlan}
                 currentSlots={teamLimit.purchased_slots}
-                onSuccess={() => {}}
               />
             )}
           </div>
@@ -156,7 +155,6 @@ export default async function TeamMembersPage() {
                 <PurchaseAddonModal
                   isLifetimePlan={isLifetimePlan}
                   currentSlots={teamLimit.purchased_slots}
-                  onSuccess={() => {}}
                 />
               </div>
             </CardContent>
