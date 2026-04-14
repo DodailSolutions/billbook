@@ -299,7 +299,7 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
             <thead>
                 <tr>
                     <th>Description</th>
-                    ${invoice.invoice_items.some(item => item.hsn_sac_code) ? '<th>HSN/SAC</th>' : ''}
+                    <th>HSN/SAC</th>
                     <th class="text-right">Qty</th>
                     <th class="text-right">Price</th>
                     <th class="text-right">Amount</th>
@@ -310,7 +310,7 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
                 ${invoice.invoice_items.map(item => `
                 <tr>
                     <td>${item.description}${item.item_details ? `<div style="font-size:${Math.max(9, invoiceFontSize - 2)}px; color:#6b7280; margin-top:4px; white-space:pre-line;">${item.item_details}</div>` : ''}</td>
-                    ${invoice.invoice_items.some(i => i.hsn_sac_code) ? `<td>${item.hsn_sac_code || '-'}</td>` : ''}
+                    <td style="font-family:monospace">${item.hsn_sac_code ? `${item.hsn_sac_type ? `<span style="font-size:${Math.max(8, invoiceFontSize - 3)}px; color:#9ca3af;">${item.hsn_sac_type} </span>` : ''}${item.hsn_sac_code}` : '<span style="color:#d1d5db">—</span>'}</td>
                     <td class="text-right">${item.quantity}</td>
                     <td class="text-right">₹${item.unit_price.toFixed(2)}</td>
                     <td class="text-right">₹${item.amount.toFixed(2)}</td>

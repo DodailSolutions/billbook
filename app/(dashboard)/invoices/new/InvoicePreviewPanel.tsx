@@ -249,9 +249,7 @@ export function InvoicePreviewPanel({
                                     }}
                                 >
                                     <th className="text-left p-2">Description</th>
-                                    {items.some(item => item.hsn_sac_code) && (
-                                        <th className="text-left p-2">HSN/SAC</th>
-                                    )}
+                                    <th className="text-left p-2">HSN/SAC</th>
                                     <th className="text-right p-2">Qty</th>
                                     <th className="text-right p-2">Price</th>
                                     <th className="text-right p-2">Amount</th>
@@ -266,9 +264,7 @@ export function InvoicePreviewPanel({
                                                 <div className="text-xs text-gray-400 mt-0.5 whitespace-pre-line">{item.details}</div>
                                             )}
                                         </td>
-                                        {items.some(i => i.hsn_sac_code) && (
-                                            <td className="p-2 text-gray-500">{item.hsn_sac_code || '-'}</td>
-                                        )}
+                                        <td className="p-2 text-gray-500 font-mono text-xs">{item.hsn_sac_code || '—'}</td>
                                         <td className="p-2 text-right text-gray-700">{item.quantity}</td>
                                         <td className="p-2 text-right text-gray-700">₹{item.unit_price.toFixed(2)}</td>
                                         <td className="p-2 text-right text-gray-700">₹{(item.quantity * item.unit_price).toFixed(2)}</td>
@@ -370,13 +366,13 @@ export function InvoicePreviewPanel({
                 {/* Signature, Stamp & Client Signature — always shown */}
                 <div className="flex justify-between items-start gap-4 mt-4 pt-3 border-t border-gray-200">
                     {/* LEFT: Client signature placeholder */}
-                    <div className="text-center min-w-[110px]">
+                    <div className="text-center min-w-27.5">
                         <div className="border-2 border-dashed border-gray-300 rounded h-12 mb-1" />
                         <div className="text-xs text-gray-400">Customer Signature</div>
                     </div>
                     {/* CENTER: Company seal */}
                     {settings.show_stamp && settings.company_stamp_url?.startsWith('data:image') && (
-                        <div className="text-center min-w-[90px]">
+                        <div className="text-center min-w-22.5">
                             <div className="h-14 w-14 mx-auto mb-1 rounded-full overflow-hidden border border-gray-200 bg-white">
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img src={settings.company_stamp_url} alt="Stamp" className="w-full h-full object-cover"
@@ -387,10 +383,10 @@ export function InvoicePreviewPanel({
                     )}
                     {/* RIGHT: Authorized signatory */}
                     {settings.show_signature && settings.digital_signature_url?.startsWith('data:image') && (
-                        <div className="text-center min-w-[110px]">
+                        <div className="text-center min-w-27.5">
                             <div className="h-12 flex items-end justify-center mb-1">
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img src={settings.digital_signature_url} alt="Signature" className="max-h-10 max-w-[120px] w-auto h-auto object-contain mx-auto"
+                                <img src={settings.digital_signature_url} alt="Signature" className="max-h-10 max-w-30 w-auto h-auto object-contain mx-auto"
                                     onError={(e) => { e.currentTarget.style.display = 'none' }} />
                             </div>
                             <div className="border-t-2 border-gray-700 pt-1 text-xs font-semibold text-gray-700">{settings.company_name}</div>

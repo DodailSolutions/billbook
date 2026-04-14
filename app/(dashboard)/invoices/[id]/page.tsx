@@ -175,9 +175,7 @@ export default async function InvoiceDetailPage({
                             <thead>
                                 <tr className="bg-gray-50 dark:bg-gray-800 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                                     <th className="text-left px-4 py-3">Item</th>
-                                    {invoice.invoice_items.some(item => item.hsn_sac_code) && (
-                                        <th className="text-left px-3 py-3">HSN/SAC</th>
-                                    )}
+                                    <th className="text-left px-3 py-3">HSN/SAC</th>
                                     <th className="text-right px-3 py-3">Qty</th>
                                     <th className="text-right px-3 py-3">Rate</th>
                                     {invoice.invoice_items.some(item => item.gst_rate) && (
@@ -195,9 +193,14 @@ export default async function InvoiceDetailPage({
                                                 <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 whitespace-pre-line">{item.item_details}</div>
                                             )}
                                         </td>
-                                        {invoice.invoice_items.some(i => i.hsn_sac_code) && (
-                                            <td className="px-3 py-3 text-gray-500 font-mono text-xs">{item.hsn_sac_code || '—'}</td>
-                                        )}
+                                        <td className="px-3 py-3 font-mono text-xs">
+                                            {item.hsn_sac_code ? (
+                                                <span className="text-gray-700 dark:text-gray-300">
+                                                    {item.hsn_sac_type && <span className="text-gray-400 mr-0.5 text-xs">{item.hsn_sac_type} </span>}
+                                                    {item.hsn_sac_code}
+                                                </span>
+                                            ) : <span className="text-gray-300 dark:text-gray-600">—</span>}
+                                        </td>
                                         <td className="text-right px-3 py-3 text-gray-700 dark:text-gray-300">{item.quantity}</td>
                                         <td className="text-right px-3 py-3 text-gray-700 dark:text-gray-300">₹{item.unit_price.toFixed(2)}</td>
                                         {invoice.invoice_items.some(i => i.gst_rate) && (
@@ -290,7 +293,7 @@ export default async function InvoiceDetailPage({
                         </div>
                         {/* CENTER: Company seal */}
                         {invoiceSettings?.show_stamp && invoiceSettings?.company_stamp_url?.startsWith('data:image') && (
-                            <div className="text-center min-w-[120px]">
+                            <div className="text-center min-w-30">
                                 <div className="h-20 w-20 mx-auto mb-2 rounded-full overflow-hidden border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-100">
                                     {/* eslint-disable-next-line @next/next/no-img-element */}
                                     <img src={invoiceSettings.company_stamp_url} alt="Company Stamp"
@@ -303,11 +306,11 @@ export default async function InvoiceDetailPage({
                         )}
                         {/* RIGHT: Authorized signatory */}
                         {invoiceSettings?.show_signature && invoiceSettings?.digital_signature_url?.startsWith('data:image') && (
-                            <div className="text-center min-w-[160px]">
+                            <div className="text-center min-w-40">
                                 <div className="h-16 flex items-end justify-center mb-1">
                                     {/* eslint-disable-next-line @next/next/no-img-element */}
                                     <img src={invoiceSettings.digital_signature_url} alt="Signature"
-                                        className="max-h-14 max-w-[180px] w-auto h-auto object-contain" />
+                                        className="max-h-14 max-w-45 w-auto h-auto object-contain" />
                                 </div>
                                 <div className="border-t-2 border-gray-700 dark:border-gray-400 pt-1 text-center">
                                     {invoiceSettings.company_name && (
