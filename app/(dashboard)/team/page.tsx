@@ -19,38 +19,45 @@ export default async function TeamMembersPage() {
 
   // Check plan status and team member limits
   const planStatus = await getUserPlanStatus()
-  const hasTeamAccess = planStatus && canAccessAIAccountant(planStatus.planSlug, planStatus.subscription?.plan?.billing_period)
-  const isLifetimePlan = planStatus?.subscription?.plan?.billing_period === 'lifetime'
+  const hasTeamAccess = planStatus && canAccessAIAccountant(
+    planStatus.planSlug,
+    planStatus.subscription && planStatus.subscription.plan ? planStatus.subscription.plan.billing_period : undefined
+  )
+  const isLifetimePlan = !!(planStatus && planStatus.subscription && planStatus.subscription.plan && planStatus.subscription.plan.billing_period === 'lifetime')
 
   // Get team member limits
-  const { data: limits } = await supabase.rpc('check_team_member_limit', {
-    p_owner_id: user.id
-  })
+  let teamLimit = { allowed: 1, current: 0, can_add: false, base_limit: 0, purchased_slots: 0, plan_slug: '' }
+  try {
+    const { data: limits } = await supabase.rpc('check_team_member_limit', { p_owner_id: user.id })
+    if (Array.isArray(limits) && limits[0]) teamLimit = limits[0]
+  } catch {}
 
-  const teamLimit = limits?.[0] || { allowed: 1, current: 0, can_add: false, base_limit: 0, purchased_slots: 0, plan_slug: '' }
+  let addons = { active_slots: 0, monthly_slots: 0, yearly_slots: 0 }
+  if (isLifetimePlan) {
+    try {
+      const { data: addonInfo } = await supabase.rpc('get_user_team_addons', { p_user_id: user.id })
+      if (Array.isArray(addonInfo) && addonInfo[0]) addons = addonInfo[0]
+    } catch {}
+  }
 
-  // Get addon info for lifetime users
-  const { data: addonInfo } = isLifetimePlan 
-    ? await supabase.rpc('get_user_team_addons', { p_user_id: user.id })
-    : { data: null }
+  let teamMembers: any[] = []
+  try {
+    const { data } = await supabase
+      .from('team_members')
+      .select(`*, role:team_roles(*)`)
+      .eq('owner_id', user.id)
+      .order('created_at', { ascending: false })
+    if (Array.isArray(data)) teamMembers = data
+  } catch {}
 
-  const addons = addonInfo?.[0] || { active_slots: 0, monthly_slots: 0, yearly_slots: 0 }
-
-  // Get team members
-  const { data: teamMembers } = await supabase
-    .from('team_members')
-    .select(`
-      *,
-      role:team_roles(*)
-    `)
-    .eq('owner_id', user.id)
-    .order('created_at', { ascending: false })
-
-  // Get available roles
-  const { data: roles } = await supabase
-    .from('team_roles')
-    .select('*')
-    .order('name')
+  let roles: any[] = []
+  try {
+    const { data } = await supabase
+      .from('team_roles')
+      .select('*')
+      .order('name')
+    if (Array.isArray(data)) roles = data
+  } catch {}
 
   if (!hasTeamAccess) {
     return (
