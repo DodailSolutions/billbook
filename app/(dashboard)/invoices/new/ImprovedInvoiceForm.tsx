@@ -22,6 +22,7 @@ interface InvoiceItem {
   description: string
   details: string
   hsn_sac_code: string
+  hsn_sac_type: 'HSN' | 'SAC' | ''
   quantity: number
   unit_price: number
   gst_rate: number
@@ -79,6 +80,7 @@ export function ImprovedInvoiceForm({ customers: initialCustomers, savedItems = 
       description: '',
       details: '',
       hsn_sac_code: '',
+      hsn_sac_type: '',
       quantity: 1,
       unit_price: 0,
       gst_rate: 18,
@@ -164,6 +166,7 @@ export function ImprovedInvoiceForm({ customers: initialCustomers, savedItems = 
       description: '',
       details: '',
       hsn_sac_code: '',
+      hsn_sac_type: '',
       quantity: 1,
       unit_price: 0,
       gst_rate: 18,
@@ -182,6 +185,7 @@ export function ImprovedInvoiceForm({ customers: initialCustomers, savedItems = 
       description: savedItem.description,
       details: savedItem.item_details || '',
       hsn_sac_code: savedItem.hsn_sac_code || '',
+      hsn_sac_type: savedItem.hsn_sac_type || '',
       quantity: savedItem.default_quantity,
       unit_price: savedItem.unit_price,
       gst_rate: savedItem.gst_rate ?? 18,
@@ -285,6 +289,7 @@ export function ImprovedInvoiceForm({ customers: initialCustomers, savedItems = 
           quantity: item.quantity,
           unit_price: item.unit_price,
           hsn_sac_code: item.hsn_sac_code || undefined,
+          hsn_sac_type: (item.hsn_sac_type as 'HSN' | 'SAC') || undefined,
           gst_rate: item.gst_rate
         })),
         is_recurring: formData.is_recurring,
@@ -851,11 +856,22 @@ export function ImprovedInvoiceForm({ customers: initialCustomers, savedItems = 
 
                           <div className="space-y-2">
                             <label className="text-sm font-semibold text-gray-900">HSN/SAC Code</label>
-                            <Input
-                              placeholder="998314"
-                              value={item.hsn_sac_code}
-                              onChange={(e) => updateItem(item.id, 'hsn_sac_code', e.target.value)}
-                            />
+                            <div className="flex gap-2">
+                              <select
+                                value={item.hsn_sac_type}
+                                onChange={(e) => updateItem(item.id, 'hsn_sac_type', e.target.value)}
+                                className="px-2 py-2 border border-gray-300 rounded-md text-sm text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-20 shrink-0"
+                              >
+                                <option value="">Type</option>
+                                <option value="HSN">HSN</option>
+                                <option value="SAC">SAC</option>
+                              </select>
+                              <Input
+                                placeholder="998314"
+                                value={item.hsn_sac_code}
+                                onChange={(e) => updateItem(item.id, 'hsn_sac_code', e.target.value)}
+                              />
+                            </div>
                           </div>
 
                           <div className="space-y-2">

@@ -423,7 +423,7 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
             ${showStamp && companyStampUrl && companyStampUrl.startsWith('data:image') ? `
             <div style="text-align: center;">
                 <img src="${companyStampUrl}" alt="Company Stamp" style="max-height: 110px; max-width: 120px; width: auto; height: auto; object-fit: contain; opacity: 0.85; display: block; margin: 0 auto;" onerror="this.style.display='none'" />
-                <div style="font-size: 11px; color: #6b7280; margin-top: 8px; padding-top: 6px; border-top: 1px solid #e5e7eb;">Company Seal</div>
+                <div style="font-size: 11px; color: #6b7280; margin-top: 8px;">Company Seal</div>
             </div>
             ` : ''}
             ${showSignature && digitalSignatureUrl && digitalSignatureUrl.startsWith('data:image') ? `
