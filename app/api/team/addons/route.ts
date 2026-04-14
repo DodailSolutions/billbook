@@ -29,8 +29,8 @@ export async function GET() {
       .eq('status', 'active')
       .single()
 
-    // Check if user is on lifetime plan
-    const isLifetimePlan = subscription?.plan?.slug === 'lifetime'
+    // Check if user is on lifetime plan (by billing_period)
+    const isLifetimePlan = subscription?.plan?.billing_period === 'lifetime'
 
     if (!isLifetimePlan) {
       return NextResponse.json({ 
@@ -85,7 +85,7 @@ export async function POST(request: Request) {
       .eq('status', 'active')
       .single()
 
-    if (subscription?.plan?.slug !== 'lifetime') {
+    if (subscription?.plan?.billing_period !== 'lifetime') {
       return NextResponse.json({ 
         error: 'Additional team members are only available for Lifetime plan users'
       }, { status: 403 })
