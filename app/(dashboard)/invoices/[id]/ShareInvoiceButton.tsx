@@ -27,7 +27,6 @@ export function ShareInvoiceButton({
     const [emailSent, setEmailSent] = useState(false)
 
     const generatePDFBlob = async (): Promise<Blob> => {
-        setIsGenerating(true)
         try {
             // Fetch the invoice HTML
             const response = await fetch(`/api/invoices/${invoiceId}/pdf?mode=html`)
@@ -163,8 +162,8 @@ export function ShareInvoiceButton({
             
             // Return PDF as blob
             return pdf.output('blob')
-        } finally {
-            setIsGenerating(false)
+        } catch (error) {
+            throw error
         }
     }
 
@@ -172,52 +171,33 @@ export function ShareInvoiceButton({
         try {
             setIsGenerating(true)
             
-            // Generate PDF
+            // Generate PDF and download it
             const pdfBlob = await generatePDFBlob()
-            const file = new File([pdfBlob], `Invoice-${invoiceNumber}.pdf`, { type: 'application/pdf' })
+            const url = URL.createObjectURL(pdfBlob)
+            const link = document.createElement('a')
+            link.href = url
+            link.download = `Invoice-${invoiceNumber}.pdf`
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
+            URL.revokeObjectURL(url)
             
-            // Check if Web Share API with files is supported
-            if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-                await navigator.share({
-                    title: `Invoice ${invoiceNumber}`,
-                    text: `Hi ${customerName}! 👋\n\nHere's your invoice from BillBooky:\n\n📄 Invoice: ${invoiceNumber}\n💰 Amount: ₹${total.toFixed(2)}\n\nThank you for your business! 🙏`,
-                    files: [file]
-                })
-            } else {
-                // Fallback: Download PDF and show WhatsApp message
-                const url = URL.createObjectURL(pdfBlob)
-                const link = document.createElement('a')
-                link.href = url
-                link.download = `Invoice-${invoiceNumber}.pdf`
-                document.body.appendChild(link)
-                link.click()
-                document.body.removeChild(link)
-                URL.revokeObjectURL(url)
-                
-                // Open WhatsApp with message
-                const message = encodeURIComponent(
-                    `Hi ${customerName}! 👋\n\n` +
-                    `Here's your invoice from BillBooky:\n\n` +
-                    `📄 Invoice: ${invoiceNumber}\n` +
-                    `💰 Amount: ₹${total.toFixed(2)}\n\n` +
-                    `(PDF downloaded - please attach manually)\n\n` +
-                    `Thank you for your business! 🙏`
-                )
-                
-                const whatsappUrl = customerPhone 
-                    ? `https://wa.me/${customerPhone.replace(/[^0-9]/g, '')}?text=${message}`
-                    : `https://wa.me/?text=${message}`
-                
-                window.open(whatsappUrl, '_blank')
-            }
+            // Open WhatsApp with pre-filled message
+            const message = encodeURIComponent(
+                `Hi ${customerName}! 👋\n\n` +
+                `Here's your invoice:\n\n` +
+                `📄 Invoice: ${invoiceNumber}\n` +
+                `💰 Amount: ₹${total.toFixed(2)}\n\n` +
+                `(PDF downloaded — please attach it to this chat)\n\n` +
+                `Thank you for your business! 🙏`
+            )
+            const whatsappUrl = customerPhone
+                ? `https://wa.me/${customerPhone.replace(/[^0-9]/g, '')}?text=${message}`
+                : `https://wa.me/?text=${message}`
+            window.open(whatsappUrl, '_blank')
         } catch (error) {
-            // Don't show error if user just canceled the share dialog
-            if (error instanceof Error && error.name === 'AbortError') {
-                console.log('Share canceled by user')
-            } else {
-                console.error('Error sharing via WhatsApp:', error)
-                alert('Failed to share PDF. Please try again.')
-            }
+            console.error('Error sharing via WhatsApp:', error)
+            alert('Failed to generate PDF. Please try again.')
         } finally {
             setIsGenerating(false)
         }
