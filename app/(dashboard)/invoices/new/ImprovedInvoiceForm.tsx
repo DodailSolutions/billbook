@@ -102,7 +102,6 @@ export function ImprovedInvoiceForm({ customers: initialCustomers, savedItems = 
         igst: formData.supply_type === 'inter-state' ? gstAmount : 0
       }
     }))
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData.supply_type])
 
   // Calculate totals
@@ -458,8 +457,8 @@ export function ImprovedInvoiceForm({ customers: initialCustomers, savedItems = 
       const maxWidth = pdfWidth - 20 // 10mm margin on each side
       const maxHeight = pdfHeight - 20 // 10mm margin top and bottom
       
-      let imgWidth = maxWidth
-      let imgHeight = (canvas.height * imgWidth) / canvas.width
+      const imgWidth = maxWidth
+      const imgHeight = (canvas.height * imgWidth) / canvas.width
       
       // If content fits on one page, scale it to fit nicely
       if (imgHeight <= maxHeight) {
@@ -1090,7 +1089,7 @@ export function ImprovedInvoiceForm({ customers: initialCustomers, savedItems = 
                               </label>
                               <select
                                 value={formData.payment_method}
-                                onChange={(e) => setFormData({...formData, payment_method: e.target.value as any})}
+                                onChange={(e) => setFormData({...formData, payment_method: e.target.value as 'cash' | 'bank_transfer' | 'upi' | 'card' | 'cheque'})}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                                 required={formData.mark_as_paid}
                               >
@@ -1464,6 +1463,7 @@ export function ImprovedInvoiceForm({ customers: initialCustomers, savedItems = 
                       description: '',
                       details: '',
                       hsn_sac_code: '',
+                      hsn_sac_type: '',
                       quantity: 1,
                       unit_price: 0,
                       gst_rate: 18,
