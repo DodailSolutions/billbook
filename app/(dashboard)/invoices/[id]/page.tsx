@@ -287,7 +287,7 @@ export default async function InvoiceDetailPage({
                 <div className="border-t border-gray-200 dark:border-gray-700 px-5 py-5">
                     <div className="flex justify-between items-start gap-4">
                         {/* LEFT: Client signature placeholder */}
-                        <div className="text-center min-w-[160px]">
+                        <div className="text-center min-w-40">
                             <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg h-16 mb-2" />
                             <span className="text-xs text-gray-400">Customer Signature</span>
                         </div>
