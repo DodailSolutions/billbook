@@ -19,18 +19,22 @@ CREATE TABLE IF NOT EXISTS saved_items (
 -- Row-level security
 ALTER TABLE saved_items ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view their own saved items" ON saved_items;
 CREATE POLICY "Users can view their own saved items"
     ON saved_items FOR SELECT
     USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can create their own saved items" ON saved_items;
 CREATE POLICY "Users can create their own saved items"
     ON saved_items FOR INSERT
     WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update their own saved items" ON saved_items;
 CREATE POLICY "Users can update their own saved items"
     ON saved_items FOR UPDATE
     USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can delete their own saved items" ON saved_items;
 CREATE POLICY "Users can delete their own saved items"
     ON saved_items FOR DELETE
     USING (auth.uid() = user_id);
@@ -47,6 +51,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS saved_items_updated_at ON saved_items;
 CREATE TRIGGER saved_items_updated_at
     BEFORE UPDATE ON saved_items
     FOR EACH ROW

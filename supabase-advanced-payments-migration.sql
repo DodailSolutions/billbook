@@ -18,8 +18,8 @@ CREATE TABLE IF NOT EXISTS upi_payment_details (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_upi_payment_user ON upi_payment_details(user_id);
-CREATE INDEX idx_upi_payment_primary ON upi_payment_details(user_id, is_primary) WHERE is_primary = true;
+CREATE INDEX IF NOT EXISTS idx_upi_payment_user ON upi_payment_details(user_id);
+CREATE INDEX IF NOT EXISTS idx_upi_payment_primary ON upi_payment_details(user_id, is_primary) WHERE is_primary = true;
 
 -- ============================================
 -- PAYMENT INSTALLMENTS TABLE
@@ -45,9 +45,9 @@ CREATE TABLE IF NOT EXISTS payment_installments (
   UNIQUE(invoice_id, installment_number)
 );
 
-CREATE INDEX idx_installments_invoice ON payment_installments(invoice_id);
-CREATE INDEX idx_installments_status ON payment_installments(status, due_date);
-CREATE INDEX idx_installments_overdue ON payment_installments(due_date) WHERE status = 'pending';
+CREATE INDEX IF NOT EXISTS idx_installments_invoice ON payment_installments(invoice_id);
+CREATE INDEX IF NOT EXISTS idx_installments_status ON payment_installments(status, due_date);
+CREATE INDEX IF NOT EXISTS idx_installments_overdue ON payment_installments(due_date) WHERE status = 'pending';
 
 -- ============================================
 -- BANK TRANSACTIONS TABLE (For Reconciliation)
@@ -73,10 +73,10 @@ CREATE TABLE IF NOT EXISTS bank_transactions (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_bank_trans_user ON bank_transactions(user_id);
-CREATE INDEX idx_bank_trans_reconciled ON bank_transactions(user_id, reconciled);
-CREATE INDEX idx_bank_trans_date ON bank_transactions(transaction_date);
-CREATE INDEX idx_bank_trans_invoice ON bank_transactions(invoice_id);
+CREATE INDEX IF NOT EXISTS idx_bank_trans_user ON bank_transactions(user_id);
+CREATE INDEX IF NOT EXISTS idx_bank_trans_reconciled ON bank_transactions(user_id, reconciled);
+CREATE INDEX IF NOT EXISTS idx_bank_trans_date ON bank_transactions(transaction_date);
+CREATE INDEX IF NOT EXISTS idx_bank_trans_invoice ON bank_transactions(invoice_id);
 
 -- ============================================
 -- FAILED PAYMENTS TABLE
@@ -101,9 +101,9 @@ CREATE TABLE IF NOT EXISTS failed_payments (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_failed_payments_invoice ON failed_payments(invoice_id);
-CREATE INDEX idx_failed_payments_customer ON failed_payments(customer_id);
-CREATE INDEX idx_failed_payments_retry ON failed_payments(next_retry_at) WHERE recovered = false AND auto_retry_enabled = true;
+CREATE INDEX IF NOT EXISTS idx_failed_payments_invoice ON failed_payments(invoice_id);
+CREATE INDEX IF NOT EXISTS idx_failed_payments_customer ON failed_payments(customer_id);
+CREATE INDEX IF NOT EXISTS idx_failed_payments_retry ON failed_payments(next_retry_at) WHERE recovered = false AND auto_retry_enabled = true;
 
 -- ============================================
 -- LATE FEE CONFIG TABLE
@@ -125,7 +125,7 @@ CREATE TABLE IF NOT EXISTS late_fee_config (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_late_fee_config_user ON late_fee_config(user_id);
+CREATE INDEX IF NOT EXISTS idx_late_fee_config_user ON late_fee_config(user_id);
 
 -- ============================================
 -- BNPL APPLICATIONS TABLE
@@ -150,9 +150,9 @@ CREATE TABLE IF NOT EXISTS bnpl_applications (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_bnpl_invoice ON bnpl_applications(invoice_id);
-CREATE INDEX idx_bnpl_customer ON bnpl_applications(customer_id);
-CREATE INDEX idx_bnpl_status ON bnpl_applications(status);
+CREATE INDEX IF NOT EXISTS idx_bnpl_invoice ON bnpl_applications(invoice_id);
+CREATE INDEX IF NOT EXISTS idx_bnpl_customer ON bnpl_applications(customer_id);
+CREATE INDEX IF NOT EXISTS idx_bnpl_status ON bnpl_applications(status);
 
 -- ============================================
 -- PAYMENT FOLLOW-UPS TABLE
@@ -178,9 +178,9 @@ CREATE TABLE IF NOT EXISTS payment_followups (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_followups_invoice ON payment_followups(invoice_id);
-CREATE INDEX idx_followups_customer ON payment_followups(customer_id);
-CREATE INDEX idx_followups_scheduled ON payment_followups(scheduled_at, status) WHERE status = 'pending';
+CREATE INDEX IF NOT EXISTS idx_followups_invoice ON payment_followups(invoice_id);
+CREATE INDEX IF NOT EXISTS idx_followups_customer ON payment_followups(customer_id);
+CREATE INDEX IF NOT EXISTS idx_followups_scheduled ON payment_followups(scheduled_at, status) WHERE status = 'pending';
 
 -- ============================================
 -- PAYMENT BEHAVIOR ANALYTICS TABLE
@@ -207,9 +207,9 @@ CREATE TABLE IF NOT EXISTS payment_behavior_analytics (
   UNIQUE(customer_id, user_id)
 );
 
-CREATE INDEX idx_payment_behavior_customer ON payment_behavior_analytics(customer_id);
-CREATE INDEX idx_payment_behavior_score ON payment_behavior_analytics(payment_reliability_score);
-CREATE INDEX idx_payment_behavior_risk ON payment_behavior_analytics(risk_category);
+CREATE INDEX IF NOT EXISTS idx_payment_behavior_customer ON payment_behavior_analytics(customer_id);
+CREATE INDEX IF NOT EXISTS idx_payment_behavior_score ON payment_behavior_analytics(payment_reliability_score);
+CREATE INDEX IF NOT EXISTS idx_payment_behavior_risk ON payment_behavior_analytics(risk_category);
 
 -- ============================================
 -- WHATSAPP PAYMENT LINKS TABLE
@@ -232,8 +232,8 @@ CREATE TABLE IF NOT EXISTS whatsapp_payment_links (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_whatsapp_links_invoice ON whatsapp_payment_links(invoice_id);
-CREATE INDEX idx_whatsapp_links_customer ON whatsapp_payment_links(customer_id);
+CREATE INDEX IF NOT EXISTS idx_whatsapp_links_invoice ON whatsapp_payment_links(invoice_id);
+CREATE INDEX IF NOT EXISTS idx_whatsapp_links_customer ON whatsapp_payment_links(customer_id);
 
 -- ============================================
 -- ADD PAYMENT FIELDS TO EXISTING TABLES
@@ -261,42 +261,51 @@ ALTER TABLE payments ADD COLUMN IF NOT EXISTS installment_id UUID REFERENCES pay
 
 -- UPI Payment Details
 ALTER TABLE upi_payment_details ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users manage own UPI details" ON upi_payment_details;
 CREATE POLICY "Users manage own UPI details" ON upi_payment_details FOR ALL USING (auth.uid() = user_id);
 
 -- Payment Installments
 ALTER TABLE payment_installments ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users manage installments" ON payment_installments;
 CREATE POLICY "Users manage installments" ON payment_installments FOR ALL 
   USING (EXISTS (SELECT 1 FROM invoices WHERE invoices.id = payment_installments.invoice_id AND invoices.user_id = auth.uid()));
 
 -- Bank Transactions
 ALTER TABLE bank_transactions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users manage own bank transactions" ON bank_transactions;
 CREATE POLICY "Users manage own bank transactions" ON bank_transactions FOR ALL USING (auth.uid() = user_id);
 
 -- Failed Payments
 ALTER TABLE failed_payments ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users view own failed payments" ON failed_payments;
 CREATE POLICY "Users view own failed payments" ON failed_payments FOR ALL 
   USING (EXISTS (SELECT 1 FROM invoices WHERE invoices.id = failed_payments.invoice_id AND invoices.user_id = auth.uid()));
 
 -- Late Fee Config
 ALTER TABLE late_fee_config ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users manage own late fee config" ON late_fee_config;
 CREATE POLICY "Users manage own late fee config" ON late_fee_config FOR ALL USING (auth.uid() = user_id);
 
 -- BNPL Applications
 ALTER TABLE bnpl_applications ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users view own BNPL applications" ON bnpl_applications;
 CREATE POLICY "Users view own BNPL applications" ON bnpl_applications FOR ALL 
   USING (EXISTS (SELECT 1 FROM invoices WHERE invoices.id = bnpl_applications.invoice_id AND invoices.user_id = auth.uid()));
 
 -- Payment Follow-ups
 ALTER TABLE payment_followups ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users manage own followups" ON payment_followups;
 CREATE POLICY "Users manage own followups" ON payment_followups FOR ALL 
   USING (EXISTS (SELECT 1 FROM invoices WHERE invoices.id = payment_followups.invoice_id AND invoices.user_id = auth.uid()));
 
 -- Payment Behavior Analytics
 ALTER TABLE payment_behavior_analytics ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users view own customer analytics" ON payment_behavior_analytics;
 CREATE POLICY "Users view own customer analytics" ON payment_behavior_analytics FOR ALL USING (auth.uid() = user_id);
 
 -- WhatsApp Payment Links
 ALTER TABLE whatsapp_payment_links ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users manage own WhatsApp links" ON whatsapp_payment_links;
 CREATE POLICY "Users manage own WhatsApp links" ON whatsapp_payment_links FOR ALL 
   USING (EXISTS (SELECT 1 FROM invoices WHERE invoices.id = whatsapp_payment_links.invoice_id AND invoices.user_id = auth.uid()));
 
@@ -381,9 +390,9 @@ BEGIN
   FROM invoices WHERE customer_id = p_customer_id;
   
   -- Calculate average delay
-  SELECT AVG(EXTRACT(DAY FROM paid_date - due_date))
+  SELECT AVG(EXTRACT(DAY FROM paid_at - due_date::TIMESTAMPTZ))
   INTO v_avg_delay
-  FROM invoices WHERE customer_id = p_customer_id AND status = 'paid' AND paid_date > due_date;
+  FROM invoices WHERE customer_id = p_customer_id AND status = 'paid' AND paid_at > due_date::TIMESTAMPTZ;
   
   -- Calculate reliability score (0-100)
   IF v_total_invoices > 0 THEN
@@ -476,24 +485,31 @@ $$ LANGUAGE plpgsql;
 -- ============================================
 
 -- Update timestamp triggers
+DROP TRIGGER IF EXISTS update_upi_payment_updated_at ON upi_payment_details;
 CREATE TRIGGER update_upi_payment_updated_at BEFORE UPDATE ON upi_payment_details
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_installments_updated_at ON payment_installments;
 CREATE TRIGGER update_installments_updated_at BEFORE UPDATE ON payment_installments
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_bank_trans_updated_at ON bank_transactions;
 CREATE TRIGGER update_bank_trans_updated_at BEFORE UPDATE ON bank_transactions
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_failed_payments_updated_at ON failed_payments;
 CREATE TRIGGER update_failed_payments_updated_at BEFORE UPDATE ON failed_payments
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_late_fee_config_updated_at ON late_fee_config;
 CREATE TRIGGER update_late_fee_config_updated_at BEFORE UPDATE ON late_fee_config
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_bnpl_updated_at ON bnpl_applications;
 CREATE TRIGGER update_bnpl_updated_at BEFORE UPDATE ON bnpl_applications
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_followups_updated_at ON payment_followups;
 CREATE TRIGGER update_followups_updated_at BEFORE UPDATE ON payment_followups
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
@@ -507,6 +523,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS invoice_status_update_behavior ON invoices;
 CREATE TRIGGER invoice_status_update_behavior
 AFTER UPDATE OF status ON invoices
 FOR EACH ROW
@@ -517,6 +534,7 @@ EXECUTE FUNCTION trigger_update_payment_behavior();
 -- ============================================
 
 -- Overdue invoices with late fees
+DROP VIEW IF EXISTS invoices_with_late_fees;
 CREATE OR REPLACE VIEW invoices_with_late_fees AS
 SELECT 
   i.*,
@@ -530,6 +548,7 @@ FROM invoices i
 WHERE i.status NOT IN ('paid', 'cancelled');
 
 -- Payment analytics summary
+DROP VIEW IF EXISTS payment_analytics_summary;
 CREATE OR REPLACE VIEW payment_analytics_summary AS
 SELECT 
   user_id,

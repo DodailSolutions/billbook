@@ -76,7 +76,7 @@ const FAQS = [
       },
       {
         q: 'What is the AI Accountant feature?',
-        a: 'The AI Accountant (available on Professional and Enterprise plans) helps you with bookkeeping insights, expense categorization, and provides smart suggestions for your business finances.'
+        a: 'The AI Accountant (available on Professional, Lifetime, and Enterprise plans) helps you with bookkeeping insights, expense categorization, and provides smart suggestions for your business finances.'
       },
     ]
   },

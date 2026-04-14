@@ -1,27 +1,16 @@
-import { Settings } from 'lucide-react'
 import { getUserProfile } from './actions'
+import { getUserPlanStatus } from '@/lib/plan-utils'
 import SettingsContent from './SettingsContent'
 
 export default async function SettingsPage() {
-    const profile = await getUserProfile()
+    const [profile, planStatus] = await Promise.all([
+        getUserProfile(),
+        getUserPlanStatus(),
+    ])
 
     return (
-        <div className="max-w-7xl mx-auto space-y-6">
-            <div className="flex items-center gap-4">
-                <div className="p-3 bg-linear-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg">
-                    <Settings className="h-8 w-8 text-white" />
-                </div>
-                <div>
-                    <h1 className="text-3xl font-bold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                        Account Settings
-                    </h1>
-                    <p className="text-gray-600 mt-1">
-                        Manage your account preferences and security settings
-                    </p>
-                </div>
-            </div>
-
-            <SettingsContent initialProfile={profile} />
+        <div className="max-w-5xl mx-auto">
+            <SettingsContent initialProfile={profile} planStatus={planStatus} />
         </div>
     )
 }
