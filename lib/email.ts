@@ -1,6 +1,7 @@
 'use server'
 
 import nodemailer from 'nodemailer'
+import { Resend } from 'resend'
 import { createClient } from '@/lib/supabase/server'
 
 const FALLBACK_SMTP_HOST = process.env.SMTP_HOST || 'smtp-mail.outlook.com'
@@ -191,6 +192,35 @@ export async function sendContactEmail({
   }
 }
 
+const invoiceEmailHtml = (invoiceNumber: string, pdfUrl: string, supportEmail: string) => `
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+  <body style="margin:0;padding:0;background:#f3f4f6;font-family:Arial,sans-serif;">
+    <div style="max-width:600px;margin:40px auto;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 6px rgba(0,0,0,0.07);">
+      <div style="background:linear-gradient(135deg,#10b981 0%,#059669 100%);padding:32px;text-align:center;">
+        <h1 style="margin:0;color:#ffffff;font-size:24px;">Invoice ${invoiceNumber}</h1>
+      </div>
+      <div style="padding:40px;">
+        <p style="color:#374151;font-size:16px;">Hello,</p>
+        <p style="color:#374151;font-size:15px;">Please find your invoice <strong>${invoiceNumber}</strong> ready for review.</p>
+        <p style="color:#374151;font-size:15px;">Click the button below to view or download your invoice:</p>
+        <div style="text-align:center;margin:32px 0;">
+          <a href="${pdfUrl}" style="display:inline-block;background:#10b981;color:#ffffff;padding:14px 32px;text-decoration:none;border-radius:8px;font-weight:bold;font-size:15px;">View Invoice →</a>
+        </div>
+        <p style="color:#6b7280;font-size:14px;">If you have any questions, please don't hesitate to reach out.</p>
+        <p style="color:#374151;font-size:15px;">Thank you for your business!</p>
+      </div>
+      <div style="background:#f9fafb;padding:20px;text-align:center;border-top:1px solid #e5e7eb;">
+        <p style="margin:0;color:#9ca3af;font-size:13px;">Sent from BillBooky · Support: ${supportEmail}</p>
+      </div>
+    </div>
+  </body>
+</html>`
+
 export async function sendInvoiceEmail({
   to,
   invoiceNumber,
@@ -200,87 +230,47 @@ export async function sendInvoiceEmail({
   invoiceNumber: string
   pdfUrl: string
 }) {
+  const resendApiKey = process.env.RESEND_API_KEY
+
+  // ── Path 1: Resend (preferred – avoids SMTP auth issues) ──────────────────
+  if (resendApiKey) {
+    try {
+      const resend = new Resend(resendApiKey)
+      const fromEmail = process.env.RESEND_FROM_EMAIL || 'invoices@billbooky.dodail.com'
+      const fromName = process.env.RESEND_FROM_NAME || 'BillBooky'
+
+      const { error } = await resend.emails.send({
+        from: `${fromName} <${fromEmail}>`,
+        to,
+        subject: `Invoice ${invoiceNumber} from BillBooky`,
+        html: invoiceEmailHtml(invoiceNumber, pdfUrl, fromEmail),
+      })
+
+      if (error) {
+        console.error('[sendInvoiceEmail] Resend error:', error)
+        // Fall through to nodemailer
+      } else {
+        console.log('[sendInvoiceEmail] Sent via Resend to', to)
+        return { success: true }
+      }
+    } catch (err) {
+      console.error('[sendInvoiceEmail] Resend threw:', err)
+      // Fall through to nodemailer
+    }
+  }
+
+  // ── Path 2: nodemailer / SMTP (fallback) ──────────────────────────────────
   try {
     const settings = await getSMTPSettings()
-    
-    const emailParams = {
+    const result = await sendEmailSafely({
       to,
       from: `${settings.from_name} <${settings.from_email}>`,
       subject: `Invoice ${invoiceNumber} from BillBooky`,
-      html: `
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <style>
-              body {
-                font-family: Arial, sans-serif;
-                line-height: 1.6;
-                color: #333;
-              }
-              .container {
-                max-width: 600px;
-                margin: 0 auto;
-                padding: 20px;
-              }
-              .header {
-                background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-                color: white;
-                padding: 30px;
-                border-radius: 8px 8px 0 0;
-                text-align: center;
-              }
-              .content {
-                background: #f9fafb;
-                padding: 40px;
-                border: 1px solid #e5e7eb;
-                border-radius: 0 0 8px 8px;
-              }
-              .button {
-                display: inline-block;
-                background: #10b981;
-                color: white;
-                padding: 12px 30px;
-                text-decoration: none;
-                border-radius: 6px;
-                margin-top: 20px;
-                font-weight: bold;
-              }
-              .footer {
-                text-align: center;
-                margin-top: 20px;
-                color: #6b7280;
-                font-size: 14px;
-              }
-            </style>
-          </head>
-          <body>
-            <div class="container">
-              <div class="header">
-                <h1 style="margin: 0;">Invoice ${invoiceNumber}</h1>
-              </div>
-              <div class="content">
-                <p>Hello,</p>
-                <p>Please find attached your invoice <strong>${invoiceNumber}</strong>.</p>
-                <p>You can download or view your invoice using the button below:</p>
-                <div style="text-align: center;">
-                  <a href="${pdfUrl}" class="button">View Invoice</a>
-                </div>
-                <p style="margin-top: 30px;">If you have any questions, please don't hesitate to contact us.</p>
-                <p>Thank you for your business!</p>
-              </div>
-              <div class="footer">
-                <p>This email was sent from BillBooky</p>
-                <p>For support, contact us at ${settings.from_email}</p>
-              </div>
-            </div>
-          </body>
-        </html>
-      `,
-    }
-
-    return await sendEmailSafely(emailParams)
+      html: invoiceEmailHtml(invoiceNumber, pdfUrl, settings.from_email),
+    })
+    return result
   } catch (error) {
-    console.error('Error in sendInvoiceEmail:', error)
+    console.error('[sendInvoiceEmail] nodemailer error:', error)
     throw error
   }
 }
