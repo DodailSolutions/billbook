@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { getUserPlanStatus, canAccessAIAccountant } from '@/lib/plan-utils'
+import { getUserPlanStatus } from '@/lib/plan-utils'
 import { AIAccountantChat } from './AIAccountantChat'
 import { Lock } from 'lucide-react'
 import Link from 'next/link'
@@ -16,7 +16,11 @@ export default async function AIAccountantPage() {
 
   // Check if user has access to AI Accountant
   const planStatus = await getUserPlanStatus()
-  const hasAIAccess = planStatus && canAccessAIAccountant(planStatus.planSlug, planStatus.subscription?.plan?.billing_period)
+  const hasAIAccess = planStatus && (
+    planStatus.planSlug === 'professional' ||
+    planStatus.planSlug === 'enterprise' ||
+    planStatus.isLifetime
+  )
 
   // Get user's business info for context
   const { data: profile } = await supabase

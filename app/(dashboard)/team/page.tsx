@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { getUserPlanStatus, canAccessAIAccountant } from '@/lib/plan-utils'
+import { getUserPlanStatus } from '@/lib/plan-utils'
 import { Users, UserPlus, Shield, Lock } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
@@ -19,11 +19,12 @@ export default async function TeamMembersPage() {
 
   // Check plan status and team member limits
   const planStatus = await getUserPlanStatus()
-  const hasTeamAccess = planStatus && canAccessAIAccountant(
-    planStatus.planSlug,
-    planStatus.subscription && planStatus.subscription.plan ? planStatus.subscription.plan.billing_period : undefined
+  const isLifetimePlan = planStatus?.isLifetime ?? false
+  const hasTeamAccess = planStatus && (
+    planStatus.planSlug === 'professional' ||
+    planStatus.planSlug === 'enterprise' ||
+    isLifetimePlan
   )
-  const isLifetimePlan = !!(planStatus && planStatus.subscription && planStatus.subscription.plan && planStatus.subscription.plan.billing_period === 'lifetime')
 
   // Get team member limits
   let teamLimit = { allowed: 1, current: 0, can_add: false, base_limit: 0, purchased_slots: 0, plan_slug: '' }

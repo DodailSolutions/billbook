@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
-import { getUserPlanStatus, canAccessAIAccountant } from '@/lib/plan-utils'
+import { getUserPlanStatus } from '@/lib/plan-utils'
 
 // Use Node.js runtime for this API route
 export const runtime = 'nodejs'
@@ -24,7 +24,11 @@ export async function POST(request: NextRequest) {
 
     // Check if user has access to AI Accountant
     const planStatus = await getUserPlanStatus()
-    const hasAIAccess = planStatus && canAccessAIAccountant(planStatus.planSlug, planStatus.subscription?.plan?.billing_period)
+    const hasAIAccess = planStatus && (
+      planStatus.planSlug === 'professional' ||
+      planStatus.planSlug === 'enterprise' ||
+      planStatus.isLifetime
+    )
 
     if (!hasAIAccess) {
       return NextResponse.json(
