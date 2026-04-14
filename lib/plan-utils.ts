@@ -1,14 +1,15 @@
+// Plan utilities for checking user subscription status and limits
+import { createClient } from '@/lib/supabase/server'
+import { UserSubscription, SubscriptionPlan } from '@/lib/types-admin'
+
 /**
  * Check if a user can access the AI Accountant feature based on plan slug and billing period
  */
 export function canAccessAIAccountant(planSlug: string, billingPeriod?: string): boolean {
     return planSlug === 'professional' ||
-                 planSlug === 'enterprise' ||
-                 billingPeriod === 'lifetime';
+           planSlug === 'enterprise' ||
+           billingPeriod === 'lifetime';
 }
-// Plan utilities for checking user subscription status and limits
-import { createClient } from '@/lib/supabase/server'
-import { UserSubscription, SubscriptionPlan } from '@/lib/types-admin'
 
 export interface PlanStatus {
     hasActivePlan: boolean
