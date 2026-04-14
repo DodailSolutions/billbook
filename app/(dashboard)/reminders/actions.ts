@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import type { ReminderWithDetails } from '@/lib/types'
+import { sendInvoiceEmail } from '@/lib/email'
 
 export async function getReminders(): Promise<ReminderWithDetails[]> {
     try {
@@ -161,6 +162,60 @@ export async function createReminderForInvoice(
     } catch (err) {
         console.error('Error in createReminderForInvoice:', err)
         throw err
+    }
+}
+
+export async function sendEmailReminder(reminderId: string): Promise<{ success: boolean; error?: string }> {
+    try {
+        const supabase = await createClient()
+
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) return { success: false, error: 'Not authenticated' }
+
+        const { data: reminder, error } = await supabase
+            .from('reminders')
+            .select(`
+                *,
+                invoice:invoices(
+                    invoice_number,
+                    id,
+                    customer:customers(email, name)
+                ),
+                recurring_invoice:recurring_invoices(
+                    customer:customers(email, name)
+                )
+            `)
+            .eq('id', reminderId)
+            .eq('user_id', user.id)
+            .single()
+
+        if (error || !reminder) return { success: false, error: 'Reminder not found' }
+
+        const email = reminder.invoice?.customer?.email || reminder.recurring_invoice?.customer?.email
+        const invoiceNumber = reminder.invoice?.invoice_number || 'Invoice'
+        const invoiceId = reminder.invoice?.id
+
+        if (!email) return { success: false, error: 'Customer has no email address on file' }
+
+        const origin = process.env.NEXT_PUBLIC_APP_URL || 'https://billbook.app'
+        const pdfUrl = invoiceId ? `${origin}/invoices/${invoiceId}` : origin
+
+        const result = await sendInvoiceEmail({ to: email, invoiceNumber, pdfUrl })
+
+        if (!result.success) return { success: false, error: 'Failed to send email' }
+
+        // Auto-mark as sent after successful email
+        await supabase
+            .from('reminders')
+            .update({ is_sent: true, sent_at: new Date().toISOString() })
+            .eq('id', reminderId)
+            .eq('user_id', user.id)
+
+        revalidatePath('/reminders')
+        return { success: true }
+    } catch (err) {
+        console.error('Error in sendEmailReminder:', err)
+        return { success: false, error: 'An unexpected error occurred' }
     }
 }
 

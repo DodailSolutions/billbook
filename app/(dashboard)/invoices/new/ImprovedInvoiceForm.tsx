@@ -9,7 +9,7 @@ import {
   ArrowLeft, Plus, Trash2, Send, 
   User, Receipt, FileText, 
   AlertCircle, CheckCircle2, ChevronDown, ChevronUp,
-  Sparkles, Shield, Clock, X, UserPlus, Download, CheckCircle
+  Sparkles, Shield, Clock, X, UserPlus, Download, CheckCircle, Mail, Loader2
 } from 'lucide-react'
 import { createInvoice } from '../actions'
 import { saveItemFromInvoice, deleteSavedItem as deleteSavedItemAction } from '../../items/actions'
@@ -53,6 +53,7 @@ export function ImprovedInvoiceForm({ customers: initialCustomers, savedItems = 
   const [savedItemToSave, setSavedItemToSave] = useState<InvoiceItem | null>(null)
   const [itemName, setItemName] = useState('')
   const [isSavingItem, setIsSavingItem] = useState(false)
+  const [isSendingEmail, setIsSendingEmail] = useState(false)
 
   // Form state
   const [formData, setFormData] = useState({
@@ -516,6 +517,25 @@ export function ImprovedInvoiceForm({ customers: initialCustomers, savedItems = 
       console.error('Error generating PDF:', error)
       alert('Failed to download PDF. Please try viewing the invoice from the invoices list.')
       setIsDownloading(false)
+    }
+  }
+
+  // Send invoice email to customer
+  const handleSendEmail = async () => {
+    if (!createdInvoiceId) return
+    setIsSendingEmail(true)
+    try {
+      const res = await fetch(`/api/invoices/${createdInvoiceId}/send-email`, { method: 'POST' })
+      const data = await res.json()
+      if (res.ok) {
+        alert('Invoice emailed to customer successfully!')
+      } else {
+        alert(data.error || 'Failed to send email')
+      }
+    } catch {
+      alert('Failed to send email. Please try again.')
+    } finally {
+      setIsSendingEmail(false)
     }
   }
 
@@ -1427,6 +1447,23 @@ export function ImprovedInvoiceForm({ customers: initialCustomers, savedItems = 
                     </>
                   )}
                 </Button>
+
+                {(() => {
+                  const selectedCustomer = customers.find(c => c.id === formData.customer_id)
+                  return selectedCustomer?.email ? (
+                    <Button
+                      onClick={handleSendEmail}
+                      disabled={isSendingEmail}
+                      className="w-full gap-2 bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      {isSendingEmail ? (
+                        <><Loader2 className="w-4 h-4 animate-spin" />Sending...</>
+                      ) : (
+                        <><Mail className="w-4 h-4" />Send to {selectedCustomer.email}</>
+                      )}
+                    </Button>
+                  ) : null
+                })()}
 
                 <Button
                   onClick={handleViewInvoices}

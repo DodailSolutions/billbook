@@ -11,6 +11,7 @@ interface ShareInvoiceButtonProps {
     invoiceNumber: string
     customerName: string
     customerPhone?: string
+    customerEmail?: string
     total: number
 }
 
@@ -19,11 +20,13 @@ export function ShareInvoiceButton({
     invoiceNumber, 
     customerName,
     customerPhone,
-    total 
+    customerEmail,
+    total
 }: ShareInvoiceButtonProps) {
     const [showMenu, setShowMenu] = useState(false)
     const [copied, setCopied] = useState(false)
     const [isGenerating, setIsGenerating] = useState(false)
+    const [emailSent, setEmailSent] = useState(false)
 
     const invoiceUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/invoices/${invoiceId}`
 
@@ -250,55 +253,32 @@ export function ShareInvoiceButton({
     }
 
     const handleEmailShare = async () => {
-        try {
-            setIsGenerating(true)
-            
-            // Generate PDF
-            const pdfBlob = await generatePDFBlob()
-            const file = new File([pdfBlob], `Invoice-${invoiceNumber}.pdf`, { type: 'application/pdf' })
-            
-            // Check if Web Share API with files is supported
-            if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-                await navigator.share({
-                    title: `Invoice ${invoiceNumber}`,
-                    text: `Hi ${customerName},\n\nPlease find your invoice details:\n\nInvoice: ${invoiceNumber}\nAmount: ₹${total.toFixed(2)}\n\nThank you for your business!`,
-                    files: [file]
-                })
-            } else {
-                // Fallback: Download PDF and open email client
-                const url = URL.createObjectURL(pdfBlob)
-                const link = document.createElement('a')
-                link.href = url
-                link.download = `Invoice-${invoiceNumber}.pdf`
-                document.body.appendChild(link)
-                link.click()
-                document.body.removeChild(link)
-                URL.revokeObjectURL(url)
-                
-                // Open email client
-                const subject = encodeURIComponent(`Invoice ${invoiceNumber}`)
-                const body = encodeURIComponent(
-                    `Hi ${customerName},\n\n` +
-                    `Please find your invoice attached.\n\n` +
-                    `Invoice: ${invoiceNumber}\n` +
-                    `Amount: ₹${total.toFixed(2)}\n\n` +
-                    `(PDF downloaded - please attach manually)\n\n` +
-                    `Thank you for your business!`
-                )
-                window.location.href = `mailto:?subject=${subject}&body=${body}`
+        if (customerEmail) {
+            // Server-side email via SMTP
+            try {
+                setIsGenerating(true)
+                const res = await fetch(`/api/invoices/${invoiceId}/send-email`, { method: 'POST' })
+                const data = await res.json()
+                if (res.ok) {
+                    setEmailSent(true)
+                    setTimeout(() => setEmailSent(false), 3000)
+                } else {
+                    alert(data.error || 'Failed to send email')
+                }
+            } catch {
+                alert('Failed to send email. Please try again.')
+            } finally {
+                setIsGenerating(false)
+                setShowMenu(false)
             }
-            
+        } else {
+            // No email on file — fallback to mailto
+            const subject = encodeURIComponent(`Invoice ${invoiceNumber}`)
+            const body = encodeURIComponent(
+                `Hi ${customerName},\n\nPlease find your invoice.\n\nInvoice: ${invoiceNumber}\nAmount: ₹${total.toFixed(2)}\n\nThank you for your business!`
+            )
+            window.location.href = `mailto:?subject=${subject}&body=${body}`
             setShowMenu(false)
-        } catch (error) {
-            // Don't show error if user just canceled the share dialog
-            if (error instanceof Error && error.name === 'AbortError') {
-                console.log('Share canceled by user')
-            } else {
-                console.error('Error sharing via email:', error)
-                alert('Failed to share PDF. Please try again.')
-            }
-        } finally {
-            setIsGenerating(false)
         }
     }
 
@@ -385,19 +365,21 @@ export function ShareInvoiceButton({
                             <button
                                 onClick={handleEmailShare}
                                 disabled={isGenerating}
-                                className="w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
                                     {isGenerating ? (
                                         <Loader2 className="h-4 w-4 text-blue-600 animate-spin" />
+                                    ) : emailSent ? (
+                                        <Check className="h-4 w-4 text-green-600" />
                                     ) : (
                                         <Mail className="h-4 w-4 text-blue-600" />
                                     )}
                                 </div>
                                 <div className="flex-1 text-left">
-                                    <div className="font-medium">Email</div>
-                                    <div className="text-xs text-gray-600">
-                                        Send PDF via email
+                                    <div className="font-medium text-blue-900 dark:text-blue-100">{emailSent ? 'Sent!' : 'Email Invoice'}</div>
+                                    <div className="text-xs text-blue-600">
+                                        {customerEmail ? customerEmail : 'Open email client'}
                                     </div>
                                 </div>
                             </button>

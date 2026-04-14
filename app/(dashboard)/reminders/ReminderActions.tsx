@@ -2,9 +2,9 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Check, X } from 'lucide-react'
+import { Check, X, Mail, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
-import { markReminderAsSent, deleteReminder } from './actions'
+import { markReminderAsSent, deleteReminder, sendEmailReminder } from './actions'
 import type { ReminderWithDetails } from '@/lib/types'
 
 interface ReminderActionsProps {
@@ -14,6 +14,26 @@ interface ReminderActionsProps {
 export default function ReminderActions({ reminder }: ReminderActionsProps) {
     const router = useRouter()
     const [isLoading, setIsLoading] = useState(false)
+    const [isSendingEmail, setIsSendingEmail] = useState(false)
+
+    const customerEmail = reminder.invoice?.customer?.email || reminder.recurring_invoice?.customer?.email
+
+    const handleSendEmail = async () => {
+        setIsSendingEmail(true)
+        try {
+            const result = await sendEmailReminder(reminder.id)
+            if (result.success) {
+                router.refresh()
+            } else {
+                alert(result.error || 'Failed to send email')
+            }
+        } catch (err) {
+            console.error('Error sending email reminder:', err)
+            alert('Failed to send email')
+        } finally {
+            setIsSendingEmail(false)
+        }
+    }
 
     const handleMarkAsSent = async () => {
         setIsLoading(true)

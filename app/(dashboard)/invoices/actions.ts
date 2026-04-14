@@ -374,6 +374,30 @@ export async function createInvoice(data: CreateInvoiceData) {
         }
     }
 
+        // Auto-create 7-day payment reminder if due_date is set
+        if (data.due_date) {
+            try {
+                const dueDate = new Date(data.due_date)
+                const reminderDate = new Date(dueDate)
+                reminderDate.setDate(reminderDate.getDate() - 7)
+                const today = new Date()
+                today.setHours(0, 0, 0, 0)
+                if (reminderDate >= today) {
+                    const reminderDateStr = reminderDate.toISOString().split('T')[0]
+                    await supabase.from('reminders').insert([{
+                        user_id: user.id,
+                        invoice_id: invoice.id,
+                        reminder_type: 'due_date',
+                        reminder_date: reminderDateStr,
+                        days_before: 7,
+                        message: `Invoice ${invoice_number} payment is due in 7 days (${data.due_date})`
+                    }])
+                }
+            } catch (reminderErr) {
+                console.warn('Failed to create payment reminder:', reminderErr)
+            }
+        }
+
         revalidatePath('/invoices')
         return { success: true, invoiceId: invoice.id }
     } catch (error) {
