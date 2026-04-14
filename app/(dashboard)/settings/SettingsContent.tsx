@@ -26,7 +26,7 @@ export default function SettingsContent({ initialProfile, planStatus: initialPla
     const [activeTab, setActiveTab] = useState<TabType>('profile')
     const [loading, setLoading] = useState(false)
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
-    const [planStatus, setPlanStatus] = useState<PlanStatus | null>(initialPlanStatus)
+    const [planStatus, setPlanStatus] = useState<PlanStatus | null>(initialPlanStatus ?? null)
 
     // Refresh plan status client-side (same as PlanBanner) for accuracy
     useEffect(() => {
