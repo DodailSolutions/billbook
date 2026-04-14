@@ -210,8 +210,6 @@ export function ShareInvoiceButton({
                 
                 window.open(whatsappUrl, '_blank')
             }
-            
-            setShowMenu(false)
         } catch (error) {
             // Don't show error if user just canceled the share dialog
             if (error instanceof Error && error.name === 'AbortError') {
