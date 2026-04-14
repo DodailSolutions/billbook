@@ -23,7 +23,8 @@ export function ShareInvoiceButton({
     customerEmail,
     total
 }: ShareInvoiceButtonProps) {
-    const [isGenerating, setIsGenerating] = useState(false)
+    const [isWhatsAppLoading, setIsWhatsAppLoading] = useState(false)
+    const [isEmailSending, setIsEmailSending] = useState(false)
     const [emailSent, setEmailSent] = useState(false)
 
     const generatePDFBlob = async (): Promise<Blob> => {
@@ -169,7 +170,7 @@ export function ShareInvoiceButton({
 
     const handleWhatsAppShare = async () => {
         try {
-            setIsGenerating(true)
+            setIsWhatsAppLoading(true)
             
             // Generate PDF and download it
             const pdfBlob = await generatePDFBlob()
@@ -182,13 +183,13 @@ export function ShareInvoiceButton({
             document.body.removeChild(link)
             URL.revokeObjectURL(url)
             
-            // Open WhatsApp with pre-filled message
+            // Open WhatsApp with the customer's number and pre-filled message
             const message = encodeURIComponent(
                 `Hi ${customerName}! 👋\n\n` +
-                `Here's your invoice:\n\n` +
+                `Please find your invoice details below:\n\n` +
                 `📄 Invoice: ${invoiceNumber}\n` +
                 `💰 Amount: ₹${total.toFixed(2)}\n\n` +
-                `(PDF downloaded — please attach it to this chat)\n\n` +
+                `The PDF has been downloaded to your device — please attach it to this chat.\n\n` +
                 `Thank you for your business! 🙏`
             )
             const whatsappUrl = customerPhone
@@ -199,7 +200,7 @@ export function ShareInvoiceButton({
             console.error('Error sharing via WhatsApp:', error)
             alert('Failed to generate PDF. Please try again.')
         } finally {
-            setIsGenerating(false)
+            setIsWhatsAppLoading(false)
         }
     }
 
@@ -207,7 +208,7 @@ export function ShareInvoiceButton({
         if (customerEmail) {
             // Server-side email via SMTP
             try {
-                setIsGenerating(true)
+                setIsEmailSending(true)
                 const res = await fetch(`/api/invoices/${invoiceId}/send-email`, { method: 'POST' })
                 const data = await res.json()
                 if (res.ok) {
@@ -219,7 +220,7 @@ export function ShareInvoiceButton({
             } catch {
                 alert('Failed to send email. Please try again.')
             } finally {
-                setIsGenerating(false)
+                setIsEmailSending(false)
             }
         } else {
             // No email on file — fallback to mailto
@@ -236,23 +237,23 @@ export function ShareInvoiceButton({
             {/* WhatsApp */}
             <Button
                 onClick={handleWhatsAppShare}
-                disabled={isGenerating}
+                disabled={isWhatsAppLoading}
                 variant="outline"
                 size="sm"
                 className="gap-1.5 rounded-lg text-green-700 border-green-200 hover:bg-green-50 hover:border-green-300 disabled:opacity-50"
             >
-                {isGenerating ? (
+                {isWhatsAppLoading ? (
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
                 ) : (
                     <MessageCircle className="h-3.5 w-3.5" />
                 )}
-                WhatsApp
+                {isWhatsAppLoading ? 'Generating...' : 'WhatsApp'}
             </Button>
 
             {/* Send Email */}
             <Button
                 onClick={handleEmailShare}
-                disabled={isGenerating}
+                disabled={isEmailSending}
                 variant="outline"
                 size="sm"
                 className={`gap-1.5 rounded-lg disabled:opacity-50 transition-colors ${
@@ -261,14 +262,14 @@ export function ShareInvoiceButton({
                         : 'text-blue-700 border-blue-200 hover:bg-blue-50 hover:border-blue-300'
                 }`}
             >
-                {isGenerating ? (
+                {isEmailSending ? (
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
                 ) : emailSent ? (
                     <Check className="h-3.5 w-3.5" />
                 ) : (
                     <Mail className="h-3.5 w-3.5" />
                 )}
-                {emailSent ? 'Sent!' : 'Send Email'}
+                {isEmailSending ? 'Sending...' : emailSent ? 'Sent!' : 'Send Email'}
             </Button>
         </>
     )
