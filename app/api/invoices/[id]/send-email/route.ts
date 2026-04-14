@@ -45,9 +45,13 @@ export async function POST(
         if (result.success) {
             return NextResponse.json({ success: true })
         } else {
-            return NextResponse.json({ error: 'Failed to send email' }, { status: 500 })
+            const errMsg = result.error instanceof Error ? result.error.message : String(result.error ?? 'Failed to send email')
+            console.error('[send-email] nodemailer error:', errMsg)
+            return NextResponse.json({ error: errMsg }, { status: 500 })
         }
-    } catch {
-        return NextResponse.json({ error: 'Failed to send email' }, { status: 500 })
+    } catch (err) {
+        const errMsg = err instanceof Error ? err.message : 'Failed to send email'
+        console.error('[send-email] caught error:', errMsg)
+        return NextResponse.json({ error: errMsg }, { status: 500 })
     }
 }
