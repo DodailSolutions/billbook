@@ -42,13 +42,13 @@ export async function POST(
             pdfUrl,
         })
 
-        if (result.success) {
-            return NextResponse.json({ success: true })
-        } else {
-            const errMsg = result.error instanceof Error ? result.error.message : String(result.error ?? 'Failed to send email')
-            console.error('[send-email] nodemailer error:', errMsg)
+        if (!result.success) {
+            const errObj = 'error' in result ? result.error : undefined
+            const errMsg = errObj instanceof Error ? errObj.message : String(errObj ?? 'Failed to send email')
+            console.error('[send-email] email error:', errMsg)
             return NextResponse.json({ error: errMsg }, { status: 500 })
         }
+        return NextResponse.json({ success: true })
     } catch (err) {
         const errMsg = err instanceof Error ? err.message : 'Failed to send email'
         console.error('[send-email] caught error:', errMsg)

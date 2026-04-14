@@ -1,7 +1,6 @@
 'use server'
 
 import nodemailer from 'nodemailer'
-import { Resend } from 'resend'
 import { createClient } from '@/lib/supabase/server'
 
 const FALLBACK_SMTP_HOST = process.env.SMTP_HOST || 'smtp-mail.outlook.com'
