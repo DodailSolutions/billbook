@@ -16,7 +16,7 @@ import type { PlanStatus } from '@/lib/plan-utils'
 
 interface SettingsContentProps {
     initialProfile: UserProfile | null
-    planStatus: PlanStatus | null
+    planStatus?: PlanStatus | null
 }
 
 type TabType = 'profile' | 'security' | 'notifications'
