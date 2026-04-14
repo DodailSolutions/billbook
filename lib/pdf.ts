@@ -415,7 +415,7 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
         </div>
         ` : ''}
 
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-top: 36px; padding-top: 16px; border-top: 1px solid #e5e7eb; page-break-inside: avoid;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-top: 36px; padding-bottom: 16px; border-bottom: 1px solid #e5e7eb; page-break-inside: avoid;">
             <div style="text-align: center; min-width: 160px;">
                 <div style="border: 1.5px dashed #d1d5db; border-radius: 6px; height: 65px; margin-bottom: 8px;"></div>
                 <div style="font-size: 11px; color: #6b7280;">Customer Signature</div>
