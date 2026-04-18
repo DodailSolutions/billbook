@@ -4,7 +4,17 @@ import { getCADashboard, getCAProfile } from '@/lib/gst-advanced-actions'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/Button'
-import { Users, AlertTriangle, FileText, TrendingUp, Clock, CheckCircle2, Activity } from 'lucide-react'
+import {
+  Users,
+  AlertTriangle,
+  FileText,
+  TrendingUp,
+  Clock,
+  CheckCircle2,
+  Activity,
+  Shield,
+  ArrowRight,
+} from 'lucide-react'
 import Link from 'next/link'
 
 export default async function CADashboardPage() {
@@ -46,13 +56,44 @@ export default async function CADashboardPage() {
           <CardHeader>
             <CardTitle>Error Loading Dashboard</CardTitle>
             <CardDescription>
-              Unable to load CA dashboard data
+              Unable to load CA dashboard data right now.
             </CardDescription>
           </CardHeader>
+          <CardContent className="flex flex-wrap gap-3">
+            <Link href="/ca-dashboard">
+              <Button>Try Again</Button>
+            </Link>
+            <Link href="/ca-profile">
+              <Button variant="outline">Review CA Profile</Button>
+            </Link>
+          </CardContent>
         </Card>
       </div>
     )
   }
+
+  const onboardingChecks = [
+    Boolean(caProfile.ca_name?.trim()),
+    Boolean(caProfile.ca_firm_name?.trim()),
+    Boolean(caProfile.specializations?.length),
+    Boolean(caProfile.phone?.trim()),
+    Boolean(caProfile.address?.trim()),
+    Boolean(caProfile.is_verified),
+  ]
+
+  const onboardingCompletion = Math.round(
+    (onboardingChecks.filter(Boolean).length / onboardingChecks.length) * 100
+  )
+
+  const returnsFiled = dashboard.clients_summary.reduce((sum, client) => {
+    const filedGSTR1 = client.pending_gstr1 === 0 ? 1 : 0
+    const filedGSTR3B = client.pending_gstr3b === 0 ? 1 : 0
+    return sum + filedGSTR1 + filedGSTR3B
+  }, 0)
+
+  const urgentClients = dashboard.clients_summary.filter(
+    (client) => client.open_alerts > 0 || client.risk_level === 'high'
+  )
 
   return (
     <div className="p-6 space-y-6">
@@ -81,6 +122,55 @@ export default async function CADashboardPage() {
           </Link>
         </div>
       </div>
+
+      <Card className="border-blue-200 bg-linear-to-r from-blue-50 via-white to-emerald-50">
+        <CardContent className="p-6">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div className="max-w-2xl">
+              <Badge variant={onboardingCompletion === 100 ? 'default' : 'secondary'}>
+                Profile setup {onboardingCompletion}%
+              </Badge>
+              <h2 className="mt-3 text-2xl font-bold text-gray-900 dark:text-white">
+                Stay visible and ready for the next client request
+              </h2>
+              <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+                Complete your contact, specialization, and verification details to build trust and improve your matching quality.
+              </p>
+              <div className="mt-4 h-2 w-full max-w-xl overflow-hidden rounded-full bg-white/80">
+                <div
+                  className="h-full rounded-full bg-blue-600 transition-all"
+                  style={{ width: `${onboardingCompletion}%` }}
+                />
+              </div>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Link href="/ca-profile">
+                  <Button>
+                    Complete Profile
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+                <Link href="/ca-marketplace">
+                  <Button variant="outline">View Marketplace Listing</Button>
+                </Link>
+              </div>
+            </div>
+
+            <div className="grid gap-2 sm:grid-cols-2">
+              {[
+                { label: 'Identity added', done: Boolean(caProfile.ca_name?.trim()) },
+                { label: 'Firm details added', done: Boolean(caProfile.ca_firm_name?.trim()) },
+                { label: 'Specializations selected', done: Boolean(caProfile.specializations?.length) },
+                { label: 'Contact and verification ready', done: Boolean(caProfile.phone?.trim()) && Boolean(caProfile.address?.trim()) && Boolean(caProfile.is_verified) },
+              ].map((item) => (
+                <div key={item.label} className="flex items-center gap-2 rounded-lg border border-white/80 bg-white/90 px-3 py-2 text-sm text-gray-700 shadow-sm">
+                  <CheckCircle2 className={`h-4 w-4 ${item.done ? 'text-emerald-600' : 'text-gray-300'}`} />
+                  <span>{item.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -144,11 +234,74 @@ export default async function CADashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">
-              {dashboard.pending_returns || 0}
+              {returnsFiled}
             </div>
             <p className="text-xs text-gray-600 mt-1">
-              Pending Returns
+              GSTR cycles currently clear
             </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+        <Card className="xl:col-span-2">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="h-5 w-5 text-blue-600" />
+              Focus for today
+            </CardTitle>
+            <CardDescription>
+              Recommended actions to keep your onboarding and client work moving.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-3 md:grid-cols-3">
+              <div className="rounded-xl border border-gray-200 p-4">
+                <p className="text-sm font-medium text-gray-500">Onboarding</p>
+                <p className="mt-1 text-lg font-semibold">{100 - onboardingCompletion}% left</p>
+                <p className="mt-1 text-sm text-gray-600">Add missing profile details to improve visibility.</p>
+              </div>
+              <div className="rounded-xl border border-gray-200 p-4">
+                <p className="text-sm font-medium text-gray-500">Critical alerts</p>
+                <p className="mt-1 text-lg font-semibold text-red-600">{dashboard.critical_alerts}</p>
+                <p className="mt-1 text-sm text-gray-600">Prioritize clients with compliance risks.</p>
+              </div>
+              <div className="rounded-xl border border-gray-200 p-4">
+                <p className="text-sm font-medium text-gray-500">Pending returns</p>
+                <p className="mt-1 text-lg font-semibold text-orange-600">{dashboard.pending_returns}</p>
+                <p className="mt-1 text-sm text-gray-600">Follow up on open GSTR submissions.</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Needs attention</CardTitle>
+            <CardDescription>Clients requiring the fastest follow-up.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {urgentClients.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700">
+                No urgent client issues right now.
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {urgentClients.slice(0, 3).map((client) => (
+                  <Link key={client.client_user_id} href={`/ca-dashboard/clients/${client.client_user_id}`} className="block rounded-xl border border-gray-200 p-3 hover:border-emerald-300 transition-colors">
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <p className="font-medium text-gray-900 dark:text-white">{client.client_email}</p>
+                        <p className="text-xs text-gray-500">{client.open_alerts} alerts • {client.pending_gstr1 + client.pending_gstr3b} pending returns</p>
+                      </div>
+                      <Badge variant={client.risk_level === 'high' ? 'destructive' : 'secondary'}>
+                        {(client.risk_level || 'watch').toUpperCase()}
+                      </Badge>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

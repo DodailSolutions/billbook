@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { createCAProfile } from '@/lib/ca-profile-actions'
@@ -14,6 +15,9 @@ import {
   IndianRupee,
   CheckCircle,
   Briefcase,
+  Clock3,
+  Shield,
+  Sparkles,
 } from 'lucide-react'
 
 const SPECIALIZATIONS: CASpecialization[] = [
@@ -42,12 +46,82 @@ const LANGUAGES = [
   'Kannada', 'Malayalam', 'Punjabi', 'Odia', 'Urdu',
 ]
 
+const STORAGE_KEY = 'caRegistrationData'
+
+const STEP_DETAILS = [
+  {
+    title: 'Basic info',
+    description: 'Verify your identity and ICAI details',
+  },
+  {
+    title: 'Expertise',
+    description: 'Select the services and languages you offer',
+  },
+  {
+    title: 'Location',
+    description: 'Add your office and service coverage',
+  },
+  {
+    title: 'Pricing',
+    description: 'Set fees and write a client-facing profile',
+  },
+]
+
+const createInitialFormData = () => ({
+  full_name: '',
+  email: '',
+  phone: '',
+  icai_membership_number: '',
+  firm_name: '',
+  years_of_experience: 0,
+  specializations: [] as CASpecialization[],
+  office_address: '',
+  city: '',
+  state: '',
+  pincode: '',
+  bio: '',
+  education: [''],
+  certifications: [''],
+  languages_spoken: [] as string[],
+  consultation_fee: undefined as number | undefined,
+  monthly_retainer_fee: undefined as number | undefined,
+})
+
+type CARegistrationFormData = ReturnType<typeof createInitialFormData>
+
 export default function CARegistrationPage() {
   const router = useRouter()
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
+  const [validationError, setValidationError] = useState('')
+  const [draftRestored, setDraftRestored] = useState(() => {
+    if (typeof window === 'undefined') return false
+    return Boolean(localStorage.getItem(STORAGE_KEY) || sessionStorage.getItem(STORAGE_KEY))
+  })
+  const [formData, setFormData] = useState<CARegistrationFormData>(() => {
+    const fallback = createInitialFormData()
+
+    if (typeof window === 'undefined') {
+      return fallback
+    }
+
+    const savedData = localStorage.getItem(STORAGE_KEY) || sessionStorage.getItem(STORAGE_KEY)
+    if (!savedData) {
+      return fallback
+    }
+
+    try {
+      return {
+        ...fallback,
+        ...JSON.parse(savedData),
+      }
+    } catch (error) {
+      console.error('Failed to restore form data:', error)
+      return fallback
+    }
+  })
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -58,40 +132,72 @@ export default function CARegistrationPage() {
     checkAuth()
   }, [])
 
-  // Restore form data from session storage if user is returning from signup
   useEffect(() => {
-    if (isAuthenticated && typeof window !== 'undefined') {
-      const savedData = sessionStorage.getItem('caRegistrationData')
-      if (savedData) {
-        try {
-          const parsed = JSON.parse(savedData)
-          setFormData(parsed)
-        } catch (e) {
-          console.error('Failed to restore form data:', e)
-        }
+    if (typeof window === 'undefined') return
+
+    const hasStarted = Object.values(formData).some((value) => {
+      if (Array.isArray(value)) return value.some((item) => Boolean(String(item).trim()))
+      if (typeof value === 'number') return value > 0
+      return Boolean(value)
+    })
+
+    if (hasStarted) {
+      const serialized = JSON.stringify(formData)
+      localStorage.setItem(STORAGE_KEY, serialized)
+      sessionStorage.setItem(STORAGE_KEY, serialized)
+    }
+  }, [formData])
+
+  const completedItems = [
+    Boolean(formData.full_name.trim()),
+    /\S+@\S+\.\S+/.test(formData.email),
+    formData.phone.replace(/\D/g, '').length >= 10,
+    /^[A-Za-z0-9/-]{5,15}$/.test(formData.icai_membership_number.trim()),
+    formData.specializations.length > 0,
+    Boolean(
+      formData.office_address.trim() &&
+      formData.city.trim() &&
+      formData.state &&
+      formData.pincode.trim().length >= 6
+    ),
+    Boolean(formData.bio.trim() || formData.consultation_fee || formData.monthly_retainer_fee),
+  ]
+
+  const profileCompletion = Math.round(
+    (completedItems.filter(Boolean).length / completedItems.length) * 100
+  )
+
+  const validateStep = (stepToValidate: number) => {
+    setValidationError('')
+
+    const emailIsValid = /\S+@\S+\.\S+/.test(formData.email)
+    const phoneDigits = formData.phone.replace(/\D/g, '')
+    const membershipLooksValid = /^[A-Za-z0-9/-]{5,15}$/.test(
+      formData.icai_membership_number.trim()
+    )
+
+    if (stepToValidate === 1) {
+      if (!formData.full_name.trim() || !emailIsValid || phoneDigits.length < 10 || !membershipLooksValid) {
+        setValidationError('Please enter valid contact details and a valid ICAI membership number to continue.')
+        return false
       }
     }
-  }, [isAuthenticated])
 
-  const [formData, setFormData] = useState({
-    full_name: '',
-    email: '',
-    phone: '',
-    icai_membership_number: '',
-    firm_name: '',
-    years_of_experience: 0,
-    specializations: [] as CASpecialization[],
-    office_address: '',
-    city: '',
-    state: '',
-    pincode: '',
-    bio: '',
-    education: [''],
-    certifications: [''],
-    languages_spoken: [] as string[],
-    consultation_fee: undefined as number | undefined,
-    monthly_retainer_fee: undefined as number | undefined,
-  })
+    if (stepToValidate === 2 && formData.specializations.length === 0) {
+      setValidationError('Please select at least one specialization so clients can discover your services.')
+      return false
+    }
+
+    if (stepToValidate === 3) {
+      const pincodeLooksValid = /^\d{6}$/.test(formData.pincode.trim())
+      if (!formData.office_address.trim() || !formData.city.trim() || !formData.state || !pincodeLooksValid) {
+        setValidationError('Please complete your office address with a valid 6-digit pincode.')
+        return false
+      }
+    }
+
+    return true
+  }
 
   const handleSpecializationToggle = (spec: CASpecialization) => {
     setFormData((prev) => ({
@@ -112,16 +218,20 @@ export default function CARegistrationPage() {
   }
 
   const handleSubmit = async () => {
-    if (formData.specializations.length === 0) {
-      alert('Please select at least one specialization')
+    if (!validateStep(1) || !validateStep(2) || !validateStep(3)) {
+      return
+    }
+
+    if ((formData.consultation_fee ?? 0) < 0 || (formData.monthly_retainer_fee ?? 0) < 0) {
+      setValidationError('Pricing values cannot be negative.')
       return
     }
 
     // Check if user is authenticated
     if (!isAuthenticated) {
-      // Save form data to session storage so we can restore it after login
-      sessionStorage.setItem('caRegistrationData', JSON.stringify(formData))
-      // Redirect to signup with return URL
+      const serialized = JSON.stringify(formData)
+      localStorage.setItem(STORAGE_KEY, serialized)
+      sessionStorage.setItem(STORAGE_KEY, serialized)
       router.push('/signup?returnTo=/ca-registration&message=Please sign up or log in to complete your CA registration')
       return
     }
@@ -135,11 +245,12 @@ export default function CARegistrationPage() {
     setLoading(false)
 
     if (result.success) {
-      // Clear saved form data
-      sessionStorage.removeItem('caRegistrationData')
+      localStorage.removeItem(STORAGE_KEY)
+      sessionStorage.removeItem(STORAGE_KEY)
+      setDraftRestored(false)
       setSubmitted(true)
     } else {
-      alert(result.error || 'Failed to create profile')
+      setValidationError(result.error || 'Failed to create profile. Please review your details and try again.')
     }
   }
 
@@ -194,7 +305,7 @@ export default function CARegistrationPage() {
       </header>
 
       <div className="container max-w-4xl mx-auto py-12 px-4">
-        <div className="mb-12 text-center">
+        <div className="mb-8 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-100 mb-4">
             <Award className="h-4 w-4 text-blue-600" />
             <span className="text-sm font-medium text-blue-600">CA Registration</span>
@@ -205,29 +316,101 @@ export default function CARegistrationPage() {
           </p>
         </div>
 
-      {/* Progress Indicator */}
-      <div className="flex items-center justify-center mb-8">
-        {[1, 2, 3, 4].map((s) => (
-          <div key={s} className="flex items-center">
-            <div
-              className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
-                s <= step
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 text-gray-500'
-              }`}
-            >
-              {s}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <Card className="p-4 bg-white border-blue-100">
+            <div className="flex items-center gap-3">
+              <Shield className="h-5 w-5 text-blue-600" />
+              <div>
+                <p className="font-semibold">Verified onboarding</p>
+                <p className="text-sm text-gray-600">ICAI details are reviewed before your profile goes live.</p>
+              </div>
             </div>
-            {s < 4 && (
-              <div
-                className={`w-24 h-1 ${
-                  s < step ? 'bg-blue-600' : 'bg-gray-200'
-                }`}
-              />
-            )}
+          </Card>
+          <Card className="p-4 bg-white border-emerald-100">
+            <div className="flex items-center gap-3">
+              <Clock3 className="h-5 w-5 text-emerald-600" />
+              <div>
+                <p className="font-semibold">Fast setup</p>
+                <p className="text-sm text-gray-600">Finish in about 3 minutes and continue anytime.</p>
+              </div>
+            </div>
+          </Card>
+          <Card className="p-4 bg-white border-amber-100">
+            <div className="flex items-center gap-3">
+              <Sparkles className="h-5 w-5 text-amber-600" />
+              <div>
+                <p className="font-semibold">Better discovery</p>
+                <p className="text-sm text-gray-600">Complete profiles appear more trustworthy to businesses.</p>
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        <Card className="p-5 bg-white mb-8">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-sm font-semibold text-blue-700">Step {step} of 4</p>
+              <h2 className="text-xl font-bold">{STEP_DETAILS[step - 1].title}</h2>
+              <p className="text-sm text-gray-600">{STEP_DETAILS[step - 1].description}</p>
+            </div>
+            <div className="min-w-45">
+              <div className="flex items-center justify-between text-sm mb-2">
+                <span className="text-gray-600">Profile completion</span>
+                <span className="font-semibold">{profileCompletion}%</span>
+              </div>
+              <div className="h-2 rounded-full bg-gray-100 overflow-hidden">
+                <div className="h-full rounded-full bg-blue-600 transition-all" style={{ width: `${profileCompletion}%` }} />
+              </div>
+            </div>
           </div>
-        ))}
-      </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-5">
+            {STEP_DETAILS.map((item, index) => {
+              const stepNumber = index + 1
+              const isCurrent = stepNumber === step
+              const isComplete = stepNumber < step
+
+              return (
+                <div
+                  key={item.title}
+                  className={`rounded-xl border p-3 text-left ${
+                    isCurrent
+                      ? 'border-blue-300 bg-blue-50'
+                      : isComplete
+                        ? 'border-emerald-200 bg-emerald-50'
+                        : 'border-gray-200 bg-gray-50'
+                  }`}
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold ${
+                      isCurrent
+                        ? 'bg-blue-600 text-white'
+                        : isComplete
+                          ? 'bg-emerald-600 text-white'
+                          : 'bg-gray-200 text-gray-600'
+                    }`}>
+                      {stepNumber}
+                    </div>
+                    <p className="font-medium">{item.title}</p>
+                  </div>
+                  <p className="text-xs text-gray-600">{item.description}</p>
+                </div>
+              )
+            })}
+          </div>
+        </Card>
+
+        {draftRestored && (
+          <div className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+            Your saved CA application draft has been restored.
+          </div>
+        )}
+
+        {validationError && (
+          <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {validationError}
+          </div>
+        )}
 
       {/* Step 1: Basic Information */}
       {step === 1 && (
@@ -325,7 +508,9 @@ export default function CARegistrationPage() {
 
           <div className="flex justify-end">
             <Button
-              onClick={() => setStep(2)}
+              onClick={() => {
+                if (validateStep(1)) setStep(2)
+              }}
               disabled={
                 !formData.full_name ||
                 !formData.email ||
@@ -390,7 +575,12 @@ export default function CARegistrationPage() {
             <Button variant="outline" onClick={() => setStep(1)}>
               Back
             </Button>
-            <Button onClick={() => setStep(3)} disabled={formData.specializations.length === 0}>
+            <Button
+              onClick={() => {
+                if (validateStep(2)) setStep(3)
+              }}
+              disabled={formData.specializations.length === 0}
+            >
               Next: Location
             </Button>
           </div>
@@ -470,7 +660,9 @@ export default function CARegistrationPage() {
               Back
             </Button>
             <Button
-              onClick={() => setStep(4)}
+              onClick={() => {
+                if (validateStep(3)) setStep(4)
+              }}
               disabled={
                 !formData.office_address || !formData.city || !formData.state || !formData.pincode
               }
@@ -619,10 +811,10 @@ export default function CARegistrationPage() {
             <div>
               <h3 className="font-semibold text-gray-900 mb-4">Product</h3>
               <ul className="space-y-3 text-sm text-gray-600">
-                <li><a href="/#features" className="hover:text-blue-600 transition-colors">Features</a></li>
-                <li><a href="/#pricing" className="hover:text-blue-600 transition-colors">Pricing</a></li>
-                <li><a href="/#lifetime-deal" className="hover:text-blue-600 transition-colors">Lifetime Deal</a></li>
-                <li><a href="/enterprise" className="hover:text-blue-600 transition-colors">Enterprise</a></li>
+                <li><Link href="/#features" className="hover:text-blue-600 transition-colors">Features</Link></li>
+                <li><Link href="/#pricing" className="hover:text-blue-600 transition-colors">Pricing</Link></li>
+                <li><Link href="/#lifetime-deal" className="hover:text-blue-600 transition-colors">Lifetime Deal</Link></li>
+                <li><Link href="/enterprise" className="hover:text-blue-600 transition-colors">Enterprise</Link></li>
               </ul>
             </div>
 
@@ -630,9 +822,9 @@ export default function CARegistrationPage() {
             <div>
               <h3 className="font-semibold text-gray-900 mb-4">For CAs</h3>
               <ul className="space-y-3 text-sm text-gray-600">
-                <li><a href="/ca-registration" className="hover:text-blue-600 transition-colors">Register as CA</a></li>
-                <li><a href="/hire-ca" className="hover:text-blue-600 transition-colors">Hire a CA</a></li>
-                <li><a href="/ca-marketplace" className="hover:text-blue-600 transition-colors">CA Marketplace</a></li>
+                <li><Link href="/ca-registration" className="hover:text-blue-600 transition-colors">Register as CA</Link></li>
+                <li><Link href="/hire-ca" className="hover:text-blue-600 transition-colors">Hire a CA</Link></li>
+                <li><Link href="/ca-marketplace" className="hover:text-blue-600 transition-colors">CA Marketplace</Link></li>
               </ul>
             </div>
 
@@ -640,9 +832,9 @@ export default function CARegistrationPage() {
             <div>
               <h3 className="font-semibold text-gray-900 mb-4">Support</h3>
               <ul className="space-y-3 text-sm text-gray-600">
-                <li><a href="/contact" className="hover:text-blue-600 transition-colors">Contact Us</a></li>
-                <li><a href="/help" className="hover:text-blue-600 transition-colors">Help Center</a></li>
-                <li><a href="/docs" className="hover:text-blue-600 transition-colors">Documentation</a></li>
+                <li><Link href="/contact" className="hover:text-blue-600 transition-colors">Contact Us</Link></li>
+                <li><Link href="/help" className="hover:text-blue-600 transition-colors">Help Center</Link></li>
+                <li><Link href="/docs" className="hover:text-blue-600 transition-colors">Documentation</Link></li>
               </ul>
             </div>
 
@@ -650,9 +842,9 @@ export default function CARegistrationPage() {
             <div>
               <h3 className="font-semibold text-gray-900 mb-4">Legal</h3>
               <ul className="space-y-3 text-sm text-gray-600">
-                <li><a href="/privacy" className="hover:text-blue-600 transition-colors">Privacy Policy</a></li>
-                <li><a href="/terms" className="hover:text-blue-600 transition-colors">Terms of Service</a></li>
-                <li><a href="/refund" className="hover:text-blue-600 transition-colors">Refund Policy</a></li>
+                <li><Link href="/privacy" className="hover:text-blue-600 transition-colors">Privacy Policy</Link></li>
+                <li><Link href="/terms" className="hover:text-blue-600 transition-colors">Terms of Service</Link></li>
+                <li><Link href="/refund" className="hover:text-blue-600 transition-colors">Refund Policy</Link></li>
               </ul>
             </div>
 
@@ -660,9 +852,9 @@ export default function CARegistrationPage() {
             <div>
               <h3 className="font-semibold text-gray-900 mb-4">Company</h3>
               <ul className="space-y-3 text-sm text-gray-600">
-                <li><a href="/about" className="hover:text-blue-600 transition-colors">About Us</a></li>
-                <li><a href="/blog" className="hover:text-blue-600 transition-colors">Blog</a></li>
-                <li><a href="/careers" className="hover:text-blue-600 transition-colors">Careers</a></li>
+                <li><Link href="/about" className="hover:text-blue-600 transition-colors">About Us</Link></li>
+                <li><Link href="/blog" className="hover:text-blue-600 transition-colors">Blog</Link></li>
+                <li><Link href="/careers" className="hover:text-blue-600 transition-colors">Careers</Link></li>
               </ul>
             </div>
           </div>
