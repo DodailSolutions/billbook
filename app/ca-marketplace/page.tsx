@@ -8,18 +8,20 @@ import { Button } from '@/components/ui/Button'
 import { Footer } from '@/app/_components/Footer'
 import { getCAMarketplace } from '@/lib/hire-ca-actions'
 import type { CAMarketplaceItem, CASearchFilters, CASpecialization } from '@/lib/hire-ca-types'
-  Search,
-  MapPin,
-  Star,
-  Users,
-  Briefcase,
-  IndianRupee,
-  Filter,
-  ArrowLeft,
-  Award,
-  Home,
-  Heart,
-  HeartOff,
+import { 
+  Search, 
+  MapPin, 
+  Star, 
+  Users, 
+  Briefcase, 
+  IndianRupee, 
+  Filter, 
+  ArrowLeft, 
+  Award, 
+  Home, 
+  Heart, 
+  HeartOff, 
+  Mail 
 } from 'lucide-react'
 // Favorite (shortlist) helpers
 function getFavorites(): string[] {
