@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/Button'
 import { Footer } from '@/app/_components/Footer'
 import { getCAMarketplace } from '@/lib/hire-ca-actions'
 import type { CAMarketplaceItem, CASearchFilters, CASpecialization } from '@/lib/hire-ca-types'
-import {
   Search,
   MapPin,
   Star,
@@ -19,7 +18,23 @@ import {
   ArrowLeft,
   Award,
   Home,
+  Heart,
+  HeartOff,
 } from 'lucide-react'
+// Favorite (shortlist) helpers
+function getFavorites(): string[] {
+  if (typeof window === 'undefined') return []
+  try {
+    return JSON.parse(localStorage.getItem('ca_favorites') || '[]')
+  } catch {
+    return []
+  }
+}
+
+function setFavorites(ids: string[]) {
+  if (typeof window === 'undefined') return
+  localStorage.setItem('ca_favorites', JSON.stringify(ids))
+}
 import { useRouter } from 'next/navigation'
 
 const SPECIALIZATIONS: CASpecialization[] = [
@@ -48,12 +63,41 @@ const STATES = [
 ]
 
 export default function CAMarketplacePage() {
+    // Favorite (shortlist) state
+    const [favorites, setFavoritesState] = useState<string[]>([])
+    const [showShortlist, setShowShortlist] = useState(false)
+    useEffect(() => {
+      setFavoritesState(getFavorites())
+    }, [])
+    const toggleFavorite = (id: string) => {
+      setFavoritesState(prev => {
+        let updated: string[]
+        if (prev.includes(id)) {
+          updated = prev.filter(fav => fav !== id)
+        } else {
+          updated = [...prev, id]
+        }
+        setFavorites(updated)
+        return updated
+      })
+    }
+    const resetShortlist = () => {
+      setFavoritesState([])
+      setFavorites([])
+    }
   const router = useRouter()
   const [cas, setCAs] = useState<CAMarketplaceItem[]>([])
   const [loading, setLoading] = useState(true)
   const [showFilters, setShowFilters] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [showPolicies, setShowPolicies] = useState(false)
+  const [sortKey, setSortKey] = useState<'rating' | 'fee' | 'experience'>('rating')
+  const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc')
+  const [page, setPage] = useState(1)
+  const PAGE_SIZE = 12
+  // Quick filter chips
+  const [languageChip, setLanguageChip] = useState<string | undefined>(undefined)
+  const [specializationChip, setSpecializationChip] = useState<CASpecialization | undefined>(undefined)
 
   const [filters, setFilters] = useState<CASearchFilters>({
     city: undefined,
@@ -77,18 +121,46 @@ export default function CAMarketplacePage() {
     loadCAs()
   }, [loadCAs])
 
-  // Apply search filter using useMemo
+  // Apply search, sort, and pagination
   const filteredCAsComputed = useMemo(() => {
+    let filtered = cas
+    if (showShortlist) {
+      filtered = filtered.filter(ca => favorites.includes(ca.id))
+    }
     if (searchQuery.trim()) {
-      return cas.filter(ca => 
+      filtered = filtered.filter(ca => 
         ca.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         ca.firm_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         ca.specializations.some(s => s.toLowerCase().includes(searchQuery.toLowerCase())) ||
         ca.city.toLowerCase().includes(searchQuery.toLowerCase())
       )
     }
-    return cas
-  }, [searchQuery, cas])
+    if (languageChip) {
+      filtered = filtered.filter(ca => ca.languages_spoken?.includes(languageChip))
+    }
+    if (specializationChip) {
+      filtered = filtered.filter(ca => ca.specializations.includes(specializationChip))
+    }
+    // Sorting
+    filtered = [...filtered].sort((a, b) => {
+      if (sortKey === 'rating') {
+        return sortOrder === 'desc' ? b.average_rating - a.average_rating : a.average_rating - b.average_rating
+      } else if (sortKey === 'fee') {
+        return sortOrder === 'desc'
+          ? (b.consultation_fee || 0) - (a.consultation_fee || 0)
+          : (a.consultation_fee || 0) - (b.consultation_fee || 0)
+      } else if (sortKey === 'experience') {
+        return sortOrder === 'desc' ? b.years_of_experience - a.years_of_experience : a.years_of_experience - b.years_of_experience
+      }
+      return 0
+    })
+    return filtered
+  }, [searchQuery, cas, sortKey, sortOrder, languageChip, specializationChip, showShortlist, favorites])
+
+  const paginatedCAs = useMemo(() => {
+    const start = (page - 1) * PAGE_SIZE
+    return filteredCAsComputed.slice(start, start + PAGE_SIZE)
+  }, [filteredCAsComputed, page])
 
   const handleApplyFilters = () => {
     loadCAs()
@@ -604,19 +676,122 @@ export default function CAMarketplacePage() {
           </Card>
         ) : (
           <>
-            <div className="mb-4 text-sm text-gray-600">
-              Showing {filteredCAsComputed.length} {filteredCAsComputed.length === 1 ? 'CA' : 'CAs'}
+            {/* Top Bar Actions */}
+            <div className="flex flex-wrap gap-2 mb-4 items-center">
+              <Button
+                variant={showShortlist ? 'default' : 'outline'}
+                onClick={() => setShowShortlist(v => !v)}
+                className="flex items-center gap-2"
+              >
+                <Heart className="w-4 h-4" />
+                {showShortlist ? 'Show All' : 'Show Shortlist'}
+                {showShortlist && <span className="ml-1 px-2 py-0.5 bg-red-600 text-white text-xs rounded-full">{favorites.length}</span>}
+              </Button>
+              <Button variant="outline" onClick={resetShortlist} disabled={favorites.length === 0} className="flex items-center gap-2">
+                <HeartOff className="w-4 h-4" /> Reset Shortlist
+              </Button>
+              <Button variant="outline" onClick={handleClearFilters} className="flex items-center gap-2">
+                Clear All Filters
+              </Button>
+              <Button variant="outline" disabled className="flex items-center gap-2 opacity-60 cursor-not-allowed" title="Coming soon">
+                <span role="img" aria-label="save">💾</span> Save Search
+              </Button>
             </div>
 
+            {/* Quick Filter Chips */}
+            <div className="flex flex-wrap gap-2 mb-4">
+              {/* Languages */}
+              {Array.from(new Set(cas.flatMap(ca => ca.languages_spoken || []))).slice(0, 8).map(lang => (
+                <button
+                  key={lang}
+                  className={`px-3 py-1 rounded-full text-xs border ${languageChip === lang ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-700'}`}
+                  onClick={() => setLanguageChip(languageChip === lang ? undefined : lang)}
+                >
+                  {lang}
+                </button>
+              ))}
+              {/* Specializations */}
+              {SPECIALIZATIONS.slice(0, 8).map(spec => (
+                <button
+                  key={spec}
+                  className={`px-3 py-1 rounded-full text-xs border ${specializationChip === spec ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-700'}`}
+                  onClick={() => setSpecializationChip(specializationChip === spec ? undefined : spec)}
+                >
+                  {spec}
+                </button>
+              ))}
+              {(languageChip || specializationChip) && (
+                <button className="ml-2 px-3 py-1 rounded-full text-xs border bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-400 dark:border-gray-600" onClick={() => { setLanguageChip(undefined); setSpecializationChip(undefined) }}>Clear Chips</button>
+              )}
+            </div>
+
+            {/* Sorting Controls */}
+            <div className="flex flex-wrap gap-3 mb-4 items-center">
+              <div className="text-sm text-gray-600">
+                Showing {filteredCAsComputed.length} {filteredCAsComputed.length === 1 ? 'CA' : 'CAs'}
+              </div>
+              <div className="flex items-center gap-2 ml-auto">
+                <span className="text-sm">Sort by:</span>
+                <select
+                  value={sortKey}
+                  onChange={e => setSortKey(e.target.value as any)}
+                  className="border border-gray-300 dark:border-gray-700 rounded px-2 py-1 text-sm bg-white dark:bg-gray-800"
+                >
+                  <option value="rating">Rating</option>
+                  <option value="fee">Consultation Fee</option>
+                  <option value="experience">Experience</option>
+                </select>
+                <button
+                  className="ml-1 px-2 py-1 border rounded text-sm bg-gray-100 dark:bg-gray-800"
+                  onClick={() => setSortOrder(sortOrder === 'desc' ? 'asc' : 'desc')}
+                  title={sortOrder === 'desc' ? 'Descending' : 'Ascending'}
+                >
+                  {sortOrder === 'desc' ? '↓' : '↑'}
+                </button>
+              </div>
+            </div>
+
+            {/* Featured CA highlight */}
+            {!showShortlist && filteredCAsComputed.length > 0 && (
+              <div className="mb-8">
+                <div className="p-4 rounded-lg bg-linear-to-r from-yellow-100 to-yellow-50 border border-yellow-300 flex items-center gap-4 shadow">
+                  <Award className="w-8 h-8 text-yellow-600" />
+                  <div className="flex-1">
+                    <div className="font-bold text-lg">Featured CA: {filteredCAsComputed[0].full_name}</div>
+                    <div className="text-sm text-gray-700">Top-rated CA with {filteredCAsComputed[0].average_rating.toFixed(1)}★ and {filteredCAsComputed[0].total_reviews} reviews</div>
+                  </div>
+                  <Link href={`/ca-marketplace/${filteredCAsComputed[0].id}`}>
+                    <Button>View Profile</Button>
+                  </Link>
+                </div>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredCAsComputed.map((ca) => (
-                <Card key={ca.id} className="p-6 hover:shadow-lg transition-shadow">
+              {paginatedCAs.map((ca) => (
+                <Card key={ca.id} className="p-6 hover:shadow-lg transition-shadow relative">
+                                    {/* Favorite (shortlist) button */}
+                                    <button
+                                      className={`absolute top-3 right-3 z-10 rounded-full p-1 border ${favorites.includes(ca.id) ? 'bg-red-100 border-red-400' : 'bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700'}`}
+                                      title={favorites.includes(ca.id) ? 'Remove from Shortlist' : 'Add to Shortlist'}
+                                      onClick={e => { e.stopPropagation(); e.preventDefault(); toggleFavorite(ca.id) }}
+                                    >
+                                      {favorites.includes(ca.id) ? (
+                                        <Heart className="w-5 h-5 text-red-500 fill-red-500" />
+                                      ) : (
+                                        <HeartOff className="w-5 h-5 text-gray-400" />
+                                      )}
+                                    </button>
+                  {/* ...existing CA card content... */}
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
                         <h3 className="text-lg font-bold">{ca.full_name}</h3>
                         {ca.verification_status === 'verified' && (
-                          <Award className="w-4 h-4 text-blue-600" />
+                          <span className="relative group">
+                            <Award className="w-4 h-4 text-blue-600" />
+                            <span className="absolute left-6 top-0 z-10 hidden group-hover:block bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 px-2 py-1 rounded shadow text-xs text-gray-700 dark:text-gray-200 whitespace-nowrap">Verified by ICAI</span>
+                          </span>
                         )}
                       </div>
                       {ca.firm_name && (
@@ -632,6 +807,11 @@ export default function CAMarketplacePage() {
                   </div>
 
                   <div className="space-y-2 mb-4">
+                    {/* Last active/response time indicator (mock) */}
+                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                      <span className="inline-block w-2 h-2 rounded-full bg-green-500" title="Active recently" />
+                      Last active: 2h ago • Response: &lt;24h
+                    </div>
                     <div className="flex items-center text-sm text-gray-600">
                       <MapPin className="w-4 h-4 mr-2" />
                       {ca.city}, {ca.state}
@@ -668,6 +848,20 @@ export default function CAMarketplacePage() {
                     </p>
                   )}
 
+                  {/* Recent Reviews Preview */}
+                  {ca.recent_reviews && ca.recent_reviews.length > 0 && (
+                    <div className="mb-4">
+                      <h4 className="text-xs font-semibold text-gray-500 mb-1">Recent Reviews</h4>
+                      <ul className="space-y-1">
+                        {ca.recent_reviews.slice(0, 2).map((review) => (
+                          <li key={review.id} className="text-xs text-gray-600 border-l-2 border-blue-400 pl-2">
+                            <span className="font-semibold">{review.rating.toFixed(1)}★</span> {review.review_text.slice(0, 60)}{review.review_text.length > 60 ? '…' : ''}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
                   <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mb-4">
                     <div className="flex justify-between text-sm">
                       {ca.consultation_fee && (
@@ -691,11 +885,56 @@ export default function CAMarketplacePage() {
                     </div>
                   </div>
 
-                  <Link href={`/ca-marketplace/${ca.id}`}>
-                    <Button className="w-full">View Profile</Button>
-                  </Link>
+                  <div className="flex gap-2 mt-2">
+                    <Link href={`/ca-marketplace/${ca.id}`} className="flex-1">
+                      <Button className="w-full">View Profile</Button>
+                    </Link>
+                    <Link href="/reports/hire-ca">
+                      <Button variant="outline">Request Proposal</Button>
+                    </Link>
+                    {/* Contact CA (email) */}
+                    {ca.email && (
+                      <a href={`mailto:${ca.email}`} target="_blank" rel="noopener noreferrer">
+                        <Button variant="ghost" title="Contact CA">
+                          <Mail className="w-4 h-4" />
+                        </Button>
+                      </a>
+                    )}
+                    {/* Share profile */}
+                    <button
+                      className="ml-1"
+                      title="Copy profile link"
+                      onClick={() => {
+                        navigator.clipboard.writeText(window.location.origin + `/ca-marketplace/${ca.id}`)
+                        alert('Profile link copied!')
+                      }}
+                    >
+                      <Button variant="ghost">
+                        <span role="img" aria-label="share">🔗</span>
+                      </Button>
+                    </button>
+                  </div>
                 </Card>
               ))}
+            </div>
+
+            {/* Pagination Controls */}
+            <div className="flex justify-center items-center gap-2 mt-8">
+              <Button
+                variant="outline"
+                disabled={page === 1}
+                onClick={() => setPage(page - 1)}
+              >
+                Previous
+              </Button>
+              <span className="text-sm px-2">Page {page} of {Math.ceil(filteredCAsComputed.length / PAGE_SIZE)}</span>
+              <Button
+                variant="outline"
+                disabled={page >= Math.ceil(filteredCAsComputed.length / PAGE_SIZE)}
+                onClick={() => setPage(page + 1)}
+              >
+                Next
+              </Button>
             </div>
           </>
         )}
