@@ -1,15 +1,10 @@
 import { ImageResponse } from 'next/og'
+import { NextRequest } from 'next/server'
  
 export const runtime = 'edge'
  
-export const size = {
-  width: 32,
-  height: 32,
-}
- 
-export const contentType = 'image/x-icon'
- 
-export default function Icon() {
+export async function GET(request: NextRequest) {
+  // Return PNG with .ico content type for browser compatibility
   return new ImageResponse(
     (
       <div
@@ -23,24 +18,25 @@ export default function Icon() {
           borderRadius: '6px',
         }}
       >
-        {/* Ultra-simplified invoice icon for 32x32 */}
+        {/* Simplified invoice icon */}
         <svg width="24" height="24" viewBox="0 0 24 24">
           {/* Document */}
           <rect x="6" y="4" width="14" height="17" rx="2" fill="white"/>
           
-          {/* Rupee/Lines */}
+          {/* Invoice lines */}
           <rect x="8" y="7" width="8" height="2" rx="1" fill="#0072BC"/>
           <rect x="8" y="11" width="6" height="1.5" rx="0.75" fill="#0072BC" opacity="0.6"/>
           <rect x="8" y="14" width="7" height="1.5" rx="0.75" fill="#0072BC" opacity="0.6"/>
           
-          {/* Check */}
+          {/* Checkmark */}
           <path d="M 14 16 L 16 18 L 19 14" 
                 stroke="#00A651" strokeWidth="2" strokeLinecap="round" fill="none"/>
         </svg>
       </div>
     ),
     {
-      ...size,
+      width: 32,
+      height: 32,
     }
   )
 }
