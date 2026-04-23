@@ -61,20 +61,11 @@ export const metadata: Metadata = {
     title: 'BillBooky - Free Invoice Generator for Indian Businesses | Made in India',
     description: 'Free GST-compliant invoice generator made in India. Perfect for MSMEs, freelancers, and enterprises. Create professional invoices in seconds!',
     siteName: 'BillBooky',
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'BillBooky - Free Invoice Generator India',
-      },
-    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'BillBooky - Free Invoice Generator for Indian Businesses',
     description: 'Free GST-compliant invoice software made in India. Start creating professional invoices today!',
-    images: ['/og-image.png'],
     creator: '@billbooky',
   },
   robots: {
@@ -87,10 +78,6 @@ export const metadata: Metadata = {
       'max-image-preview': 'large',
       'max-snippet': -1,
     },
-  },
-  icons: {
-    icon: '/logo-icon.svg',
-    apple: '/logo-icon.svg',
   },
   manifest: '/manifest.json',
   alternates: {
