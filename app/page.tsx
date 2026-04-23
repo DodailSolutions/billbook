@@ -3,7 +3,6 @@ import Image from 'next/image'
 import dynamic from 'next/dynamic'
 import { Button } from '@/components/ui/Button'
 import { FileText, Users, IndianRupee, Zap, CheckCircle, Shield, TrendingUp, RefreshCw, Clock, Building2, ArrowRight, Star, Check, BarChart3, Smartphone, Globe, Lock } from 'lucide-react'
-import { createClient } from '@/lib/supabase/server'
 
 // Lazy load below-the-fold components for better performance
 const FAQSection = dynamic(() => import('./_components/FAQSection').then(mod => ({ default: mod.FAQSection })), {
@@ -32,10 +31,9 @@ const BENEFITS = [
   'Cloud storage',
 ]
 
-export default async function Home() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  const isAuthenticated = !!user
+export default function Home() {
+  // Keep the landing page fully static for faster TTFB and better mobile scores.
+  const isAuthenticated = false
 
   return (
     <div className="min-h-screen bg-white">

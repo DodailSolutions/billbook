@@ -58,6 +58,17 @@ export async function updateSession(request: NextRequest) {
             request,
         })
 
+        const pathname = request.nextUrl.pathname
+        const needsAuthLookup =
+            pathname.startsWith('/dashboard') ||
+            pathname.startsWith('/login') ||
+            pathname.startsWith('/signup')
+
+        // Skip Supabase user lookup for public routes to reduce TTFB.
+        if (!needsAuthLookup) {
+            return addSecurityHeaders(supabaseResponse)
+        }
+
         const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
         const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 

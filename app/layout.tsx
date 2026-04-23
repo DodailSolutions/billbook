@@ -86,8 +86,6 @@ export const metadata: Metadata = {
   category: 'Business Software',
 };
 
-export const dynamic = 'force-dynamic'
-
 export default function RootLayout({
   children,
 }: Readonly<{
