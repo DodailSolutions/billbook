@@ -133,23 +133,24 @@ export function DashboardTabs({ stats }: DashboardTabsProps) {
     return (
         <div className="space-y-5">
             {/* Header */}
-            <div className="bg-white rounded-2xl px-6 pt-6 pb-0 shadow-sm border border-gray-100">
-                <div className="flex items-start justify-between mb-5">
+            <div className="bg-white rounded-2xl px-4 sm:px-6 pt-5 sm:pt-6 pb-0 shadow-sm border border-gray-100">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between mb-5">
                     <div>
-                        <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
+                        <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Dashboard</h2>
                         <p className="text-sm text-gray-500 mt-0.5">Real-time business finance overview</p>
                     </div>
-                    <div className="hidden sm:flex items-center gap-2 bg-emerald-50 rounded-xl px-4 py-2">
+                    <div className="inline-flex w-fit items-center gap-2 bg-emerald-50 rounded-xl px-3 sm:px-4 py-2">
                         <span className="text-xs text-gray-500">Collection Rate</span>
-                        <span className="text-lg font-bold text-emerald-600">{stats.collectionRate}%</span>
+                        <span className="text-base sm:text-lg font-bold text-emerald-600">{stats.collectionRate}%</span>
                     </div>
                 </div>
-                <div className="flex gap-1">
+                <div className="-mx-4 px-4 sm:mx-0 sm:px-0 overflow-x-auto no-scrollbar">
+                    <div className="flex w-max sm:w-auto gap-1">
                     {tabs.map(({ key, label, icon: Icon }) => (
                         <button
                             key={key}
                             onClick={() => setActiveTab(key)}
-                            className={`flex items-center gap-2 pb-3 px-3 font-medium text-sm transition-all relative ${
+                            className={`flex items-center gap-2 pb-3 px-3 font-medium text-sm whitespace-nowrap transition-all relative ${
                                 activeTab === key ? 'text-blue-600' : 'text-gray-400 hover:text-gray-700'
                             }`}
                         >
@@ -160,13 +161,14 @@ export function DashboardTabs({ stats }: DashboardTabsProps) {
                             )}
                         </button>
                     ))}
+                    </div>
                 </div>
             </div>
 
             {/* OVERVIEW TAB */}
             {activeTab === 'overview' && (
                 <>
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <Card className="bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
                             <CardContent className="p-5">
                                 <div className="flex items-center justify-between mb-3">
@@ -175,7 +177,7 @@ export function DashboardTabs({ stats }: DashboardTabsProps) {
                                         <IndianRupee className="h-5 w-5 text-blue-600" />
                                     </div>
                                 </div>
-                                <p className="text-2xl font-bold text-gray-900">{formatINR(stats.totalRevenue)}</p>
+                                <p className="text-xl sm:text-2xl font-bold text-gray-900 wrap-break-word">{formatINR(stats.totalRevenue)}</p>
                                 <TrendBadge change={revenueChange} />
                             </CardContent>
                         </Card>
@@ -188,7 +190,7 @@ export function DashboardTabs({ stats }: DashboardTabsProps) {
                                         <TrendingDown className="h-5 w-5 text-red-500" />
                                     </div>
                                 </div>
-                                <p className="text-2xl font-bold text-gray-900">{formatINR(stats.totalExpenses)}</p>
+                                <p className="text-xl sm:text-2xl font-bold text-gray-900 wrap-break-word">{formatINR(stats.totalExpenses)}</p>
                                 <TrendBadge change={expensesChange} inverse />
                             </CardContent>
                         </Card>
@@ -201,7 +203,7 @@ export function DashboardTabs({ stats }: DashboardTabsProps) {
                                         <TrendingUp className={`h-5 w-5 ${stats.netProfit >= 0 ? 'text-emerald-600' : 'text-red-500'}`} />
                                     </div>
                                 </div>
-                                <p className={`text-2xl font-bold ${stats.netProfit >= 0 ? 'text-gray-900' : 'text-red-600'}`}>
+                                <p className={`text-xl sm:text-2xl font-bold wrap-break-word ${stats.netProfit >= 0 ? 'text-gray-900' : 'text-red-600'}`}>
                                     {formatINR(stats.netProfit)}
                                 </p>
                                 <p className={`text-xs mt-1 font-medium ${stats.netProfit >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
@@ -218,7 +220,7 @@ export function DashboardTabs({ stats }: DashboardTabsProps) {
                                         <AlertCircle className="h-5 w-5 text-violet-600" />
                                     </div>
                                 </div>
-                                <p className="text-2xl font-bold text-gray-900">{formatINR(stats.outstandingAmount)}</p>
+                                <p className="text-xl sm:text-2xl font-bold text-gray-900 wrap-break-word">{formatINR(stats.outstandingAmount)}</p>
                                 <p className="text-xs text-gray-400 mt-1">{stats.pendingInvoices + stats.partialInvoices} unpaid</p>
                             </CardContent>
                         </Card>
@@ -265,8 +267,9 @@ export function DashboardTabs({ stats }: DashboardTabsProps) {
                                     No invoice data yet
                                 </div>
                             ) : (
-                                <div className="flex items-center gap-8">
-                                    <ResponsiveContainer width="45%" height={160}>
+                                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 sm:gap-8">
+                                    <div className="w-full sm:w-[45%]">
+                                    <ResponsiveContainer width="100%" height={160}>
                                         <PieChart>
                                             <Pie data={pieData} cx="50%" cy="50%" innerRadius={45} outerRadius={70} paddingAngle={3} dataKey="value">
                                                 {pieData.map(entry => (
@@ -276,7 +279,8 @@ export function DashboardTabs({ stats }: DashboardTabsProps) {
                                             <Tooltip formatter={(value) => [`${value} invoices`, '']} />
                                         </PieChart>
                                     </ResponsiveContainer>
-                                    <div className="flex-1 space-y-2.5">
+                                    </div>
+                                    <div className="w-full sm:flex-1 space-y-2.5">
                                         {pieData.map(d => (
                                             <div key={d.name} className="flex items-center justify-between">
                                                 <span className="flex items-center gap-2 text-sm text-gray-600">
@@ -462,21 +466,21 @@ export function DashboardTabs({ stats }: DashboardTabsProps) {
                     <div className="space-y-4">
                         <div className="bg-blue-50 rounded-2xl p-5 border border-blue-100">
                             <p className="text-sm text-gray-500 mb-1">Average Invoice Value</p>
-                            <p className="text-3xl font-bold text-blue-700">{formatINR(stats.avgInvoiceValue)}</p>
+                            <p className="text-2xl sm:text-3xl font-bold text-blue-700 wrap-break-word">{formatINR(stats.avgInvoiceValue)}</p>
                         </div>
                         <div className="bg-emerald-50 rounded-2xl p-5 border border-emerald-100">
                             <p className="text-sm text-gray-500 mb-1">Collection Rate</p>
-                            <p className="text-3xl font-bold text-emerald-700">{stats.collectionRate}%</p>
+                            <p className="text-2xl sm:text-3xl font-bold text-emerald-700">{stats.collectionRate}%</p>
                             <p className="text-xs text-gray-400 mt-1">{stats.paidInvoices} paid · {stats.partialInvoices} partial</p>
                         </div>
                         <div className="bg-purple-50 rounded-2xl p-5 border border-purple-100">
                             <p className="text-sm text-gray-500 mb-1">Average Payment Time</p>
-                            <p className="text-3xl font-bold text-purple-700">{stats.avgPaymentTime} days</p>
+                            <p className="text-2xl sm:text-3xl font-bold text-purple-700">{stats.avgPaymentTime} days</p>
                             <p className="text-xs text-gray-400 mt-1">From invoice date to payment</p>
                         </div>
                         <div className="bg-amber-50 rounded-2xl p-5 border border-amber-100">
                             <p className="text-sm text-gray-500 mb-1">Outstanding Amount</p>
-                            <p className="text-3xl font-bold text-amber-700">{formatINR(stats.outstandingAmount)}</p>
+                            <p className="text-2xl sm:text-3xl font-bold text-amber-700 wrap-break-word">{formatINR(stats.outstandingAmount)}</p>
                             <p className="text-xs text-gray-400 mt-1">{stats.pendingInvoices + stats.partialInvoices} unpaid invoices</p>
                         </div>
                     </div>
@@ -510,7 +514,7 @@ export function DashboardTabs({ stats }: DashboardTabsProps) {
                             <div className="divide-y divide-gray-50">
                                 {stats.recentInvoices.map(inv => (
                                     <Link key={inv.id} href={`/invoices/${inv.id}`}
-                                        className="flex items-center justify-between py-3 px-2 rounded-xl hover:bg-gray-50 transition-colors group"
+                                        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 py-3 px-2 rounded-xl hover:bg-gray-50 transition-colors group"
                                     >
                                         <div className="flex items-center gap-3">
                                             <div className="h-9 w-9 rounded-xl bg-blue-50 flex items-center justify-center group-hover:bg-blue-100 transition-colors shrink-0">
@@ -523,7 +527,7 @@ export function DashboardTabs({ stats }: DashboardTabsProps) {
                                                 </p>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-3">
+                                        <div className="w-full sm:w-auto flex items-center justify-between sm:justify-end gap-3">
                                             <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${statusBadgeClass[inv.status] || 'bg-gray-100 text-gray-600'}`}>
                                                 {statusLabel[inv.status] || inv.status}
                                             </span>

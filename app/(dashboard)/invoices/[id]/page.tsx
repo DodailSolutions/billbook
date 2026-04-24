@@ -50,9 +50,9 @@ export default async function InvoiceDetailPage({
                         <ArrowLeft className="h-4 w-4" />Back
                     </Button>
                 </Link>
-                <div className="flex flex-wrap gap-2">
+                <div className="grid w-full sm:w-auto grid-cols-2 sm:flex gap-2">
                     <Link href={`/invoices/recurring/new?fromInvoice=${id}`}>
-                        <Button variant="outline" size="sm" className="gap-1.5 rounded-lg text-gray-700">
+                        <Button variant="outline" size="sm" className="w-full gap-1.5 rounded-lg text-gray-700">
                             <RefreshCw className="h-3.5 w-3.5" />Recurring
                         </Button>
                     </Link>
@@ -65,7 +65,7 @@ export default async function InvoiceDetailPage({
                         total={invoice.total}
                     />
                     <Link href={`/invoices/${id}/edit`}>
-                        <Button variant="outline" size="sm" className="gap-1.5 rounded-lg">
+                        <Button variant="outline" size="sm" className="w-full gap-1.5 rounded-lg">
                             <Pencil className="h-3.5 w-3.5" />Edit
                         </Button>
                     </Link>
@@ -77,24 +77,24 @@ export default async function InvoiceDetailPage({
             <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
 
                 {/* Invoice Header Band */}
-                <div className="bg-linear-to-r from-blue-600 to-indigo-700 px-6 py-5">
-                    <div className="flex items-start justify-between">
+                <div className="bg-linear-to-r from-blue-600 to-indigo-700 px-4 sm:px-6 py-5">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                         <div>
                             <p className="text-blue-200 text-xs font-semibold uppercase tracking-widest mb-1">Tax Invoice</p>
-                            <h1 className="text-white text-3xl font-bold tracking-tight">INVOICE</h1>
+                            <h1 className="text-white text-2xl sm:text-3xl font-bold tracking-tight">INVOICE</h1>
                         </div>
-                        <div className="text-right">
+                        <div className="text-left sm:text-right">
                             <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${status.bg} ${status.text} ${status.border} border`}>
                                 <StatusIcon className="h-3.5 w-3.5" />
                                 {status.label}
                             </div>
-                            <p className="text-white text-2xl font-bold mt-2">₹{invoice.total.toFixed(2)}</p>
+                            <p className="text-white text-xl sm:text-2xl font-bold mt-2">₹{invoice.total.toFixed(2)}</p>
                         </div>
                     </div>
                 </div>
 
                 {/* Invoice Meta */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-0 border-b border-gray-200 dark:border-gray-700 divide-x divide-gray-200 dark:divide-gray-700">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-0 border-b border-gray-200 dark:border-gray-700 divide-y sm:divide-y-0 sm:divide-x divide-gray-200 dark:divide-gray-700">
                     <div className="px-4 py-3">
                         <p className="text-xs text-gray-500 flex items-center gap-1 mb-1"><Hash className="h-3 w-3" />Invoice #</p>
                         <p className="text-sm font-bold text-gray-900 dark:text-white">{invoice.invoice_number}</p>
@@ -170,9 +170,9 @@ export default async function InvoiceDetailPage({
 
                 {/* Items Table */}
                 {invoice.invoice_items.length > 0 && (
-                <div className="px-5 py-4">
-                    <div className="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
-                        <table className="w-full text-sm">
+                <div className="px-4 sm:px-5 py-4">
+                    <div className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-x-auto">
+                        <table className="w-full min-w-180 text-sm">
                             <thead>
                                 <tr className="bg-gray-50 dark:bg-gray-800 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                                     <th className="text-left px-4 py-3">Item</th>
@@ -219,9 +219,9 @@ export default async function InvoiceDetailPage({
                 )}
 
                 {/* Totals */}
-                <div className="px-5 pb-5">
+                <div className="px-4 sm:px-5 pb-5">
                     <div className="flex justify-end">
-                        <div className="w-72 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                        <div className="w-full sm:w-72 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
                             <div className="px-4 py-3 space-y-2">
                                 <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
                                     <span>Subtotal</span>
@@ -285,16 +285,16 @@ export default async function InvoiceDetailPage({
                 )}
 
                 {/* Signature, Stamp & Client Signature — always shown */}
-                <div className="border-t border-gray-200 dark:border-gray-700 px-5 py-5">
-                    <div className="flex justify-between items-start gap-4">
+                <div className="border-t border-gray-200 dark:border-gray-700 px-4 sm:px-5 py-5">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
                         {/* LEFT: Client signature placeholder */}
-                        <div className="text-center min-w-40">
+                        <div className="text-center min-w-0 sm:min-w-40">
                             <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg h-16 mb-2" />
                             <span className="text-xs text-gray-400">Customer Signature</span>
                         </div>
                         {/* CENTER: Company seal */}
                         {invoiceSettings?.show_stamp && invoiceSettings?.company_stamp_url?.startsWith('data:image') && (
-                            <div className="text-center min-w-30">
+                            <div className="text-center min-w-0 sm:min-w-30">
                                 <div className="h-20 w-20 mx-auto mb-2 rounded-full overflow-hidden border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-100">
                                     {/* eslint-disable-next-line @next/next/no-img-element */}
                                     <img src={invoiceSettings.company_stamp_url} alt="Company Stamp"
@@ -307,7 +307,7 @@ export default async function InvoiceDetailPage({
                         )}
                         {/* RIGHT: Authorized signatory */}
                         {invoiceSettings?.show_signature && invoiceSettings?.digital_signature_url?.startsWith('data:image') && (
-                            <div className="text-center min-w-40">
+                            <div className="text-center min-w-0 sm:min-w-40">
                                 <div className="h-16 flex items-end justify-center mb-1">
                                     {/* eslint-disable-next-line @next/next/no-img-element */}
                                     <img src={invoiceSettings.digital_signature_url} alt="Signature"
@@ -325,7 +325,7 @@ export default async function InvoiceDetailPage({
                 </div>
 
                 {/* Payment Status */}
-                <div className="border-t border-gray-200 dark:border-gray-700 px-5 py-5">
+                <div className="border-t border-gray-200 dark:border-gray-700 px-4 sm:px-5 py-5">
                     {isPaid ? (
                         <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-xl p-4">
                             <div className="flex items-center gap-3">
@@ -366,7 +366,7 @@ export default async function InvoiceDetailPage({
                             <div className="w-full bg-blue-200 dark:bg-blue-900 rounded-full h-2">
                                 <div className="bg-blue-600 h-2 rounded-full" style={{ width: `${Math.min((amountPaid / invoice.total) * 100, 100)}%` }} />
                             </div>
-                            <div className="flex gap-2">
+                            <div className="flex flex-col sm:flex-row gap-2">
                                 <PartialPaymentButton invoiceId={invoice.id} invoiceNumber={invoice.invoice_number}
                                     totalAmount={invoice.total} amountPaid={amountPaid} amountRemaining={amountRemaining} />
                                 <MarkAsPaidButton invoiceId={invoice.id} invoiceNumber={invoice.invoice_number} />
@@ -379,7 +379,7 @@ export default async function InvoiceDetailPage({
                         </div>
                     ) : (
                         <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-xl p-4">
-                            <div className="flex items-center justify-between gap-3">
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                                 <div className="flex items-center gap-3">
                                     <Clock className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
                                     <div>
@@ -387,7 +387,7 @@ export default async function InvoiceDetailPage({
                                         <p className="text-sm text-yellow-600 dark:text-yellow-400">₹{invoice.total.toFixed(2)} due</p>
                                     </div>
                                 </div>
-                                <div className="flex gap-2">
+                                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                                     <PartialPaymentButton invoiceId={invoice.id} invoiceNumber={invoice.invoice_number}
                                         totalAmount={invoice.total} amountPaid={amountPaid} amountRemaining={amountRemaining} />
                                     <MarkAsPaidButton invoiceId={invoice.id} invoiceNumber={invoice.invoice_number} />

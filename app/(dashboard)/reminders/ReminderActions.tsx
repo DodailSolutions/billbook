@@ -72,13 +72,13 @@ export default function ReminderActions({ reminder }: ReminderActionsProps) {
     }
 
     return (
-        <div className="flex items-center gap-2 pt-3 border-t border-gray-200">
+        <div className="grid grid-cols-4 gap-2 pt-3 border-t border-gray-200">
             <Button
                 variant="outline"
                 size="sm"
                 onClick={handleMarkAsSent}
                 disabled={isLoading}
-                className="flex-1"
+                className="col-span-3"
             >
                 <Check className="h-4 w-4 mr-1 text-green-600" />
                 Mark Sent

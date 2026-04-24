@@ -11,17 +11,17 @@ export default async function RecurringInvoicesPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div>
-                    <h1 className="text-3xl font-bold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    <h1 className="text-2xl sm:text-3xl font-bold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                         Recurring Invoices
                     </h1>
-                    <p className="text-gray-600 mt-1">
+                    <p className="text-sm sm:text-base text-gray-600 mt-1">
                         Automate monthly and yearly invoice generation
                     </p>
                 </div>
-                <Link href="/invoices/recurring/new">
-                    <Button>
+                <Link href="/invoices/recurring/new" className="w-full sm:w-auto">
+                    <Button className="w-full sm:w-auto">
                         <Plus className="h-4 w-4 mr-2" />
                         New Recurring Invoice
                     </Button>
@@ -30,17 +30,17 @@ export default async function RecurringInvoicesPage() {
 
             {recurringInvoices.length === 0 ? (
                 <div className="space-y-8">
-                    <Card className="p-12 text-center border-2 border-dashed border-gray-300 bg-linear-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900">
+                    <Card className="p-6 sm:p-12 text-center border-2 border-dashed border-gray-300 bg-linear-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900">
                         <div className="flex flex-col items-center space-y-6 max-w-2xl mx-auto">
-                            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+                            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
                                 Create. Set. Repeat.
                             </h2>
-                            <p className="text-lg text-gray-600">
+                            <p className="text-base sm:text-lg text-gray-600">
                                 Set up a profile to periodically create and send invoices to your customers.
                             </p>
                             
-                            <Link href="/invoices/recurring/new">
-                                <Button className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-6 text-lg font-medium rounded-lg shadow-lg hover:shadow-xl transition-all">
+                            <Link href="/invoices/recurring/new" className="w-full sm:w-auto">
+                                <Button className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white px-6 sm:px-8 py-5 sm:py-6 text-base sm:text-lg font-medium rounded-lg shadow-lg hover:shadow-xl transition-all">
                                     CREATE NEW RECURRING INVOICE
                                 </Button>
                             </Link>
@@ -52,8 +52,8 @@ export default async function RecurringInvoicesPage() {
                     </Card>
 
                     {/* Lifecycle Diagram */}
-                    <Card className="p-8 bg-white">
-                        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-8 text-center">
+                    <Card className="p-4 sm:p-8 bg-white">
+                        <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-8 text-center">
                             Life cycle of a Recurring Invoice
                         </h3>
                         
@@ -65,7 +65,7 @@ export default async function RecurringInvoicesPage() {
                                         <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                         </svg>
-                                        <span className="font-semibold text-gray-900 dark:text-white">RECURRING PROFILE</span>
+                                        <span className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">RECURRING PROFILE</span>
                                     </div>
                                 </div>
                                 <div className="w-0.5 h-12 bg-gray-300 dark:bg-gray-600"></div>
@@ -78,7 +78,7 @@ export default async function RecurringInvoicesPage() {
                                         <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                         </svg>
-                                        <span className="font-semibold text-gray-900 dark:text-white">INVOICES</span>
+                                        <span className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">INVOICES</span>
                                     </div>
                                 </div>
                                 <div className="w-0.5 h-12 bg-gray-300 dark:bg-gray-600"></div>
@@ -142,7 +142,7 @@ export default async function RecurringInvoicesPage() {
                                                     </span>
                                                 )}
                                             </div>
-                                            <p className="text-base font-medium text-gray-600" style={{ color: 'var(--foreground)' }}>
+                                            <p className="text-sm sm:text-base font-medium text-gray-600 wrap-break-word" style={{ color: 'var(--foreground)' }}>
                                                 {recurringInvoice.customer.email}
                                             </p>
                                         </div>
@@ -160,14 +160,14 @@ export default async function RecurringInvoicesPage() {
                                     <div className="pt-3 border-t-2 border-gray-200">
                                         <div className="flex items-center justify-between">
                                             <span className="text-base font-semibold text-gray-600" style={{ color: 'var(--foreground)' }}>Invoice Amount</span>
-                                            <span className="text-3xl font-extrabold text-gray-900" style={{ color: 'var(--foreground)' }}>
+                                            <span className="text-2xl sm:text-3xl font-extrabold text-gray-900 wrap-break-word" style={{ color: 'var(--foreground)' }}>
                                                 ₹{total.toFixed(2)}
                                             </span>
                                         </div>
                                     </div>
 
                                     {/* Next Invoice Date */}
-                                    <div className="flex items-center gap-2 text-base">
+                                    <div className="flex flex-wrap items-center gap-2 text-sm sm:text-base">
                                         <TrendingUp className="h-5 w-5 text-blue-600 dark:text-blue-300" />
                                         <span className="font-medium text-gray-600" style={{ color: 'var(--foreground)' }}>Next invoice:</span>
                                         <span className="font-bold text-gray-900" style={{ color: 'var(--foreground)' }}>

@@ -87,7 +87,7 @@ export function AccountingReportGenerator() {
                         <Calendar className="h-4 w-4" />
                         Report Period
                     </label>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <div>
                             <label className="text-xs text-muted-foreground">Start Date</label>
                             <Input
@@ -111,7 +111,7 @@ export function AccountingReportGenerator() {
 
                 <div className="space-y-2">
                     <label className="text-sm font-medium">Format</label>
-                    <div className="flex gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <Button
                             type="button"
                             variant={format === 'pdf' ? 'default' : 'outline'}
@@ -151,7 +151,7 @@ export function AccountingReportGenerator() {
                 <Button
                     onClick={handleGenerate}
                     disabled={isGenerating || !startDate || !endDate}
-                    className="flex-1"
+                    className="w-full"
                 >
                     {isGenerating ? (
                         <>
@@ -168,12 +168,12 @@ export function AccountingReportGenerator() {
             </div>
 
             {reportUrl && (
-                <div className="flex gap-2 pt-2 border-t">
-                    <Button onClick={handleDownload} variant="outline" className="flex-1">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t">
+                    <Button onClick={handleDownload} variant="outline" className="w-full">
                         <Download className="h-4 w-4 mr-2" />
                         Download
                     </Button>
-                    <Button onClick={handleShare} variant="outline" className="flex-1">
+                    <Button onClick={handleShare} variant="outline" className="w-full">
                         <Share2 className="h-4 w-4 mr-2" />
                         Share
                     </Button>

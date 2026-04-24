@@ -73,13 +73,13 @@ export default function RecurringInvoiceActions({ recurringInvoice }: RecurringI
     }
 
     return (
-        <div className="flex items-center gap-2 pt-4 border-t border-gray-200">
+        <div className="grid grid-cols-4 gap-2 pt-4 border-t border-gray-200">
             <Button
                 variant="outline"
                 size="sm"
                 onClick={handleGenerateNow}
                 disabled={isLoading}
-                className="flex-1"
+                className="col-span-2"
             >
                 {isLoading && action === 'generate' ? (
                     <RefreshCw className="h-4 w-4 animate-spin" />

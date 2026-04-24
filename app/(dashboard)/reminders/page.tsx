@@ -20,16 +20,16 @@ export default async function RemindersPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div>
-                    <h1 className="text-3xl font-bold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    <h1 className="text-2xl sm:text-3xl font-bold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                         Payment Reminders
                     </h1>
-                    <p className="text-gray-600 mt-1">
+                    <p className="text-sm sm:text-base text-gray-600 mt-1">
                         Upcoming payment reminders for the next 30 days
                     </p>
                 </div>
-                <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-lg">
+                <div className="inline-flex w-fit items-center gap-2 px-4 py-2 bg-blue-50 rounded-lg">
                     <Bell className="h-5 w-5 text-blue-600" />
                     <span className="text-sm font-medium text-blue-900">
                         {reminders.length} reminder{reminders.length !== 1 ? 's' : ''}
@@ -38,7 +38,7 @@ export default async function RemindersPage() {
             </div>
 
             {reminders.length === 0 ? (
-                <Card className="p-12 text-center">
+                <Card className="p-6 sm:p-12 text-center">
                     <div className="flex flex-col items-center space-y-4">
                         <div className="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center">
                             <Bell className="h-8 w-8 text-green-600" />
@@ -63,9 +63,9 @@ export default async function RemindersPage() {
 
                         return (
                             <div key={date} className="space-y-3">
-                                <div className="flex items-center gap-3">
+                                <div className="flex flex-wrap items-center gap-3">
                                     <Calendar className="h-5 w-5 text-gray-400" />
-                                    <h2 className="text-lg font-semibold text-gray-900">
+                                    <h2 className="text-base sm:text-lg font-semibold text-gray-900">
                                         {isToday ? 'Today' : dateObj.toLocaleDateString('en-US', {
                                             weekday: 'long',
                                             year: 'numeric',
@@ -113,7 +113,7 @@ export default async function RemindersPage() {
                                                 {/* Invoice Details */}
                                                 {reminder.invoice && (
                                                     <div className="space-y-2">
-                                                        <div className="flex items-center justify-between">
+                                                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                                                             <span className="text-sm font-medium text-gray-900">
                                                                 {reminder.invoice.invoice_number}
                                                             </span>

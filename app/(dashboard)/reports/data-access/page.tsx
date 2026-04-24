@@ -11,7 +11,7 @@ export default function DataAccessPage() {
   const [activeTab, setActiveTab] = useState<'requests' | 'info'>('requests')
 
   return (
-    <div className="container max-w-6xl mx-auto py-8 px-4">
+    <div className="container max-w-6xl mx-auto py-6 sm:py-8 px-4">
       <Link href="/reports">
         <Button variant="ghost" className="mb-6">
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -20,9 +20,9 @@ export default function DataAccessPage() {
       </Link>
 
       <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <Shield className="w-8 h-8 text-blue-600" />
-          <h1 className="text-3xl font-bold">Data Access Management</h1>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-2">
+          <Shield className="w-7 h-7 sm:w-8 sm:h-8 text-blue-600" />
+          <h1 className="text-2xl sm:text-3xl font-bold">Data Access Management</h1>
         </div>
         <p className="text-gray-600">
           Review and manage data access requests from your hired CAs for GST filing, tax returns,
@@ -31,7 +31,8 @@ export default function DataAccessPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-6 border-b border-gray-200">
+      <div className="mb-6 border-b border-gray-200 overflow-x-auto">
+        <div className="flex w-max min-w-full gap-2">
         <button
           onClick={() => setActiveTab('requests')}
           className={`px-4 py-2 font-medium transition-colors border-b-2 ${
@@ -52,6 +53,7 @@ export default function DataAccessPage() {
         >
           Security Info
         </button>
+        </div>
       </div>
 
       {/* Content */}
@@ -59,7 +61,7 @@ export default function DataAccessPage() {
 
       {activeTab === 'info' && (
         <div className="space-y-6">
-          <Card className="p-6">
+          <Card className="p-4 sm:p-6">
             <div className="flex items-start gap-4 mb-4">
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center shrink-0">
                 <Lock className="w-6 h-6 text-blue-600" />
@@ -129,7 +131,7 @@ export default function DataAccessPage() {
             </div>
           </Card>
 
-          <Card className="p-6">
+          <Card className="p-4 sm:p-6">
             <div className="flex items-start gap-4 mb-4">
               <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center shrink-0">
                 <Shield className="w-6 h-6 text-green-600" />
@@ -181,7 +183,7 @@ export default function DataAccessPage() {
             </ul>
           </Card>
 
-          <Card className="p-6 bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800">
+          <Card className="p-4 sm:p-6 bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800">
             <h3 className="text-lg font-bold mb-3 flex items-center gap-2">
               <Shield className="w-5 h-5 text-yellow-600" />
               Best Practices

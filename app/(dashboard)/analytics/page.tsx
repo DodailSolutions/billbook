@@ -41,16 +41,16 @@ async function AnalyticsContent() {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-        <div className="flex items-center gap-4">
+      <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-200">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
           <div className="p-3 bg-linear-to-br from-purple-500 to-blue-600 rounded-xl shadow-lg">
             <BarChart3 className="h-8 w-8 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold bg-linear-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+            <h1 className="text-2xl sm:text-3xl font-bold bg-linear-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
               Business Analytics
             </h1>
-            <p className="text-gray-600 mt-1">
+            <p className="text-sm sm:text-base text-gray-600 mt-1">
               Comprehensive insights and real-time business intelligence
             </p>
           </div>
@@ -60,9 +60,9 @@ async function AnalyticsContent() {
       {/* Business Health Index */}
       {businessHealth && (
         <Card>
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
+          <div className="p-4 sm:p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
+              <div className="flex items-start sm:items-center gap-3">
                 <div className="p-2 bg-blue-100 rounded-lg">
                   <Activity className="h-6 w-6 text-blue-600" />
                 </div>
@@ -75,8 +75,8 @@ async function AnalyticsContent() {
                   </p>
                 </div>
               </div>
-              <div className="text-right">
-                <div className="text-4xl font-bold text-blue-600">
+              <div className="text-left sm:text-right">
+                <div className="text-3xl sm:text-4xl font-bold text-blue-600">
                   {businessHealth.overall_score}
                 </div>
                 <div className={`text-sm font-medium mt-1 px-3 py-1 rounded-full inline-block ${
@@ -90,7 +90,7 @@ async function AnalyticsContent() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4 mb-6">
               {[
                 { label: 'Liquidity', value: businessHealth.scores.liquidity_score, color: 'blue' },
                 { label: 'Profitability', value: businessHealth.scores.profitability_score, color: 'green' },
@@ -98,8 +98,8 @@ async function AnalyticsContent() {
                 { label: 'Growth', value: businessHealth.scores.growth_score, color: 'orange' },
                 { label: 'Compliance', value: businessHealth.scores.compliance_score, color: 'indigo' }
               ].map((score) => (
-                <div key={score.label} className="text-center p-4 bg-gray-50 rounded-lg">
-                  <div className={`text-2xl font-bold text-${score.color}-600 dark:text-${score.color}-400`}>
+                <div key={score.label} className="text-center p-3 sm:p-4 bg-gray-50 rounded-lg">
+                  <div className="text-xl sm:text-2xl font-bold text-blue-600">
                     {score.value}
                   </div>
                   <div className="text-xs text-gray-600 mt-1">
@@ -142,7 +142,7 @@ async function AnalyticsContent() {
         {/* Cash Flow */}
         {cashFlow && (
           <Card>
-            <div className="p-6">
+            <div className="p-4 sm:p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2 bg-green-100 rounded-lg">
                   <DollarSign className="h-6 w-6 text-green-600" />
@@ -190,7 +190,7 @@ async function AnalyticsContent() {
         {/* GST Liability */}
         {gstLiability && (
           <Card>
-            <div className="p-6">
+            <div className="p-4 sm:p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
                   <Shield className="h-6 w-6 text-orange-600 dark:text-orange-400" />
@@ -225,7 +225,7 @@ async function AnalyticsContent() {
                   </span>
                 </div>
                 
-                <div className="grid grid-cols-3 gap-2 mt-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-4">
                   <div className="text-center p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                     <div className="text-sm font-semibold text-blue-600">
                       ₹{gstLiability.output_gst_breakdown.cgst.toLocaleString('en-IN')}
@@ -269,7 +269,7 @@ async function AnalyticsContent() {
       {/* AI Insights */}
       {insights && insights.length > 0 && (
         <Card>
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
                 <Brain className="h-6 w-6 text-purple-600 dark:text-purple-400" />
@@ -303,7 +303,7 @@ async function AnalyticsContent() {
                       'text-blue-600'
                     }`} />
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
+                      <div className="flex flex-wrap items-center gap-2 mb-1">
                         <h3 className="font-semibold text-gray-900">
                           {insight.title}
                         </h3>
@@ -345,9 +345,9 @@ async function AnalyticsContent() {
       {/* City-wise Profitability */}
       {profitability && profitability.data.length > 0 && (
         <Card>
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
+          <div className="p-4 sm:p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-4">
+              <div className="flex items-start sm:items-center gap-3">
                 <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg">
                   <MapPin className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
                 </div>
@@ -360,8 +360,8 @@ async function AnalyticsContent() {
                   </p>
                 </div>
               </div>
-              <div className="text-right">
-                <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
+              <div className="text-left sm:text-right">
+                <div className="text-xl sm:text-2xl font-bold text-indigo-600 dark:text-indigo-400">
                   {profitability.overall_margin.toFixed(1)}%
                 </div>
                 <div className="text-xs text-gray-600">
@@ -371,7 +371,7 @@ async function AnalyticsContent() {
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full">
+              <table className="w-full min-w-180">
                 <thead>
                   <tr className="border-b border-gray-200">
                     <th className="text-left py-3 px-4 text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -433,7 +433,7 @@ async function AnalyticsContent() {
       {/* Collection Efficiency */}
       {collectionEfficiency && (
         <Card>
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 bg-cyan-100 dark:bg-cyan-900/30 rounded-lg">
                 <TrendingUp className="h-6 w-6 text-cyan-600 dark:text-cyan-400" />
@@ -448,8 +448,8 @@ async function AnalyticsContent() {
               </div>
             </div>
 
-            <div className="text-center p-6 bg-linear-to-br from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-xl">
-              <div className="text-5xl font-bold text-cyan-600 dark:text-cyan-400 mb-2">
+            <div className="text-center p-4 sm:p-6 bg-linear-to-br from-cyan-50 to-blue-50 dark:from-cyan-900/20 dark:to-blue-900/20 rounded-xl">
+              <div className="text-3xl sm:text-5xl font-bold text-cyan-600 dark:text-cyan-400 mb-2 wrap-break-word">
                 {collectionEfficiency.collection_efficiency_percentage?.toFixed(1) || '0'}%
               </div>
               <div className="text-sm text-gray-600">
@@ -462,9 +462,9 @@ async function AnalyticsContent() {
 
       {/* MIS Reports Access */}
       <Card>
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
+        <div className="p-4 sm:p-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
+            <div className="flex items-start sm:items-center gap-3">
               <div className="p-2 bg-pink-100 dark:bg-pink-900/30 rounded-lg">
                 <FileText className="h-6 w-6 text-pink-600 dark:text-pink-400" />
               </div>
@@ -490,12 +490,12 @@ async function AnalyticsContent() {
             ].map((report) => (
               <button
                 key={report.type}
-                className={`p-4 text-left rounded-lg border-2 border-${report.color}-200 dark:border-${report.color}-800 hover:bg-${report.color}-50 dark:hover:bg-${report.color}-900/20 transition-all group`}
+                className="p-4 text-left rounded-lg border-2 border-gray-200 hover:bg-gray-50 transition-all group"
               >
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">{report.icon}</span>
                   <div>
-                    <div className="font-medium text-gray-900 group-hover:text-${report.color}-600">
+                    <div className="font-medium text-gray-900 group-hover:text-blue-600">
                       {report.label}
                     </div>
                     <div className="text-xs text-gray-600">

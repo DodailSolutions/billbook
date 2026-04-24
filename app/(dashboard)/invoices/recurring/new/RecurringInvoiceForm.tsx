@@ -145,7 +145,7 @@ export default function RecurringInvoiceForm({ customers, sourceInvoice }: Recur
     return (
         <form onSubmit={handleSubmit}>
             <Card>
-                <div className="p-6 space-y-6">
+                <div className="p-4 sm:p-6 space-y-6">
                     {/* Customer Selection */}
                     <div className="grid gap-6 md:grid-cols-2">
                         <div>
@@ -232,7 +232,7 @@ export default function RecurringInvoiceForm({ customers, sourceInvoice }: Recur
 
                     {/* Items */}
                     <div className="space-y-4">
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                             <label className="block text-sm font-medium text-gray-700">
                                 Invoice Items *
                             </label>
@@ -241,6 +241,7 @@ export default function RecurringInvoiceForm({ customers, sourceInvoice }: Recur
                                 variant="outline"
                                 size="sm"
                                 onClick={addItem}
+                                className="w-full sm:w-auto"
                             >
                                 <Plus className="h-4 w-4 mr-1" />
                                 Add Item
@@ -265,6 +266,7 @@ export default function RecurringInvoiceForm({ customers, sourceInvoice }: Recur
                                                 variant="outline"
                                                 size="sm"
                                                 onClick={() => removeItem(index)}
+                                                className="shrink-0"
                                             >
                                                 <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
                                             </Button>
@@ -336,11 +338,11 @@ export default function RecurringInvoiceForm({ customers, sourceInvoice }: Recur
                     </div>
 
                     {/* Actions */}
-                    <div className="flex gap-3 pt-4">
+                    <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4">
                         <Button
                             type="submit"
                             disabled={isLoading}
-                            className="flex-1"
+                            className="w-full sm:flex-1"
                         >
                             {isLoading ? 'Creating...' : 'Create Recurring Invoice'}
                         </Button>
@@ -349,6 +351,7 @@ export default function RecurringInvoiceForm({ customers, sourceInvoice }: Recur
                             variant="outline"
                             onClick={() => router.back()}
                             disabled={isLoading}
+                            className="w-full sm:w-auto"
                         >
                             Cancel
                         </Button>
