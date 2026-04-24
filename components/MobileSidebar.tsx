@@ -5,7 +5,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { LayoutDashboard, FileText, Users, Bell, Settings, User, Menu, X, Bot, UserCog } from "lucide-react"
+import { LayoutDashboard, FileText, Users, Bell, Settings, User, Menu, X, Bot, UserCog, Package } from "lucide-react"
 import { SignOutButton } from "./SignOutButton"
 import { PlanBanner } from "./PlanBanner"
 
@@ -33,6 +33,12 @@ const routes = [
         icon: Users,
         href: '/customers',
         color: "text-pink-700",
+    },
+    {
+        label: 'Inventory',
+        icon: Package,
+        href: '/inventory',
+        color: "text-amber-500",
     },
     {
         label: 'AI Accountant',
@@ -79,9 +85,9 @@ const mobileTabs = [
         href: '/customers',
     },
     {
-        label: 'Alerts',
-        icon: Bell,
-        href: '/reminders',
+        label: 'Inventory',
+        icon: Package,
+        href: '/inventory',
     },
 ]
 

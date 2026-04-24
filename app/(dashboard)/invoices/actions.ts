@@ -11,6 +11,165 @@ import {
 } from '@/lib/advanced-gst-utils'
 import type { Invoice, InvoiceWithDetails, InvoiceItem } from '@/lib/types'
 
+type InventoryLinkedInvoiceItem = {
+    inventory_item_id?: string
+    quantity: number
+}
+
+function buildInventoryQuantityMap(items: InventoryLinkedInvoiceItem[]) {
+    const quantities = new Map<string, number>()
+
+    for (const item of items) {
+        if (!item.inventory_item_id || !item.quantity || item.quantity <= 0) {
+            continue
+        }
+
+        const current = quantities.get(item.inventory_item_id) || 0
+        quantities.set(item.inventory_item_id, current + Number(item.quantity))
+    }
+
+    return quantities
+}
+
+function getInventoryDeltaMap(previousItems: InventoryLinkedInvoiceItem[], newItems: InventoryLinkedInvoiceItem[]) {
+    const previousQuantities = buildInventoryQuantityMap(previousItems)
+    const nextQuantities = buildInventoryQuantityMap(newItems)
+    const deltas = new Map<string, number>()
+    const ids = new Set([...previousQuantities.keys(), ...nextQuantities.keys()])
+
+    for (const id of ids) {
+        const previousQty = previousQuantities.get(id) || 0
+        const nextQty = nextQuantities.get(id) || 0
+        const delta = nextQty - previousQty
+
+        if (delta !== 0) {
+            deltas.set(id, delta)
+        }
+    }
+
+    return deltas
+}
+
+async function getInventoryRecords(supabase: Awaited<ReturnType<typeof createClient>>, userId: string, ids: string[]) {
+    if (ids.length === 0) {
+        return new Map<string, { id: string; name: string; current_stock: number }>()
+    }
+
+    const { data, error } = await supabase
+        .from('inventory_items')
+        .select('id, name, current_stock')
+        .eq('user_id', userId)
+        .in('id', ids)
+
+    if (error) {
+        throw new Error('Failed to fetch linked inventory items')
+    }
+
+    return new Map(
+        (data || []).map((item) => [item.id, {
+            id: item.id,
+            name: item.name,
+            current_stock: Number(item.current_stock || 0),
+        }])
+    )
+}
+
+async function validateInventoryAvailability(
+    supabase: Awaited<ReturnType<typeof createClient>>,
+    userId: string,
+    previousItems: InventoryLinkedInvoiceItem[],
+    newItems: InventoryLinkedInvoiceItem[]
+) {
+    const deltas = getInventoryDeltaMap(previousItems, newItems)
+    const requiredIds = Array.from(deltas.entries())
+        .filter(([, delta]) => delta > 0)
+        .map(([id]) => id)
+
+    if (requiredIds.length === 0) {
+        return
+    }
+
+    const inventoryMap = await getInventoryRecords(supabase, userId, requiredIds)
+
+    for (const [inventoryItemId, delta] of deltas.entries()) {
+        if (delta <= 0) {
+            continue
+        }
+
+        const inventoryItem = inventoryMap.get(inventoryItemId)
+        if (!inventoryItem) {
+            throw new Error('A linked inventory item was not found')
+        }
+
+        if (inventoryItem.current_stock < delta) {
+            throw new Error(`Insufficient stock for ${inventoryItem.name}. Available: ${inventoryItem.current_stock}, required: ${delta}`)
+        }
+    }
+}
+
+async function syncInventoryForInvoice(
+    supabase: Awaited<ReturnType<typeof createClient>>,
+    userId: string,
+    invoiceId: string,
+    previousItems: InventoryLinkedInvoiceItem[],
+    newItems: InventoryLinkedInvoiceItem[]
+) {
+    const deltas = getInventoryDeltaMap(previousItems, newItems)
+    const changedIds = Array.from(deltas.keys())
+
+    if (changedIds.length === 0) {
+        return
+    }
+
+    const inventoryMap = await getInventoryRecords(supabase, userId, changedIds)
+
+    for (const [inventoryItemId, delta] of deltas.entries()) {
+        const inventoryItem = inventoryMap.get(inventoryItemId)
+        if (!inventoryItem) {
+            throw new Error('A linked inventory item was not found during stock sync')
+        }
+
+        const previousStock = Number(inventoryItem.current_stock || 0)
+        const newStock = previousStock - delta
+
+        if (newStock < 0) {
+            throw new Error(`Insufficient stock for ${inventoryItem.name}`)
+        }
+
+        const { error: updateError } = await supabase
+            .from('inventory_items')
+            .update({ current_stock: newStock })
+            .eq('id', inventoryItemId)
+            .eq('user_id', userId)
+
+        if (updateError) {
+            throw new Error(`Failed to update stock for ${inventoryItem.name}`)
+        }
+
+        const { error: transactionError } = await supabase
+            .from('inventory_transactions')
+            .insert({
+                item_id: inventoryItemId,
+                user_id: userId,
+                movement_type: delta > 0 ? 'out' : 'in',
+                quantity: Math.abs(delta),
+                previous_stock: previousStock,
+                new_stock: newStock,
+                notes: delta > 0
+                    ? `Auto-deducted from invoice ${invoiceId}`
+                    : `Restored from invoice update ${invoiceId}`,
+                reference_type: 'invoice',
+                reference_id: invoiceId,
+            })
+
+        if (transactionError) {
+            throw new Error(`Failed to log stock movement for ${inventoryItem.name}`)
+        }
+
+        inventoryItem.current_stock = newStock
+    }
+}
+
 export async function getInvoices(): Promise<InvoiceWithDetails[]> {
     try {
         const supabase = await createClient()
@@ -145,6 +304,7 @@ interface CreateInvoiceData {
     items: Array<{
         description: string
         details?: string
+        inventory_item_id?: string
         quantity: number
         unit_price: number
         hsn_sac_code?: string
@@ -172,6 +332,8 @@ export async function createInvoice(data: CreateInvoiceData) {
         if (!user) {
             return { success: false, error: 'Not authenticated' }
         }
+
+        await validateInventoryAvailability(supabase, user.id, [], data.items)
 
         // Get customer for auto GST classification
         const { data: customer } = await supabase
@@ -286,6 +448,7 @@ export async function createInvoice(data: CreateInvoiceData) {
                 invoice_id: invoice!.id,
                 description: item.description,
                 item_details: item.details || null,
+                inventory_item_id: item.inventory_item_id || null,
                 quantity: item.quantity,
                 unit_price: item.unit_price,
                 amount: itemAmount,
@@ -305,8 +468,8 @@ export async function createInvoice(data: CreateInvoiceData) {
             .insert(itemsWithDetails)
 
         if (itemsError) {
-            // Fallback: strip item_details and retry
-            const itemsCore = itemsWithDetails.map(({ item_details, ...rest }) => rest)
+            // Fallback: strip optional columns and retry
+            const itemsCore = itemsWithDetails.map(({ item_details, inventory_item_id, ...rest }) => rest)
             const { error: itemsFallbackError } = await supabase
                 .from('invoice_items')
                 .insert(itemsCore)
@@ -315,6 +478,8 @@ export async function createInvoice(data: CreateInvoiceData) {
                 return { success: false, error: 'Failed to create invoice items' }
             }
         }
+
+        await syncInventoryForInvoice(supabase, user.id, invoice.id, [], data.items)
     
     // Handle payment collection if mark_as_paid is true
     if (data.mark_as_paid && data.payment_amount && data.payment_amount > 0) {
@@ -419,6 +584,7 @@ interface UpdateInvoiceData {
     items: Array<{
         description: string
         details?: string
+        inventory_item_id?: string
         quantity: number
         unit_price: number
         hsn_sac_code?: string
@@ -435,6 +601,23 @@ export async function updateInvoice(id: string, data: UpdateInvoiceData) {
         if (!user) {
             return { success: false, error: 'Not authenticated' }
         }
+
+        const { data: existingInvoiceItems, error: existingItemsError } = await supabase
+            .from('invoice_items')
+            .select('*')
+            .eq('invoice_id', id)
+
+        if (existingItemsError) {
+            console.error('Error fetching existing invoice items:', existingItemsError)
+            return { success: false, error: 'Failed to load current invoice items' }
+        }
+
+        await validateInventoryAvailability(
+            supabase,
+            user.id,
+            ((existingInvoiceItems || []) as Array<{ inventory_item_id?: string; quantity: number }>),
+            data.items
+        )
 
         const supplyType = data.supply_type || 'intra-state'
         const reverseChargeApplicable = data.reverse_charge_applicable || false
@@ -527,6 +710,7 @@ export async function updateInvoice(id: string, data: UpdateInvoiceData) {
                 invoice_id: id,
                 description: item.description,
                 item_details: item.details || null,
+                inventory_item_id: item.inventory_item_id || null,
                 quantity: item.quantity,
                 unit_price: item.unit_price,
                 amount: itemAmount,
@@ -545,8 +729,8 @@ export async function updateInvoice(id: string, data: UpdateInvoiceData) {
             .insert(items)
 
         if (itemsError) {
-            // Fallback: strip item_details and retry
-            const itemsCore = items.map(({ item_details, ...rest }) => rest)
+            // Fallback: strip optional columns and retry
+            const itemsCore = items.map(({ item_details, inventory_item_id, ...rest }) => rest)
             const { error: itemsFallbackError } = await supabase
                 .from('invoice_items')
                 .insert(itemsCore)
@@ -556,7 +740,16 @@ export async function updateInvoice(id: string, data: UpdateInvoiceData) {
             }
         }
 
+        await syncInventoryForInvoice(
+            supabase,
+            user.id,
+            id,
+            ((existingInvoiceItems || []) as Array<{ inventory_item_id?: string; quantity: number }>),
+            data.items
+        )
+
         revalidatePath('/invoices')
+        revalidatePath('/inventory')
         return { success: true, invoiceId: id }
     } catch (error) {
         console.error('Error in updateInvoice:', error)

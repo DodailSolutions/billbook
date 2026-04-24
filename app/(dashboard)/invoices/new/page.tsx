@@ -4,13 +4,15 @@ import { Button } from "@/components/ui/Button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card"
 import { getCustomers } from "../../customers/actions"
 import { getSavedItems } from "../../items/actions"
+import { getInventoryItems } from "../../inventory/actions"
 import { ImprovedInvoiceForm } from "./ImprovedInvoiceForm"
 import { checkInvoiceLimit } from '@/lib/plan-utils'
 
 export default async function NewInvoicePage() {
-    const [customers, savedItems, limitStatus] = await Promise.all([
+    const [customers, savedItems, inventoryItems, limitStatus] = await Promise.all([
         getCustomers(),
         getSavedItems(),
+        getInventoryItems(),
         checkInvoiceLimit()
     ])
 
@@ -73,7 +75,7 @@ export default async function NewInvoicePage() {
 
     return (
         <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50">
-            <ImprovedInvoiceForm customers={customers} savedItems={savedItems} />
+            <ImprovedInvoiceForm customers={customers} savedItems={savedItems} inventoryItems={inventoryItems} />
         </div>
     )
 }

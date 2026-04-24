@@ -13,7 +13,7 @@ import {
 } from 'lucide-react'
 import { createInvoice } from '../actions'
 import { saveItemFromInvoice, deleteSavedItem as deleteSavedItemAction } from '../../items/actions'
-import type { Customer, SavedItem } from '@/lib/types'
+import type { Customer, InventoryItem as InventoryOption, SavedItem } from '@/lib/types'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
 
@@ -21,6 +21,9 @@ interface InvoiceItem {
   id: string
   description: string
   details: string
+  inventory_item_id?: string
+  inventory_name?: string
+  available_stock?: number
   hsn_sac_code: string
   hsn_sac_type: 'HSN' | 'SAC' | ''
   quantity: number
@@ -35,9 +38,10 @@ interface InvoiceItem {
 interface ImprovedInvoiceFormProps {
   customers: Customer[]
   savedItems?: SavedItem[]
+  inventoryItems?: InventoryOption[]
 }
 
-export function ImprovedInvoiceForm({ customers: initialCustomers, savedItems = [] }: ImprovedInvoiceFormProps) {
+export function ImprovedInvoiceForm({ customers: initialCustomers, savedItems = [], inventoryItems = [] }: ImprovedInvoiceFormProps) {
   const router = useRouter()
   const [, startTransition] = useTransition()
   const [currentStep, setCurrentStep] = useState(1)
@@ -196,6 +200,27 @@ export function ImprovedInvoiceForm({ customers: initialCustomers, savedItems = 
     }])
   }
 
+  const addInventoryItemToForm = (inventoryItem: InventoryOption) => {
+    const gstAmount = inventoryItem.selling_price * 18 / 100
+    setItems([...items, {
+      id: crypto.randomUUID(),
+      description: inventoryItem.name,
+      details: inventoryItem.description || '',
+      inventory_item_id: inventoryItem.id,
+      inventory_name: inventoryItem.name,
+      available_stock: inventoryItem.current_stock,
+      hsn_sac_code: '',
+      hsn_sac_type: '',
+      quantity: 1,
+      unit_price: inventoryItem.selling_price,
+      gst_rate: 18,
+      amount: inventoryItem.selling_price,
+      cgst: formData.supply_type === 'intra-state' ? gstAmount / 2 : 0,
+      sgst: formData.supply_type === 'intra-state' ? gstAmount / 2 : 0,
+      igst: formData.supply_type === 'inter-state' ? gstAmount : 0,
+    }])
+  }
+
   const saveCurrentItem = (item: InvoiceItem) => {
     setSavedItemToSave(item)
     setShowSaveItemModal(true)
@@ -249,6 +274,21 @@ export function ImprovedInvoiceForm({ customers: initialCustomers, savedItems = 
     setItems(items.map(item => {
       if (item.id !== id) return item
       const updatedItem = { ...item, [field]: value }
+      if (field === 'inventory_item_id') {
+        const linkedInventory = inventoryItems.find(entry => entry.id === value)
+        if (linkedInventory) {
+          updatedItem.description = linkedInventory.name
+          updatedItem.details = linkedInventory.description || updatedItem.details
+          updatedItem.unit_price = linkedInventory.selling_price
+          updatedItem.inventory_item_id = linkedInventory.id
+          updatedItem.inventory_name = linkedInventory.name
+          updatedItem.available_stock = linkedInventory.current_stock
+        } else {
+          updatedItem.inventory_item_id = undefined
+          updatedItem.inventory_name = undefined
+          updatedItem.available_stock = undefined
+        }
+      }
       const amount = updatedItem.quantity * updatedItem.unit_price
       const gstAmount = (amount * updatedItem.gst_rate) / 100
       return {
@@ -286,6 +326,7 @@ export function ImprovedInvoiceForm({ customers: initialCustomers, savedItems = 
         items: items.map(item => ({
           description: item.description,
           details: item.details || undefined,
+          inventory_item_id: item.inventory_item_id || undefined,
           quantity: item.quantity,
           unit_price: item.unit_price,
           hsn_sac_code: item.hsn_sac_code || undefined,
@@ -822,6 +863,24 @@ export function ImprovedInvoiceForm({ customers: initialCustomers, savedItems = 
                     </div>
                   )}
 
+                  {inventoryItems.length > 0 && (
+                    <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
+                      <p className="text-xs font-semibold text-emerald-700 mb-2">Inventory items</p>
+                      <div className="flex flex-wrap gap-2">
+                        {inventoryItems.slice(0, 12).map((inventoryItem) => (
+                          <button
+                            key={inventoryItem.id}
+                            type="button"
+                            onClick={() => addInventoryItemToForm(inventoryItem)}
+                            className="rounded-full border border-emerald-200 bg-white px-2.5 py-1 text-xs font-medium text-emerald-700 hover:bg-emerald-100"
+                          >
+                            + {inventoryItem.name} ({inventoryItem.current_stock})
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   {items.map((item, index) => (
                     <Card key={item.id} className="border-2 border-gray-200 hover:border-blue-200 transition-colors bg-white dark:bg-white dark:border-gray-200">
                       <CardContent className="p-4 space-y-4">
@@ -844,6 +903,25 @@ export function ImprovedInvoiceForm({ customers: initialCustomers, savedItems = 
                         </div>
 
                         <div className="grid md:grid-cols-2 gap-4">
+                          <div className="md:col-span-2 space-y-2">
+                            <label className="text-sm font-semibold text-gray-900">Linked Inventory</label>
+                            <select
+                              value={item.inventory_item_id || ''}
+                              onChange={(e) => updateItem(item.id, 'inventory_item_id', e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            >
+                              <option value="">No linked inventory item</option>
+                              {inventoryItems.map((inventoryItem) => (
+                                <option key={inventoryItem.id} value={inventoryItem.id}>
+                                  {inventoryItem.name} ({inventoryItem.current_stock} {inventoryItem.unit})
+                                </option>
+                              ))}
+                            </select>
+                            {item.inventory_item_id && item.available_stock !== undefined && (
+                              <p className="text-xs text-emerald-700">Available stock: {item.available_stock}</p>
+                            )}
+                          </div>
+
                           <div className="md:col-span-2 space-y-2">
                             <label className="text-sm font-semibold text-gray-900">Description *</label>
                             <Input

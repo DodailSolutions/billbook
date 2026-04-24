@@ -61,6 +61,12 @@ export function Sidebar() {
             color: "text-teal-500",
         },
         {
+            label: 'Inventory',
+            icon: Package,
+            href: '/inventory',
+            color: "text-amber-600",
+        },
+        {
             label: 'AI Accountant',
             icon: Bot,
             href: '/ai-accountant',

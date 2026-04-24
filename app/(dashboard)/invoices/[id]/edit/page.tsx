@@ -7,6 +7,7 @@ import { InvoiceForm } from "../../new/InvoiceForm"
 import { getInvoice } from "../../actions"
 import { getCustomers } from "../../../customers/actions"
 import { getSavedItems } from "../../../items/actions"
+import { getInventoryItems } from "../../../inventory/actions"
 
 export default async function EditInvoicePage({
     params,
@@ -14,10 +15,11 @@ export default async function EditInvoicePage({
     params: Promise<{ id: string }>
 }) {
     const { id } = await params
-    const [invoice, customers, savedItems] = await Promise.all([
+    const [invoice, customers, savedItems, inventoryItems] = await Promise.all([
         getInvoice(id),
         getCustomers(),
         getSavedItems(),
+        getInventoryItems(),
     ])
 
     if (!invoice) {
@@ -38,7 +40,7 @@ export default async function EditInvoicePage({
                     <CardTitle>Edit Invoice {invoice.invoice_number}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <InvoiceForm customers={customers} invoice={invoice} mode="edit" savedItems={savedItems} />
+                    <InvoiceForm customers={customers} invoice={invoice} mode="edit" savedItems={savedItems} inventoryItems={inventoryItems} />
                 </CardContent>
             </Card>
         </div>

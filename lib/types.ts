@@ -13,6 +13,44 @@ export interface SavedItem {
     updated_at: string
 }
 
+export interface InventoryItem {
+    id: string
+    user_id: string
+    name: string
+    sku?: string
+    description?: string
+    unit: string
+    current_stock: number
+    reorder_level: number
+    purchase_price: number
+    selling_price: number
+    location?: string
+    is_active: boolean
+    created_at: string
+    updated_at: string
+}
+
+export interface InventoryTransaction {
+    id: string
+    item_id: string
+    user_id: string
+    movement_type: 'in' | 'out'
+    quantity: number
+    previous_stock: number
+    new_stock: number
+    unit_cost?: number
+    notes?: string
+    reference_type?: string
+    reference_id?: string
+    created_at: string
+    item?: {
+        id?: string
+        name: string
+        sku?: string
+        unit?: string
+    }
+}
+
 export interface Customer {
     id: string
     user_id: string
@@ -76,6 +114,7 @@ export interface InvoiceItem {
     invoice_id: string
     description: string
     item_details?: string
+    inventory_item_id?: string
     quantity: number
     unit_price: number
     amount: number

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/Button"
 import { Input } from "@/components/ui/Input"
 import { createInvoice, updateInvoice } from "../actions"
 import { saveItemFromInvoice, deleteSavedItem as deleteSavedItemAction } from "../../items/actions"
-import type { Customer, InvoiceWithDetails, SavedItem } from "@/lib/types"
+import type { Customer, InventoryItem as InventoryOption, InvoiceWithDetails, SavedItem } from "@/lib/types"
 import { InvoicePreviewPanel } from "./InvoicePreviewPanel"
 
 interface InvoiceFormProps {
@@ -15,9 +15,13 @@ interface InvoiceFormProps {
     invoice?: InvoiceWithDetails
     mode?: 'create' | 'edit'
     savedItems?: SavedItem[]
+    inventoryItems?: InventoryOption[]
 }
 
 interface InvoiceItem {
+    inventory_item_id?: string
+    inventory_name?: string
+    available_stock?: number
     description: string
     details?: string
     quantity: number
@@ -27,7 +31,7 @@ interface InvoiceItem {
     gst_rate?: number
 }
 
-export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'create', savedItems = [] }: InvoiceFormProps) {
+export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'create', savedItems = [], inventoryItems = [] }: InvoiceFormProps) {
     const router = useRouter()
     const [, startTransition] = useTransition()
     const [customers, setCustomers] = useState<Customer[]>(initialCustomers)
@@ -38,6 +42,9 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
     const [simplifiedView, setSimplifiedView] = useState(true)
     const [items, setItems] = useState<InvoiceItem[]>(
         invoice?.invoice_items.map(item => ({
+            inventory_item_id: item.inventory_item_id,
+            inventory_name: inventoryItems.find((inventoryItem) => inventoryItem.id === item.inventory_item_id)?.name,
+            available_stock: inventoryItems.find((inventoryItem) => inventoryItem.id === item.inventory_item_id)?.current_stock,
             description: item.description,
             details: item.item_details || '',
             quantity: item.quantity,
@@ -97,6 +104,28 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
     const updateItem = (index: number, field: keyof InvoiceItem, value: string | number) => {
         const newItems = [...items]
         newItems[index] = { ...newItems[index], [field]: value }
+
+        if (field === 'inventory_item_id') {
+            const linkedInventory = inventoryItems.find((entry) => entry.id === value)
+            if (linkedInventory) {
+                newItems[index] = {
+                    ...newItems[index],
+                    inventory_item_id: linkedInventory.id,
+                    inventory_name: linkedInventory.name,
+                    available_stock: linkedInventory.current_stock,
+                    description: linkedInventory.name,
+                    details: linkedInventory.description || newItems[index].details,
+                    unit_price: linkedInventory.selling_price,
+                }
+            } else {
+                newItems[index] = {
+                    ...newItems[index],
+                    inventory_item_id: undefined,
+                    inventory_name: undefined,
+                    available_stock: undefined,
+                }
+            }
+        }
         setItems(newItems)
     }
 
@@ -109,6 +138,18 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
             hsn_sac_code: savedItem.hsn_sac_code,
             hsn_sac_type: savedItem.hsn_sac_type,
             gst_rate: savedItem.gst_rate,
+        }])
+    }
+
+    const addInventoryItem = (inventoryItem: InventoryOption) => {
+        setItems([...items, {
+            inventory_item_id: inventoryItem.id,
+            inventory_name: inventoryItem.name,
+            available_stock: inventoryItem.current_stock,
+            description: inventoryItem.name,
+            details: inventoryItem.description || '',
+            quantity: 1,
+            unit_price: inventoryItem.selling_price,
         }])
     }
 
@@ -231,7 +272,7 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                 notes: formData.get('notes') as string || undefined,
                 discount_type: discountValue > 0 ? discountType : undefined,
                 discount_value: discountValue > 0 ? discountValue : undefined,
-                items: items.filter(item => item.description && item.quantity > 0 && item.unit_price > 0).map(item => ({ ...item, details: item.details || undefined })),
+                items: items.filter(item => item.description && item.quantity > 0 && item.unit_price > 0).map(item => ({ ...item, details: item.details || undefined, inventory_item_id: item.inventory_item_id || undefined })),
                 // Recurring invoice data
                 is_recurring: isRecurring,
                 recurring_frequency: isRecurring ? recurringFrequency : undefined,
@@ -416,8 +457,40 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                     </div>
                 )}
 
+                {inventoryItems.length > 0 && (
+                    <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg p-3">
+                        <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-300 mb-2">Inventory Items</p>
+                        <div className="flex flex-wrap gap-2">
+                            {inventoryItems.slice(0, 12).map((inventoryItem) => (
+                                <button type="button" key={inventoryItem.id} onClick={() => addInventoryItem(inventoryItem)} className="rounded-full border border-emerald-200 bg-white px-2.5 py-1 text-xs font-medium text-emerald-700 hover:bg-emerald-100">
+                                    + {inventoryItem.name} ({inventoryItem.current_stock})
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
                 {items.map((item, index) => (
                     <div key={index} className="border border-gray-200 dark:border-gray-700 rounded-xl p-3 space-y-3 bg-gray-50 dark:bg-gray-800/50 hover:border-blue-200 dark:hover:border-blue-800 transition-colors">
+                        <div className="space-y-1.5">
+                            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Linked Inventory</label>
+                            <select
+                                value={item.inventory_item_id || ''}
+                                onChange={(e) => updateItem(index, 'inventory_item_id', e.target.value)}
+                                className="flex h-9 w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                            >
+                                <option value="">No linked inventory item</option>
+                                {inventoryItems.map((inventoryItem) => (
+                                    <option key={inventoryItem.id} value={inventoryItem.id}>
+                                        {inventoryItem.name} ({inventoryItem.current_stock} {inventoryItem.unit})
+                                    </option>
+                                ))}
+                            </select>
+                            {item.inventory_item_id && item.available_stock !== undefined && (
+                                <p className="text-xs text-emerald-700">Available stock: {item.available_stock}</p>
+                            )}
+                        </div>
+
                         <div className="flex items-start justify-between gap-2">
                             <div className="flex-1 space-y-1.5">
                                 <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Item Name *</label>
