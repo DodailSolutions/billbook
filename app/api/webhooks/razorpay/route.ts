@@ -1,6 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyWebhookSignature } from '@/lib/razorpay'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@supabase/supabase-js'
+
+export const runtime = 'nodejs'
+
+function createWebhookSupabaseClient() {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+    if (!supabaseUrl || !serviceRoleKey) {
+        throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY for webhook processing')
+    }
+
+    return createClient(supabaseUrl, serviceRoleKey)
+}
 
 export async function POST(request: NextRequest) {
     try {
@@ -34,7 +47,7 @@ export async function POST(request: NextRequest) {
         }
 
         const event = JSON.parse(body)
-        const supabase = await createClient()
+        const supabase = createWebhookSupabaseClient()
 
         console.log('Razorpay webhook event:', event.event)
 
@@ -76,7 +89,7 @@ async function handlePaymentCaptured(payment: {
     amount: number
     status: string
     method: string
-}, supabase: Awaited<ReturnType<typeof createClient>>) {
+}, supabase: ReturnType<typeof createWebhookSupabaseClient>) {
     try {
         // Find payment by order ID
         const { data: existingPayment } = await supabase
@@ -125,7 +138,7 @@ async function handlePaymentFailed(payment: {
     order_id: string
     error_code?: string
     error_description?: string
-}, supabase: Awaited<ReturnType<typeof createClient>>) {
+}, supabase: ReturnType<typeof createWebhookSupabaseClient>) {
     try {
         const { error } = await supabase
             .from('payments')
@@ -155,7 +168,7 @@ async function handleRefundProcessed(refund: {
     payment_id: string
     amount: number
     status: string
-}, supabase: Awaited<ReturnType<typeof createClient>>) {
+}, supabase: ReturnType<typeof createWebhookSupabaseClient>) {
     try {
         // Find refund by gateway refund ID
         const { data: existingRefund } = await supabase
@@ -205,7 +218,7 @@ async function handleRefundProcessed(refund: {
 async function handleRefundFailed(refund: {
     id: string
     payment_id: string
-}, supabase: Awaited<ReturnType<typeof createClient>>) {
+}, supabase: ReturnType<typeof createWebhookSupabaseClient>) {
     try {
         await supabase
             .from('refunds')

@@ -137,12 +137,20 @@ export async function POST(request: NextRequest) {
                 .from('payments')
                 .insert({
                     user_id: user.id,
-                    razorpay_order_id,
-                    razorpay_payment_id,
-                    amount: amount * 100, // Store in paise/fils/cents
+                    invoice_id: null,
+                    amount,
                     currency: currency,
-                    status: 'success',
-                    plan_type: plan,
+                    payment_gateway: 'razorpay',
+                    gateway_order_id: razorpay_order_id,
+                    gateway_payment_id: razorpay_payment_id,
+                    gateway_signature: razorpay_signature,
+                    status: 'completed',
+                    description: `Subscription payment for plan ${plan}`,
+                    metadata: {
+                        plan,
+                        region,
+                        subscription_context: true,
+                    },
                     created_at: new Date().toISOString()
                 })
             console.log('Payment recorded successfully')

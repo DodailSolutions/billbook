@@ -1,7 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { createRazorpayOrder, createRefund, fetchPaymentDetails } from '@/lib/razorpay'
+import { createRazorpayOrder, createRefund, fetchPaymentDetails, verifyPaymentSignature } from '@/lib/razorpay'
 import { revalidatePath } from 'next/cache'
 
 export interface Payment {
@@ -146,8 +146,22 @@ export async function verifyAndCompletePayment(data: {
             throw new Error('Payment not found')
         }
 
+        // Verify callback signature before any state changes.
+        const isSignatureValid = verifyPaymentSignature(data.orderId, data.paymentId, data.signature)
+        if (!isSignatureValid) {
+            throw new Error('Invalid payment signature')
+        }
+
         // Fetch payment details from Razorpay
         const razorpayPayment = await fetchPaymentDetails(data.paymentId)
+
+        if (razorpayPayment.order_id !== data.orderId) {
+            throw new Error('Payment/order mismatch')
+        }
+
+        if (razorpayPayment.status !== 'captured') {
+            throw new Error(`Payment is not captured (status: ${razorpayPayment.status})`)
+        }
 
         // Update payment record
         const { error: updateError } = await supabase
@@ -173,7 +187,11 @@ export async function verifyAndCompletePayment(data: {
         if (payment.invoice_id) {
             await supabase
                 .from('invoices')
-                .update({ status: 'paid' })
+                .update({
+                    status: 'paid',
+                    paid_at: new Date().toISOString(),
+                    payment_method: razorpayPayment.method,
+                })
                 .eq('id', payment.invoice_id)
         }
 

@@ -148,12 +148,19 @@ export async function POST(request: NextRequest) {
                 .from('payments')
                 .insert({
                     user_id: userId,
-                    razorpay_order_id,
-                    razorpay_payment_id,
-                    amount: amount * 100, // Store in paise
+                    invoice_id: null,
+                    amount,
                     currency: 'INR',
-                    status: 'success',
-                    plan_type: plan,
+                    payment_gateway: 'razorpay',
+                    gateway_order_id: razorpay_order_id,
+                    gateway_payment_id: razorpay_payment_id,
+                    gateway_signature: razorpay_signature,
+                    status: 'completed',
+                    description: `Guest subscription payment for plan ${plan}`,
+                    metadata: {
+                        plan,
+                        guest_checkout: true,
+                    },
                     created_at: new Date().toISOString()
                 })
         } catch (err) {
