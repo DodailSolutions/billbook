@@ -27,7 +27,7 @@ export default async function SuperAdminLayout({
             {/* Main Content */}
             <main className="md:pl-72 min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
                 {/* Add top padding on mobile for fixed header */}
-                <div className="pt-20 md:pt-0">
+                <div className="pt-20 pb-24 md:pt-0 md:pb-0">
                     {children}
                 </div>
             </main>

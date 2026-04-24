@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { PWARegister } from "@/components/PWARegister";
+import { PublicMobileNav } from "@/components/PublicMobileNav";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -109,6 +110,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         {children}
+        <PublicMobileNav />
         <SpeedInsights />
         <PWARegister />
         
