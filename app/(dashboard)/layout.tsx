@@ -22,7 +22,7 @@ export default function DashboardLayout({
             {/* Main Content */}
             <main className="flex-1 min-h-screen bg-linear-to-br from-slate-50 via-white to-slate-50">
                 {/* Add top padding on mobile for fixed header */}
-                <div className="p-4 md:p-8 pt-20 md:pt-8">
+                <div className="p-4 md:p-8 pt-20 md:pt-8 pb-24 md:pb-8">
                     {children}
                 </div>
             </main>

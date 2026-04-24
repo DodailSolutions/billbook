@@ -1,9 +1,12 @@
 {
+  "id": "/",
   "name": "BillBooky - Free Invoice Generator",
   "short_name": "BillBooky",
   "description": "Free GST-compliant invoice generator for Indian businesses. Made in India.",
+  "scope": "/",
   "start_url": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"],
   "background_color": "#ffffff",
   "theme_color": "#0072BC",
   "orientation": "portrait-primary",

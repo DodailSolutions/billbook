@@ -1,7 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import { PWARegister } from "@/components/PWARegister";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,6 +19,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  applicationName: 'BillBooky',
   metadataBase: new URL('https://billbooky.dodail.com'),
   title: {
     default: 'BillBooky - Free GST Invoice Generator for Indian Businesses | Made in India',
@@ -80,10 +82,19 @@ export const metadata: Metadata = {
     },
   },
   manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'BillBooky',
+  },
   alternates: {
     canonical: 'https://billbooky.dodail.com',
   },
   category: 'Business Software',
+};
+
+export const viewport: Viewport = {
+  themeColor: '#0072BC',
 };
 
 export default function RootLayout({
@@ -99,6 +110,7 @@ export default function RootLayout({
       >
         {children}
         <SpeedInsights />
+        <PWARegister />
         
         {/* Structured Data - SoftwareApplication */}
         <script
