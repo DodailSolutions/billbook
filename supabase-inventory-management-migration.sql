@@ -36,6 +36,26 @@ ALTER TABLE inventory_items ADD COLUMN IF NOT EXISTS is_active BOOLEAN NOT NULL 
 ALTER TABLE inventory_items ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW();
 ALTER TABLE inventory_items ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW();
 
+UPDATE inventory_items
+SET
+    unit = COALESCE(unit, 'pcs'),
+    current_stock = COALESCE(current_stock, 0),
+    reorder_level = COALESCE(reorder_level, 0),
+    purchase_price = COALESCE(purchase_price, 0),
+    selling_price = COALESCE(selling_price, 0),
+    is_active = COALESCE(is_active, TRUE),
+    created_at = COALESCE(created_at, NOW()),
+    updated_at = COALESCE(updated_at, NOW())
+WHERE
+    unit IS NULL
+    OR current_stock IS NULL
+    OR reorder_level IS NULL
+    OR purchase_price IS NULL
+    OR selling_price IS NULL
+    OR is_active IS NULL
+    OR created_at IS NULL
+    OR updated_at IS NULL;
+
 -- Stock movement transactions ledger
 CREATE TABLE IF NOT EXISTS inventory_transactions (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -57,6 +77,11 @@ ALTER TABLE inventory_transactions ADD COLUMN IF NOT EXISTS notes TEXT;
 ALTER TABLE inventory_transactions ADD COLUMN IF NOT EXISTS reference_type VARCHAR(50);
 ALTER TABLE inventory_transactions ADD COLUMN IF NOT EXISTS reference_id UUID;
 ALTER TABLE inventory_transactions ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW();
+
+UPDATE inventory_transactions
+SET
+    created_at = COALESCE(created_at, NOW())
+WHERE created_at IS NULL;
 
 ALTER TABLE invoice_items ADD COLUMN IF NOT EXISTS inventory_item_id UUID REFERENCES inventory_items(id) ON DELETE SET NULL;
 
