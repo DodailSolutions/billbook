@@ -5,7 +5,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { LayoutDashboard, FileText, Users, RefreshCw, Bell, Settings, User, Bot, UserCog, FileBarChart, HelpCircle, MessageCircle, Briefcase, UserPlus, ChevronLeft, ChevronRight, Package } from "lucide-react"
+import { LayoutDashboard, FileText, Users, RefreshCw, Bell, Settings, User, Bot, UserCog, FileBarChart, HelpCircle, MessageCircle, Briefcase, UserPlus, ChevronLeft, ChevronRight, Package, Receipt } from "lucide-react"
 import { SignOutButton } from "./SignOutButton"
 import { PlanBanner } from "./PlanBanner"
 import { getMyCAProfile } from "@/lib/ca-profile-actions"
@@ -65,6 +65,12 @@ export function Sidebar() {
             icon: Package,
             href: '/inventory',
             color: "text-amber-600",
+        },
+        {
+            label: 'Expenses',
+            icon: Receipt,
+            href: '/expenses',
+            color: "text-rose-500",
         },
         {
             label: 'AI Accountant',

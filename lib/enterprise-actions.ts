@@ -952,20 +952,26 @@ export async function generateMISReport(config: { report_type: string; period_st
       case 'profit_loss':
         const { data: invoices } = await supabase
           .from('invoices')
-          .select('total_amount, gst_amount, subtotal')
+          .select('total, status, amount_paid')
           .eq('user_id', user.id)
           .gte('invoice_date', config.period_start)
           .lte('invoice_date', config.period_end)
 
         const { data: expenses } = await supabase
           .from('expenses')
-          .select('amount, category')
+          .select('total_amount, expense_categories(category_name)')
           .eq('user_id', user.id)
           .gte('expense_date', config.period_start)
           .lte('expense_date', config.period_end)
 
-        const totalRevenue = invoices?.reduce((sum, inv) => sum + (inv.total_amount || 0), 0) || 0
-        const totalExpenses = expenses?.reduce((sum, exp) => sum + (exp.amount || 0), 0) || 0
+        // Calculate revenue matching the dashboard logic (paid + partial amounts paid)
+        const totalRevenue = invoices?.reduce((sum, inv) => {
+          if (inv.status === 'paid') return sum + (inv.total || 0)
+          if (inv.status === 'partial') return sum + (inv.amount_paid || 0)
+          return sum
+        }, 0) || 0
+
+        const totalExpenses = expenses?.reduce((sum, exp) => sum + (exp.total_amount || 0), 0) || 0
         const grossProfit = totalRevenue - totalExpenses
 
         reportData = {
@@ -973,8 +979,9 @@ export async function generateMISReport(config: { report_type: string; period_st
           expenses: totalExpenses,
           gross_profit: grossProfit,
           gross_margin: totalRevenue > 0 ? (grossProfit / totalRevenue) * 100 : 0,
-          expense_breakdown: expenses?.reduce((acc: any, exp) => {
-            acc[exp.category || 'Other'] = (acc[exp.category || 'Other'] || 0) + exp.amount
+          expense_breakdown: expenses?.reduce((acc: any, exp: any) => {
+            const catName = exp.expense_categories?.category_name || 'Other'
+            acc[catName] = (acc[catName] || 0) + (exp.total_amount || 0)
             return acc
           }, {})
         }

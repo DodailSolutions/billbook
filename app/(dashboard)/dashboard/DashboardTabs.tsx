@@ -195,19 +195,25 @@ export function DashboardTabs({ stats }: DashboardTabsProps) {
                             </CardContent>
                         </Card>
 
-                        <Card className="bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                        <Card className={`bg-white rounded-2xl shadow-sm border hover:shadow-md transition-shadow ${stats.netProfit >= 0 ? 'border-emerald-100/50' : 'border-red-100/50'}`}>
                             <CardContent className="p-5">
                                 <div className="flex items-center justify-between mb-3">
-                                    <span className="text-sm text-gray-500 font-medium">Net Profit</span>
-                                    <div className={`h-10 w-10 rounded-full flex items-center justify-center ${stats.netProfit >= 0 ? 'bg-emerald-100' : 'bg-red-100'}`}>
-                                        <TrendingUp className={`h-5 w-5 ${stats.netProfit >= 0 ? 'text-emerald-600' : 'text-red-500'}`} />
+                                    <span className="text-sm text-gray-500 font-medium">
+                                        {stats.netProfit >= 0 ? 'Net Profit' : 'Net Loss'}
+                                    </span>
+                                    <div className={`h-10 w-10 rounded-full flex items-center justify-center ${stats.netProfit >= 0 ? 'bg-emerald-50' : 'bg-red-50'}`}>
+                                        {stats.netProfit >= 0 ? (
+                                            <TrendingUp className="h-5 w-5 text-emerald-600" />
+                                        ) : (
+                                            <TrendingDown className="h-5 w-5 text-red-600" />
+                                        )}
                                     </div>
                                 </div>
                                 <p className={`text-xl sm:text-2xl font-bold wrap-break-word ${stats.netProfit >= 0 ? 'text-gray-900' : 'text-red-600'}`}>
-                                    {formatINR(stats.netProfit)}
+                                    {formatINR(Math.abs(stats.netProfit))}
                                 </p>
                                 <p className={`text-xs mt-1 font-medium ${stats.netProfit >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
-                                    {profitMargin}% margin
+                                    {stats.netProfit >= 0 ? `${profitMargin}% margin` : `${Math.abs(parseFloat(profitMargin)).toFixed(1)}% margin loss`}
                                 </p>
                             </CardContent>
                         </Card>
