@@ -848,13 +848,12 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
                     )}
 
                     {/* Navigation Buttons */}
-                    <div className="flex justify-between gap-4 pt-4">
+                    <div className="flex justify-between gap-4 pt-6 border-t border-slate-100">
                         <Button
                             type="button"
-                            variant="secondary"
                             onClick={handlePrevious}
                             disabled={currentStep === 1 || isSubmitting}
-                            className="flex items-center gap-2"
+                            className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-full px-6 py-3 disabled:opacity-40"
                         >
                             <ChevronLeft className="w-4 h-4" />
                             Previous
@@ -865,20 +864,20 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
                                 type="button"
                                 onClick={handleNext}
                                 disabled={isSubmitting}
-                                className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
+                                className="flex items-center gap-2 bg-black hover:bg-slate-900 text-white font-bold rounded-full px-8 py-3.5 shadow-md hover:scale-[1.01] transition-all"
                             >
-                                Next
+                                Next Step
                                 <ChevronRight className="w-4 h-4" />
                             </Button>
                         ) : (
                             <Button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-50 disabled:cursor-not-allowed min-w-50 justify-center"
+                                className="flex items-center gap-2 bg-black hover:bg-slate-900 text-white font-bold rounded-full px-8 py-3.5 shadow-md hover:scale-[1.01] transition-all disabled:opacity-50 disabled:cursor-not-allowed min-w-52 justify-center"
                             >
                                 {isSubmitting ? (
                                     <>
-                                        <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <svg className="animate-spin h-4 w-4 text-emerald-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                         </svg>
@@ -887,7 +886,7 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
                                 ) : (
                                     <>
                                         Create Free Account
-                                        <Check className="w-4 h-4" />
+                                        <Check className="w-4 h-4 text-emerald-400" />
                                     </>
                                 )}
                             </Button>
