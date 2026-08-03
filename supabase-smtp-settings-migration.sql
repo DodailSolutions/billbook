@@ -55,7 +55,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-DROP TRIGGER IF NOT EXISTS smtp_settings_timestamp_trigger ON smtp_settings;
+DROP TRIGGER IF EXISTS smtp_settings_timestamp_trigger ON smtp_settings;
 CREATE TRIGGER smtp_settings_timestamp_trigger
 BEFORE UPDATE ON smtp_settings
 FOR EACH ROW
