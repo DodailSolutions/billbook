@@ -12,11 +12,11 @@ import { InteractiveFeaturePreview } from './_components/InteractiveFeaturePrevi
 
 // Lazy load below-the-fold components for performance
 const FAQSection = dynamic(() => import('./_components/FAQSection').then(mod => ({ default: mod.FAQSection })), {
-    loading: () => <div className="py-20 text-center">Loading FAQ...</div>,
+    loading: () => <div className="py-20 text-center text-slate-500 font-medium">Loading FAQ...</div>,
 })
 
 const TestimonialCarousel = dynamic(() => import('./_components/TestimonialCarousel').then(mod => ({ default: mod.TestimonialCarousel })), {
-    loading: () => <div className="py-20 text-center">Loading testimonials...</div>,
+    loading: () => <div className="py-20 text-center text-slate-500 font-medium">Loading testimonials...</div>,
 })
 
 const ALL_FEATURES = [
@@ -38,9 +38,9 @@ export default function Home() {
     const isAuthenticated = false
 
     return (
-        <div className="min-h-screen bg-slate-950 text-slate-900 selection:bg-indigo-500 selection:text-white">
+        <div className="min-h-screen bg-white text-slate-900 selection:bg-blue-600 selection:text-white">
             {/* Sticky Navigation */}
-            <nav className="sticky top-0 z-50 bg-slate-950/90 backdrop-blur-xl border-b border-slate-800/80">
+            <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200/80">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-16 sm:h-20">
                         <Link href="/" className="flex items-center gap-2.5">
@@ -53,27 +53,27 @@ export default function Home() {
                                     priority
                                 />
                             </div>
-                            <span className="text-xl sm:text-2xl font-black tracking-tight text-white">
-                                BillBooky<span className="text-blue-500">.</span>
+                            <span className="text-xl sm:text-2xl font-black tracking-tight text-slate-900">
+                                BillBooky<span className="text-blue-600">.</span>
                             </span>
                         </Link>
                         
-                        <div className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-300">
-                            <Link href="#features" className="hover:text-blue-400 transition-colors">Features</Link>
-                            <Link href="#showcase" className="hover:text-blue-400 transition-colors">Live Preview</Link>
-                            <Link href="#pricing" className="hover:text-blue-400 transition-colors">Pricing</Link>
-                            <Link href="/ca-marketplace" className="hover:text-blue-400 transition-colors">CA Services</Link>
-                            <Link href="/contact" className="hover:text-blue-400 transition-colors">Contact</Link>
+                        <div className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-700">
+                            <Link href="#features" className="hover:text-blue-600 transition-colors">Features</Link>
+                            <Link href="#showcase" className="hover:text-blue-600 transition-colors">Live Preview</Link>
+                            <Link href="#pricing" className="hover:text-blue-600 transition-colors">Pricing</Link>
+                            <Link href="/ca-marketplace" className="hover:text-blue-600 transition-colors">CA Services</Link>
+                            <Link href="/contact" className="hover:text-blue-600 transition-colors">Contact</Link>
                         </div>
 
                         <div className="flex items-center gap-3">
                             <Link href="/login" className="hidden sm:block">
-                                <Button variant="ghost" className="text-slate-300 hover:text-white hover:bg-slate-800/60 font-semibold min-h-[44px]">
+                                <Button variant="ghost" className="text-slate-700 hover:text-slate-900 hover:bg-slate-100 font-bold min-h-[44px]">
                                     Sign In
                                 </Button>
                             </Link>
                             <Link href="/signup">
-                                <Button className="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold shadow-lg shadow-blue-500/25 min-h-[44px] px-5 rounded-xl border border-blue-400/30">
+                                <Button className="bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-lg shadow-blue-500/25 min-h-[44px] px-5 rounded-xl border border-blue-500/30">
                                     Get Started Free
                                 </Button>
                             </Link>
@@ -83,62 +83,62 @@ export default function Home() {
             </nav>
 
             {/* Hero Section */}
-            <section className="relative pt-12 sm:pt-20 pb-20 md:pb-28 overflow-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
-                {/* Decorative background glow */}
-                <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] sm:w-[800px] h-[400px] bg-gradient-to-tr from-blue-600/20 via-indigo-600/20 to-emerald-500/10 blur-[120px] rounded-full pointer-events-none" />
+            <section className="relative pt-12 sm:pt-20 pb-20 md:pb-28 overflow-hidden bg-gradient-to-b from-blue-50/70 via-slate-50/30 to-white">
+                {/* Decorative background glow accents */}
+                <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] sm:w-[800px] h-[400px] bg-gradient-to-tr from-blue-400/15 via-indigo-400/15 to-emerald-400/10 blur-[120px] rounded-full pointer-events-none" />
 
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                     <div className="text-center max-w-4xl mx-auto space-y-6 sm:space-y-8">
                         {/* Pill Badge */}
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900/90 border border-blue-500/30 shadow-lg shadow-blue-500/10">
-                            <Sparkles className="h-4 w-4 text-blue-400 animate-pulse" />
-                            <span className="text-xs sm:text-sm font-bold text-blue-300 tracking-wide uppercase">
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-200/80 shadow-xs">
+                            <Sparkles className="h-4 w-4 text-blue-600 animate-pulse" />
+                            <span className="text-xs sm:text-sm font-bold text-blue-700 tracking-wide uppercase">
                                 All-In-One Business Operating System
                             </span>
                         </div>
 
                         {/* Main Title */}
-                        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black text-white tracking-tight leading-[1.1]">
+                        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black text-slate-900 tracking-tight leading-[1.1]">
                             Accounting, Invoicing, CRM & Payroll{' '}
-                            <span className="bg-gradient-to-r from-blue-400 via-indigo-300 to-emerald-400 bg-clip-text text-transparent">
+                            <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-600 bg-clip-text text-transparent">
                                 Built for Indian Business
                             </span>
                         </h1>
 
-                        <p className="text-base sm:text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed">
+                        <p className="text-base sm:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed font-medium">
                             Create GST invoices, track CRM sales pipelines, manage double-entry books, issue vendor POs, and run monthly staff payroll — all in one powerful platform.
                         </p>
 
                         {/* Action Buttons */}
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
                             <Link href="/signup" className="w-full sm:w-auto">
-                                <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold px-8 py-6 rounded-2xl shadow-xl shadow-blue-500/25 border border-blue-400/30 text-base min-h-[54px] gap-2">
+                                <Button size="lg" className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-extrabold px-8 py-6 rounded-2xl shadow-xl shadow-blue-500/25 border border-blue-500/30 text-base min-h-[54px] gap-2">
                                     Start Free Account
                                     <ArrowRight className="h-5 w-5" />
                                 </Button>
                             </Link>
                             <Link href="#showcase" className="w-full sm:w-auto">
-                                <Button size="lg" className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white border border-slate-700 font-bold px-8 py-6 rounded-2xl text-base min-h-[54px] shadow-md transition-all">
+                                <Button size="lg" className="w-full sm:w-auto bg-white hover:bg-slate-50 text-slate-800 font-bold border border-slate-300 px-8 py-6 rounded-2xl text-base min-h-[54px] shadow-sm hover:shadow-md transition-all">
                                     Explore Features
                                 </Button>
                             </Link>
                         </div>
 
                         {/* Ratings & Social Proof */}
-                        <div className="flex flex-wrap items-center justify-center gap-6 pt-4 text-xs text-slate-400">
+                        <div className="flex flex-wrap items-center justify-center gap-6 pt-4 text-xs text-slate-600 font-semibold">
                             <div className="flex items-center gap-1">
                                 {[1, 2, 3, 4, 5].map(i => (
                                     <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
                                 ))}
-                                <span className="font-bold text-white ml-1.5">4.9/5 Rating</span>
+                                <span className="font-bold text-slate-900 ml-1.5">4.9/5 Rating</span>
                             </div>
-                            <span className="hidden sm:inline">•</span>
-                            <div className="flex items-center gap-1.5 text-slate-300 font-semibold">
-                                <CheckCircle className="w-4 h-4 text-emerald-400" /> 100% GST Compliant
+                            <span className="hidden sm:inline text-slate-300">•</span>
+                            <div className="flex items-center gap-1.5 text-slate-700">
+                                <CheckCircle className="w-4 h-4 text-emerald-600" /> 100% GST Compliant
                             </div>
-                            <span className="hidden sm:inline">•</span>
-                            <div className="flex items-center gap-1.5 text-slate-300 font-semibold">
-                                <Shield className="w-4 h-4 text-blue-400" /> 500+ Indian SMBs Trust Us
+                            <span className="hidden sm:inline text-slate-300">•</span>
+                            <div className="flex items-center gap-1.5 text-slate-700">
+                                <Shield className="w-4 h-4 text-blue-600" /> 500+ Indian SMBs Trust Us
                             </div>
                         </div>
                     </div>
@@ -146,40 +146,40 @@ export default function Home() {
             </section>
 
             {/* Trust Metrics Bar */}
-            <section className="py-10 bg-slate-900/60 border-y border-slate-800">
+            <section className="py-10 bg-slate-50/80 border-y border-slate-200/80">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-                        <div className="p-4 rounded-2xl bg-slate-950/40 border border-slate-800">
-                            <div className="text-2xl sm:text-4xl font-extrabold text-white font-mono">500+</div>
-                            <div className="text-xs text-slate-400 mt-1 font-semibold uppercase tracking-wider">Active Businesses</div>
+                        <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs">
+                            <div className="text-2xl sm:text-4xl font-black text-slate-900 font-mono">500+</div>
+                            <div className="text-xs text-slate-500 mt-1 font-bold uppercase tracking-wider">Active Businesses</div>
                         </div>
-                        <div className="p-4 rounded-2xl bg-slate-950/40 border border-slate-800">
-                            <div className="text-2xl sm:text-4xl font-extrabold text-blue-400 font-mono">₹10Cr+</div>
-                            <div className="text-xs text-slate-400 mt-1 font-semibold uppercase tracking-wider">Invoices Processed</div>
+                        <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs">
+                            <div className="text-2xl sm:text-4xl font-black text-blue-600 font-mono">₹10Cr+</div>
+                            <div className="text-xs text-slate-500 mt-1 font-bold uppercase tracking-wider">Invoices Processed</div>
                         </div>
-                        <div className="p-4 rounded-2xl bg-slate-950/40 border border-slate-800">
-                            <div className="text-2xl sm:text-4xl font-extrabold text-emerald-400 font-mono">100%</div>
-                            <div className="text-xs text-slate-400 mt-1 font-semibold uppercase tracking-wider">GST Audit Ready</div>
+                        <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs">
+                            <div className="text-2xl sm:text-4xl font-black text-emerald-600 font-mono">100%</div>
+                            <div className="text-xs text-slate-500 mt-1 font-bold uppercase tracking-wider">GST Audit Ready</div>
                         </div>
-                        <div className="p-4 rounded-2xl bg-slate-950/40 border border-slate-800">
-                            <div className="text-2xl sm:text-4xl font-extrabold text-amber-400 font-mono">6-in-1</div>
-                            <div className="text-xs text-slate-400 mt-1 font-semibold uppercase tracking-wider">Enterprise Modules</div>
+                        <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs">
+                            <div className="text-2xl sm:text-4xl font-black text-indigo-600 font-mono">6-in-1</div>
+                            <div className="text-xs text-slate-500 mt-1 font-bold uppercase tracking-wider">Enterprise Modules</div>
                         </div>
                     </div>
                 </div>
             </section>
 
             {/* Interactive Live Feature Preview Section */}
-            <section id="showcase" className="py-20 sm:py-28 bg-slate-950">
+            <section id="showcase" className="py-20 sm:py-28 bg-slate-50/50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
                     <div className="text-center max-w-3xl mx-auto space-y-4">
-                        <span className="inline-block px-4 py-1.5 rounded-full bg-blue-500/10 text-blue-400 text-xs font-extrabold uppercase tracking-wider border border-blue-500/20">
+                        <span className="inline-block px-4 py-1.5 rounded-full bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-wider border border-blue-200">
                             Interactive Platform Preview
                         </span>
-                        <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
+                        <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
                             Explore the Full Suite of Features
                         </h2>
-                        <p className="text-slate-400 text-sm sm:text-base">
+                        <p className="text-slate-600 text-sm sm:text-base font-medium">
                             Click through the tabs below to test live interactive previews of each module.
                         </p>
                     </div>
@@ -189,16 +189,16 @@ export default function Home() {
             </section>
 
             {/* Comprehensive Feature Grid (12 Feature Suite) */}
-            <section id="features" className="py-20 sm:py-28 bg-slate-900/50 border-t border-slate-800">
+            <section id="features" className="py-20 sm:py-28 bg-white border-t border-slate-200">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
                     <div className="text-center max-w-3xl mx-auto space-y-4">
-                        <span className="inline-block px-4 py-1.5 rounded-full bg-indigo-500/10 text-indigo-400 text-xs font-extrabold uppercase tracking-wider border border-indigo-500/20">
+                        <span className="inline-block px-4 py-1.5 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold uppercase tracking-wider border border-indigo-200">
                             Complete Feature Arsenal
                         </span>
-                        <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
+                        <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
                             Everything your business needs to scale
                         </h2>
-                        <p className="text-slate-400 text-sm sm:text-base">
+                        <p className="text-slate-600 text-sm sm:text-base font-medium">
                             No more juggling separate accounting software, CRM tools, or payroll spreadsheets.
                         </p>
                     </div>
@@ -209,15 +209,15 @@ export default function Home() {
                             return (
                                 <div 
                                     key={idx}
-                                    className="bg-slate-900/90 p-6 rounded-3xl border border-slate-800 hover:border-blue-500/40 hover:bg-slate-800/80 transition-all duration-300 group shadow-lg"
+                                    className="bg-white p-6 rounded-3xl border border-slate-200/80 hover:border-blue-400 hover:shadow-xl shadow-slate-100 transition-all duration-300 group"
                                 >
-                                    <div className="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
-                                        <Icon className="h-6 w-6 text-blue-400" />
+                                    <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+                                        <Icon className="h-6 w-6 text-blue-600" />
                                     </div>
-                                    <h3 className="text-lg font-bold text-white mb-2 group-hover:text-blue-300 transition-colors">
+                                    <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">
                                         {feature.title}
                                     </h3>
-                                    <p className="text-slate-400 text-xs leading-relaxed">
+                                    <p className="text-slate-600 text-xs leading-relaxed font-medium">
                                         {feature.desc}
                                     </p>
                                 </div>
@@ -228,90 +228,90 @@ export default function Home() {
             </section>
 
             {/* Pricing Section */}
-            <section id="pricing" className="py-20 sm:py-28 bg-slate-950 border-t border-slate-800">
+            <section id="pricing" className="py-20 sm:py-28 bg-slate-50/70 border-t border-slate-200">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
                     <div className="text-center max-w-3xl mx-auto space-y-4">
-                        <span className="inline-block px-4 py-1.5 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-extrabold uppercase tracking-wider border border-emerald-500/20">
+                        <span className="inline-block px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold uppercase tracking-wider border border-emerald-200">
                             Transparent Pricing
                         </span>
-                        <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
+                        <h2 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight">
                             Simple, predictable plans
                         </h2>
-                        <p className="text-slate-400 text-sm sm:text-base">
+                        <p className="text-slate-600 text-sm sm:text-base font-medium">
                             Start 100% free with no credit card required. Upgrade as your company grows.
                         </p>
                     </div>
 
                     <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
                         {/* Free Plan */}
-                        <div className="bg-slate-900 p-8 rounded-3xl border border-slate-800 space-y-6 flex flex-col justify-between hover:border-slate-700 transition-all">
+                        <div className="bg-white p-8 rounded-3xl border border-slate-200 space-y-6 flex flex-col justify-between hover:shadow-xl transition-all shadow-xs">
                             <div className="space-y-4">
-                                <span className="text-sm font-bold text-slate-300 uppercase tracking-wider block">Free Plan</span>
+                                <span className="text-sm font-bold text-slate-700 uppercase tracking-wider block">Free Plan</span>
                                 <div>
-                                    <span className="text-4xl font-black text-white">₹0</span>
-                                    <span className="text-slate-400 text-xs font-semibold"> / forever</span>
+                                    <span className="text-4xl font-black text-slate-900">₹0</span>
+                                    <span className="text-slate-500 text-xs font-semibold"> / forever</span>
                                 </div>
-                                <p className="text-xs text-slate-300">Ideal for freelancers and new startups.</p>
-                                <ul className="space-y-3 pt-4 border-t border-slate-800 text-xs text-slate-200 font-medium">
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-emerald-400 shrink-0" /> 50 Invoices / Month</li>
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-emerald-400 shrink-0" /> GST Tax Compliance</li>
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-emerald-400 shrink-0" /> Customer & Items Directory</li>
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-emerald-400 shrink-0" /> Basic Financial Reports</li>
+                                <p className="text-xs text-slate-600 font-medium">Ideal for freelancers and new startups.</p>
+                                <ul className="space-y-3 pt-4 border-t border-slate-100 text-xs text-slate-700 font-semibold">
+                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-emerald-600 shrink-0" /> 50 Invoices / Month</li>
+                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-emerald-600 shrink-0" /> GST Tax Compliance</li>
+                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-emerald-600 shrink-0" /> Customer & Items Directory</li>
+                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-emerald-600 shrink-0" /> Basic Financial Reports</li>
                                 </ul>
                             </div>
                             <Link href="/signup">
-                                <Button className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold border border-slate-700 min-h-[44px]">
+                                <Button className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold min-h-[44px]">
                                     Get Started Free
                                 </Button>
                             </Link>
                         </div>
 
                         {/* Pro Starter Plan */}
-                        <div className="bg-gradient-to-b from-blue-950/80 via-slate-900 to-slate-900 p-8 rounded-3xl border-2 border-blue-500 space-y-6 flex flex-col justify-between shadow-2xl relative">
-                            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-[10px] font-black px-4 py-1 rounded-full uppercase tracking-wider shadow-md">
+                        <div className="bg-white p-8 rounded-3xl border-2 border-blue-600 space-y-6 flex flex-col justify-between shadow-2xl relative">
+                            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-[10px] font-black px-4 py-1 rounded-full uppercase tracking-wider shadow-md">
                                 MOST POPULAR
                             </div>
                             <div className="space-y-4">
-                                <span className="text-sm font-bold text-blue-400 uppercase tracking-wider block">Pro Starter</span>
+                                <span className="text-sm font-bold text-blue-600 uppercase tracking-wider block">Pro Starter</span>
                                 <div>
-                                    <span className="text-4xl font-black text-white">₹299</span>
-                                    <span className="text-slate-300 text-xs font-semibold"> / month</span>
+                                    <span className="text-4xl font-black text-slate-900">₹299</span>
+                                    <span className="text-slate-500 text-xs font-semibold"> / month</span>
                                 </div>
-                                <p className="text-xs text-slate-200">Everything growing SMBs need.</p>
-                                <ul className="space-y-3 pt-4 border-t border-blue-500/30 text-xs text-slate-100 font-medium">
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-blue-400 shrink-0" /> <strong>Unlimited</strong> Invoices & Quotes</li>
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-blue-400 shrink-0" /> Full CRM & Deal Pipeline</li>
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-blue-400 shrink-0" /> Bookkeeping & General Ledger</li>
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-blue-400 shrink-0" /> Vendor Purchase Orders</li>
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-blue-400 shrink-0" /> WhatsApp Direct Sharing</li>
+                                <p className="text-xs text-slate-600 font-medium">Everything growing SMBs need.</p>
+                                <ul className="space-y-3 pt-4 border-t border-slate-100 text-xs text-slate-700 font-semibold">
+                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-blue-600 shrink-0" /> <strong>Unlimited</strong> Invoices & Quotes</li>
+                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-blue-600 shrink-0" /> Full CRM & Deal Pipeline</li>
+                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-blue-600 shrink-0" /> Bookkeeping & General Ledger</li>
+                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-blue-600 shrink-0" /> Vendor Purchase Orders</li>
+                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-blue-600 shrink-0" /> WhatsApp Direct Sharing</li>
                                 </ul>
                             </div>
                             <Link href="/signup">
-                                <Button className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold min-h-[44px] shadow-lg shadow-blue-500/20">
+                                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold min-h-[44px] shadow-lg shadow-blue-500/25">
                                     Start 14-Day Free Trial
                                 </Button>
                             </Link>
                         </div>
 
                         {/* Enterprise Plan */}
-                        <div className="bg-slate-900 p-8 rounded-3xl border border-slate-800 space-y-6 flex flex-col justify-between hover:border-slate-700 transition-all">
+                        <div className="bg-white p-8 rounded-3xl border border-slate-200 space-y-6 flex flex-col justify-between hover:shadow-xl transition-all shadow-xs">
                             <div className="space-y-4">
-                                <span className="text-sm font-bold text-purple-400 uppercase tracking-wider block">Enterprise Suite</span>
+                                <span className="text-sm font-bold text-purple-700 uppercase tracking-wider block">Enterprise Suite</span>
                                 <div>
-                                    <span className="text-4xl font-black text-white">₹599</span>
-                                    <span className="text-slate-400 text-xs font-semibold"> / month</span>
+                                    <span className="text-4xl font-black text-slate-900">₹599</span>
+                                    <span className="text-slate-500 text-xs font-semibold"> / month</span>
                                 </div>
-                                <p className="text-xs text-slate-300">Complete suite with AI & Payroll.</p>
-                                <ul className="space-y-3 pt-4 border-t border-slate-800 text-xs text-slate-200 font-medium">
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-purple-400 shrink-0" /> Everything in Pro Starter</li>
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-purple-400 shrink-0" /> Full Payroll & Payslip Engine</li>
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-purple-400 shrink-0" /> AI Accountant Assistant</li>
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-purple-400 shrink-0" /> Multi-User Team Roles</li>
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-purple-400 shrink-0" /> Certified CA Marketplace Access</li>
+                                <p className="text-xs text-slate-600 font-medium">Complete suite with AI & Payroll.</p>
+                                <ul className="space-y-3 pt-4 border-t border-slate-100 text-xs text-slate-700 font-semibold">
+                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-purple-600 shrink-0" /> Everything in Pro Starter</li>
+                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-purple-600 shrink-0" /> Full Payroll & Payslip Engine</li>
+                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-purple-600 shrink-0" /> AI Accountant Assistant</li>
+                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-purple-600 shrink-0" /> Multi-User Team Roles</li>
+                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-purple-600 shrink-0" /> Certified CA Marketplace Access</li>
                                 </ul>
                             </div>
                             <Link href="/signup">
-                                <Button className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold border border-slate-700 min-h-[44px]">
+                                <Button className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold min-h-[44px]">
                                     Get Enterprise Plan
                                 </Button>
                             </Link>
@@ -321,30 +321,30 @@ export default function Home() {
             </section>
 
             {/* Testimonials */}
-            <section className="py-20 bg-slate-900 border-t border-slate-800">
+            <section className="py-20 bg-white border-t border-slate-200">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <TestimonialCarousel />
                 </div>
             </section>
 
             {/* FAQ Section */}
-            <section className="py-20 bg-slate-950 border-t border-slate-800">
+            <section className="py-20 bg-slate-50/60 border-t border-slate-200">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <FAQSection />
                 </div>
             </section>
 
             {/* Final CTA Banner */}
-            <section className="py-20 bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 border-t border-blue-800/50 relative overflow-hidden">
+            <section className="py-20 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white shadow-xl relative overflow-hidden">
                 <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6 relative z-10">
                     <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
                         Ready to streamline your business financial operations?
                     </h2>
-                    <p className="text-blue-200 text-sm sm:text-base max-w-xl mx-auto">
+                    <p className="text-blue-100 text-sm sm:text-base max-w-xl mx-auto font-medium">
                         Join 500+ Indian startups and SMBs managing invoicing, CRM, bookkeeping, and payroll on BillBooky.
                     </p>
                     <Link href="/signup" className="inline-block">
-                        <Button size="lg" className="bg-white text-slate-950 hover:bg-slate-100 font-black px-8 py-6 rounded-2xl shadow-2xl text-base min-h-[54px] gap-2">
+                        <Button size="lg" className="bg-white text-blue-700 hover:bg-slate-50 font-black px-8 py-6 rounded-2xl shadow-2xl text-base min-h-[54px] gap-2">
                             Create Free Account Now
                             <ArrowRight className="h-5 w-5" />
                         </Button>
@@ -353,13 +353,13 @@ export default function Home() {
             </section>
 
             {/* Footer */}
-            <footer className="py-12 bg-slate-950 border-t border-slate-800 text-xs text-slate-400">
+            <footer className="py-12 bg-slate-900 text-slate-400 text-xs">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div className="flex items-center gap-2">
                         <span className="font-bold text-white text-base">BillBooky</span>
                         <span>© 2026 BillBooky Inc. All rights reserved.</span>
                     </div>
-                    <div className="flex gap-6">
+                    <div className="flex gap-6 font-medium">
                         <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
                         <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
                         <Link href="/refund" className="hover:text-white transition-colors">Refund Policy</Link>
