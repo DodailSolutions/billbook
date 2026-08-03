@@ -8624,17 +8624,17 @@ CREATE POLICY payment_nudge_settings_policy ON payment_nudge_settings FOR ALL US
 -- INDEXES FOR PERFORMANCE
 -- =====================================================
 
-CREATE INDEX idx_inventory_items_user_id ON inventory_items(user_id);
-CREATE INDEX idx_inventory_items_item_type ON inventory_items(item_type);
-CREATE INDEX idx_inventory_batches_expiry_date ON inventory_batches(expiry_date) WHERE batch_status = 'active';
-CREATE INDEX idx_inventory_alerts_status ON inventory_alerts(alert_status, alert_type);
-CREATE INDEX idx_expenses_date ON expenses(expense_date DESC);
-CREATE INDEX idx_expenses_approval_status ON expenses(approval_status) WHERE requires_approval = true;
-CREATE INDEX idx_assets_status ON assets(asset_status);
-CREATE INDEX idx_business_metrics_date ON business_metrics(metric_date DESC);
-CREATE INDEX idx_approval_requests_status ON approval_requests(approval_status);
-CREATE INDEX idx_client_portal_users_customer_id ON client_portal_users(customer_id);
-CREATE INDEX idx_whatsapp_messages_status ON whatsapp_messages(message_status);
+CREATE INDEX IF NOT EXISTS idx_inventory_items_user_id ON inventory_items(user_id);
+CREATE INDEX IF NOT EXISTS idx_inventory_items_item_type ON inventory_items(item_type);
+CREATE INDEX IF NOT EXISTS idx_inventory_batches_expiry_date ON inventory_batches(expiry_date) WHERE batch_status = 'active';
+CREATE INDEX IF NOT EXISTS idx_inventory_alerts_status ON inventory_alerts(alert_status, alert_type);
+CREATE INDEX IF NOT EXISTS idx_expenses_date ON expenses(expense_date DESC);
+CREATE INDEX IF NOT EXISTS idx_expenses_approval_status ON expenses(approval_status) WHERE requires_approval = true;
+CREATE INDEX IF NOT EXISTS idx_assets_status ON assets(asset_status);
+CREATE INDEX IF NOT EXISTS idx_business_metrics_date ON business_metrics(metric_date DESC);
+CREATE INDEX IF NOT EXISTS idx_approval_requests_status ON approval_requests(approval_status);
+CREATE INDEX IF NOT EXISTS idx_client_portal_users_customer_id ON client_portal_users(customer_id);
+CREATE INDEX IF NOT EXISTS idx_whatsapp_messages_status ON whatsapp_messages(message_status);
 
 -- =====================================================
 -- COMMENTS
