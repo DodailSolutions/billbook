@@ -77,8 +77,8 @@ CREATE TABLE IF NOT EXISTS voice_commands_log (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_voice_commands_user ON voice_commands_log(user_id);
-CREATE INDEX idx_voice_commands_type ON voice_commands_log(command_type);
+CREATE INDEX IF NOT EXISTS idx_voice_commands_user ON voice_commands_log(user_id);
+CREATE INDEX IF NOT EXISTS idx_voice_commands_type ON voice_commands_log(command_type);
 
 -- ============================================
 -- ADD VOICE FIELDS TO INVOICES
