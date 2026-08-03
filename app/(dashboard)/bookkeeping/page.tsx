@@ -63,7 +63,7 @@ export default function BookkeepingPage() {
 
             {/* Navigation Tabs */}
             <div className="flex items-center justify-between border-b border-gray-200 pb-1">
-                <div className="flex items-center gap-2 overflow-x-auto">
+                <div className="flex items-center gap-2 overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 no-scrollbar">
                     <button
                         onClick={() => setActiveTab('accounts')}
                         className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl transition-colors whitespace-nowrap ${
@@ -72,7 +72,7 @@ export default function BookkeepingPage() {
                                 : 'text-gray-600 hover:bg-gray-100'
                         }`}
                     >
-                        <FolderTree className="h-4 w-4" />
+                        <FolderTree className="h-4 w-4 hidden sm:block" />
                         Chart of Accounts ({accounts.length})
                     </button>
 
@@ -84,7 +84,7 @@ export default function BookkeepingPage() {
                                 : 'text-gray-600 hover:bg-gray-100'
                         }`}
                     >
-                        <ArrowRightLeft className="h-4 w-4" />
+                        <ArrowRightLeft className="h-4 w-4 hidden sm:block" />
                         Journal Entries ({journalEntries.length})
                     </button>
 
@@ -96,8 +96,9 @@ export default function BookkeepingPage() {
                                 : 'text-gray-600 hover:bg-gray-100'
                         }`}
                     >
-                        <FileText className="h-4 w-4" />
-                        Financial Statements (P&L & BS)
+                        <FileText className="h-4 w-4 hidden sm:block" />
+                        <span className="sm:hidden">P&L</span>
+                        <span className="hidden sm:inline">Financial Statements (P&L & BS)</span>
                     </button>
 
                     <button
@@ -108,7 +109,7 @@ export default function BookkeepingPage() {
                                 : 'text-gray-600 hover:bg-gray-100'
                         }`}
                     >
-                        <Landmark className="h-4 w-4" />
+                        <Landmark className="h-4 w-4 hidden sm:block" />
                         Bank Reconciliation
                     </button>
                 </div>
@@ -149,7 +150,7 @@ export default function BookkeepingPage() {
                             <div className="divide-y divide-gray-100">
                                 {journalEntries.map((entry) => (
                                     <div key={entry.id} className="p-4 space-y-2 hover:bg-slate-50/50 transition-colors">
-                                        <div className="flex items-center justify-between text-xs">
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs gap-2 sm:gap-0">
                                             <div className="flex items-center gap-2">
                                                 <span className="font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100">
                                                     {entry.entry_number}
@@ -168,11 +169,11 @@ export default function BookkeepingPage() {
                                         {entry.lines && entry.lines.length > 0 && (
                                             <div className="bg-slate-50 p-2.5 rounded-lg border border-gray-100 text-xs space-y-1">
                                                 {entry.lines.map((line, idx) => (
-                                                    <div key={idx} className="flex items-center justify-between text-[11px]">
+                                                    <div key={idx} className="flex flex-col sm:flex-row sm:items-center justify-between text-[11px] gap-1 sm:gap-0">
                                                         <span className="font-medium text-gray-700">
                                                             {line.account_code} - {line.account_name} {line.memo ? `(${line.memo})` : ''}
                                                         </span>
-                                                        <div className="flex items-center gap-6 font-mono">
+                                                        <div className="flex items-center justify-between sm:justify-end gap-6 font-mono">
                                                             <span className={line.debit_amount > 0 ? 'text-gray-900 font-bold' : 'text-gray-400'}>
                                                                 Dr: ₹{line.debit_amount.toFixed(2)}
                                                             </span>

@@ -81,13 +81,13 @@ export default function CRMPage() {
                         <CardContent className="p-4 flex items-center justify-between">
                             <div>
                                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Pipeline Value</p>
-                                <h3 className="text-2xl font-bold text-gray-900 mt-1">
+                                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mt-1">
                                     ₹{stats.pipelineValue.toLocaleString('en-IN')}
                                 </h3>
                                 <p className="text-[11px] text-indigo-600 font-medium mt-0.5">Across all active stages</p>
                             </div>
                             <div className="p-3 bg-indigo-50 text-indigo-600 rounded-2xl">
-                                <DollarSign className="h-6 w-6" />
+                                <DollarSign className="h-5 w-5 sm:h-6 sm:w-6" />
                             </div>
                         </CardContent>
                     </Card>
@@ -96,13 +96,13 @@ export default function CRMPage() {
                         <CardContent className="p-4 flex items-center justify-between">
                             <div>
                                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Won Deals Value</p>
-                                <h3 className="text-2xl font-bold text-emerald-600 mt-1">
+                                <h3 className="text-xl sm:text-2xl font-bold text-emerald-600 mt-1">
                                     ₹{stats.wonDealsValue.toLocaleString('en-IN')}
                                 </h3>
                                 <p className="text-[11px] text-emerald-700 font-medium mt-0.5">{stats.stageCounts.won} closed deals</p>
                             </div>
                             <div className="p-3 bg-emerald-50 text-emerald-600 rounded-2xl">
-                                <Award className="h-6 w-6" />
+                                <Award className="h-5 w-5 sm:h-6 sm:w-6" />
                             </div>
                         </CardContent>
                     </Card>
@@ -111,13 +111,13 @@ export default function CRMPage() {
                         <CardContent className="p-4 flex items-center justify-between">
                             <div>
                                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Win Rate</p>
-                                <h3 className="text-2xl font-bold text-gray-900 mt-1">
+                                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mt-1">
                                     {stats.winRate}%
                                 </h3>
                                 <p className="text-[11px] text-gray-500 font-medium mt-0.5">Won vs Lost ratio</p>
                             </div>
                             <div className="p-3 bg-amber-50 text-amber-600 rounded-2xl">
-                                <TrendingUp className="h-6 w-6" />
+                                <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6" />
                             </div>
                         </CardContent>
                     </Card>
@@ -126,13 +126,13 @@ export default function CRMPage() {
                         <CardContent className="p-4 flex items-center justify-between">
                             <div>
                                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Leads</p>
-                                <h3 className="text-2xl font-bold text-gray-900 mt-1">
+                                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mt-1">
                                     {stats.totalLeads}
                                 </h3>
                                 <p className="text-[11px] text-gray-500 font-medium mt-0.5">Active prospects</p>
                             </div>
                             <div className="p-3 bg-purple-50 text-purple-600 rounded-2xl">
-                                <Target className="h-6 w-6" />
+                                <Target className="h-5 w-5 sm:h-6 sm:w-6" />
                             </div>
                         </CardContent>
                     </Card>
@@ -140,11 +140,11 @@ export default function CRMPage() {
             )}
 
             {/* Navigation Tabs */}
-            <div className="flex items-center justify-between border-b border-gray-200 pb-1">
-                <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between border-b border-gray-200 pb-1 overflow-x-auto whitespace-nowrap scrollbar-hide">
+                <div className="flex items-center gap-2 w-full sm:w-auto">
                     <button
                         onClick={() => setActiveTab('kanban')}
-                        className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl transition-colors ${
+                        className={`flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold rounded-xl transition-colors shrink-0 ${
                             activeTab === 'kanban' 
                                 ? 'bg-indigo-600 text-white shadow-xs' 
                                 : 'text-gray-600 hover:bg-gray-100'
@@ -155,7 +155,7 @@ export default function CRMPage() {
                     </button>
                     <button
                         onClick={() => setActiveTab('activities')}
-                        className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl transition-colors ${
+                        className={`flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold rounded-xl transition-colors shrink-0 ${
                             activeTab === 'activities' 
                                 ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:bg-gray-100'
                         }`}

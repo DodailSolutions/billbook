@@ -5,7 +5,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { LayoutDashboard, FileText, Users, Bell, Settings, User, Menu, X, Bot, UserCog, Package, Receipt, Sparkles, BookOpen } from "lucide-react"
+import { LayoutDashboard, FileText, Users, Bell, Settings, User, Menu, X, Bot, UserCog, Package, Receipt, Sparkles, BookOpen, MoreHorizontal } from "lucide-react"
 import { SignOutButton } from "./SignOutButton"
 import { PlanBanner } from "./PlanBanner"
 
@@ -100,14 +100,14 @@ const mobileTabs = [
         href: '/invoices',
     },
     {
-        label: 'Customers',
-        icon: Users,
-        href: '/customers',
+        label: 'CRM',
+        icon: Sparkles,
+        href: '/crm',
     },
     {
-        label: 'Inventory',
-        icon: Package,
-        href: '/inventory',
+        label: 'Books',
+        icon: BookOpen,
+        href: '/bookkeeping',
     },
 ]
 
@@ -230,13 +230,13 @@ export function MobileSidebar() {
                                 key={tab.href}
                                 href={tab.href}
                                 className={cn(
-                                    "flex flex-col items-center justify-center rounded-xl py-1.5 text-[11px] font-medium transition-colors",
+                                    "flex flex-col items-center justify-center rounded-xl py-2 text-[10px] font-medium transition-colors min-h-[44px]",
                                     active
                                         ? "bg-linear-to-r from-blue-500/20 to-violet-500/20 text-white"
                                         : "text-slate-400 hover:text-slate-200"
                                 )}
                             >
-                                <tab.icon className={cn("h-5 w-5 mb-1", active ? "text-blue-300" : "text-slate-500")} />
+                                <tab.icon className={cn("h-5 w-5 mb-0.5", active ? "text-blue-300" : "text-slate-500")} />
                                 {tab.label}
                             </Link>
                         )
@@ -245,15 +245,15 @@ export function MobileSidebar() {
                     <button
                         onClick={() => setIsOpen(true)}
                         className={cn(
-                            "flex flex-col items-center justify-center rounded-xl py-1.5 text-[11px] font-medium transition-colors",
+                            "flex flex-col items-center justify-center rounded-xl py-2 text-[10px] font-medium transition-colors min-h-[44px]",
                             isOpen
                                 ? "bg-linear-to-r from-blue-500/20 to-violet-500/20 text-white"
                                 : "text-slate-400 hover:text-slate-200"
                         )}
                         aria-label="Open menu"
                     >
-                        <Menu className={cn("h-5 w-5 mb-1", isOpen ? "text-blue-300" : "text-slate-500")} />
-                        Menu
+                        <MoreHorizontal className={cn("h-5 w-5 mb-0.5", isOpen ? "text-blue-300" : "text-slate-500")} />
+                        More
                     </button>
                 </div>
             </nav>

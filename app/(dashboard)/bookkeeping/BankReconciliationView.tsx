@@ -228,7 +228,7 @@ export function BankReconciliationView() {
                         <div className="md:col-span-2 space-y-4">
                             <Card className="border-gray-100 shadow-2xs">
                                 <CardContent className="p-6 space-y-4">
-                                    <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0 border-b border-gray-100 pb-3">
                                         <div>
                                             <h4 className="text-sm font-bold text-gray-900">
                                                 Reconcile {selectedAccount.bank_name} ({selectedAccount.account_name})
@@ -237,7 +237,7 @@ export function BankReconciliationView() {
                                                 Enter your bank statement ending balance to compute variance.
                                             </p>
                                         </div>
-                                        <span className="text-xs font-mono font-bold bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-lg border border-emerald-100">
+                                        <span className="text-xs font-mono font-bold bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-lg border border-emerald-100 self-start sm:self-auto">
                                             Ledger: ₹{Number(selectedAccount.current_balance).toLocaleString('en-IN')}
                                         </span>
                                     </div>

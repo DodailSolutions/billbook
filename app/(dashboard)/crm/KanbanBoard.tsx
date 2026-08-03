@@ -23,6 +23,9 @@ const STAGES: { id: LeadStage; title: string; color: string; bg: string; border:
 
 export function KanbanBoard({ leads, onEditLead, onRefresh }: KanbanBoardProps) {
     const [updatingId, setUpdatingId] = useState<string | null>(null)
+    const [expandedMobile, setExpandedMobile] = useState<Record<string, boolean>>({
+        lead: true
+    })
 
     const handleStageChange = async (leadId: string, newStage: LeadStage) => {
         setUpdatingId(leadId)
@@ -39,18 +42,22 @@ export function KanbanBoard({ leads, onEditLead, onRefresh }: KanbanBoardProps) 
     }
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 overflow-x-auto pb-4">
+        <div className="flex flex-col md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 overflow-x-hidden md:overflow-x-auto pb-4">
             {STAGES.map((col) => {
                 const stageLeads = leads.filter(l => l.stage === col.id)
                 const stageValue = stageLeads.reduce((acc, l) => acc + Number(l.value || 0), 0)
+                const isExpanded = expandedMobile[col.id]
 
                 return (
                     <div 
                         key={col.id}
-                        className={`flex flex-col rounded-2xl p-3 border ${col.bg} ${col.border} min-w-[240px] shrink-0 min-h-[500px]`}
+                        className={`flex flex-col rounded-2xl p-3 border ${col.bg} ${col.border} w-full md:min-w-[240px] shrink-0 md:min-h-[500px]`}
                     >
                         {/* Stage Header */}
-                        <div className="flex items-center justify-between pb-3 border-b border-gray-200/60 mb-3">
+                        <div 
+                            className="flex items-center justify-between pb-3 border-b border-gray-200/60 mb-3 cursor-pointer md:cursor-default"
+                            onClick={() => setExpandedMobile(prev => ({ ...prev, [col.id]: !prev[col.id] }))}
+                        >
                             <div>
                                 <h3 className={`text-xs font-bold uppercase tracking-wider ${col.color}`}>
                                     {col.title}
@@ -59,10 +66,15 @@ export function KanbanBoard({ leads, onEditLead, onRefresh }: KanbanBoardProps) 
                                     ₹{stageValue.toLocaleString('en-IN')} ({stageLeads.length})
                                 </p>
                             </div>
+                            <div className="md:hidden">
+                                <svg className={`w-5 h-5 text-gray-500 transition-transform ${isExpanded ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </div>
                         </div>
 
                         {/* Leads Cards Container */}
-                        <div className="flex-1 space-y-3 overflow-y-auto max-h-[calc(100vh-280px)] pr-1">
+                        <div className={`flex-1 space-y-3 overflow-y-auto max-h-none md:max-h-[calc(100vh-280px)] pr-1 ${isExpanded ? 'block' : 'hidden md:block'}`}>
                             {stageLeads.length === 0 ? (
                                 <div className="text-center py-10 border border-dashed border-gray-200 rounded-xl bg-white/50">
                                     <p className="text-[11px] text-gray-400 font-medium">No deals in stage</p>
@@ -123,7 +135,7 @@ export function KanbanBoard({ leads, onEditLead, onRefresh }: KanbanBoardProps) 
                                             <select
                                                 value={lead.stage}
                                                 onChange={(e) => handleStageChange(lead.id, e.target.value as LeadStage)}
-                                                className="text-[10px] font-medium bg-slate-50 border border-gray-200 rounded-md px-1.5 py-1 text-gray-700 focus:outline-hidden"
+                                                className="text-xs md:text-[10px] font-medium bg-slate-50 border border-gray-200 rounded-md px-2 py-1.5 md:px-1.5 md:py-1 text-gray-700 focus:outline-hidden"
                                             >
                                                 {STAGES.map(s => (
                                                     <option key={s.id} value={s.id}>Move: {s.title}</option>
@@ -133,14 +145,14 @@ export function KanbanBoard({ leads, onEditLead, onRefresh }: KanbanBoardProps) 
                                             <div className="flex items-center gap-1">
                                                 <button
                                                     onClick={() => onEditLead(lead)}
-                                                    className="p-1 text-gray-400 hover:text-indigo-600 rounded-md hover:bg-indigo-50 transition-colors"
+                                                    className="p-2 md:p-1 text-gray-400 hover:text-indigo-600 rounded-md hover:bg-indigo-50 transition-colors"
                                                     title="Edit Deal"
                                                 >
                                                     <Edit3 className="h-3.5 w-3.5" />
                                                 </button>
                                                 <button
                                                     onClick={() => handleDelete(lead.id)}
-                                                    className="p-1 text-gray-400 hover:text-rose-600 rounded-md hover:bg-rose-50 transition-colors"
+                                                    className="p-2 md:p-1 text-gray-400 hover:text-rose-600 rounded-md hover:bg-rose-50 transition-colors"
                                                     title="Delete Deal"
                                                 >
                                                     <Trash2 className="h-3.5 w-3.5" />

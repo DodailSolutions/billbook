@@ -43,7 +43,7 @@ export function FinancialStatementsView() {
     return (
         <div className="space-y-6">
             {/* Report Sub Tabs */}
-            <div className="flex items-center gap-2 border-b border-gray-200 pb-2">
+            <div className="flex items-center gap-2 border-b border-gray-200 pb-2 overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 no-scrollbar">
                 <button
                     onClick={() => setSubTab('pnl')}
                     className={`flex items-center gap-2 px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
@@ -77,12 +77,12 @@ export function FinancialStatementsView() {
             {subTab === 'pnl' && pnl && (
                 <div className="space-y-4 animate-in fade-in duration-200">
                     <Card className="border-gray-100 shadow-2xs overflow-hidden">
-                        <div className="p-4 bg-slate-900 text-white flex items-center justify-between">
+                        <div className="p-4 bg-slate-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0">
                             <div>
                                 <h3 className="text-base font-bold">Statement of Profit & Loss</h3>
                                 <p className="text-xs text-slate-400">Income vs Operating Expenses</p>
                             </div>
-                            <div className="text-right">
+                            <div className="sm:text-right">
                                 <span className="text-xs uppercase font-semibold text-slate-400">Net Income / Profit</span>
                                 <h4 className={`text-xl font-extrabold ${pnl.netProfit >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
                                     ₹{pnl.netProfit.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
@@ -246,7 +246,8 @@ export function FinancialStatementsView() {
                             </div>
                         </div>
 
-                        <table className="w-full text-left text-xs">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left text-xs whitespace-nowrap">
                             <thead className="bg-slate-50 text-gray-700 font-semibold border-b border-gray-200">
                                 <tr>
                                     <th className="p-3">Code</th>
@@ -278,6 +279,7 @@ export function FinancialStatementsView() {
                                 </tr>
                             </tfoot>
                         </table>
+                        </div>
                     </div>
                 </div>
             )}

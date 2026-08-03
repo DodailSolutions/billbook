@@ -78,7 +78,7 @@ export function ActivityTimeline({ activities, leadId, onRefresh }: ActivityTime
 
             {isAdding && (
                 <form onSubmit={handleAdd} className="bg-slate-50 p-4 rounded-xl border border-indigo-100 space-y-3 animate-in fade-in duration-200">
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-2">
                         <div>
                             <label className="block text-[11px] font-semibold text-gray-600 uppercase mb-1">Type</label>
                             <select
@@ -106,7 +106,7 @@ export function ActivityTimeline({ activities, leadId, onRefresh }: ActivityTime
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-2">
                         <div>
                             <label className="block text-[11px] font-semibold text-gray-600 uppercase mb-1">Due Date / Reminder</label>
                             <input
@@ -154,7 +154,7 @@ export function ActivityTimeline({ activities, leadId, onRefresh }: ActivityTime
                         >
                             <button
                                 onClick={() => handleToggle(act.id, act.completed)}
-                                className={`p-1 rounded-full border transition-colors mt-0.5 ${
+                                className={`p-1.5 sm:p-1 rounded-full border transition-colors mt-0.5 ${
                                     act.completed 
                                         ? 'bg-emerald-500 border-emerald-500 text-white' 
                                         : 'border-gray-300 text-transparent hover:border-emerald-500'

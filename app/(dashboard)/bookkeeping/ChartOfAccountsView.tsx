@@ -196,9 +196,9 @@ export function ChartOfAccountsView({ accounts, onRefresh }: ChartOfAccountsView
                                     <div className="p-4 text-center text-xs text-gray-400">No {type} accounts configured</div>
                                 ) : (
                                     typeAccounts.map((acc) => (
-                                        <div key={acc.id} className="p-3 flex items-center justify-between hover:bg-slate-50/50 transition-colors">
-                                            <div className="flex items-center gap-3">
-                                                <span className="font-mono text-xs font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded-md">
+                                        <div key={acc.id} className="p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0 hover:bg-slate-50/50 transition-colors">
+                                            <div className="flex items-start sm:items-center gap-3 w-full sm:w-auto">
+                                                <span className="font-mono text-xs font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded-md shrink-0">
                                                     {acc.account_code}
                                                 </span>
                                                 <div>
@@ -206,7 +206,7 @@ export function ChartOfAccountsView({ accounts, onRefresh }: ChartOfAccountsView
                                                     <p className="text-[11px] text-gray-500">{acc.category} {acc.description ? `• ${acc.description}` : ''}</p>
                                                 </div>
                                             </div>
-                                            <div className="text-right">
+                                            <div className="flex items-center justify-between sm:block sm:text-right w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-0 border-gray-100">
                                                 <span className="text-xs font-bold text-gray-900 font-mono">
                                                     ₹{Number(acc.current_balance || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                                                 </span>

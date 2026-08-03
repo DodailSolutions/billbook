@@ -95,8 +95,8 @@ export function JournalEntryModal({ isOpen, onClose, accounts, onSuccess }: Jour
     }
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs overflow-y-auto">
-            <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden border border-gray-100 animate-in fade-in zoom-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 sm:p-4 backdrop-blur-xs overflow-y-auto">
+            <div className="bg-white sm:rounded-2xl shadow-xl w-full h-full sm:h-auto max-w-2xl overflow-hidden border border-gray-100 animate-in fade-in zoom-in duration-200 flex flex-col">
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-slate-50/50">
                     <div className="flex items-center gap-2">
                         <Scale className="h-5 w-5 text-emerald-600" />
@@ -112,7 +112,7 @@ export function JournalEntryModal({ isOpen, onClose, accounts, onSuccess }: Jour
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[85vh] overflow-y-auto">
+                <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 flex-1 overflow-y-auto">
                     {error && (
                         <div className="p-3 text-xs bg-rose-50 text-rose-600 rounded-xl border border-rose-100 font-medium">
                             {error}
@@ -178,86 +178,157 @@ export function JournalEntryModal({ isOpen, onClose, accounts, onSuccess }: Jour
                         </div>
 
                         <div className="border border-gray-200 rounded-xl overflow-hidden">
-                            <table className="w-full text-left text-xs">
-                                <thead className="bg-slate-50 text-gray-600 font-semibold border-b border-gray-200">
-                                    <tr>
-                                        <th className="p-2.5">Account Name</th>
-                                        <th className="p-2.5 w-28">Debit (₹)</th>
-                                        <th className="p-2.5 w-28">Credit (₹)</th>
-                                        <th className="p-2.5">Memo / Note</th>
-                                        <th className="p-2.5 w-10"></th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-100">
-                                    {lines.map((line, idx) => (
-                                        <tr key={idx} className="hover:bg-slate-50/50">
-                                            <td className="p-2">
-                                                <select
-                                                    value={line.account_id}
-                                                    onChange={(e) => handleLineChange(idx, 'account_id', e.target.value)}
-                                                    className="w-full p-1.5 border border-gray-200 rounded-lg text-xs bg-white focus:ring-2 focus:ring-emerald-500/20"
+                            {/* Desktop Table view */}
+                            <div className="hidden sm:block">
+                                <table className="w-full text-left text-xs">
+                                    <thead className="bg-slate-50 text-gray-600 font-semibold border-b border-gray-200">
+                                        <tr>
+                                            <th className="p-2.5">Account Name</th>
+                                            <th className="p-2.5 w-28">Debit (₹)</th>
+                                            <th className="p-2.5 w-28">Credit (₹)</th>
+                                            <th className="p-2.5">Memo / Note</th>
+                                            <th className="p-2.5 w-10"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-100">
+                                        {lines.map((line, idx) => (
+                                            <tr key={idx} className="hover:bg-slate-50/50">
+                                                <td className="p-2">
+                                                    <select
+                                                        value={line.account_id}
+                                                        onChange={(e) => handleLineChange(idx, 'account_id', e.target.value)}
+                                                        className="w-full p-1.5 border border-gray-200 rounded-lg text-xs bg-white focus:ring-2 focus:ring-emerald-500/20"
+                                                    >
+                                                        {accounts.map(acc => (
+                                                            <option key={acc.id} value={acc.id}>
+                                                                {acc.account_code} - {acc.account_name} ({acc.account_type})
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </td>
+                                                <td className="p-2">
+                                                    <input
+                                                        type="number"
+                                                        step="0.01"
+                                                        min="0"
+                                                        value={line.debit_amount}
+                                                        onChange={(e) => handleLineChange(idx, 'debit_amount', e.target.value)}
+                                                        className="w-full p-1.5 border border-gray-200 rounded-lg text-xs font-semibold text-gray-900 focus:ring-2 focus:ring-emerald-500/20"
+                                                    />
+                                                </td>
+                                                <td className="p-2">
+                                                    <input
+                                                        type="number"
+                                                        step="0.01"
+                                                        min="0"
+                                                        value={line.credit_amount}
+                                                        onChange={(e) => handleLineChange(idx, 'credit_amount', e.target.value)}
+                                                        className="w-full p-1.5 border border-gray-200 rounded-lg text-xs font-semibold text-gray-900 focus:ring-2 focus:ring-emerald-500/20"
+                                                    />
+                                                </td>
+                                                <td className="p-2">
+                                                    <input
+                                                        type="text"
+                                                        placeholder="Line detail..."
+                                                        value={line.memo}
+                                                        onChange={(e) => handleLineChange(idx, 'memo', e.target.value)}
+                                                        className="w-full p-1.5 border border-gray-200 rounded-lg text-xs text-gray-600 focus:ring-2 focus:ring-emerald-500/20"
+                                                    />
+                                                </td>
+                                                <td className="p-2 text-center">
+                                                    {lines.length > 2 && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleRemoveLine(idx)}
+                                                            className="text-gray-400 hover:text-rose-600 p-1 rounded-md min-h-[32px] min-w-[32px] flex items-center justify-center"
+                                                        >
+                                                            <Trash2 className="h-3.5 w-3.5" />
+                                                        </button>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            {/* Mobile stacked view */}
+                            <div className="sm:hidden divide-y divide-gray-100">
+                                {lines.map((line, idx) => (
+                                    <div key={idx} className="p-3 space-y-3 bg-white">
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-xs font-bold text-gray-500">Line {idx + 1}</span>
+                                            {lines.length > 2 && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleRemoveLine(idx)}
+                                                    className="text-gray-400 hover:text-rose-600 p-2 rounded-md bg-gray-50"
                                                 >
-                                                    {accounts.map(acc => (
-                                                        <option key={acc.id} value={acc.id}>
-                                                            {acc.account_code} - {acc.account_name} ({acc.account_type})
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                            </td>
-                                            <td className="p-2">
+                                                    <Trash2 className="h-4 w-4" />
+                                                </button>
+                                            )}
+                                        </div>
+                                        <div>
+                                            <label className="block text-[10px] font-semibold text-gray-500 uppercase mb-1">Account</label>
+                                            <select
+                                                value={line.account_id}
+                                                onChange={(e) => handleLineChange(idx, 'account_id', e.target.value)}
+                                                className="w-full p-2 border border-gray-200 rounded-lg text-xs bg-white"
+                                            >
+                                                {accounts.map(acc => (
+                                                    <option key={acc.id} value={acc.id}>
+                                                        {acc.account_code} - {acc.account_name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div>
+                                                <label className="block text-[10px] font-semibold text-gray-500 uppercase mb-1">Debit (₹)</label>
                                                 <input
                                                     type="number"
                                                     step="0.01"
                                                     min="0"
                                                     value={line.debit_amount}
                                                     onChange={(e) => handleLineChange(idx, 'debit_amount', e.target.value)}
-                                                    className="w-full p-1.5 border border-gray-200 rounded-lg text-xs font-semibold text-gray-900 focus:ring-2 focus:ring-emerald-500/20"
+                                                    className="w-full p-2 border border-gray-200 rounded-lg text-xs font-semibold"
                                                 />
-                                            </td>
-                                            <td className="p-2">
+                                            </div>
+                                            <div>
+                                                <label className="block text-[10px] font-semibold text-gray-500 uppercase mb-1">Credit (₹)</label>
                                                 <input
                                                     type="number"
                                                     step="0.01"
                                                     min="0"
                                                     value={line.credit_amount}
                                                     onChange={(e) => handleLineChange(idx, 'credit_amount', e.target.value)}
-                                                    className="w-full p-1.5 border border-gray-200 rounded-lg text-xs font-semibold text-gray-900 focus:ring-2 focus:ring-emerald-500/20"
+                                                    className="w-full p-2 border border-gray-200 rounded-lg text-xs font-semibold"
                                                 />
-                                            </td>
-                                            <td className="p-2">
-                                                <input
-                                                    type="text"
-                                                    placeholder="Line detail..."
-                                                    value={line.memo}
-                                                    onChange={(e) => handleLineChange(idx, 'memo', e.target.value)}
-                                                    className="w-full p-1.5 border border-gray-200 rounded-lg text-xs text-gray-600 focus:ring-2 focus:ring-emerald-500/20"
-                                                />
-                                            </td>
-                                            <td className="p-2 text-center">
-                                                {lines.length > 2 && (
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => handleRemoveLine(idx)}
-                                                        className="text-gray-400 hover:text-rose-600 p-1 rounded-md"
-                                                    >
-                                                        <Trash2 className="h-3.5 w-3.5" />
-                                                    </button>
-                                                )}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="block text-[10px] font-semibold text-gray-500 uppercase mb-1">Memo</label>
+                                            <input
+                                                type="text"
+                                                placeholder="Line detail..."
+                                                value={line.memo}
+                                                onChange={(e) => handleLineChange(idx, 'memo', e.target.value)}
+                                                className="w-full p-2 border border-gray-200 rounded-lg text-xs"
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
 
                     {/* Balance Check Footer */}
-                    <div className={`p-3 rounded-xl border flex items-center justify-between text-xs font-semibold ${
+                    <div className={`p-3 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between text-xs font-semibold gap-3 sm:gap-0 ${
                         isBalanced 
                             ? 'bg-emerald-50 border-emerald-200 text-emerald-800' 
                             : 'bg-rose-50 border-rose-200 text-rose-800'
                     }`}>
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center justify-between sm:justify-start gap-4">
                             <span>Total Debits: ₹{totalDebit.toFixed(2)}</span>
                             <span>Total Credits: ₹{totalCredit.toFixed(2)}</span>
                         </div>

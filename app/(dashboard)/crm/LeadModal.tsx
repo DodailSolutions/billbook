@@ -72,9 +72,9 @@ export function LeadModal({ isOpen, onClose, leadToEdit, onSuccess }: LeadModalP
     }
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs overflow-y-auto">
-            <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden border border-gray-100 animate-in fade-in zoom-in duration-200">
-                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-slate-50/50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-0 sm:p-4 backdrop-blur-xs overflow-hidden">
+            <div className="bg-white w-full h-full sm:h-auto sm:max-h-[90vh] sm:rounded-2xl shadow-xl sm:max-w-lg overflow-hidden border-0 sm:border border-gray-100 flex flex-col animate-in fade-in zoom-in duration-200">
+                <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-100 bg-slate-50/50 shrink-0 pt-[max(1rem,env(safe-area-inset-top))]">
                     <div className="flex items-center gap-2">
                         <Sparkles className="h-5 w-5 text-indigo-600" />
                         <h3 className="text-lg font-bold text-gray-900">
@@ -89,7 +89,7 @@ export function LeadModal({ isOpen, onClose, leadToEdit, onSuccess }: LeadModalP
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+                <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 flex-1 overflow-y-auto pb-[max(1.5rem,env(safe-area-inset-bottom))]">
                     {error && (
                         <div className="p-3 text-xs bg-rose-50 text-rose-600 rounded-xl border border-rose-100 font-medium">
                             {error}
@@ -240,7 +240,7 @@ export function LeadModal({ isOpen, onClose, leadToEdit, onSuccess }: LeadModalP
                         />
                     </div>
 
-                    <div className="pt-3 flex items-center justify-end gap-3 border-t border-gray-100">
+                    <div className="pt-4 sm:pt-3 flex items-center justify-end gap-3 border-t border-gray-100 mt-4">
                         <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
                             Cancel
                         </Button>
