@@ -147,7 +147,7 @@ export default function CRMPage() {
                         className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl transition-colors ${
                             activeTab === 'kanban' 
                                 ? 'bg-indigo-600 text-white shadow-xs' 
-                                ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:bg-gray-100'
+                                : 'text-gray-600 hover:bg-gray-100'
                         }`}
                     >
                         <LayoutGrid className="h-4 w-4" />
