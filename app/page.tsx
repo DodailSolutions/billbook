@@ -62,6 +62,7 @@ export default function Home() {
                             <Link href="#showcase" className="hover:text-black transition-colors">Live Preview</Link>
                             <Link href="#pricing" className="hover:text-black transition-colors">Pricing</Link>
                             <Link href="/ca-marketplace" className="hover:text-black transition-colors">CA Services</Link>
+                            <Link href="/ca-registration" className="hover:text-emerald-600 font-bold transition-colors">Register as CA</Link>
                             <Link href="/contact" className="hover:text-black transition-colors">Contact</Link>
                         </div>
 
