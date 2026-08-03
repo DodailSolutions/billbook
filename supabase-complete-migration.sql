@@ -77,20 +77,24 @@ ALTER TABLE invoice_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE invoice_sequences ENABLE ROW LEVEL SECURITY;
 
 -- Customers Policies
+
 DROP POLICY IF EXISTS "Users can view their own customers" ON customers;
 CREATE POLICY "Users can view their own customers"
   ON customers FOR SELECT
   USING (auth.uid() = user_id);
+
 
 DROP POLICY IF EXISTS "Users can insert their own customers" ON customers;
 CREATE POLICY "Users can insert their own customers"
   ON customers FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
+
 DROP POLICY IF EXISTS "Users can update their own customers" ON customers;
 CREATE POLICY "Users can update their own customers"
   ON customers FOR UPDATE
   USING (auth.uid() = user_id);
+
 
 DROP POLICY IF EXISTS "Users can delete their own customers" ON customers;
 CREATE POLICY "Users can delete their own customers"
@@ -98,20 +102,24 @@ CREATE POLICY "Users can delete their own customers"
   USING (auth.uid() = user_id);
 
 -- Invoices Policies
+
 DROP POLICY IF EXISTS "Users can view their own invoices" ON invoices;
 CREATE POLICY "Users can view their own invoices"
   ON invoices FOR SELECT
   USING (auth.uid() = user_id);
+
 
 DROP POLICY IF EXISTS "Users can insert their own invoices" ON invoices;
 CREATE POLICY "Users can insert their own invoices"
   ON invoices FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
+
 DROP POLICY IF EXISTS "Users can update their own invoices" ON invoices;
 CREATE POLICY "Users can update their own invoices"
   ON invoices FOR UPDATE
   USING (auth.uid() = user_id);
+
 
 DROP POLICY IF EXISTS "Users can delete their own invoices" ON invoices;
 CREATE POLICY "Users can delete their own invoices"
@@ -119,6 +127,7 @@ CREATE POLICY "Users can delete their own invoices"
   USING (auth.uid() = user_id);
 
 -- Invoice Items Policies
+
 DROP POLICY IF EXISTS "Users can view invoice items for their invoices" ON invoice_items;
 CREATE POLICY "Users can view invoice items for their invoices"
   ON invoice_items FOR SELECT
@@ -129,6 +138,7 @@ CREATE POLICY "Users can view invoice items for their invoices"
       AND invoices.user_id = auth.uid()
     )
   );
+
 
 DROP POLICY IF EXISTS "Users can insert invoice items for their invoices" ON invoice_items;
 CREATE POLICY "Users can insert invoice items for their invoices"
@@ -141,6 +151,7 @@ CREATE POLICY "Users can insert invoice items for their invoices"
     )
   );
 
+
 DROP POLICY IF EXISTS "Users can update invoice items for their invoices" ON invoice_items;
 CREATE POLICY "Users can update invoice items for their invoices"
   ON invoice_items FOR UPDATE
@@ -151,6 +162,7 @@ CREATE POLICY "Users can update invoice items for their invoices"
       AND invoices.user_id = auth.uid()
     )
   );
+
 
 DROP POLICY IF EXISTS "Users can delete invoice items for their invoices" ON invoice_items;
 CREATE POLICY "Users can delete invoice items for their invoices"
@@ -164,15 +176,18 @@ CREATE POLICY "Users can delete invoice items for their invoices"
   );
 
 -- Invoice Sequences Policies
+
 DROP POLICY IF EXISTS "Users can view their own invoice sequence" ON invoice_sequences;
 CREATE POLICY "Users can view their own invoice sequence"
   ON invoice_sequences FOR SELECT
   USING (auth.uid() = user_id);
 
+
 DROP POLICY IF EXISTS "Users can insert their own invoice sequence" ON invoice_sequences;
 CREATE POLICY "Users can insert their own invoice sequence"
   ON invoice_sequences FOR INSERT
   WITH CHECK (auth.uid() = user_id);
+
 
 DROP POLICY IF EXISTS "Users can update their own invoice sequence" ON invoice_sequences;
 CREATE POLICY "Users can update their own invoice sequence"
@@ -189,17 +204,20 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Triggers for updated_at
+
 DROP TRIGGER IF EXISTS update_customers_updated_at ON customers;
 CREATE TRIGGER update_customers_updated_at
   BEFORE UPDATE ON customers
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
 
+
 DROP TRIGGER IF EXISTS update_invoices_updated_at ON invoices;
 CREATE TRIGGER update_invoices_updated_at
   BEFORE UPDATE ON invoices
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
+
 
 DROP TRIGGER IF EXISTS update_invoice_sequences_updated_at ON invoice_sequences;
 CREATE TRIGGER update_invoice_sequences_updated_at
@@ -526,73 +544,89 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- User Profiles: Users can view their own, super admins can view all
+
 DROP POLICY IF EXISTS "Users can view own profile" ON user_profiles;
 CREATE POLICY "Users can view own profile" ON user_profiles
     FOR SELECT USING (auth.uid() = id OR is_super_admin(auth.uid()));
+
 
 DROP POLICY IF EXISTS "Super admins can update user profiles" ON user_profiles;
 CREATE POLICY "Super admins can update user profiles" ON user_profiles
     FOR ALL USING (is_super_admin(auth.uid()));
 
 -- Subscription Plans: Anyone can view active plans, only super admins can modify
+
 DROP POLICY IF EXISTS "Anyone can view active plans" ON subscription_plans;
 CREATE POLICY "Anyone can view active plans" ON subscription_plans
     FOR SELECT USING (is_active = true OR is_super_admin(auth.uid()));
+
 
 DROP POLICY IF EXISTS "Only super admins can modify plans" ON subscription_plans;
 CREATE POLICY "Only super admins can modify plans" ON subscription_plans
     FOR ALL USING (is_super_admin(auth.uid()));
 
 -- User Subscriptions: Users see own, super admins see all
+
 DROP POLICY IF EXISTS "Users can view own subscriptions" ON user_subscriptions;
 CREATE POLICY "Users can view own subscriptions" ON user_subscriptions
     FOR SELECT USING (auth.uid() = user_id OR is_super_admin(auth.uid()));
+
 
 DROP POLICY IF EXISTS "Super admins manage subscriptions" ON user_subscriptions;
 CREATE POLICY "Super admins manage subscriptions" ON user_subscriptions
     FOR ALL USING (is_super_admin(auth.uid()));
 
 -- Coupons: Anyone can view active coupons, super admins manage all
+
 DROP POLICY IF EXISTS "Anyone can view active coupons" ON coupons;
 CREATE POLICY "Anyone can view active coupons" ON coupons
     FOR SELECT USING (is_active = true OR is_super_admin(auth.uid()));
+
 
 DROP POLICY IF EXISTS "Super admins manage coupons" ON coupons;
 CREATE POLICY "Super admins manage coupons" ON coupons
     FOR ALL USING (is_super_admin(auth.uid()));
 
 -- Payments: Users see own, super admins see all
+
 DROP POLICY IF EXISTS "Users view own payments" ON payments;
 CREATE POLICY "Users view own payments" ON payments
     FOR SELECT USING (auth.uid() = user_id OR is_super_admin(auth.uid()));
+
 
 DROP POLICY IF EXISTS "Super admins manage payments" ON payments;
 CREATE POLICY "Super admins manage payments" ON payments
     FOR ALL USING (is_super_admin(auth.uid()));
 
 -- Refunds: Users see own, super admins manage all
+
 DROP POLICY IF EXISTS "Users view own refunds" ON refunds;
 CREATE POLICY "Users view own refunds" ON refunds
     FOR SELECT USING (auth.uid() = user_id OR is_super_admin(auth.uid()));
+
 
 DROP POLICY IF EXISTS "Super admins manage refunds" ON refunds;
 CREATE POLICY "Super admins manage refunds" ON refunds
     FOR ALL USING (is_super_admin(auth.uid()));
 
 -- Support Tickets: Users manage own, super admins manage all
+
 DROP POLICY IF EXISTS "Users view own tickets" ON support_tickets;
 CREATE POLICY "Users view own tickets" ON support_tickets
     FOR SELECT USING (auth.uid() = user_id OR is_super_admin(auth.uid()));
 
+
 DROP POLICY IF EXISTS "Users create own tickets" ON support_tickets;
 CREATE POLICY "Users create own tickets" ON support_tickets
     FOR INSERT WITH CHECK (auth.uid() = user_id);
+
 
 DROP POLICY IF EXISTS "Super admins manage all tickets" ON support_tickets;
 CREATE POLICY "Super admins manage all tickets" ON support_tickets
     FOR ALL USING (is_super_admin(auth.uid()));
 
 -- Support Messages: Access based on ticket access
+
 DROP POLICY IF EXISTS "View messages for accessible tickets" ON support_ticket_messages;
 CREATE POLICY "View messages for accessible tickets" ON support_ticket_messages
     FOR SELECT USING (
@@ -602,6 +636,7 @@ CREATE POLICY "View messages for accessible tickets" ON support_ticket_messages
             AND (user_id = auth.uid() OR is_super_admin(auth.uid()))
         )
     );
+
 
 DROP POLICY IF EXISTS "Create messages for accessible tickets" ON support_ticket_messages;
 CREATE POLICY "Create messages for accessible tickets" ON support_ticket_messages
@@ -614,47 +649,57 @@ CREATE POLICY "Create messages for accessible tickets" ON support_ticket_message
     );
 
 -- Audit Logs: Super admins only
+
 DROP POLICY IF EXISTS "Super admins view audit logs" ON audit_logs;
 CREATE POLICY "Super admins view audit logs" ON audit_logs
     FOR SELECT USING (is_super_admin(auth.uid()));
 
 -- System Settings: Super admins only
+
 DROP POLICY IF EXISTS "Super admins manage settings" ON system_settings;
 CREATE POLICY "Super admins manage settings" ON system_settings
     FOR ALL USING (is_super_admin(auth.uid()));
+
 DROP TRIGGER IF EXISTS update_user_profiles_updated_at ON user_profiles;
 CREATE TRIGGER update_user_profiles_updated_at BEFORE UPDATE ON user_profiles
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
 
 DROP TRIGGER IF EXISTS update_subscription_plans_updated_at ON subscription_plans;
 CREATE TRIGGER update_subscription_plans_updated_at BEFORE UPDATE ON subscription_plans
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+
 DROP TRIGGER IF EXISTS update_user_subscriptions_updated_at ON user_subscriptions;
 CREATE TRIGGER update_user_subscriptions_updated_at BEFORE UPDATE ON user_subscriptions
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
 
 DROP TRIGGER IF EXISTS update_coupons_updated_at ON coupons;
 CREATE TRIGGER update_coupons_updated_at BEFORE UPDATE ON coupons
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+
 DROP TRIGGER IF EXISTS update_payments_updated_at ON payments;
 CREATE TRIGGER update_payments_updated_at BEFORE UPDATE ON payments
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
 
 DROP TRIGGER IF EXISTS update_refunds_updated_at ON refunds;
 CREATE TRIGGER update_refunds_updated_at BEFORE UPDATE ON refunds
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+
 DROP TRIGGER IF EXISTS update_support_tickets_updated_at ON support_tickets;
 CREATE TRIGGER update_support_tickets_updated_at BEFORE UPDATE ON support_tickets
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
 
 DROP TRIGGER IF EXISTS update_system_settings_updated_at ON system_settings;
 CREATE TRIGGER update_system_settings_updated_at BEFORE UPDATE ON system_settings
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-DROP TRIGGER IF EXISTS set_support_ticket_number ON support_tickets;
+
 -- Function to generate ticket numbers
 CREATE OR REPLACE FUNCTION generate_ticket_number()
 RETURNS TEXT AS $$
@@ -682,6 +727,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS set_support_ticket_number ON support_tickets;
 CREATE TRIGGER set_support_ticket_number BEFORE INSERT ON support_tickets
     FOR EACH ROW EXECUTE FUNCTION set_ticket_number();
 
@@ -764,31 +810,35 @@ CREATE TABLE IF NOT EXISTS invoice_settings (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Create index for user_id lookups
+-- CREATE INDEX IF NOT EXISTS for user_id lookups
 CREATE INDEX IF NOT EXISTS idx_invoice_settings_user_id ON invoice_settings(user_id);
 
 -- Enable Row Level Security
 ALTER TABLE invoice_settings ENABLE ROW LEVEL SECURITY;
 
 -- Drop existing policies if they exist
-DROP POLICY IF EXISTS "Users can view their own invoice settings" ON invoice_settings;
-DROP POLICY IF EXISTS "Users can insert their own invoice settings" ON invoice_settings;
-DROP POLICY IF EXISTS "Users can update their own invoice settings" ON invoice_settings;
-DROP POLICY IF EXISTS "Users can delete their own invoice settings" ON invoice_settings;
+
+
+
+
 
 -- RLS Policies for invoice_settings
+DROP POLICY IF EXISTS "Users can view their own invoice settings" ON invoice_settings;
 CREATE POLICY "Users can view their own invoice settings"
   ON invoice_settings FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert their own invoice settings" ON invoice_settings;
 CREATE POLICY "Users can insert their own invoice settings"
   ON invoice_settings FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update their own invoice settings" ON invoice_settings;
 CREATE POLICY "Users can update their own invoice settings"
   ON invoice_settings FOR UPDATE
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can delete their own invoice settings" ON invoice_settings;
 CREATE POLICY "Users can delete their own invoice settings"
   ON invoice_settings FOR DELETE
   USING (auth.uid() = user_id);
@@ -825,11 +875,12 @@ ADD COLUMN IF NOT EXISTS business_phone VARCHAR(20),
 ADD COLUMN IF NOT EXISTS business_email VARCHAR(255),
 ADD COLUMN IF NOT EXISTS gstin VARCHAR(15);
 
--- Create index for business_type for analytics
+-- CREATE INDEX IF NOT EXISTS for business_type for analytics
 CREATE INDEX IF NOT EXISTS idx_user_profiles_business_type ON user_profiles(business_type);
 
 -- Create a view for super admin analytics
 DROP VIEW IF EXISTS business_type_analytics;
+DROP VIEW IF EXISTS business_type_analytics CASCADE;
 CREATE OR REPLACE VIEW business_type_analytics AS
 SELECT 
     business_type,
@@ -851,18 +902,21 @@ ORDER BY total_users DESC;
 ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
 
 -- Policy for users to read their own profile
+
 DROP POLICY IF EXISTS "Users can view own profile" ON user_profiles;
 CREATE POLICY "Users can view own profile" 
 ON user_profiles FOR SELECT 
 USING (auth.uid() = id);
 
 -- Policy for users to update their own profile
+
 DROP POLICY IF EXISTS "Users can update own profile" ON user_profiles;
 CREATE POLICY "Users can update own profile" 
 ON user_profiles FOR UPDATE 
 USING (auth.uid() = id);
 
 -- Policy for inserting during signup
+
 DROP POLICY IF EXISTS "Users can insert own profile" ON user_profiles;
 CREATE POLICY "Users can insert own profile" 
 ON user_profiles FOR INSERT 
@@ -950,12 +1004,14 @@ CREATE TABLE IF NOT EXISTS public.testimonials (
 ALTER TABLE public.testimonials ENABLE ROW LEVEL SECURITY;
 
 -- Public can read active testimonials
+DROP POLICY IF EXISTS "Anyone can view active testimonials" ON public.testimonials;
 CREATE POLICY "Anyone can view active testimonials"
   ON public.testimonials
   FOR SELECT
   USING (is_active = true);
 
 -- Admin can manage all testimonials
+DROP POLICY IF EXISTS "Admins can manage testimonials" ON public.testimonials;
 CREATE POLICY "Admins can manage testimonials"
   ON public.testimonials
   FOR ALL
@@ -967,7 +1023,7 @@ CREATE POLICY "Admins can manage testimonials"
     )
   );
 
--- Create index for faster queries
+-- CREATE INDEX IF NOT EXISTS for faster queries
 CREATE INDEX IF NOT EXISTS idx_testimonials_active_order 
   ON public.testimonials(is_active, display_order);
 
@@ -1078,11 +1134,13 @@ ALTER TABLE team_members ENABLE ROW LEVEL SECURITY;
 ALTER TABLE team_activity_log ENABLE ROW LEVEL SECURITY;
 
 -- Team Roles Policies
+
 DROP POLICY IF EXISTS "Anyone can view team roles" ON team_roles;
 CREATE POLICY "Anyone can view team roles" ON team_roles
     FOR SELECT USING (true);
 
 -- Team Members Policies
+
 DROP POLICY IF EXISTS "Users can view team members of their organization" ON team_members;
 CREATE POLICY "Users can view team members of their organization" ON team_members
     FOR SELECT USING (
@@ -1090,11 +1148,13 @@ CREATE POLICY "Users can view team members of their organization" ON team_member
         OR user_id = auth.uid()
     );
 
+
 DROP POLICY IF EXISTS "Owners can manage team members" ON team_members;
 CREATE POLICY "Owners can manage team members" ON team_members
     FOR ALL USING (owner_id = auth.uid());
 
 -- Team Activity Log Policies
+
 DROP POLICY IF EXISTS "Users can view own team activity" ON team_activity_log;
 CREATE POLICY "Users can view own team activity" ON team_activity_log
     FOR SELECT USING (
@@ -1172,11 +1232,13 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+
 DROP TRIGGER IF EXISTS update_team_members_updated_at ON team_members;
 CREATE TRIGGER update_team_members_updated_at
     BEFORE UPDATE ON team_members
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
+
 
 DROP TRIGGER IF EXISTS update_team_roles_updated_at ON team_roles;
 CREATE TRIGGER update_team_roles_updated_at
@@ -1229,13 +1291,16 @@ CREATE INDEX IF NOT EXISTS idx_team_member_addons_end_date ON team_member_addons
 
 ALTER TABLE team_member_addons ENABLE ROW LEVEL SECURITY;
 
+
 DROP POLICY IF EXISTS "Users can view own team member addons" ON team_member_addons;
 CREATE POLICY "Users can view own team member addons" ON team_member_addons
     FOR SELECT USING (user_id = auth.uid());
 
+
 DROP POLICY IF EXISTS "Users can insert own team member addons" ON team_member_addons;
 CREATE POLICY "Users can insert own team member addons" ON team_member_addons
     FOR INSERT WITH CHECK (user_id = auth.uid());
+
 
 DROP POLICY IF EXISTS "Users can update own team member addons" ON team_member_addons;
 CREATE POLICY "Users can update own team member addons" ON team_member_addons
@@ -1338,6 +1403,7 @@ ON CONFLICT (billing_period) DO UPDATE SET
 -- RLS for pricing table
 ALTER TABLE team_addon_pricing ENABLE ROW LEVEL SECURITY;
 
+
 DROP POLICY IF EXISTS "Anyone can view addon pricing" ON team_addon_pricing;
 CREATE POLICY "Anyone can view addon pricing" ON team_addon_pricing
     FOR SELECT USING (is_active = true);
@@ -1371,6 +1437,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- 6. TRIGGERS
 -- ============================================
 
+DROP TRIGGER IF EXISTS update_team_member_addons_updated_at ON team_member_addons;
 CREATE TRIGGER update_team_member_addons_updated_at
     BEFORE UPDATE ON team_member_addons
     FOR EACH ROW
@@ -1462,20 +1529,24 @@ ALTER TABLE recurring_invoice_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE reminders ENABLE ROW LEVEL SECURITY;
 
 -- Recurring Invoices Policies
+
 DROP POLICY IF EXISTS "Users can view their own recurring invoices" ON recurring_invoices;
 CREATE POLICY "Users can view their own recurring invoices"
   ON recurring_invoices FOR SELECT
   USING (auth.uid() = user_id);
+
 
 DROP POLICY IF EXISTS "Users can insert their own recurring invoices" ON recurring_invoices;
 CREATE POLICY "Users can insert their own recurring invoices"
   ON recurring_invoices FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
+
 DROP POLICY IF EXISTS "Users can update their own recurring invoices" ON recurring_invoices;
 CREATE POLICY "Users can update their own recurring invoices"
   ON recurring_invoices FOR UPDATE
   USING (auth.uid() = user_id);
+
 
 DROP POLICY IF EXISTS "Users can delete their own recurring invoices" ON recurring_invoices;
 CREATE POLICY "Users can delete their own recurring invoices"
@@ -1483,6 +1554,7 @@ CREATE POLICY "Users can delete their own recurring invoices"
   USING (auth.uid() = user_id);
 
 -- Recurring Invoice Items Policies
+
 DROP POLICY IF EXISTS "Users can view items for their recurring invoices" ON recurring_invoice_items;
 CREATE POLICY "Users can view items for their recurring invoices"
   ON recurring_invoice_items FOR SELECT
@@ -1493,6 +1565,7 @@ CREATE POLICY "Users can view items for their recurring invoices"
       AND recurring_invoices.user_id = auth.uid()
     )
   );
+
 
 DROP POLICY IF EXISTS "Users can insert items for their recurring invoices" ON recurring_invoice_items;
 CREATE POLICY "Users can insert items for their recurring invoices"
@@ -1505,6 +1578,7 @@ CREATE POLICY "Users can insert items for their recurring invoices"
     )
   );
 
+
 DROP POLICY IF EXISTS "Users can update items for their recurring invoices" ON recurring_invoice_items;
 CREATE POLICY "Users can update items for their recurring invoices"
   ON recurring_invoice_items FOR UPDATE
@@ -1515,6 +1589,7 @@ CREATE POLICY "Users can update items for their recurring invoices"
       AND recurring_invoices.user_id = auth.uid()
     )
   );
+
 
 DROP POLICY IF EXISTS "Users can delete items for their recurring invoices" ON recurring_invoice_items;
 CREATE POLICY "Users can delete items for their recurring invoices"
@@ -1528,20 +1603,24 @@ CREATE POLICY "Users can delete items for their recurring invoices"
   );
 
 -- Reminders Policies
+
 DROP POLICY IF EXISTS "Users can view their own reminders" ON reminders;
 CREATE POLICY "Users can view their own reminders"
   ON reminders FOR SELECT
   USING (auth.uid() = user_id);
+
 
 DROP POLICY IF EXISTS "Users can insert their own reminders" ON reminders;
 CREATE POLICY "Users can insert their own reminders"
   ON reminders FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
+
 DROP POLICY IF EXISTS "Users can update their own reminders" ON reminders;
 CREATE POLICY "Users can update their own reminders"
   ON reminders FOR UPDATE
   USING (auth.uid() = user_id);
+
 
 DROP POLICY IF EXISTS "Users can delete their own reminders" ON reminders;
 CREATE POLICY "Users can delete their own reminders"
@@ -1549,6 +1628,7 @@ CREATE POLICY "Users can delete their own reminders"
   USING (auth.uid() = user_id);
 
 -- Triggers for updated_at
+
 DROP TRIGGER IF EXISTS update_recurring_invoices_updated_at ON recurring_invoices;
 CREATE TRIGGER update_recurring_invoices_updated_at
   BEFORE UPDATE ON recurring_invoices
@@ -1797,23 +1877,28 @@ ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE refunds ENABLE ROW LEVEL SECURITY;
 
 -- Payments Policies
+DROP POLICY IF EXISTS "Users can view their own payments" ON payments;
 CREATE POLICY "Users can view their own payments"
     ON payments FOR SELECT
     USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert their own payments" ON payments;
 CREATE POLICY "Users can insert their own payments"
     ON payments FOR INSERT
     WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update their own payments" ON payments;
 CREATE POLICY "Users can update their own payments"
     ON payments FOR UPDATE
     USING (auth.uid() = user_id);
 
 -- Refunds Policies
+DROP POLICY IF EXISTS "Users can view their own refunds" ON refunds;
 CREATE POLICY "Users can view their own refunds"
     ON refunds FOR SELECT
     USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can create refund requests" ON refunds;
 CREATE POLICY "Users can create refund requests"
     ON refunds FOR INSERT
     WITH CHECK (auth.uid() = user_id);
@@ -1823,6 +1908,7 @@ CREATE POLICY "Users can create refund requests"
 
 /*
 -- Super admins can view all payments
+DROP POLICY IF EXISTS "Super admins can view all payments" ON payments;
 CREATE POLICY "Super admins can view all payments"
     ON payments FOR SELECT
     USING (
@@ -1834,6 +1920,7 @@ CREATE POLICY "Super admins can view all payments"
     );
 
 -- Super admins can view and manage all refunds
+DROP POLICY IF EXISTS "Super admins can view all refunds" ON refunds;
 CREATE POLICY "Super admins can view all refunds"
     ON refunds FOR SELECT
     USING (
@@ -1844,6 +1931,7 @@ CREATE POLICY "Super admins can view all refunds"
         )
     );
 
+DROP POLICY IF EXISTS "Super admins can update refunds" ON refunds;
 CREATE POLICY "Super admins can update refunds"
     ON refunds FOR UPDATE
     USING (
@@ -1856,11 +1944,13 @@ CREATE POLICY "Super admins can update refunds"
 */
 
 -- Triggers for updated_at
+DROP TRIGGER IF EXISTS update_payments_updated_at ON payments;
 CREATE TRIGGER update_payments_updated_at
     BEFORE UPDATE ON payments
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_refunds_updated_at ON refunds;
 CREATE TRIGGER update_refunds_updated_at
     BEFORE UPDATE ON refunds
     FOR EACH ROW
@@ -1884,9 +1974,10 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Drop existing trigger if it exists
-DROP TRIGGER IF EXISTS trigger_update_invoice_on_payment ON payments;
+
 
 -- Create trigger
+DROP TRIGGER IF EXISTS trigger_update_invoice_on_payment ON payments;
 CREATE TRIGGER trigger_update_invoice_on_payment
     AFTER UPDATE OF status ON payments
     FOR EACH ROW
@@ -1949,8 +2040,8 @@ CREATE TABLE IF NOT EXISTS customer_credit_limit_history (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_credit_history_customer ON customer_credit_limit_history(customer_id);
-CREATE INDEX idx_credit_history_date ON customer_credit_limit_history(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_credit_history_customer ON customer_credit_limit_history(customer_id);
+CREATE INDEX IF NOT EXISTS idx_credit_history_date ON customer_credit_limit_history(created_at DESC);
 
 -- =====================================================
 -- 2. CUSTOMER AGING & RISK SCORE
@@ -1998,9 +2089,9 @@ CREATE TABLE IF NOT EXISTS customer_aging_analysis (
   UNIQUE(customer_id, user_id)
 );
 
-CREATE INDEX idx_aging_customer ON customer_aging_analysis(customer_id);
-CREATE INDEX idx_aging_risk_score ON customer_aging_analysis(risk_score DESC);
-CREATE INDEX idx_aging_category ON customer_aging_analysis(risk_category);
+CREATE INDEX IF NOT EXISTS idx_aging_customer ON customer_aging_analysis(customer_id);
+CREATE INDEX IF NOT EXISTS idx_aging_risk_score ON customer_aging_analysis(risk_score DESC);
+CREATE INDEX IF NOT EXISTS idx_aging_category ON customer_aging_analysis(risk_category);
 
 -- =====================================================
 -- 3. VENDOR BILLS & PAYABLE TRACKING
@@ -2045,9 +2136,9 @@ CREATE TABLE IF NOT EXISTS vendors (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_vendors_user ON vendors(user_id);
-CREATE INDEX idx_vendors_gstin ON vendors(gstin);
-CREATE INDEX idx_vendors_active ON vendors(is_active);
+CREATE INDEX IF NOT EXISTS idx_vendors_user ON vendors(user_id);
+CREATE INDEX IF NOT EXISTS idx_vendors_gstin ON vendors(gstin);
+CREATE INDEX IF NOT EXISTS idx_vendors_active ON vendors(is_active);
 
 -- Vendor bills (payables)
 CREATE TABLE IF NOT EXISTS vendor_bills (
@@ -2096,10 +2187,10 @@ CREATE TABLE IF NOT EXISTS vendor_bills (
   UNIQUE(user_id, bill_number)
 );
 
-CREATE INDEX idx_bills_user ON vendor_bills(user_id);
-CREATE INDEX idx_bills_vendor ON vendor_bills(vendor_id);
-CREATE INDEX idx_bills_status ON vendor_bills(payment_status);
-CREATE INDEX idx_bills_due_date ON vendor_bills(due_date);
+CREATE INDEX IF NOT EXISTS idx_bills_user ON vendor_bills(user_id);
+CREATE INDEX IF NOT EXISTS idx_bills_vendor ON vendor_bills(vendor_id);
+CREATE INDEX IF NOT EXISTS idx_bills_status ON vendor_bills(payment_status);
+CREATE INDEX IF NOT EXISTS idx_bills_due_date ON vendor_bills(due_date);
 
 -- Vendor bill items
 CREATE TABLE IF NOT EXISTS vendor_bill_items (
@@ -2121,7 +2212,7 @@ CREATE TABLE IF NOT EXISTS vendor_bill_items (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_bill_items_bill ON vendor_bill_items(bill_id);
+CREATE INDEX IF NOT EXISTS idx_bill_items_bill ON vendor_bill_items(bill_id);
 
 -- Vendor payment records
 CREATE TABLE IF NOT EXISTS vendor_payments (
@@ -2148,10 +2239,10 @@ CREATE TABLE IF NOT EXISTS vendor_payments (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_vendor_payments_user ON vendor_payments(user_id);
-CREATE INDEX idx_vendor_payments_vendor ON vendor_payments(vendor_id);
-CREATE INDEX idx_vendor_payments_bill ON vendor_payments(bill_id);
-CREATE INDEX idx_vendor_payments_date ON vendor_payments(payment_date DESC);
+CREATE INDEX IF NOT EXISTS idx_vendor_payments_user ON vendor_payments(user_id);
+CREATE INDEX IF NOT EXISTS idx_vendor_payments_vendor ON vendor_payments(vendor_id);
+CREATE INDEX IF NOT EXISTS idx_vendor_payments_bill ON vendor_payments(bill_id);
+CREATE INDEX IF NOT EXISTS idx_vendor_payments_date ON vendor_payments(payment_date DESC);
 
 -- =====================================================
 -- 4. CUSTOMER-WISE GST SUMMARY
@@ -2194,9 +2285,9 @@ CREATE TABLE IF NOT EXISTS customer_gst_summary (
   UNIQUE(customer_id, user_id, financial_year)
 );
 
-CREATE INDEX idx_gst_summary_customer ON customer_gst_summary(customer_id);
-CREATE INDEX idx_gst_summary_fy ON customer_gst_summary(financial_year);
-CREATE INDEX idx_gst_summary_user ON customer_gst_summary(user_id);
+CREATE INDEX IF NOT EXISTS idx_gst_summary_customer ON customer_gst_summary(customer_id);
+CREATE INDEX IF NOT EXISTS idx_gst_summary_fy ON customer_gst_summary(financial_year);
+CREATE INDEX IF NOT EXISTS idx_gst_summary_user ON customer_gst_summary(user_id);
 
 -- =====================================================
 -- 5. CUSTOMER DOCUMENT VAULT
@@ -2242,10 +2333,10 @@ CREATE TABLE IF NOT EXISTS customer_documents (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_documents_customer ON customer_documents(customer_id);
-CREATE INDEX idx_documents_type ON customer_documents(document_type);
-CREATE INDEX idx_documents_expiry ON customer_documents(expiry_date) WHERE expiry_date IS NOT NULL;
-CREATE INDEX idx_documents_active ON customer_documents(is_active);
+CREATE INDEX IF NOT EXISTS idx_documents_customer ON customer_documents(customer_id);
+CREATE INDEX IF NOT EXISTS idx_documents_type ON customer_documents(document_type);
+CREATE INDEX IF NOT EXISTS idx_documents_expiry ON customer_documents(expiry_date) WHERE expiry_date IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_documents_active ON customer_documents(is_active);
 
 -- Document access log
 CREATE TABLE IF NOT EXISTS customer_document_access_log (
@@ -2258,9 +2349,9 @@ CREATE TABLE IF NOT EXISTS customer_document_access_log (
   accessed_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_doc_access_document ON customer_document_access_log(document_id);
-CREATE INDEX idx_doc_access_user ON customer_document_access_log(accessed_by);
-CREATE INDEX idx_doc_access_date ON customer_document_access_log(accessed_at DESC);
+CREATE INDEX IF NOT EXISTS idx_doc_access_document ON customer_document_access_log(document_id);
+CREATE INDEX IF NOT EXISTS idx_doc_access_user ON customer_document_access_log(accessed_by);
+CREATE INDEX IF NOT EXISTS idx_doc_access_date ON customer_document_access_log(accessed_at DESC);
 
 -- =====================================================
 -- FUNCTIONS & TRIGGERS
@@ -2285,6 +2376,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Trigger on invoice status changes
+
 DROP TRIGGER IF EXISTS trigger_update_credit_used ON invoices;
 CREATE TRIGGER trigger_update_credit_used
 AFTER INSERT OR UPDATE OF status, total ON invoices
@@ -2548,6 +2640,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Trigger on vendor payments
+
 DROP TRIGGER IF EXISTS trigger_update_bill_status ON vendor_payments;
 CREATE TRIGGER trigger_update_bill_status
 AFTER INSERT OR UPDATE ON vendor_payments
@@ -2564,6 +2657,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Trigger to update document expiry on insert/update
+
 DROP TRIGGER IF EXISTS trigger_update_document_expiry ON customer_documents;
 CREATE TRIGGER trigger_update_document_expiry
 BEFORE INSERT OR UPDATE ON customer_documents
@@ -2575,6 +2669,7 @@ EXECUTE FUNCTION update_document_expiry();
 -- =====================================================
 
 -- Comprehensive customer financial view
+DROP VIEW IF EXISTS customer_financial_overview CASCADE;
 CREATE OR REPLACE VIEW customer_financial_overview AS
 SELECT 
   c.id as customer_id,
@@ -2618,6 +2713,7 @@ LEFT JOIN customer_aging_analysis ca ON c.id = ca.customer_id AND c.user_id = ca
 LEFT JOIN customer_gst_summary cgs ON c.id = cgs.customer_id AND c.user_id = cgs.user_id;
 
 -- Vendor payables summary
+DROP VIEW IF EXISTS vendor_payables_summary CASCADE;
 CREATE OR REPLACE VIEW vendor_payables_summary AS
 SELECT 
   v.id as vendor_id,
@@ -2659,35 +2755,53 @@ ALTER TABLE customer_documents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE customer_document_access_log ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies
+DROP POLICY IF EXISTS "Users can view their own credit history" ON customer_credit_limit_history;
 CREATE POLICY "Users can view their own credit history" ON customer_credit_limit_history FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can insert their own credit history" ON customer_credit_limit_history;
 CREATE POLICY "Users can insert their own credit history" ON customer_credit_limit_history FOR INSERT WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can view their customer aging" ON customer_aging_analysis;
 CREATE POLICY "Users can view their customer aging" ON customer_aging_analysis FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can manage their customer aging" ON customer_aging_analysis;
 CREATE POLICY "Users can manage their customer aging" ON customer_aging_analysis FOR ALL USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can view their vendors" ON vendors;
 CREATE POLICY "Users can view their vendors" ON vendors FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can manage their vendors" ON vendors;
 CREATE POLICY "Users can manage their vendors" ON vendors FOR ALL USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can view their vendor bills" ON vendor_bills;
 CREATE POLICY "Users can view their vendor bills" ON vendor_bills FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can manage their vendor bills" ON vendor_bills;
 CREATE POLICY "Users can manage their vendor bills" ON vendor_bills FOR ALL USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can view vendor bill items" ON vendor_bill_items;
 CREATE POLICY "Users can view vendor bill items" ON vendor_bill_items FOR SELECT USING (
   EXISTS (SELECT 1 FROM vendor_bills WHERE id = vendor_bill_items.bill_id AND user_id = auth.uid())
 );
+DROP POLICY IF EXISTS "Users can manage vendor bill items" ON vendor_bill_items;
 CREATE POLICY "Users can manage vendor bill items" ON vendor_bill_items FOR ALL USING (
   EXISTS (SELECT 1 FROM vendor_bills WHERE id = vendor_bill_items.bill_id AND user_id = auth.uid())
 );
 
+DROP POLICY IF EXISTS "Users can view their vendor payments" ON vendor_payments;
 CREATE POLICY "Users can view their vendor payments" ON vendor_payments FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can manage their vendor payments" ON vendor_payments;
 CREATE POLICY "Users can manage their vendor payments" ON vendor_payments FOR ALL USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can view customer GST summary" ON customer_gst_summary;
 CREATE POLICY "Users can view customer GST summary" ON customer_gst_summary FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can manage customer GST summary" ON customer_gst_summary;
 CREATE POLICY "Users can manage customer GST summary" ON customer_gst_summary FOR ALL USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can view their customer documents" ON customer_documents;
 CREATE POLICY "Users can view their customer documents" ON customer_documents FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can manage their customer documents" ON customer_documents;
 CREATE POLICY "Users can manage their customer documents" ON customer_documents FOR ALL USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can view document access logs" ON customer_document_access_log;
 CREATE POLICY "Users can view document access logs" ON customer_document_access_log FOR SELECT USING (auth.uid() = accessed_by);
+DROP POLICY IF EXISTS "Users can insert document access logs" ON customer_document_access_log;
 CREATE POLICY "Users can insert document access logs" ON customer_document_access_log FOR INSERT WITH CHECK (auth.uid() = accessed_by);
 
 -- =====================================================
@@ -2758,10 +2872,10 @@ CREATE TABLE IF NOT EXISTS customer_credit_risk_predictions (
   UNIQUE(customer_id, user_id)
 );
 
-CREATE INDEX idx_credit_predictions_customer ON customer_credit_risk_predictions(customer_id);
-CREATE INDEX idx_credit_predictions_risk_level ON customer_credit_risk_predictions(predicted_risk_level);
-CREATE INDEX idx_credit_predictions_action ON customer_credit_risk_predictions(action_required) WHERE action_required = true;
-CREATE INDEX idx_credit_predictions_date ON customer_credit_risk_predictions(prediction_date DESC);
+CREATE INDEX IF NOT EXISTS idx_credit_predictions_customer ON customer_credit_risk_predictions(customer_id);
+CREATE INDEX IF NOT EXISTS idx_credit_predictions_risk_level ON customer_credit_risk_predictions(predicted_risk_level);
+CREATE INDEX IF NOT EXISTS idx_credit_predictions_action ON customer_credit_risk_predictions(action_required) WHERE action_required = true;
+CREATE INDEX IF NOT EXISTS idx_credit_predictions_date ON customer_credit_risk_predictions(prediction_date DESC);
 
 -- AI Prediction history (track changes over time)
 CREATE TABLE IF NOT EXISTS credit_risk_prediction_history (
@@ -2780,8 +2894,8 @@ CREATE TABLE IF NOT EXISTS credit_risk_prediction_history (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_prediction_history_customer ON credit_risk_prediction_history(customer_id);
-CREATE INDEX idx_prediction_history_date ON credit_risk_prediction_history(prediction_date DESC);
+CREATE INDEX IF NOT EXISTS idx_prediction_history_customer ON credit_risk_prediction_history(customer_id);
+CREATE INDEX IF NOT EXISTS idx_prediction_history_date ON credit_risk_prediction_history(prediction_date DESC);
 
 -- =====================================================
 -- 7. AUTO BLACKLIST CHRONIC DEFAULTERS
@@ -2835,10 +2949,10 @@ CREATE TABLE IF NOT EXISTS customer_blacklist (
   UNIQUE(customer_id, user_id)
 );
 
-CREATE INDEX idx_blacklist_customer ON customer_blacklist(customer_id);
-CREATE INDEX idx_blacklist_status ON customer_blacklist(is_blacklisted) WHERE is_blacklisted = true;
-CREATE INDEX idx_blacklist_type ON customer_blacklist(blacklist_type);
-CREATE INDEX idx_blacklist_review_date ON customer_blacklist(review_date) WHERE review_date IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_blacklist_customer ON customer_blacklist(customer_id);
+CREATE INDEX IF NOT EXISTS idx_blacklist_status ON customer_blacklist(is_blacklisted) WHERE is_blacklisted = true;
+CREATE INDEX IF NOT EXISTS idx_blacklist_type ON customer_blacklist(blacklist_type);
+CREATE INDEX IF NOT EXISTS idx_blacklist_review_date ON customer_blacklist(review_date) WHERE review_date IS NOT NULL;
 
 -- Blacklist rules configuration
 CREATE TABLE IF NOT EXISTS blacklist_rules (
@@ -2876,8 +2990,8 @@ CREATE TABLE IF NOT EXISTS blacklist_rules (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_blacklist_rules_user ON blacklist_rules(user_id);
-CREATE INDEX idx_blacklist_rules_enabled ON blacklist_rules(is_enabled) WHERE is_enabled = true;
+CREATE INDEX IF NOT EXISTS idx_blacklist_rules_user ON blacklist_rules(user_id);
+CREATE INDEX IF NOT EXISTS idx_blacklist_rules_enabled ON blacklist_rules(is_enabled) WHERE is_enabled = true;
 
 -- Blacklist action log
 CREATE TABLE IF NOT EXISTS blacklist_action_log (
@@ -2901,8 +3015,8 @@ CREATE TABLE IF NOT EXISTS blacklist_action_log (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_blacklist_log_customer ON blacklist_action_log(customer_id);
-CREATE INDEX idx_blacklist_log_date ON blacklist_action_log(performed_at DESC);
+CREATE INDEX IF NOT EXISTS idx_blacklist_log_customer ON blacklist_action_log(customer_id);
+CREATE INDEX IF NOT EXISTS idx_blacklist_log_date ON blacklist_action_log(performed_at DESC);
 
 -- =====================================================
 -- 8. CUSTOMER WHATSAPP CHAT HISTORY
@@ -2945,11 +3059,11 @@ CREATE TABLE IF NOT EXISTS customer_whatsapp_conversations (
   UNIQUE(customer_id, user_id, whatsapp_number)
 );
 
-CREATE INDEX idx_whatsapp_conv_customer ON customer_whatsapp_conversations(customer_id);
-CREATE INDEX idx_whatsapp_conv_status ON customer_whatsapp_conversations(conversation_status);
-CREATE INDEX idx_whatsapp_conv_unread ON customer_whatsapp_conversations(unread_messages) WHERE unread_messages > 0;
-CREATE INDEX idx_whatsapp_conv_action ON customer_whatsapp_conversations(requires_action) WHERE requires_action = true;
-CREATE INDEX idx_whatsapp_conv_last_msg ON customer_whatsapp_conversations(last_message_at DESC);
+CREATE INDEX IF NOT EXISTS idx_whatsapp_conv_customer ON customer_whatsapp_conversations(customer_id);
+CREATE INDEX IF NOT EXISTS idx_whatsapp_conv_status ON customer_whatsapp_conversations(conversation_status);
+CREATE INDEX IF NOT EXISTS idx_whatsapp_conv_unread ON customer_whatsapp_conversations(unread_messages) WHERE unread_messages > 0;
+CREATE INDEX IF NOT EXISTS idx_whatsapp_conv_action ON customer_whatsapp_conversations(requires_action) WHERE requires_action = true;
+CREATE INDEX IF NOT EXISTS idx_whatsapp_conv_last_msg ON customer_whatsapp_conversations(last_message_at DESC);
 
 -- WhatsApp messages
 CREATE TABLE IF NOT EXISTS customer_whatsapp_messages (
@@ -3004,13 +3118,13 @@ CREATE TABLE IF NOT EXISTS customer_whatsapp_messages (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_whatsapp_msg_conversation ON customer_whatsapp_messages(conversation_id);
-CREATE INDEX idx_whatsapp_msg_customer ON customer_whatsapp_messages(customer_id);
-CREATE INDEX idx_whatsapp_msg_direction ON customer_whatsapp_messages(message_direction);
-CREATE INDEX idx_whatsapp_msg_unread ON customer_whatsapp_messages(is_read) WHERE is_read = false;
-CREATE INDEX idx_whatsapp_msg_invoice ON customer_whatsapp_messages(related_invoice_id) WHERE related_invoice_id IS NOT NULL;
-CREATE INDEX idx_whatsapp_msg_timestamp ON customer_whatsapp_messages(whatsapp_timestamp DESC);
-CREATE INDEX idx_whatsapp_msg_payment_intent ON customer_whatsapp_messages(contains_payment_intent) WHERE contains_payment_intent = true;
+CREATE INDEX IF NOT EXISTS idx_whatsapp_msg_conversation ON customer_whatsapp_messages(conversation_id);
+CREATE INDEX IF NOT EXISTS idx_whatsapp_msg_customer ON customer_whatsapp_messages(customer_id);
+CREATE INDEX IF NOT EXISTS idx_whatsapp_msg_direction ON customer_whatsapp_messages(message_direction);
+CREATE INDEX IF NOT EXISTS idx_whatsapp_msg_unread ON customer_whatsapp_messages(is_read) WHERE is_read = false;
+CREATE INDEX IF NOT EXISTS idx_whatsapp_msg_invoice ON customer_whatsapp_messages(related_invoice_id) WHERE related_invoice_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_whatsapp_msg_timestamp ON customer_whatsapp_messages(whatsapp_timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_whatsapp_msg_payment_intent ON customer_whatsapp_messages(contains_payment_intent) WHERE contains_payment_intent = true;
 
 -- WhatsApp message templates
 CREATE TABLE IF NOT EXISTS whatsapp_message_templates (
@@ -3042,9 +3156,9 @@ CREATE TABLE IF NOT EXISTS whatsapp_message_templates (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_whatsapp_templates_user ON whatsapp_message_templates(user_id);
-CREATE INDEX idx_whatsapp_templates_category ON whatsapp_message_templates(template_category);
-CREATE INDEX idx_whatsapp_templates_active ON whatsapp_message_templates(is_active) WHERE is_active = true;
+CREATE INDEX IF NOT EXISTS idx_whatsapp_templates_user ON whatsapp_message_templates(user_id);
+CREATE INDEX IF NOT EXISTS idx_whatsapp_templates_category ON whatsapp_message_templates(template_category);
+CREATE INDEX IF NOT EXISTS idx_whatsapp_templates_active ON whatsapp_message_templates(is_active) WHERE is_active = true;
 
 -- WhatsApp quick replies
 CREATE TABLE IF NOT EXISTS whatsapp_quick_replies (
@@ -3062,7 +3176,7 @@ CREATE TABLE IF NOT EXISTS whatsapp_quick_replies (
   UNIQUE(user_id, shortcut)
 );
 
-CREATE INDEX idx_quick_replies_user ON whatsapp_quick_replies(user_id);
+CREATE INDEX IF NOT EXISTS idx_quick_replies_user ON whatsapp_quick_replies(user_id);
 
 -- =====================================================
 -- ADDITIONAL FUNCTIONS & TRIGGERS
@@ -3280,6 +3394,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+
 DROP TRIGGER IF EXISTS trigger_update_conversation ON customer_whatsapp_messages;
 CREATE TRIGGER trigger_update_conversation
 AFTER INSERT ON customer_whatsapp_messages
@@ -3300,6 +3415,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+
 DROP TRIGGER IF EXISTS trigger_mark_messages_read ON customer_whatsapp_conversations;
 CREATE TRIGGER trigger_mark_messages_read
 AFTER UPDATE ON customer_whatsapp_conversations
@@ -3312,6 +3428,7 @@ EXECUTE FUNCTION mark_conversation_messages_read();
 -- =====================================================
 
 -- High-risk customers view
+DROP VIEW IF EXISTS high_risk_customers CASCADE;
 CREATE OR REPLACE VIEW high_risk_customers AS
 SELECT 
   c.id as customer_id,
@@ -3352,6 +3469,7 @@ WHERE
   OR cb.is_blacklisted = true;
 
 -- WhatsApp conversation summary view
+DROP VIEW IF EXISTS whatsapp_conversation_summary CASCADE;
 CREATE OR REPLACE VIEW whatsapp_conversation_summary AS
 SELECT 
   cwc.id as conversation_id,
@@ -3389,41 +3507,59 @@ LEFT JOIN invoices i ON cwc.related_invoice_id = i.id;
 
 -- Credit Risk Predictions
 ALTER TABLE customer_credit_risk_predictions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users can view their credit predictions" ON customer_credit_risk_predictions;
 CREATE POLICY "Users can view their credit predictions" ON customer_credit_risk_predictions FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can manage their credit predictions" ON customer_credit_risk_predictions;
 CREATE POLICY "Users can manage their credit predictions" ON customer_credit_risk_predictions FOR ALL USING (auth.uid() = user_id);
 
 ALTER TABLE credit_risk_prediction_history ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users can view prediction history" ON credit_risk_prediction_history;
 CREATE POLICY "Users can view prediction history" ON credit_risk_prediction_history FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can insert prediction history" ON credit_risk_prediction_history;
 CREATE POLICY "Users can insert prediction history" ON credit_risk_prediction_history FOR INSERT WITH CHECK (auth.uid() = user_id);
 
 -- Blacklist
 ALTER TABLE customer_blacklist ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users can view their blacklist" ON customer_blacklist;
 CREATE POLICY "Users can view their blacklist" ON customer_blacklist FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can manage their blacklist" ON customer_blacklist;
 CREATE POLICY "Users can manage their blacklist" ON customer_blacklist FOR ALL USING (auth.uid() = user_id);
 
 ALTER TABLE blacklist_rules ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users can view their blacklist rules" ON blacklist_rules;
 CREATE POLICY "Users can view their blacklist rules" ON blacklist_rules FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can manage their blacklist rules" ON blacklist_rules;
 CREATE POLICY "Users can manage their blacklist rules" ON blacklist_rules FOR ALL USING (auth.uid() = user_id);
 
 ALTER TABLE blacklist_action_log ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users can view blacklist logs" ON blacklist_action_log;
 CREATE POLICY "Users can view blacklist logs" ON blacklist_action_log FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can insert blacklist logs" ON blacklist_action_log;
 CREATE POLICY "Users can insert blacklist logs" ON blacklist_action_log FOR INSERT WITH CHECK (auth.uid() = user_id);
 
 -- WhatsApp
 ALTER TABLE customer_whatsapp_conversations ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users can view their conversations" ON customer_whatsapp_conversations;
 CREATE POLICY "Users can view their conversations" ON customer_whatsapp_conversations FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can manage their conversations" ON customer_whatsapp_conversations;
 CREATE POLICY "Users can manage their conversations" ON customer_whatsapp_conversations FOR ALL USING (auth.uid() = user_id);
 
 ALTER TABLE customer_whatsapp_messages ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users can view their messages" ON customer_whatsapp_messages;
 CREATE POLICY "Users can view their messages" ON customer_whatsapp_messages FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can manage their messages" ON customer_whatsapp_messages;
 CREATE POLICY "Users can manage their messages" ON customer_whatsapp_messages FOR ALL USING (auth.uid() = user_id);
 
 ALTER TABLE whatsapp_message_templates ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users can view their templates" ON whatsapp_message_templates;
 CREATE POLICY "Users can view their templates" ON whatsapp_message_templates FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can manage their templates" ON whatsapp_message_templates;
 CREATE POLICY "Users can manage their templates" ON whatsapp_message_templates FOR ALL USING (auth.uid() = user_id);
 
 ALTER TABLE whatsapp_quick_replies ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users can view their quick replies" ON whatsapp_quick_replies;
 CREATE POLICY "Users can view their quick replies" ON whatsapp_quick_replies FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can manage their quick replies" ON whatsapp_quick_replies;
 CREATE POLICY "Users can manage their quick replies" ON whatsapp_quick_replies FOR ALL USING (auth.uid() = user_id);
 
 -- =====================================================
@@ -3712,50 +3848,59 @@ ALTER TABLE payments ADD COLUMN IF NOT EXISTS installment_id UUID REFERENCES pay
 
 -- UPI Payment Details
 ALTER TABLE upi_payment_details ENABLE ROW LEVEL SECURITY;
+
 DROP POLICY IF EXISTS "Users manage own UPI details" ON upi_payment_details;
 CREATE POLICY "Users manage own UPI details" ON upi_payment_details FOR ALL USING (auth.uid() = user_id);
 
 -- Payment Installments
 ALTER TABLE payment_installments ENABLE ROW LEVEL SECURITY;
+
 DROP POLICY IF EXISTS "Users manage installments" ON payment_installments;
 CREATE POLICY "Users manage installments" ON payment_installments FOR ALL 
   USING (EXISTS (SELECT 1 FROM invoices WHERE invoices.id = payment_installments.invoice_id AND invoices.user_id = auth.uid()));
 
 -- Bank Transactions
 ALTER TABLE bank_transactions ENABLE ROW LEVEL SECURITY;
+
 DROP POLICY IF EXISTS "Users manage own bank transactions" ON bank_transactions;
 CREATE POLICY "Users manage own bank transactions" ON bank_transactions FOR ALL USING (auth.uid() = user_id);
 
 -- Failed Payments
 ALTER TABLE failed_payments ENABLE ROW LEVEL SECURITY;
+
 DROP POLICY IF EXISTS "Users view own failed payments" ON failed_payments;
 CREATE POLICY "Users view own failed payments" ON failed_payments FOR ALL 
   USING (EXISTS (SELECT 1 FROM invoices WHERE invoices.id = failed_payments.invoice_id AND invoices.user_id = auth.uid()));
 
 -- Late Fee Config
 ALTER TABLE late_fee_config ENABLE ROW LEVEL SECURITY;
+
 DROP POLICY IF EXISTS "Users manage own late fee config" ON late_fee_config;
 CREATE POLICY "Users manage own late fee config" ON late_fee_config FOR ALL USING (auth.uid() = user_id);
 
 -- BNPL Applications
 ALTER TABLE bnpl_applications ENABLE ROW LEVEL SECURITY;
+
 DROP POLICY IF EXISTS "Users view own BNPL applications" ON bnpl_applications;
 CREATE POLICY "Users view own BNPL applications" ON bnpl_applications FOR ALL 
   USING (EXISTS (SELECT 1 FROM invoices WHERE invoices.id = bnpl_applications.invoice_id AND invoices.user_id = auth.uid()));
 
 -- Payment Follow-ups
 ALTER TABLE payment_followups ENABLE ROW LEVEL SECURITY;
+
 DROP POLICY IF EXISTS "Users manage own followups" ON payment_followups;
 CREATE POLICY "Users manage own followups" ON payment_followups FOR ALL 
   USING (EXISTS (SELECT 1 FROM invoices WHERE invoices.id = payment_followups.invoice_id AND invoices.user_id = auth.uid()));
 
 -- Payment Behavior Analytics
 ALTER TABLE payment_behavior_analytics ENABLE ROW LEVEL SECURITY;
+
 DROP POLICY IF EXISTS "Users view own customer analytics" ON payment_behavior_analytics;
 CREATE POLICY "Users view own customer analytics" ON payment_behavior_analytics FOR ALL USING (auth.uid() = user_id);
 
 -- WhatsApp Payment Links
 ALTER TABLE whatsapp_payment_links ENABLE ROW LEVEL SECURITY;
+
 DROP POLICY IF EXISTS "Users manage own WhatsApp links" ON whatsapp_payment_links;
 CREATE POLICY "Users manage own WhatsApp links" ON whatsapp_payment_links FOR ALL 
   USING (EXISTS (SELECT 1 FROM invoices WHERE invoices.id = whatsapp_payment_links.invoice_id AND invoices.user_id = auth.uid()));
@@ -3936,29 +4081,36 @@ $$ LANGUAGE plpgsql;
 -- ============================================
 
 -- Update timestamp triggers
+
 DROP TRIGGER IF EXISTS update_upi_payment_updated_at ON upi_payment_details;
 CREATE TRIGGER update_upi_payment_updated_at BEFORE UPDATE ON upi_payment_details
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
 
 DROP TRIGGER IF EXISTS update_installments_updated_at ON payment_installments;
 CREATE TRIGGER update_installments_updated_at BEFORE UPDATE ON payment_installments
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+
 DROP TRIGGER IF EXISTS update_bank_trans_updated_at ON bank_transactions;
 CREATE TRIGGER update_bank_trans_updated_at BEFORE UPDATE ON bank_transactions
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
 
 DROP TRIGGER IF EXISTS update_failed_payments_updated_at ON failed_payments;
 CREATE TRIGGER update_failed_payments_updated_at BEFORE UPDATE ON failed_payments
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+
 DROP TRIGGER IF EXISTS update_late_fee_config_updated_at ON late_fee_config;
 CREATE TRIGGER update_late_fee_config_updated_at BEFORE UPDATE ON late_fee_config
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+
 DROP TRIGGER IF EXISTS update_bnpl_updated_at ON bnpl_applications;
 CREATE TRIGGER update_bnpl_updated_at BEFORE UPDATE ON bnpl_applications
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
 
 DROP TRIGGER IF EXISTS update_followups_updated_at ON payment_followups;
 CREATE TRIGGER update_followups_updated_at BEFORE UPDATE ON payment_followups
@@ -3974,6 +4126,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+
 DROP TRIGGER IF EXISTS invoice_status_update_behavior ON invoices;
 CREATE TRIGGER invoice_status_update_behavior
 AFTER UPDATE OF status ON invoices
@@ -3986,6 +4139,7 @@ EXECUTE FUNCTION trigger_update_payment_behavior();
 
 -- Overdue invoices with late fees
 DROP VIEW IF EXISTS invoices_with_late_fees;
+DROP VIEW IF EXISTS invoices_with_late_fees CASCADE;
 CREATE OR REPLACE VIEW invoices_with_late_fees AS
 SELECT 
   i.*,
@@ -4000,6 +4154,7 @@ WHERE i.status NOT IN ('paid', 'cancelled');
 
 -- Payment analytics summary
 DROP VIEW IF EXISTS payment_analytics_summary;
+DROP VIEW IF EXISTS payment_analytics_summary CASCADE;
 CREATE OR REPLACE VIEW payment_analytics_summary AS
 SELECT 
   user_id,
@@ -4055,8 +4210,8 @@ CREATE TABLE IF NOT EXISTS invoice_series (
   UNIQUE(user_id, series_code)
 );
 
-CREATE INDEX idx_invoice_series_user_id ON invoice_series(user_id);
-CREATE INDEX idx_invoice_series_active ON invoice_series(user_id, is_active);
+CREATE INDEX IF NOT EXISTS idx_invoice_series_user_id ON invoice_series(user_id);
+CREATE INDEX IF NOT EXISTS idx_invoice_series_active ON invoice_series(user_id, is_active);
 
 -- Update invoices table to reference series
 ALTER TABLE invoices ADD COLUMN IF NOT EXISTS invoice_series_id UUID REFERENCES invoice_series(id);
@@ -4097,8 +4252,8 @@ CREATE TABLE IF NOT EXISTS invoice_milestones (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_invoice_milestones_parent ON invoice_milestones(parent_invoice_id);
-CREATE INDEX idx_invoice_milestones_status ON invoice_milestones(parent_invoice_id, status);
+CREATE INDEX IF NOT EXISTS idx_invoice_milestones_parent ON invoice_milestones(parent_invoice_id);
+CREATE INDEX IF NOT EXISTS idx_invoice_milestones_status ON invoice_milestones(parent_invoice_id, status);
 
 -- Add milestone tracking to invoices
 ALTER TABLE invoices ADD COLUMN IF NOT EXISTS is_milestone_based BOOLEAN DEFAULT false;
@@ -4126,8 +4281,8 @@ CREATE TABLE IF NOT EXISTS advance_payment_adjustments (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_advance_adjustments_advance ON advance_payment_adjustments(advance_invoice_id);
-CREATE INDEX idx_advance_adjustments_final ON advance_payment_adjustments(final_invoice_id);
+CREATE INDEX IF NOT EXISTS idx_advance_adjustments_advance ON advance_payment_adjustments(advance_invoice_id);
+CREATE INDEX IF NOT EXISTS idx_advance_adjustments_final ON advance_payment_adjustments(final_invoice_id);
 
 -- ============================================
 -- 5. INVOICE APPROVAL WORKFLOW (Maker-Checker)
@@ -4160,9 +4315,9 @@ CREATE TABLE IF NOT EXISTS approval_history (
   action_date TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_invoice_approvals_invoice ON invoice_approvals(invoice_id);
-CREATE INDEX idx_invoice_approvals_approver ON invoice_approvals(current_approver, approval_status);
-CREATE INDEX idx_approval_history_approval ON approval_history(approval_id);
+CREATE INDEX IF NOT EXISTS idx_invoice_approvals_invoice ON invoice_approvals(invoice_id);
+CREATE INDEX IF NOT EXISTS idx_invoice_approvals_approver ON invoice_approvals(current_approver, approval_status);
+CREATE INDEX IF NOT EXISTS idx_approval_history_approval ON approval_history(approval_id);
 
 -- Add approval fields to invoices
 ALTER TABLE invoices ADD COLUMN IF NOT EXISTS requires_approval BOOLEAN DEFAULT false;
@@ -4187,7 +4342,7 @@ CREATE TABLE IF NOT EXISTS company_gst_settings (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_company_gst_user ON company_gst_settings(user_id);
+CREATE INDEX IF NOT EXISTS idx_company_gst_user ON company_gst_settings(user_id);
 
 -- Enhanced customer state tracking (if not already present)
 ALTER TABLE customers ADD COLUMN IF NOT EXISTS state_code VARCHAR(2);
@@ -4301,7 +4456,7 @@ CREATE TABLE IF NOT EXISTS user_hsn_sac_preferences (
   UNIQUE(user_id, hsn_sac_code)
 );
 
-CREATE INDEX idx_user_hsn_preferences ON user_hsn_sac_preferences(user_id, usage_count DESC);
+CREATE INDEX IF NOT EXISTS idx_user_hsn_preferences ON user_hsn_sac_preferences(user_id, usage_count DESC);
 
 -- ============================================
 -- 8. COMPLIANCE & ROUND-OFF
@@ -4324,7 +4479,7 @@ CREATE TABLE IF NOT EXISTS invoice_compliance_log (
   checked_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_compliance_log_invoice ON invoice_compliance_log(invoice_id);
+CREATE INDEX IF NOT EXISTS idx_compliance_log_invoice ON invoice_compliance_log(invoice_id);
 
 -- ============================================
 -- RLS POLICIES
@@ -4332,42 +4487,51 @@ CREATE INDEX idx_compliance_log_invoice ON invoice_compliance_log(invoice_id);
 
 -- Invoice Series
 ALTER TABLE invoice_series ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users manage own invoice series" ON invoice_series;
 CREATE POLICY "Users manage own invoice series" ON invoice_series FOR ALL USING (auth.uid() = user_id);
 
 -- Invoice Milestones
 ALTER TABLE invoice_milestones ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users manage own milestones" ON invoice_milestones;
 CREATE POLICY "Users manage own milestones" ON invoice_milestones FOR ALL 
   USING (EXISTS (SELECT 1 FROM invoices WHERE invoices.id = invoice_milestones.parent_invoice_id AND invoices.user_id = auth.uid()));
 
 -- Advance Payment Adjustments
 ALTER TABLE advance_payment_adjustments ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users manage own adjustments" ON advance_payment_adjustments;
 CREATE POLICY "Users manage own adjustments" ON advance_payment_adjustments FOR ALL 
   USING (EXISTS (SELECT 1 FROM invoices WHERE invoices.id = advance_payment_adjustments.advance_invoice_id AND invoices.user_id = auth.uid()));
 
 -- Invoice Approvals
 ALTER TABLE invoice_approvals ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users manage own approvals" ON invoice_approvals;
 CREATE POLICY "Users manage own approvals" ON invoice_approvals FOR ALL 
   USING (auth.uid() = submitted_by OR auth.uid() = current_approver);
 
 ALTER TABLE approval_history ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users view approval history" ON approval_history;
 CREATE POLICY "Users view approval history" ON approval_history FOR SELECT 
   USING (EXISTS (SELECT 1 FROM invoice_approvals WHERE invoice_approvals.id = approval_history.approval_id 
     AND (invoice_approvals.submitted_by = auth.uid() OR invoice_approvals.current_approver = auth.uid())));
 
 -- Company GST Settings
 ALTER TABLE company_gst_settings ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users manage own GST settings" ON company_gst_settings;
 CREATE POLICY "Users manage own GST settings" ON company_gst_settings FOR ALL USING (auth.uid() = user_id);
 
 -- HSN/SAC Master (public read, admin write)
 ALTER TABLE hsn_sac_master ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Anyone can read HSN/SAC" ON hsn_sac_master;
 CREATE POLICY "Anyone can read HSN/SAC" ON hsn_sac_master FOR SELECT USING (true);
 
 -- User HSN/SAC Preferences
 ALTER TABLE user_hsn_sac_preferences ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users manage own HSN preferences" ON user_hsn_sac_preferences;
 CREATE POLICY "Users manage own HSN preferences" ON user_hsn_sac_preferences FOR ALL USING (auth.uid() = user_id);
 
 -- Invoice Compliance Log
 ALTER TABLE invoice_compliance_log ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users view own compliance logs" ON invoice_compliance_log;
 CREATE POLICY "Users view own compliance logs" ON invoice_compliance_log FOR SELECT 
   USING (EXISTS (SELECT 1 FROM invoices WHERE invoices.id = invoice_compliance_log.invoice_id AND invoices.user_id = auth.uid()));
 
@@ -4510,15 +4674,19 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS update_invoice_series_updated_at ON invoice_series;
 CREATE TRIGGER update_invoice_series_updated_at BEFORE UPDATE ON invoice_series
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_invoice_milestones_updated_at ON invoice_milestones;
 CREATE TRIGGER update_invoice_milestones_updated_at BEFORE UPDATE ON invoice_milestones
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_invoice_approvals_updated_at ON invoice_approvals;
 CREATE TRIGGER update_invoice_approvals_updated_at BEFORE UPDATE ON invoice_approvals
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_company_gst_updated_at ON company_gst_settings;
 CREATE TRIGGER update_company_gst_updated_at BEFORE UPDATE ON company_gst_settings
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
@@ -4554,6 +4722,7 @@ ON CONFLICT (code) DO NOTHING;
 -- ============================================
 
 -- Invoice Summary View with all details
+DROP VIEW IF EXISTS invoice_summary_view CASCADE;
 CREATE OR REPLACE VIEW invoice_summary_view AS
 SELECT 
   i.*,
@@ -4608,8 +4777,8 @@ CREATE TABLE IF NOT EXISTS voice_recordings (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_voice_recordings_user_id ON voice_recordings(user_id);
-CREATE INDEX idx_voice_recordings_status ON voice_recordings(user_id, status);
+CREATE INDEX IF NOT EXISTS idx_voice_recordings_user_id ON voice_recordings(user_id);
+CREATE INDEX IF NOT EXISTS idx_voice_recordings_status ON voice_recordings(user_id, status);
 
 -- ============================================
 -- VOICE TRANSCRIPTIONS TABLE
@@ -4626,7 +4795,7 @@ CREATE TABLE IF NOT EXISTS voice_transcriptions (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_voice_transcriptions_recording ON voice_transcriptions(voice_recording_id);
+CREATE INDEX IF NOT EXISTS idx_voice_transcriptions_recording ON voice_transcriptions(voice_recording_id);
 
 -- ============================================
 -- VOICE INVOICE PARSING TABLE
@@ -4647,8 +4816,8 @@ CREATE TABLE IF NOT EXISTS voice_invoice_parsing (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_voice_invoice_parsing_recording ON voice_invoice_parsing(voice_recording_id);
-CREATE INDEX idx_voice_invoice_parsing_invoice ON voice_invoice_parsing(invoice_id);
+CREATE INDEX IF NOT EXISTS idx_voice_invoice_parsing_recording ON voice_invoice_parsing(voice_recording_id);
+CREATE INDEX IF NOT EXISTS idx_voice_invoice_parsing_invoice ON voice_invoice_parsing(invoice_id);
 
 -- ============================================
 -- VOICE COMMANDS LOG
@@ -4722,20 +4891,24 @@ ALTER TABLE invoices ADD COLUMN IF NOT EXISTS voice_confidence_score DECIMAL(5, 
 
 -- Voice Recordings
 ALTER TABLE voice_recordings ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users manage own voice recordings" ON voice_recordings;
 CREATE POLICY "Users manage own voice recordings" ON voice_recordings FOR ALL USING (auth.uid() = user_id);
 
 -- Voice Transcriptions
 ALTER TABLE voice_transcriptions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users view own transcriptions" ON voice_transcriptions;
 CREATE POLICY "Users view own transcriptions" ON voice_transcriptions FOR SELECT 
   USING (EXISTS (SELECT 1 FROM voice_recordings WHERE voice_recordings.id = voice_transcriptions.voice_recording_id AND voice_recordings.user_id = auth.uid()));
 
 -- Voice Invoice Parsing
 ALTER TABLE voice_invoice_parsing ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users view own parsing" ON voice_invoice_parsing;
 CREATE POLICY "Users view own parsing" ON voice_invoice_parsing FOR SELECT 
   USING (EXISTS (SELECT 1 FROM voice_recordings WHERE voice_recordings.id = voice_invoice_parsing.voice_recording_id AND voice_recordings.user_id = auth.uid()));
 
 -- Voice Commands Log
 ALTER TABLE voice_commands_log ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users view own commands" ON voice_commands_log;
 CREATE POLICY "Users view own commands" ON voice_commands_log FOR SELECT USING (auth.uid() = user_id);
 
 -- ============================================
@@ -4801,9 +4974,11 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Update timestamp trigger
+DROP TRIGGER IF EXISTS update_voice_recordings_updated_at ON voice_recordings;
 CREATE TRIGGER update_voice_recordings_updated_at BEFORE UPDATE ON voice_recordings
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_voice_invoice_parsing_updated_at ON voice_invoice_parsing;
 CREATE TRIGGER update_voice_invoice_parsing_updated_at BEFORE UPDATE ON voice_invoice_parsing
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
@@ -4823,15 +4998,17 @@ CREATE TABLE IF NOT EXISTS voice_invoice_templates (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_voice_templates_user ON voice_invoice_templates(user_id);
+CREATE INDEX IF NOT EXISTS idx_voice_templates_user ON voice_invoice_templates(user_id);
 
 ALTER TABLE voice_invoice_templates ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users manage own templates" ON voice_invoice_templates;
 CREATE POLICY "Users manage own templates" ON voice_invoice_templates FOR ALL USING (auth.uid() = user_id);
 
 -- ============================================
 -- VIEWS FOR REPORTING
 -- ============================================
 
+DROP VIEW IF EXISTS voice_invoice_summary CASCADE;
 CREATE OR REPLACE VIEW voice_invoice_summary AS
 SELECT 
   vr.id as recording_id,
@@ -5203,25 +5380,32 @@ ALTER TABLE voice_commands_log ENABLE ROW LEVEL SECURITY;
 ALTER TABLE whatsapp_quick_actions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE mobile_app_settings ENABLE ROW LEVEL SECURITY;
 
-DROP POLICY IF EXISTS user_language_preferences_policy ON user_language_preferences;
+
+DROP POLICY IF EXISTS "user_language_preferences_policy" ON user_language_preferences;
 CREATE POLICY user_language_preferences_policy ON user_language_preferences FOR ALL USING (auth.uid() = user_id);
 
-DROP POLICY IF EXISTS invoice_templates_policy ON invoice_templates;
+
+DROP POLICY IF EXISTS "invoice_templates_policy" ON invoice_templates;
 CREATE POLICY invoice_templates_policy ON invoice_templates FOR ALL USING (auth.uid() = user_id OR is_public = true);
 
-DROP POLICY IF EXISTS offline_sync_queue_policy ON offline_sync_queue;
+
+DROP POLICY IF EXISTS "offline_sync_queue_policy" ON offline_sync_queue;
 CREATE POLICY offline_sync_queue_policy ON offline_sync_queue FOR ALL USING (auth.uid() = user_id);
 
-DROP POLICY IF EXISTS offline_cache_metadata_policy ON offline_cache_metadata;
+
+DROP POLICY IF EXISTS "offline_cache_metadata_policy" ON offline_cache_metadata;
 CREATE POLICY offline_cache_metadata_policy ON offline_cache_metadata FOR ALL USING (auth.uid() = user_id);
 
-DROP POLICY IF EXISTS voice_commands_log_policy ON voice_commands_log;
+
+DROP POLICY IF EXISTS "voice_commands_log_policy" ON voice_commands_log;
 CREATE POLICY voice_commands_log_policy ON voice_commands_log FOR ALL USING (auth.uid() = user_id);
 
-DROP POLICY IF EXISTS whatsapp_quick_actions_policy ON whatsapp_quick_actions;
+
+DROP POLICY IF EXISTS "whatsapp_quick_actions_policy" ON whatsapp_quick_actions;
 CREATE POLICY whatsapp_quick_actions_policy ON whatsapp_quick_actions FOR ALL USING (auth.uid() = user_id);
 
-DROP POLICY IF EXISTS mobile_app_settings_policy ON mobile_app_settings;
+
+DROP POLICY IF EXISTS "mobile_app_settings_policy" ON mobile_app_settings;
 CREATE POLICY mobile_app_settings_policy ON mobile_app_settings FOR ALL USING (auth.uid() = user_id);
 
 -- =====================================================
@@ -5546,6 +5730,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Create trigger for new user profiles
+
 DROP TRIGGER IF EXISTS trigger_set_user_region ON user_profiles;
 CREATE TRIGGER trigger_set_user_region
     BEFORE INSERT ON user_profiles
@@ -5557,6 +5742,7 @@ CREATE TRIGGER trigger_set_user_region
 -- =====================================================
 
 -- View for UAE invoices with VAT
+DROP VIEW IF EXISTS vw_uae_invoices CASCADE;
 CREATE OR REPLACE VIEW vw_uae_invoices AS
 SELECT 
     i.id,
@@ -5653,18 +5839,22 @@ CREATE INDEX IF NOT EXISTS idx_whatsapp_connections_status ON whatsapp_connectio
 -- Add RLS policies
 ALTER TABLE whatsapp_connections ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view their own WhatsApp connections" ON whatsapp_connections;
 CREATE POLICY "Users can view their own WhatsApp connections"
     ON whatsapp_connections FOR SELECT
     USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert their own WhatsApp connections" ON whatsapp_connections;
 CREATE POLICY "Users can insert their own WhatsApp connections"
     ON whatsapp_connections FOR INSERT
     WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update their own WhatsApp connections" ON whatsapp_connections;
 CREATE POLICY "Users can update their own WhatsApp connections"
     ON whatsapp_connections FOR UPDATE
     USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can delete their own WhatsApp connections" ON whatsapp_connections;
 CREATE POLICY "Users can delete their own WhatsApp connections"
     ON whatsapp_connections FOR DELETE
     USING (auth.uid() = user_id);
@@ -5706,14 +5896,17 @@ CREATE INDEX IF NOT EXISTS idx_whatsapp_messages_created_at ON whatsapp_messages
 -- Add RLS policies
 ALTER TABLE whatsapp_messages ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view their own WhatsApp messages" ON whatsapp_messages;
 CREATE POLICY "Users can view their own WhatsApp messages"
     ON whatsapp_messages FOR SELECT
     USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert their own WhatsApp messages" ON whatsapp_messages;
 CREATE POLICY "Users can insert their own WhatsApp messages"
     ON whatsapp_messages FOR INSERT
     WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update their own WhatsApp messages" ON whatsapp_messages;
 CREATE POLICY "Users can update their own WhatsApp messages"
     ON whatsapp_messages FOR UPDATE
     USING (auth.uid() = user_id);
@@ -5739,11 +5932,13 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Add triggers
+
 DROP TRIGGER IF EXISTS update_whatsapp_connections_updated_at ON whatsapp_connections;
 CREATE TRIGGER update_whatsapp_connections_updated_at
     BEFORE UPDATE ON whatsapp_connections
     FOR EACH ROW
     EXECUTE FUNCTION update_whatsapp_updated_at();
+
 
 DROP TRIGGER IF EXISTS update_whatsapp_messages_updated_at ON whatsapp_messages;
 CREATE TRIGGER update_whatsapp_messages_updated_at
@@ -5797,6 +5992,7 @@ CREATE INDEX IF NOT EXISTS idx_smtp_settings_is_active ON smtp_settings(is_activ
 ALTER TABLE smtp_settings ENABLE ROW LEVEL SECURITY;
 
 -- Only super admins can view and modify SMTP settings
+DROP POLICY IF EXISTS "Super admins can manage SMTP settings" ON smtp_settings;
 CREATE POLICY "Super admins can manage SMTP settings"
   ON smtp_settings
   FOR ALL
@@ -5817,6 +6013,7 @@ BEGIN
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+
 
 DROP TRIGGER IF EXISTS smtp_settings_timestamp_trigger ON smtp_settings;
 CREATE TRIGGER smtp_settings_timestamp_trigger
@@ -5883,11 +6080,11 @@ CREATE TABLE IF NOT EXISTS ca_professionals (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_ca_professionals_user ON ca_professionals(user_id);
-CREATE INDEX idx_ca_professionals_city ON ca_professionals(city);
-CREATE INDEX idx_ca_professionals_state ON ca_professionals(state);
-CREATE INDEX idx_ca_professionals_verification ON ca_professionals(verification_status);
-CREATE INDEX idx_ca_professionals_available ON ca_professionals(available_for_hire);
+CREATE INDEX IF NOT EXISTS idx_ca_professionals_user ON ca_professionals(user_id);
+CREATE INDEX IF NOT EXISTS idx_ca_professionals_city ON ca_professionals(city);
+CREATE INDEX IF NOT EXISTS idx_ca_professionals_state ON ca_professionals(state);
+CREATE INDEX IF NOT EXISTS idx_ca_professionals_verification ON ca_professionals(verification_status);
+CREATE INDEX IF NOT EXISTS idx_ca_professionals_available ON ca_professionals(available_for_hire);
 
 -- ============================================
 -- CA HIRE REQUESTS TABLE
@@ -5933,11 +6130,11 @@ CREATE TABLE IF NOT EXISTS ca_hire_requests (
   closed_at TIMESTAMPTZ
 );
 
-CREATE INDEX idx_ca_hire_requests_user ON ca_hire_requests(user_id);
-CREATE INDEX idx_ca_hire_requests_ca ON ca_hire_requests(ca_professional_id);
-CREATE INDEX idx_ca_hire_requests_status ON ca_hire_requests(status);
-CREATE INDEX idx_ca_hire_requests_city ON ca_hire_requests(preferred_city);
-CREATE INDEX idx_ca_hire_requests_created ON ca_hire_requests(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ca_hire_requests_user ON ca_hire_requests(user_id);
+CREATE INDEX IF NOT EXISTS idx_ca_hire_requests_ca ON ca_hire_requests(ca_professional_id);
+CREATE INDEX IF NOT EXISTS idx_ca_hire_requests_status ON ca_hire_requests(status);
+CREATE INDEX IF NOT EXISTS idx_ca_hire_requests_city ON ca_hire_requests(preferred_city);
+CREATE INDEX IF NOT EXISTS idx_ca_hire_requests_created ON ca_hire_requests(created_at DESC);
 
 -- ============================================
 -- CA PROPOSALS TABLE
@@ -5974,10 +6171,10 @@ CREATE TABLE IF NOT EXISTS ca_proposals (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_ca_proposals_request ON ca_proposals(hire_request_id);
-CREATE INDEX idx_ca_proposals_ca ON ca_proposals(ca_professional_id);
-CREATE INDEX idx_ca_proposals_status ON ca_proposals(status);
-CREATE INDEX idx_ca_proposals_created ON ca_proposals(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ca_proposals_request ON ca_proposals(hire_request_id);
+CREATE INDEX IF NOT EXISTS idx_ca_proposals_ca ON ca_proposals(ca_professional_id);
+CREATE INDEX IF NOT EXISTS idx_ca_proposals_status ON ca_proposals(status);
+CREATE INDEX IF NOT EXISTS idx_ca_proposals_created ON ca_proposals(created_at DESC);
 
 -- ============================================
 -- CA ENGAGEMENTS TABLE
@@ -6022,10 +6219,10 @@ CREATE TABLE IF NOT EXISTS ca_engagements (
   completed_at TIMESTAMPTZ
 );
 
-CREATE INDEX idx_ca_engagements_user ON ca_engagements(user_id);
-CREATE INDEX idx_ca_engagements_ca ON ca_engagements(ca_professional_id);
-CREATE INDEX idx_ca_engagements_status ON ca_engagements(status);
-CREATE INDEX idx_ca_engagements_dates ON ca_engagements(start_date, end_date);
+CREATE INDEX IF NOT EXISTS idx_ca_engagements_user ON ca_engagements(user_id);
+CREATE INDEX IF NOT EXISTS idx_ca_engagements_ca ON ca_engagements(ca_professional_id);
+CREATE INDEX IF NOT EXISTS idx_ca_engagements_status ON ca_engagements(status);
+CREATE INDEX IF NOT EXISTS idx_ca_engagements_dates ON ca_engagements(start_date, end_date);
 
 -- ============================================
 -- CA REVIEWS TABLE
@@ -6060,10 +6257,10 @@ CREATE TABLE IF NOT EXISTS ca_reviews (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_ca_reviews_ca ON ca_reviews(ca_professional_id);
-CREATE INDEX idx_ca_reviews_user ON ca_reviews(user_id);
-CREATE INDEX idx_ca_reviews_rating ON ca_reviews(rating);
-CREATE INDEX idx_ca_reviews_created ON ca_reviews(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ca_reviews_ca ON ca_reviews(ca_professional_id);
+CREATE INDEX IF NOT EXISTS idx_ca_reviews_user ON ca_reviews(user_id);
+CREATE INDEX IF NOT EXISTS idx_ca_reviews_rating ON ca_reviews(rating);
+CREATE INDEX IF NOT EXISTS idx_ca_reviews_created ON ca_reviews(created_at DESC);
 
 -- ============================================
 -- RLS POLICIES
@@ -6071,47 +6268,65 @@ CREATE INDEX idx_ca_reviews_created ON ca_reviews(created_at DESC);
 
 -- CA Professionals
 ALTER TABLE ca_professionals ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "CA professionals are viewable by everyone" ON ca_professionals;
 CREATE POLICY "CA professionals are viewable by everyone" ON ca_professionals FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Users can create their CA profile" ON ca_professionals;
 CREATE POLICY "Users can create their CA profile" ON ca_professionals FOR INSERT WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "CAs can update own profile" ON ca_professionals;
 CREATE POLICY "CAs can update own profile" ON ca_professionals FOR UPDATE USING (auth.uid() = user_id);
 
 -- CA Hire Requests
 ALTER TABLE ca_hire_requests ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users view own hire requests" ON ca_hire_requests;
 CREATE POLICY "Users view own hire requests" ON ca_hire_requests FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "CAs view open requests" ON ca_hire_requests;
 CREATE POLICY "CAs view open requests" ON ca_hire_requests FOR SELECT USING (status = 'open' OR ca_professional_id IN (SELECT id FROM ca_professionals WHERE user_id = auth.uid()));
+DROP POLICY IF EXISTS "Users create own hire requests" ON ca_hire_requests;
 CREATE POLICY "Users create own hire requests" ON ca_hire_requests FOR INSERT WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users update own hire requests" ON ca_hire_requests;
 CREATE POLICY "Users update own hire requests" ON ca_hire_requests FOR UPDATE USING (auth.uid() = user_id);
 
 -- CA Proposals
 ALTER TABLE ca_proposals ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users view proposals for their requests" ON ca_proposals;
 CREATE POLICY "Users view proposals for their requests" ON ca_proposals FOR SELECT USING (
   hire_request_id IN (SELECT id FROM ca_hire_requests WHERE user_id = auth.uid())
 );
+DROP POLICY IF EXISTS "CAs view own proposals" ON ca_proposals;
 CREATE POLICY "CAs view own proposals" ON ca_proposals FOR SELECT USING (
   ca_professional_id IN (SELECT id FROM ca_professionals WHERE user_id = auth.uid())
 );
+DROP POLICY IF EXISTS "CAs create proposals" ON ca_proposals;
 CREATE POLICY "CAs create proposals" ON ca_proposals FOR INSERT WITH CHECK (
   ca_professional_id IN (SELECT id FROM ca_professionals WHERE user_id = auth.uid())
 );
+DROP POLICY IF EXISTS "CAs update own proposals" ON ca_proposals;
 CREATE POLICY "CAs update own proposals" ON ca_proposals FOR UPDATE USING (
   ca_professional_id IN (SELECT id FROM ca_professionals WHERE user_id = auth.uid())
 );
 
 -- CA Engagements
 ALTER TABLE ca_engagements ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users view own engagements" ON ca_engagements;
 CREATE POLICY "Users view own engagements" ON ca_engagements FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "CAs view their engagements" ON ca_engagements;
 CREATE POLICY "CAs view their engagements" ON ca_engagements FOR SELECT USING (
   ca_professional_id IN (SELECT id FROM ca_professionals WHERE user_id = auth.uid())
 );
+DROP POLICY IF EXISTS "Users create engagements" ON ca_engagements;
 CREATE POLICY "Users create engagements" ON ca_engagements FOR INSERT WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Engagement parties can update" ON ca_engagements;
 CREATE POLICY "Engagement parties can update" ON ca_engagements FOR UPDATE USING (
   auth.uid() = user_id OR ca_professional_id IN (SELECT id FROM ca_professionals WHERE user_id = auth.uid())
 );
 
 -- CA Reviews
 ALTER TABLE ca_reviews ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Reviews are viewable by everyone" ON ca_reviews;
 CREATE POLICY "Reviews are viewable by everyone" ON ca_reviews FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Users create own reviews" ON ca_reviews;
 CREATE POLICY "Users create own reviews" ON ca_reviews FOR INSERT WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users update own reviews" ON ca_reviews;
 CREATE POLICY "Users update own reviews" ON ca_reviews FOR UPDATE USING (auth.uid() = user_id);
 
 -- ============================================
@@ -6141,6 +6356,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_update_ca_rating ON ca_reviews;
 CREATE TRIGGER trigger_update_ca_rating
 AFTER INSERT OR UPDATE OF rating ON ca_reviews
 FOR EACH ROW
@@ -6164,6 +6380,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_update_proposal_count ON ca_proposals;
 CREATE TRIGGER trigger_update_proposal_count
 AFTER INSERT ON ca_proposals
 FOR EACH ROW
@@ -6263,10 +6480,12 @@ ALTER TABLE hsn_sac_master ENABLE ROW LEVEL SECURITY;
 ALTER TABLE reverse_charge_settings ENABLE ROW LEVEL SECURITY;
 
 -- HSN/SAC Master - Allow public read (it's reference data), only admins can insert/update
+
 DROP POLICY IF EXISTS "Anyone can view hsn_sac_master" ON hsn_sac_master;
 CREATE POLICY "Anyone can view hsn_sac_master"
   ON hsn_sac_master FOR SELECT
   USING (is_active = TRUE);
+
 
 DROP POLICY IF EXISTS "No one can insert hsn_sac_master directly" ON hsn_sac_master;
 CREATE POLICY "No one can insert hsn_sac_master directly"
@@ -6274,15 +6493,18 @@ CREATE POLICY "No one can insert hsn_sac_master directly"
   WITH CHECK (FALSE);
 
 -- Reverse Charge Settings
+
 DROP POLICY IF EXISTS "Users can view their own reverse charge settings" ON reverse_charge_settings;
 CREATE POLICY "Users can view their own reverse charge settings"
   ON reverse_charge_settings FOR SELECT
   USING (auth.uid() = user_id);
 
+
 DROP POLICY IF EXISTS "Users can insert their own reverse charge settings" ON reverse_charge_settings;
 CREATE POLICY "Users can insert their own reverse charge settings"
   ON reverse_charge_settings FOR INSERT
   WITH CHECK (auth.uid() = user_id);
+
 
 DROP POLICY IF EXISTS "Users can update their own reverse charge settings" ON reverse_charge_settings;
 CREATE POLICY "Users can update their own reverse charge settings"
@@ -6400,9 +6622,9 @@ CREATE TABLE IF NOT EXISTS gstr1_records (
   UNIQUE(user_id, tax_period)
 );
 
-CREATE INDEX idx_gstr1_user ON gstr1_records(user_id);
-CREATE INDEX idx_gstr1_period ON gstr1_records(tax_period);
-CREATE INDEX idx_gstr1_status ON gstr1_records(preparation_status);
+CREATE INDEX IF NOT EXISTS idx_gstr1_user ON gstr1_records(user_id);
+CREATE INDEX IF NOT EXISTS idx_gstr1_period ON gstr1_records(tax_period);
+CREATE INDEX IF NOT EXISTS idx_gstr1_status ON gstr1_records(preparation_status);
 
 -- =====================================================
 -- 2. GSTR-3B SUMMARY
@@ -6473,9 +6695,9 @@ CREATE TABLE IF NOT EXISTS gstr3b_records (
   UNIQUE(user_id, tax_period)
 );
 
-CREATE INDEX idx_gstr3b_user ON gstr3b_records(user_id);
-CREATE INDEX idx_gstr3b_period ON gstr3b_records(tax_period);
-CREATE INDEX idx_gstr3b_status ON gstr3b_records(preparation_status);
+CREATE INDEX IF NOT EXISTS idx_gstr3b_user ON gstr3b_records(user_id);
+CREATE INDEX IF NOT EXISTS idx_gstr3b_period ON gstr3b_records(tax_period);
+CREATE INDEX IF NOT EXISTS idx_gstr3b_status ON gstr3b_records(preparation_status);
 
 -- =====================================================
 -- 3. E-INVOICE (IRN) GENERATION
@@ -6523,11 +6745,11 @@ CREATE TABLE IF NOT EXISTS einvoice_records (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_einvoice_user ON einvoice_records(user_id);
-CREATE INDEX idx_einvoice_invoice ON einvoice_records(invoice_id);
-CREATE INDEX idx_einvoice_irn ON einvoice_records(irn);
-CREATE INDEX idx_einvoice_status ON einvoice_records(irp_status);
-CREATE INDEX idx_einvoice_eway ON einvoice_records(eway_bill_number) WHERE eway_bill_number IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_einvoice_user ON einvoice_records(user_id);
+CREATE INDEX IF NOT EXISTS idx_einvoice_invoice ON einvoice_records(invoice_id);
+CREATE INDEX IF NOT EXISTS idx_einvoice_irn ON einvoice_records(irn);
+CREATE INDEX IF NOT EXISTS idx_einvoice_status ON einvoice_records(irp_status);
+CREATE INDEX IF NOT EXISTS idx_einvoice_eway ON einvoice_records(eway_bill_number) WHERE eway_bill_number IS NOT NULL;
 
 -- =====================================================
 -- 4. E-WAY BILL
@@ -6608,11 +6830,11 @@ CREATE TABLE IF NOT EXISTS eway_bills (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_eway_user ON eway_bills(user_id);
-CREATE INDEX idx_eway_invoice ON eway_bills(invoice_id);
-CREATE INDEX idx_eway_number ON eway_bills(eway_bill_number);
-CREATE INDEX idx_eway_status ON eway_bills(status);
-CREATE INDEX idx_eway_validity ON eway_bills(valid_until);
+CREATE INDEX IF NOT EXISTS idx_eway_user ON eway_bills(user_id);
+CREATE INDEX IF NOT EXISTS idx_eway_invoice ON eway_bills(invoice_id);
+CREATE INDEX IF NOT EXISTS idx_eway_number ON eway_bills(eway_bill_number);
+CREATE INDEX IF NOT EXISTS idx_eway_status ON eway_bills(status);
+CREATE INDEX IF NOT EXISTS idx_eway_validity ON eway_bills(valid_until);
 
 -- =====================================================
 -- 5. GST MISMATCH ALERTS
@@ -6661,11 +6883,11 @@ CREATE TABLE IF NOT EXISTS gst_mismatch_alerts (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_gst_alerts_user ON gst_mismatch_alerts(user_id);
-CREATE INDEX idx_gst_alerts_status ON gst_mismatch_alerts(status) WHERE status = 'open';
-CREATE INDEX idx_gst_alerts_severity ON gst_mismatch_alerts(severity);
-CREATE INDEX idx_gst_alerts_type ON gst_mismatch_alerts(alert_type);
-CREATE INDEX idx_gst_alerts_period ON gst_mismatch_alerts(tax_period);
+CREATE INDEX IF NOT EXISTS idx_gst_alerts_user ON gst_mismatch_alerts(user_id);
+CREATE INDEX IF NOT EXISTS idx_gst_alerts_status ON gst_mismatch_alerts(status) WHERE status = 'open';
+CREATE INDEX IF NOT EXISTS idx_gst_alerts_severity ON gst_mismatch_alerts(severity);
+CREATE INDEX IF NOT EXISTS idx_gst_alerts_type ON gst_mismatch_alerts(alert_type);
+CREATE INDEX IF NOT EXISTS idx_gst_alerts_period ON gst_mismatch_alerts(tax_period);
 
 -- =====================================================
 -- 6 & 7. CA COLLABORATION MODE
@@ -6703,9 +6925,9 @@ CREATE TABLE IF NOT EXISTS ca_profiles (
   UNIQUE(user_id)
 );
 
-CREATE INDEX idx_ca_profiles_user ON ca_profiles(user_id);
-CREATE INDEX idx_ca_profiles_email ON ca_profiles(email);
-CREATE INDEX idx_ca_profiles_verified ON ca_profiles(is_verified);
+CREATE INDEX IF NOT EXISTS idx_ca_profiles_user ON ca_profiles(user_id);
+CREATE INDEX IF NOT EXISTS idx_ca_profiles_email ON ca_profiles(email);
+CREATE INDEX IF NOT EXISTS idx_ca_profiles_verified ON ca_profiles(is_verified);
 
 -- Client-CA relationship
 CREATE TABLE IF NOT EXISTS client_ca_access (
@@ -6750,9 +6972,9 @@ CREATE TABLE IF NOT EXISTS client_ca_access (
   UNIQUE(client_user_id, ca_user_id)
 );
 
-CREATE INDEX idx_client_ca_client ON client_ca_access(client_user_id);
-CREATE INDEX idx_client_ca_ca ON client_ca_access(ca_user_id);
-CREATE INDEX idx_client_ca_status ON client_ca_access(status) WHERE status = 'active';
+CREATE INDEX IF NOT EXISTS idx_client_ca_client ON client_ca_access(client_user_id);
+CREATE INDEX IF NOT EXISTS idx_client_ca_ca ON client_ca_access(ca_user_id);
+CREATE INDEX IF NOT EXISTS idx_client_ca_status ON client_ca_access(status) WHERE status = 'active';
 
 -- CA activity log for clients
 CREATE TABLE IF NOT EXISTS ca_activity_log (
@@ -6777,10 +6999,10 @@ CREATE TABLE IF NOT EXISTS ca_activity_log (
   performed_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_ca_activity_ca ON ca_activity_log(ca_user_id);
-CREATE INDEX idx_ca_activity_client ON ca_activity_log(client_user_id);
-CREATE INDEX idx_ca_activity_date ON ca_activity_log(performed_at DESC);
-CREATE INDEX idx_ca_activity_type ON ca_activity_log(activity_type);
+CREATE INDEX IF NOT EXISTS idx_ca_activity_ca ON ca_activity_log(ca_user_id);
+CREATE INDEX IF NOT EXISTS idx_ca_activity_client ON ca_activity_log(client_user_id);
+CREATE INDEX IF NOT EXISTS idx_ca_activity_date ON ca_activity_log(performed_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ca_activity_type ON ca_activity_log(activity_type);
 
 -- =====================================================
 -- 8. AUDIT TRAIL WITH TIMESTAMP & IP
@@ -6834,13 +7056,13 @@ CREATE TABLE IF NOT EXISTS gst_audit_trail (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_audit_user ON gst_audit_trail(user_id);
-CREATE INDEX idx_audit_performed_by ON gst_audit_trail(performed_by);
-CREATE INDEX idx_audit_entity ON gst_audit_trail(entity_type, entity_id);
-CREATE INDEX idx_audit_action ON gst_audit_trail(action_type);
-CREATE INDEX idx_audit_date ON gst_audit_trail(performed_at DESC);
-CREATE INDEX idx_audit_ip ON gst_audit_trail(ip_address);
-CREATE INDEX idx_audit_critical ON gst_audit_trail(is_critical_action) WHERE is_critical_action = true;
+CREATE INDEX IF NOT EXISTS idx_audit_user ON gst_audit_trail(user_id);
+CREATE INDEX IF NOT EXISTS idx_audit_performed_by ON gst_audit_trail(performed_by);
+CREATE INDEX IF NOT EXISTS idx_audit_entity ON gst_audit_trail(entity_type, entity_id);
+CREATE INDEX IF NOT EXISTS idx_audit_action ON gst_audit_trail(action_type);
+CREATE INDEX IF NOT EXISTS idx_audit_date ON gst_audit_trail(performed_at DESC);
+CREATE INDEX IF NOT EXISTS idx_audit_ip ON gst_audit_trail(ip_address);
+CREATE INDEX IF NOT EXISTS idx_audit_critical ON gst_audit_trail(is_critical_action) WHERE is_critical_action = true;
 
 -- =====================================================
 -- 9. GST HEALTH SCORE
@@ -6905,10 +7127,10 @@ CREATE TABLE IF NOT EXISTS gst_health_scores (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_health_user ON gst_health_scores(user_id);
-CREATE INDEX idx_health_score ON gst_health_scores(overall_score DESC);
-CREATE INDEX idx_health_risk ON gst_health_scores(risk_level);
-CREATE INDEX idx_health_date ON gst_health_scores(calculated_at DESC);
+CREATE INDEX IF NOT EXISTS idx_health_user ON gst_health_scores(user_id);
+CREATE INDEX IF NOT EXISTS idx_health_score ON gst_health_scores(overall_score DESC);
+CREATE INDEX IF NOT EXISTS idx_health_risk ON gst_health_scores(risk_level);
+CREATE INDEX IF NOT EXISTS idx_health_date ON gst_health_scores(calculated_at DESC);
 
 -- Health score history for trend tracking
 CREATE TABLE IF NOT EXISTS gst_health_score_history (
@@ -6926,8 +7148,8 @@ CREATE TABLE IF NOT EXISTS gst_health_score_history (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_health_history_user ON gst_health_score_history(user_id);
-CREATE INDEX idx_health_history_date ON gst_health_score_history(calculated_at DESC);
+CREATE INDEX IF NOT EXISTS idx_health_history_user ON gst_health_score_history(user_id);
+CREATE INDEX IF NOT EXISTS idx_health_history_date ON gst_health_score_history(calculated_at DESC);
 
 -- =====================================================
 -- FUNCTIONS & TRIGGERS
@@ -7182,6 +7404,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+
 DROP TRIGGER IF EXISTS trigger_audit_invoices ON invoices;
 CREATE TRIGGER trigger_audit_invoices
 AFTER INSERT OR UPDATE OR DELETE ON invoices
@@ -7193,6 +7416,7 @@ EXECUTE FUNCTION audit_invoice_changes();
 -- =====================================================
 
 -- CA Dashboard view for multiple clients
+DROP VIEW IF EXISTS ca_clients_dashboard CASCADE;
 CREATE OR REPLACE VIEW ca_clients_dashboard AS
 SELECT 
   cca.ca_user_id,
@@ -7228,6 +7452,7 @@ LEFT JOIN gst_health_scores ghs ON cca.client_user_id = ghs.user_id
 WHERE cca.status = 'active';
 
 -- GST Compliance summary view
+DROP VIEW IF EXISTS gst_compliance_summary CASCADE;
 CREATE OR REPLACE VIEW gst_compliance_summary AS
 SELECT 
   i.user_id,
@@ -7279,37 +7504,59 @@ ALTER TABLE gst_health_scores ENABLE ROW LEVEL SECURITY;
 ALTER TABLE gst_health_score_history ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies
+DROP POLICY IF EXISTS "Users can view their GSTR-1 data" ON gstr1_records;
 CREATE POLICY "Users can view their GSTR-1 data" ON gstr1_records FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can manage their GSTR-1 data" ON gstr1_records;
 CREATE POLICY "Users can manage their GSTR-1 data" ON gstr1_records FOR ALL USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can view their GSTR-3B data" ON gstr3b_records;
 CREATE POLICY "Users can view their GSTR-3B data" ON gstr3b_records FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can manage their GSTR-3B data" ON gstr3b_records;
 CREATE POLICY "Users can manage their GSTR-3B data" ON gstr3b_records FOR ALL USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can view their E-Invoices" ON einvoice_records;
 CREATE POLICY "Users can view their E-Invoices" ON einvoice_records FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can manage their E-Invoices" ON einvoice_records;
 CREATE POLICY "Users can manage their E-Invoices" ON einvoice_records FOR ALL USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can view their E-Way Bills" ON eway_bills;
 CREATE POLICY "Users can view their E-Way Bills" ON eway_bills FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can manage their E-Way Bills" ON eway_bills;
 CREATE POLICY "Users can manage their E-Way Bills" ON eway_bills FOR ALL USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can view their GST alerts" ON gst_mismatch_alerts;
 CREATE POLICY "Users can view their GST alerts" ON gst_mismatch_alerts FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can manage their GST alerts" ON gst_mismatch_alerts;
 CREATE POLICY "Users can manage their GST alerts" ON gst_mismatch_alerts FOR ALL USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can view their CA profile" ON ca_profiles;
 CREATE POLICY "Users can view their CA profile" ON ca_profiles FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can manage their CA profile" ON ca_profiles;
 CREATE POLICY "Users can manage their CA profile" ON ca_profiles FOR ALL USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can view CA access to their data" ON client_ca_access;
 CREATE POLICY "Users can view CA access to their data" ON client_ca_access FOR SELECT USING (auth.uid() = client_user_id OR auth.uid() = ca_user_id);
+DROP POLICY IF EXISTS "Clients can manage CA access" ON client_ca_access;
 CREATE POLICY "Clients can manage CA access" ON client_ca_access FOR ALL USING (auth.uid() = client_user_id);
 
+DROP POLICY IF EXISTS "CAs can view activity logs" ON ca_activity_log;
 CREATE POLICY "CAs can view activity logs" ON ca_activity_log FOR SELECT USING (auth.uid() = ca_user_id OR auth.uid() = client_user_id);
+DROP POLICY IF EXISTS "System can insert activity logs" ON ca_activity_log;
 CREATE POLICY "System can insert activity logs" ON ca_activity_log FOR INSERT WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Users can view their audit trail" ON gst_audit_trail;
 CREATE POLICY "Users can view their audit trail" ON gst_audit_trail FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "System can insert audit logs" ON gst_audit_trail;
 CREATE POLICY "System can insert audit logs" ON gst_audit_trail FOR INSERT WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Users can view their health scores" ON gst_health_scores;
 CREATE POLICY "Users can view their health scores" ON gst_health_scores FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "System can manage health scores" ON gst_health_scores;
 CREATE POLICY "System can manage health scores" ON gst_health_scores FOR ALL USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can view health score history" ON gst_health_score_history;
 CREATE POLICY "Users can view health score history" ON gst_health_score_history FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "System can insert health history" ON gst_health_score_history;
 CREATE POLICY "System can insert health history" ON gst_health_score_history FOR INSERT WITH CHECK (auth.uid() = user_id);
 
 -- =====================================================
@@ -7434,20 +7681,24 @@ ALTER TABLE inventory_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE inventory_transactions ENABLE ROW LEVEL SECURITY;
 
 -- Inventory items policies
+
 DROP POLICY IF EXISTS "Users can view their inventory items" ON inventory_items;
 CREATE POLICY "Users can view their inventory items"
     ON inventory_items FOR SELECT
     USING (auth.uid() = user_id);
+
 
 DROP POLICY IF EXISTS "Users can create their inventory items" ON inventory_items;
 CREATE POLICY "Users can create their inventory items"
     ON inventory_items FOR INSERT
     WITH CHECK (auth.uid() = user_id);
 
+
 DROP POLICY IF EXISTS "Users can update their inventory items" ON inventory_items;
 CREATE POLICY "Users can update their inventory items"
     ON inventory_items FOR UPDATE
     USING (auth.uid() = user_id);
+
 
 DROP POLICY IF EXISTS "Users can delete their inventory items" ON inventory_items;
 CREATE POLICY "Users can delete their inventory items"
@@ -7455,10 +7706,12 @@ CREATE POLICY "Users can delete their inventory items"
     USING (auth.uid() = user_id);
 
 -- Inventory transactions policies
+
 DROP POLICY IF EXISTS "Users can view their inventory transactions" ON inventory_transactions;
 CREATE POLICY "Users can view their inventory transactions"
     ON inventory_transactions FOR SELECT
     USING (auth.uid() = user_id);
+
 
 DROP POLICY IF EXISTS "Users can create their inventory transactions" ON inventory_transactions;
 CREATE POLICY "Users can create their inventory transactions"
@@ -7466,6 +7719,7 @@ CREATE POLICY "Users can create their inventory transactions"
     WITH CHECK (auth.uid() = user_id);
 
 -- updated_at trigger
+
 DROP TRIGGER IF EXISTS update_inventory_items_updated_at ON inventory_items;
 CREATE TRIGGER update_inventory_items_updated_at
     BEFORE UPDATE ON inventory_items
@@ -8205,10 +8459,10 @@ CREATE TABLE IF NOT EXISTS activity_logs (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_activity_logs_user_performed_by ON activity_logs(user_id, performed_by);
-CREATE INDEX idx_activity_logs_entity ON activity_logs(entity_type, entity_id);
-CREATE INDEX idx_activity_logs_action_type ON activity_logs(action_type);
-CREATE INDEX idx_activity_logs_created_at ON activity_logs(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_activity_logs_user_performed_by ON activity_logs(user_id, performed_by);
+CREATE INDEX IF NOT EXISTS idx_activity_logs_entity ON activity_logs(entity_type, entity_id);
+CREATE INDEX IF NOT EXISTS idx_activity_logs_action_type ON activity_logs(action_type);
+CREATE INDEX IF NOT EXISTS idx_activity_logs_created_at ON activity_logs(created_at DESC);
 
 -- Maker-Checker Approvals
 CREATE TABLE IF NOT EXISTS approval_workflows (
@@ -8693,6 +8947,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_inventory_alerts ON inventory_items;
 CREATE TRIGGER trigger_inventory_alerts
 AFTER UPDATE OF current_stock ON inventory_items
 FOR EACH ROW
@@ -8703,6 +8958,7 @@ EXECUTE FUNCTION check_and_create_inventory_alerts();
 -- =====================================================
 
 -- Real-time Cash Flow View
+DROP VIEW IF EXISTS cash_flow_realtime CASCADE;
 CREATE OR REPLACE VIEW cash_flow_realtime AS
 SELECT 
   i.user_id,
@@ -8716,6 +8972,7 @@ FROM invoices i
 GROUP BY i.user_id;
 
 -- Collection Efficiency View
+DROP VIEW IF EXISTS collection_efficiency_view CASCADE;
 CREATE OR REPLACE VIEW collection_efficiency_view AS
 SELECT 
   i.user_id,
@@ -8758,28 +9015,51 @@ ALTER TABLE whatsapp_messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payment_nudge_settings ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies (User can only access their own data)
+DROP POLICY IF EXISTS "inventory_items_policy" ON inventory_items;
 CREATE POLICY inventory_items_policy ON inventory_items FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "inventory_batches_policy" ON inventory_batches;
 CREATE POLICY inventory_batches_policy ON inventory_batches FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "job_inventory_allocations_policy" ON job_inventory_allocations;
 CREATE POLICY job_inventory_allocations_policy ON job_inventory_allocations FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "inventory_alerts_policy" ON inventory_alerts;
 CREATE POLICY inventory_alerts_policy ON inventory_alerts FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "expense_categories_policy" ON expense_categories;
 CREATE POLICY expense_categories_policy ON expense_categories FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "expenses_policy" ON expenses;
 CREATE POLICY expenses_policy ON expenses FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "assets_policy" ON assets;
 CREATE POLICY assets_policy ON assets FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "asset_depreciation_log_policy" ON asset_depreciation_log;
 CREATE POLICY asset_depreciation_log_policy ON asset_depreciation_log FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "mis_reports_policy" ON mis_reports;
 CREATE POLICY mis_reports_policy ON mis_reports FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "business_metrics_policy" ON business_metrics;
 CREATE POLICY business_metrics_policy ON business_metrics FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "user_roles_policy" ON user_roles;
 CREATE POLICY user_roles_policy ON user_roles FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "branches_policy" ON branches;
 CREATE POLICY branches_policy ON branches FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "ip_access_rules_policy" ON ip_access_rules;
 CREATE POLICY ip_access_rules_policy ON ip_access_rules FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "activity_logs_policy" ON activity_logs;
 CREATE POLICY activity_logs_policy ON activity_logs FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "approval_workflows_policy" ON approval_workflows;
 CREATE POLICY approval_workflows_policy ON approval_workflows FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "approval_requests_policy" ON approval_requests;
 CREATE POLICY approval_requests_policy ON approval_requests FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "client_portal_users_policy" ON client_portal_users;
 CREATE POLICY client_portal_users_policy ON client_portal_users FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "client_invoice_approvals_policy" ON client_invoice_approvals;
 CREATE POLICY client_invoice_approvals_policy ON client_invoice_approvals FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "invoice_disputes_policy" ON invoice_disputes;
 CREATE POLICY invoice_disputes_policy ON invoice_disputes FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "client_support_chats_policy" ON client_support_chats;
 CREATE POLICY client_support_chats_policy ON client_support_chats FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "whatsapp_templates_policy" ON whatsapp_templates;
 CREATE POLICY whatsapp_templates_policy ON whatsapp_templates FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "whatsapp_messages_policy" ON whatsapp_messages;
 CREATE POLICY whatsapp_messages_policy ON whatsapp_messages FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "payment_nudge_settings_policy" ON payment_nudge_settings;
 CREATE POLICY payment_nudge_settings_policy ON payment_nudge_settings FOR ALL USING (auth.uid() = user_id);
 
 -- =====================================================
@@ -9143,28 +9423,31 @@ CREATE TABLE IF NOT EXISTS invoice_settings (
 ALTER TABLE invoice_settings ENABLE ROW LEVEL SECURITY;
 
 -- Policies
+
 DROP POLICY IF EXISTS "Users can view their own invoice settings" ON invoice_settings;
 CREATE POLICY "Users can view their own invoice settings"
   ON invoice_settings FOR SELECT
   USING (auth.uid() = user_id);
+
 
 DROP POLICY IF EXISTS "Users can insert their own invoice settings" ON invoice_settings;
 CREATE POLICY "Users can insert their own invoice settings"
   ON invoice_settings FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
+
 DROP POLICY IF EXISTS "Users can update their own invoice settings" ON invoice_settings;
 CREATE POLICY "Users can update their own invoice settings"
   ON invoice_settings FOR UPDATE
   USING (auth.uid() = user_id);
+
 
 DROP POLICY IF EXISTS "Users can delete their own invoice settings" ON invoice_settings;
 CREATE POLICY "Users can delete their own invoice settings"
   ON invoice_settings FOR DELETE
   USING (auth.uid() = user_id);
 
--- Create index
-CREATE INDEX IF NOT EXISTS idx_invoice_settings_user_id ON invoice_settings(user_id);
+-- CREATE INDEX IF NOT EXISTS CREATE INDEX IF NOT EXISTS idx_invoice_settings_user_id ON invoice_settings(user_id);
 
 
 -- ==========================================
@@ -9203,20 +9486,24 @@ CREATE TABLE IF NOT EXISTS saved_items (
 -- Row-level security
 ALTER TABLE saved_items ENABLE ROW LEVEL SECURITY;
 
+
 DROP POLICY IF EXISTS "Users can view their own saved items" ON saved_items;
 CREATE POLICY "Users can view their own saved items"
     ON saved_items FOR SELECT
     USING (auth.uid() = user_id);
+
 
 DROP POLICY IF EXISTS "Users can create their own saved items" ON saved_items;
 CREATE POLICY "Users can create their own saved items"
     ON saved_items FOR INSERT
     WITH CHECK (auth.uid() = user_id);
 
+
 DROP POLICY IF EXISTS "Users can update their own saved items" ON saved_items;
 CREATE POLICY "Users can update their own saved items"
     ON saved_items FOR UPDATE
     USING (auth.uid() = user_id);
+
 
 DROP POLICY IF EXISTS "Users can delete their own saved items" ON saved_items;
 CREATE POLICY "Users can delete their own saved items"
@@ -9234,6 +9521,7 @@ BEGIN
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+
 
 DROP TRIGGER IF EXISTS saved_items_updated_at ON saved_items;
 CREATE TRIGGER saved_items_updated_at
@@ -9283,6 +9571,7 @@ VALUES ('invoice-qr-codes', 'invoice-qr-codes', true)
 ON CONFLICT (id) DO NOTHING;
 
 -- Set up storage policies for QR codes
+DROP POLICY IF EXISTS "Users can upload their own QR codes" ON storage.objects;
 CREATE POLICY "Users can upload their own QR codes"
 ON storage.objects FOR INSERT
 WITH CHECK (
@@ -9290,6 +9579,7 @@ WITH CHECK (
   AND auth.uid()::text = (storage.foldername(name))[1]
 );
 
+DROP POLICY IF EXISTS "Users can update their own QR codes" ON storage.objects;
 CREATE POLICY "Users can update their own QR codes"
 ON storage.objects FOR UPDATE
 USING (
@@ -9297,6 +9587,7 @@ USING (
   AND auth.uid()::text = (storage.foldername(name))[1]
 );
 
+DROP POLICY IF EXISTS "Users can delete their own QR codes" ON storage.objects;
 CREATE POLICY "Users can delete their own QR codes"
 ON storage.objects FOR DELETE
 USING (
@@ -9304,6 +9595,7 @@ USING (
   AND auth.uid()::text = (storage.foldername(name))[1]
 );
 
+DROP POLICY IF EXISTS "QR codes are publicly accessible" ON storage.objects;
 CREATE POLICY "QR codes are publicly accessible"
 ON storage.objects FOR SELECT
 USING (bucket_id = 'invoice-qr-codes');
@@ -9346,7 +9638,7 @@ ALTER TABLE invoices
 ADD CONSTRAINT check_payment_amounts 
 CHECK (amount_paid >= 0 AND amount_paid <= total AND amount_remaining >= 0);
 
--- Create index for queries on partial payments
+-- CREATE INDEX IF NOT EXISTS for queries on partial payments
 CREATE INDEX IF NOT EXISTS idx_invoices_partial_payment ON invoices(user_id, is_partial_payment) 
 WHERE is_partial_payment = true;
 
@@ -9371,20 +9663,24 @@ CREATE INDEX IF NOT EXISTS idx_invoice_payments_date ON invoice_payments(payment
 ALTER TABLE invoice_payments ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for invoice_payments (drop first if they exist)
+
 DROP POLICY IF EXISTS "Users can view their own invoice payments" ON invoice_payments;
 CREATE POLICY "Users can view their own invoice payments"
   ON invoice_payments FOR SELECT
   USING (auth.uid() = user_id);
+
 
 DROP POLICY IF EXISTS "Users can insert their own invoice payments" ON invoice_payments;
 CREATE POLICY "Users can insert their own invoice payments"
   ON invoice_payments FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
+
 DROP POLICY IF EXISTS "Users can update their own invoice payments" ON invoice_payments;
 CREATE POLICY "Users can update their own invoice payments"
   ON invoice_payments FOR UPDATE
   USING (auth.uid() = user_id);
+
 
 DROP POLICY IF EXISTS "Users can delete their own invoice payments" ON invoice_payments;
 CREATE POLICY "Users can delete their own invoice payments"
@@ -9429,6 +9725,7 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Create trigger for invoice payments
+
 DROP TRIGGER IF EXISTS trigger_update_invoice_on_payment ON invoice_payments;
 CREATE TRIGGER trigger_update_invoice_on_payment
   AFTER INSERT OR UPDATE OR DELETE ON invoice_payments
@@ -9476,7 +9773,7 @@ CREATE TABLE IF NOT EXISTS ai_chat_history (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Create index for faster user-specific queries
+-- CREATE INDEX IF NOT EXISTS for faster user-specific queries
 CREATE INDEX IF NOT EXISTS ai_chat_history_user_id_idx ON ai_chat_history(user_id);
 CREATE INDEX IF NOT EXISTS ai_chat_history_created_at_idx ON ai_chat_history(created_at DESC);
 
@@ -9484,17 +9781,20 @@ CREATE INDEX IF NOT EXISTS ai_chat_history_created_at_idx ON ai_chat_history(cre
 ALTER TABLE ai_chat_history ENABLE ROW LEVEL SECURITY;
 
 -- Create RLS policies (drop first to avoid conflicts on re-run)
+
 DROP POLICY IF EXISTS "Users can view own chat history" ON ai_chat_history;
 CREATE POLICY "Users can view own chat history"
     ON ai_chat_history
     FOR SELECT
     USING (auth.uid() = user_id);
 
+
 DROP POLICY IF EXISTS "Users can insert own chat history" ON ai_chat_history;
 CREATE POLICY "Users can insert own chat history"
     ON ai_chat_history
     FOR INSERT
     WITH CHECK (auth.uid() = user_id);
+
 
 DROP POLICY IF EXISTS "Users can delete own chat history" ON ai_chat_history;
 CREATE POLICY "Users can delete own chat history"

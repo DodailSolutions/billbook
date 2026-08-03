@@ -5,7 +5,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { LayoutDashboard, FileText, Users, RefreshCw, Bell, Settings, User, Bot, UserCog, FileBarChart, HelpCircle, MessageCircle, Briefcase, UserPlus, ChevronLeft, ChevronRight, Package, Receipt } from "lucide-react"
+import { LayoutDashboard, FileText, Users, RefreshCw, Bell, Settings, User, Bot, UserCog, FileBarChart, HelpCircle, MessageCircle, Briefcase, UserPlus, ChevronLeft, ChevronRight, Package, Receipt, Sparkles, BookOpen } from "lucide-react"
 import { SignOutButton } from "./SignOutButton"
 import { PlanBanner } from "./PlanBanner"
 import { getMyCAProfile } from "@/lib/ca-profile-actions"
@@ -35,6 +35,20 @@ export function Sidebar() {
             icon: FileText,
             href: '/invoices',
             color: "text-violet-500",
+        },
+        {
+            label: 'CRM & Pipeline',
+            icon: Sparkles,
+            href: '/crm',
+            color: "text-indigo-600",
+            badge: 'NEW'
+        },
+        {
+            label: 'Bookkeeping',
+            icon: BookOpen,
+            href: '/bookkeeping',
+            color: "text-emerald-600",
+            badge: 'NEW'
         },
         {
             label: 'Recurring',
