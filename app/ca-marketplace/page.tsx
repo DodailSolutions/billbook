@@ -411,34 +411,34 @@ export default function CAMarketplacePage() {
       )}
 
       {/* Header */}
-      <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50">
+      <header className="bg-white/90 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-50">
         <div className="container max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center gap-3">
-              <div className="relative w-10 h-10">
+              <div className="relative w-9 h-9">
                 <Image 
                   src="/logo-icon.svg" 
                   alt="BillBooky Logo" 
-                  width={40} 
-                  height={40}
+                  width={36} 
+                  height={36}
                 />
               </div>
-              <h1 className="text-2xl font-bold bg-linear-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent">
-                BillBooky
-              </h1>
+              <span className="text-2xl font-black text-slate-950 tracking-tight">
+                BillBooky<span className="text-emerald-600">.</span>
+              </span>
             </Link>
             <div className="flex items-center gap-3">
-              <Button variant="ghost" onClick={() => setShowPolicies(true)} className="gap-2">
+              <Button variant="ghost" onClick={() => setShowPolicies(true)} className="gap-2 font-bold text-slate-700 hover:text-black">
                 Rules & Policies
               </Button>
               <Link href="/dashboard">
-                <Button variant="ghost" className="gap-2">
+                <Button variant="ghost" className="gap-2 font-bold text-slate-700 hover:text-black">
                   <Home className="w-4 h-4" />
                   Dashboard
                 </Button>
               </Link>
               <Link href="/reports/hire-ca">
-                <Button>Post Requirements</Button>
+                <Button className="bg-black hover:bg-slate-900 text-white font-bold rounded-full px-6 min-h-[44px] shadow-md">Post Requirements</Button>
               </Link>
             </div>
           </div>
@@ -446,42 +446,42 @@ export default function CAMarketplacePage() {
       </header>
 
       <div className="container max-w-7xl mx-auto py-8 px-4">
-        <Button variant="ghost" onClick={() => router.push('/')} className="mb-6">
+        <Button variant="ghost" onClick={() => router.push('/')} className="mb-6 font-bold text-slate-700 hover:text-black">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Home
         </Button>
 
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">Find a Chartered Accountant</h1>
-          <p className="text-lg text-gray-600">
-            Browse our network of {cas.length} verified CAs and find the perfect match for your business
+          <h1 className="text-4xl font-black text-slate-950 -tracking-tight mb-2">Find a Certified CA</h1>
+          <p className="text-lg text-slate-600 font-medium">
+            Browse our network of {cas.length} verified Chartered Accountants for business filing, audit & tax advice
           </p>
         </div>
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           <Link href="/reports/hire-ca">
-            <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer border-blue-200 dark:border-blue-800">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
-                  <Briefcase className="w-6 h-6 text-blue-600" />
+            <Card className="p-5 hover:shadow-xl transition-all duration-300 cursor-pointer border-slate-200/80 hover:border-emerald-500/50 bg-white rounded-2xl">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center justify-center">
+                  <Briefcase className="w-6 h-6 text-emerald-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg">Post Your Requirements</h3>
-                  <p className="text-sm text-gray-600">Get personalized proposals from CAs</p>
+                  <h3 className="font-bold text-slate-950 text-lg">Post Your Requirements</h3>
+                  <p className="text-sm text-slate-600 font-medium">Get personalized proposals from CAs</p>
                 </div>
               </div>
             </Card>
           </Link>
           <Link href="/reports/my-ca-requests">
-            <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer border-emerald-200 dark:border-emerald-800">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg flex items-center justify-center">
-                  <Users className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+            <Card className="p-5 hover:shadow-xl transition-all duration-300 cursor-pointer border-slate-200/80 hover:border-emerald-500/50 bg-white rounded-2xl">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center justify-center">
+                  <Users className="w-6 h-6 text-emerald-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg">View My Requests</h3>
-                  <p className="text-sm text-gray-600">Check proposals and manage engagements</p>
+                  <h3 className="font-bold text-slate-950 text-lg">View My Requests</h3>
+                  <p className="text-sm text-slate-600 font-medium">Check proposals and manage engagements</p>
                 </div>
               </div>
             </Card>
@@ -508,7 +508,7 @@ export default function CAMarketplacePage() {
             <Filter className="w-4 h-4" />
             Filters
             {Object.values(filters).filter(Boolean).length > 0 && (
-              <span className="ml-1 px-2 py-0.5 bg-blue-600 text-white text-xs rounded-full">
+              <span className="ml-1 px-2 py-0.5 bg-emerald-600 text-white text-xs rounded-full font-bold">
                 {Object.values(filters).filter(Boolean).length}
               </span>
             )}
@@ -517,16 +517,16 @@ export default function CAMarketplacePage() {
 
         {/* Filters Panel */}
         {showFilters && (
-          <Card className="p-6 mb-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Card className="p-6 mb-6 bg-white border border-slate-200/80 rounded-2xl shadow-md">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-slate-900">
               <div>
-                <label className="block text-sm font-medium mb-2">State</label>
+                <label className="block text-sm font-bold mb-2 text-slate-800">State</label>
                 <select
                   value={filters.state || ''}
                   onChange={(e) =>
                     setFilters((prev) => ({ ...prev, state: e.target.value || undefined }))
                   }
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
+                  className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl bg-white text-slate-900 font-medium"
                 >
                   <option value="">All States</option>
                   {STATES.map((state) => (
@@ -538,7 +538,7 @@ export default function CAMarketplacePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">City</label>
+                <label className="block text-sm font-bold mb-2 text-slate-800">City</label>
                 <input
                   type="text"
                   value={filters.city || ''}
@@ -546,12 +546,12 @@ export default function CAMarketplacePage() {
                     setFilters((prev) => ({ ...prev, city: e.target.value || undefined }))
                   }
                   placeholder="Enter city name"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
+                  className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl bg-white text-slate-900 font-medium"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Minimum Rating</label>
+                <label className="block text-sm font-bold mb-2 text-slate-800">Minimum Rating</label>
                 <select
                   value={filters.min_rating || ''}
                   onChange={(e) =>
@@ -560,7 +560,7 @@ export default function CAMarketplacePage() {
                       min_rating: e.target.value ? Number(e.target.value) : undefined,
                     }))
                   }
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
+                  className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl bg-white text-slate-900 font-medium"
                 >
                   <option value="">Any Rating</option>
                   <option value="4">4+ Stars</option>
@@ -569,7 +569,7 @@ export default function CAMarketplacePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Max Consultation Fee (₹)</label>
+                <label className="block text-sm font-bold mb-2 text-slate-800">Max Consultation Fee (₹)</label>
                 <input
                   type="number"
                   value={filters.max_consultation_fee || ''}
@@ -580,12 +580,12 @@ export default function CAMarketplacePage() {
                     }))
                   }
                   placeholder="e.g., 5000"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
+                  className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl bg-white text-slate-900 font-medium"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Max Monthly Retainer (₹)</label>
+                <label className="block text-sm font-bold mb-2 text-slate-800">Max Monthly Retainer (₹)</label>
                 <input
                   type="number"
                   value={filters.max_retainer_fee || ''}
@@ -596,12 +596,12 @@ export default function CAMarketplacePage() {
                     }))
                   }
                   placeholder="e.g., 15000"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
+                  className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl bg-white text-slate-900 font-medium"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Minimum Experience (Years)</label>
+                <label className="block text-sm font-bold mb-2 text-slate-800">Minimum Experience (Years)</label>
                 <input
                   type="number"
                   value={filters.min_experience || ''}
@@ -612,22 +612,22 @@ export default function CAMarketplacePage() {
                     }))
                   }
                   placeholder="e.g., 5"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"
+                  className="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl bg-white text-slate-900 font-medium"
                 />
               </div>
             </div>
 
-            <div className="mt-4">
-              <label className="block text-sm font-medium mb-3">Specializations</label>
+            <div className="mt-5">
+              <label className="block text-sm font-bold mb-3 text-slate-800">Specializations</label>
               <div className="flex flex-wrap gap-2">
                 {SPECIALIZATIONS.map((spec) => (
                   <button
                     key={spec}
                     onClick={() => toggleSpecialization(spec)}
-                    className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                    className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
                       filters.specializations?.includes(spec)
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                        ? 'bg-emerald-600 text-white shadow-xs'
+                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
                     }`}
                   >
                     {spec}
@@ -636,11 +636,11 @@ export default function CAMarketplacePage() {
               </div>
             </div>
 
-            <div className="flex justify-between mt-6">
-              <Button variant="ghost" onClick={handleClearFilters}>
+            <div className="flex justify-between mt-6 pt-4 border-t border-slate-100">
+              <Button variant="ghost" onClick={handleClearFilters} className="font-bold text-slate-600 hover:text-black">
                 Clear Filters
               </Button>
-              <Button onClick={handleApplyFilters}>Apply Filters</Button>
+              <Button onClick={handleApplyFilters} className="bg-black hover:bg-slate-900 text-white font-bold rounded-full px-6 min-h-[44px]">Apply Filters</Button>
             </div>
           </Card>
         )}

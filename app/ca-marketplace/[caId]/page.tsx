@@ -58,23 +58,23 @@ export default function CAProfilePage({ params }: { params: { caId: string } }) 
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-slate-50/50">
         {/* Header */}
-        <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <header className="bg-white/90 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-50">
           <div className="container max-w-7xl mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
               <Link href="/" className="flex items-center gap-3">
-                <div className="relative w-10 h-10">
+                <div className="relative w-9 h-9">
                   <Image 
                     src="/logo-icon.svg" 
                     alt="BillBooky Logo" 
-                    width={40} 
-                    height={40}
+                    width={36} 
+                    height={36}
                   />
                 </div>
-                <h1 className="text-2xl font-bold bg-linear-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent">
-                  BillBooky
-                </h1>
+                <span className="text-2xl font-black text-slate-950 tracking-tight">
+                  BillBooky<span className="text-emerald-600">.</span>
+                </span>
               </Link>
             </div>
           </div>
