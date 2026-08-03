@@ -26,15 +26,37 @@ ALTER TABLE customers ADD COLUMN IF NOT EXISTS customer_state_code VARCHAR(2);
 -- Create a table to track HSN/SAC master data
 CREATE TABLE IF NOT EXISTS hsn_sac_master (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  code VARCHAR(6) NOT NULL UNIQUE,
+  code VARCHAR(20) NOT NULL UNIQUE,
   description TEXT NOT NULL,
   category VARCHAR(20) NOT NULL CHECK (category IN ('HSN', 'SAC')),
-  default_gst_rate DECIMAL(5, 2) NOT NULL DEFAULT 18,
+  gst_rate DECIMAL(5, 2) DEFAULT 18.00,
+  default_gst_rate DECIMAL(5, 2) DEFAULT 18.00,
   product_category VARCHAR(100),
-  is_active BOOLEAN DEFAULT TRUE,
+  chapter_no VARCHAR(4),
+  chapter_name VARCHAR(200),
+  is_active BOOLEAN DEFAULT true,
+  effective_from DATE,
+  search_keywords TEXT[], -- For intelligent search
+  usage_count INTEGER DEFAULT 0, -- Track popularity
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- Ensure all required columns exist (in case table was created elsewhere)
+DO $$ 
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'hsn_sac_master' AND column_name = 'default_gst_rate') THEN
+    ALTER TABLE hsn_sac_master ADD COLUMN default_gst_rate DECIMAL(5, 2) DEFAULT 18.00;
+  END IF;
+  
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'hsn_sac_master' AND column_name = 'product_category') THEN
+    ALTER TABLE hsn_sac_master ADD COLUMN product_category VARCHAR(100);
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'hsn_sac_master' AND column_name = 'gst_rate') THEN
+    ALTER TABLE hsn_sac_master ADD COLUMN gst_rate DECIMAL(5, 2) DEFAULT 18.00;
+  END IF;
+END $$;
 
 -- Create table for reverse charge settings
 CREATE TABLE IF NOT EXISTS reverse_charge_settings (
