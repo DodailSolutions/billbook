@@ -3,7 +3,7 @@ import Image from 'next/image'
 
 export default function Footer() {
   return (
-    <footer className="hidden md:block border-t border-gray-200 bg-gray-50">
+    <footer className="hidden md:block border-t border-slate-200/80 bg-white text-slate-900 mt-16">
       <div className="max-w-7xl mx-auto px-6 py-12">
         <div className="grid md:grid-cols-4 gap-8 mb-8">
           <div>
@@ -16,44 +16,47 @@ export default function Footer() {
                   height={32}
                 />
               </div>
-              <h4 className="text-xl font-bold text-gray-900">BillBooky</h4>
+              <h4 className="text-xl font-black text-slate-950">BillBooky<span className="text-emerald-600">.</span></h4>
             </div>
-            <p className="text-sm text-gray-600">
-              Professional invoicing for Indian businesses. GST-compliant, simple, and secure.
+            <p className="text-xs text-slate-600 font-medium leading-relaxed">
+              Professional invoicing, CRM, double-entry bookkeeping, purchase orders & payroll for Indian businesses.
             </p>
           </div>
           
           <div>
-            <h5 className="font-bold text-gray-900 mb-4">Product</h5>
-            <ul className="space-y-2 text-sm text-gray-600">
-              <li><Link href="/features" className="hover:text-emerald-600">Features</Link></li>
-              <li><Link href="/pricing" className="hover:text-emerald-600">Pricing</Link></li>
-              <li><Link href="/faq" className="hover:text-emerald-600">FAQ</Link></li>
+            <h5 className="font-bold text-slate-950 mb-4">Product</h5>
+            <ul className="space-y-2 text-xs text-slate-600 font-medium">
+              <li><Link href="/features" className="hover:text-emerald-600 transition-colors">Features</Link></li>
+              <li><Link href="/pricing" className="hover:text-emerald-600 transition-colors">Pricing</Link></li>
+              <li><Link href="/faq" className="hover:text-emerald-600 transition-colors">FAQ</Link></li>
             </ul>
           </div>
           
           <div>
-            <h5 className="font-bold text-gray-900 mb-4">Company</h5>
-            <ul className="space-y-2 text-sm text-gray-600">
-              <li><Link href="/about" className="hover:text-emerald-600">About</Link></li>
-              <li><Link href="/contact" className="hover:text-emerald-600">Contact</Link></li>
-              <li><Link href="/support" className="hover:text-emerald-600">Support</Link></li>
+            <h5 className="font-bold text-slate-950 mb-4">Company</h5>
+            <ul className="space-y-2 text-xs text-slate-600 font-medium">
+              <li><Link href="/about" className="hover:text-emerald-600 transition-colors">About Us</Link></li>
+              <li><Link href="/contact" className="hover:text-emerald-600 transition-colors">Contact</Link></li>
+              <li><Link href="/support" className="hover:text-emerald-600 transition-colors">Support</Link></li>
             </ul>
           </div>
           
           <div>
-            <h5 className="font-bold text-gray-900 mb-4">Legal</h5>
-            <ul className="space-y-2 text-sm text-gray-600">
-              <li><Link href="/privacy" className="hover:text-emerald-600">Privacy Policy</Link></li>
-              <li><Link href="/terms" className="hover:text-emerald-600">Terms of Service</Link></li>
-              <li><Link href="/refund" className="hover:text-emerald-600">Refund Policy</Link></li>
+            <h5 className="font-bold text-slate-950 mb-4">Legal</h5>
+            <ul className="space-y-2 text-xs text-slate-600 font-medium">
+              <li><Link href="/privacy" className="hover:text-emerald-600 transition-colors">Privacy Policy</Link></li>
+              <li><Link href="/terms" className="hover:text-emerald-600 transition-colors">Terms of Service</Link></li>
+              <li><Link href="/refund" className="hover:text-emerald-600 transition-colors">Refund Policy</Link></li>
             </ul>
           </div>
         </div>
         
-        <div className="pt-8 border-t border-gray-200 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-gray-600">© 2025 BillBooky. Built with ❤️ for Indian businesses.</p>
-          <p className="text-sm text-gray-600">Made in India 🇮🇳</p>
+        <div className="pt-8 border-t border-slate-200/80 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-600 font-medium">
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-slate-950 text-base">BillBooky</span>
+            <span>© 2026 BillBooky Inc. All rights reserved.</span>
+          </div>
+          <p className="text-slate-500">Made in India 🇮🇳</p>
         </div>
       </div>
     </footer>
