@@ -212,7 +212,7 @@ export async function getJournalEntries(): Promise<JournalEntry[]> {
     })
 }
 
-export async function createJournalEntry(input: CreateJournalEntryInput): Promise<{ success: boolean; error?: string }> {
+export async function createJournalEntry(input: CreateJournalEntryInput): Promise<{ success: boolean; data?: any; error?: string }> {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
@@ -247,7 +247,7 @@ export async function createJournalEntry(input: CreateJournalEntryInput): Promis
             description: input.description,
             reference: input.reference || null,
             status: 'posted',
-            source: 'manual'
+            source: input.source || 'manual'
         }])
         .select()
         .single()
@@ -301,7 +301,7 @@ export async function createJournalEntry(input: CreateJournalEntryInput): Promis
     }
 
     revalidatePath('/bookkeeping')
-    return { success: true }
+    return { success: true, data: entry }
 }
 
 export async function getTrialBalance(): Promise<TrialBalanceItem[]> {
@@ -510,3 +510,68 @@ export async function reconcileBankAccount(
     revalidatePath('/bookkeeping')
     return { success: true }
 }
+
+export async function postPayrollJournalEntry(
+    payrollRunId: string,
+    month: number,
+    year: number,
+    grossSalary: number,
+    totalDeductions: number,
+    netPay: number
+): Promise<{ success: boolean; entryId?: string; error?: string }> {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) return { success: false, error: 'Unauthorized' }
+
+    const coa = await getChartOfAccounts()
+    const salaryAccount = coa.find(a => a.account_code === '5300') || coa.find(a => a.account_type === 'expense')
+    const bankAccount = coa.find(a => a.account_code === '1020') || coa.find(a => a.account_type === 'asset')
+    const liabilityAccount = coa.find(a => a.account_code === '2010') || coa.find(a => a.account_type === 'liability')
+
+    if (!salaryAccount || !bankAccount) {
+        return { success: false, error: 'Required Chart of Accounts (Expense / Bank) missing.' }
+    }
+
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    const monthStr = monthNames[month - 1] || `${month}`
+
+    const lines = [
+        {
+            account_id: salaryAccount.id,
+            debit_amount: grossSalary,
+            credit_amount: 0,
+            memo: `Gross salary for ${monthStr} ${year}`
+        },
+        {
+            account_id: bankAccount.id,
+            debit_amount: 0,
+            credit_amount: netPay,
+            memo: `Net salary payout via Bank for ${monthStr} ${year}`
+        }
+    ]
+
+    if (totalDeductions > 0 && liabilityAccount) {
+        lines.push({
+            account_id: liabilityAccount.id,
+            debit_amount: 0,
+            credit_amount: totalDeductions,
+            memo: `Payroll deductions (PF/ESI/TDS) for ${monthStr} ${year}`
+        })
+    }
+
+    const result = await createJournalEntry({
+        entry_date: new Date().toISOString().slice(0, 10),
+        description: `Payroll Processing - ${monthStr} ${year}`,
+        reference: `PAYROLL-${year}-${month}`,
+        source: 'payroll',
+        lines
+    })
+
+    if (result.success && result.data) {
+        return { success: true, entryId: result.data.id }
+    } else {
+        return { success: false, error: result.error || 'Failed to post payroll journal entry' }
+    }
+}
+

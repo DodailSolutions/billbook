@@ -122,6 +122,50 @@ export async function createInventoryItem(formData: FormData) {
     redirect('/inventory')
 }
 
+export async function getInventoryValuationReport() {
+    const items = await getInventoryItems()
+
+    const totalSkus = items.length
+    const totalCostValue = items.reduce((sum, item) => sum + (Number(item.current_stock || 0) * Number(item.purchase_price || 0)), 0)
+    const totalRetailValue = items.reduce((sum, item) => sum + (Number(item.current_stock || 0) * Number(item.selling_price || 0)), 0)
+    const potentialMargin = totalRetailValue - totalCostValue
+    const potentialMarginPercent = totalRetailValue > 0 ? ((potentialMargin / totalRetailValue) * 100).toFixed(1) : '0.0'
+
+    const reorderItems = items.filter(item => Number(item.current_stock || 0) <= Number(item.reorder_level || 0))
+    const outOfStockItems = items.filter(item => Number(item.current_stock || 0) <= 0)
+
+    const valuedItems = items.map(item => {
+        const stock = Number(item.current_stock || 0)
+        const costPrice = Number(item.purchase_price || 0)
+        const sellPrice = Number(item.selling_price || 0)
+        const assetValue = stock * costPrice
+        const retailValue = stock * sellPrice
+
+        return {
+            ...item,
+            current_stock: stock,
+            purchase_price: costPrice,
+            selling_price: sellPrice,
+            assetValue,
+            retailValue,
+            unitMargin: sellPrice - costPrice,
+            isLowStock: stock <= Number(item.reorder_level || 0)
+        }
+    }).sort((a, b) => b.assetValue - a.assetValue)
+
+    return {
+        totalSkus,
+        totalCostValue,
+        totalRetailValue,
+        potentialMargin,
+        potentialMarginPercent,
+        reorderCount: reorderItems.length,
+        outOfStockCount: outOfStockItems.length,
+        valuedItems
+    }
+}
+
+
 export async function updateInventoryItem(id: string, formData: FormData) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()

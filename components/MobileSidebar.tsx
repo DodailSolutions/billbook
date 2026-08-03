@@ -5,7 +5,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { LayoutDashboard, FileText, Users, Bell, Settings, User, Menu, X, Bot, UserCog, Package, Receipt, Sparkles, BookOpen, MoreHorizontal } from "lucide-react"
+import { LayoutDashboard, FileText, Users, Bell, Settings, User, Menu, X, Bot, UserCog, Package, Receipt, Sparkles, BookOpen, MoreHorizontal, ShoppingBag, DollarSign } from "lucide-react"
 import { SignOutButton } from "./SignOutButton"
 import { PlanBanner } from "./PlanBanner"
 
@@ -34,6 +34,20 @@ const routes = [
         icon: BookOpen,
         href: '/bookkeeping',
         color: "text-emerald-600",
+        badge: 'NEW'
+    },
+    {
+        label: 'Purchase Orders',
+        icon: ShoppingBag,
+        href: '/purchase-orders',
+        color: "text-indigo-500",
+        badge: 'NEW'
+    },
+    {
+        label: 'Payroll & Salaries',
+        icon: DollarSign,
+        href: '/payroll',
+        color: "text-emerald-500",
         badge: 'NEW'
     },
     {

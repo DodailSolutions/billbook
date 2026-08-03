@@ -1,7 +1,7 @@
 export type AccountType = 'asset' | 'liability' | 'equity' | 'revenue' | 'expense'
 
 export type JournalEntryStatus = 'draft' | 'posted' | 'void'
-export type JournalEntrySource = 'manual' | 'invoice' | 'expense' | 'payment'
+export type JournalEntrySource = 'manual' | 'invoice' | 'expense' | 'payment' | 'payroll'
 
 export interface ChartOfAccount {
     id: string
@@ -114,6 +114,7 @@ export interface CreateJournalEntryInput {
     entry_date: string
     description: string
     reference?: string
+    source?: JournalEntrySource
     lines: {
         account_id: string
         debit_amount: number
