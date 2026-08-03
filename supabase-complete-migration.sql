@@ -5784,8 +5784,8 @@ CREATE POLICY "Super admins can manage SMTP settings"
   FOR ALL
   USING (
     EXISTS (
-      SELECT 1 FROM user_roles
-      WHERE user_id = auth.uid()
+      SELECT 1 FROM user_profiles
+      WHERE id = auth.uid()
       AND role = 'super_admin'
     )
   );
