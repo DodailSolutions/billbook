@@ -68,12 +68,50 @@ CREATE TABLE IF NOT EXISTS voice_commands_log (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   voice_recording_id UUID REFERENCES voice_recordings(id),
-  command_type VARCHAR(50) NOT NULL, -- 'create_invoice', 'add_item', 'update_customer', 'set_date', etc.
-  command_text TEXT NOT NULL,
-  extracted_entities JSONB, -- Entities extracted from command
+  command_type VARCHAR(50) NOT NULL DEFAULT 'unknown',
+  command_text TEXT NOT NULL DEFAULT '',
+  extracted_entities JSONB,
   executed BOOLEAN DEFAULT false,
   execution_result JSONB,
+  
+  -- Voice Input
+  transcript TEXT,
+  language VARCHAR(10) DEFAULT 'en-IN',  -- en-IN, hi-IN, te-IN, ta-IN
+  confidence_score DECIMAL(5, 4),  -- 0.0000 to 1.0000
+  
+  -- Recognition
+  recognized_intent VARCHAR(100),  -- create_invoice, view_customers, check_payment, etc.
+  recognized_entities JSONB,  -- Extracted entities (customer name, amount, etc.)
+  
+  -- Processing
+  processing_status VARCHAR(50) DEFAULT 'processed',  -- processing, processed, failed
+  processing_time_ms INTEGER,
+  
+  -- Action Taken
+  action_executed VARCHAR(100),
+  action_result VARCHAR(50),  -- success, failed, cancelled
+  action_data JSONB,
+  
+  -- Error Handling
   error_message TEXT,
+  fallback_used BOOLEAN DEFAULT false,
+  
+  -- User Feedback
+  user_confirmed BOOLEAN,
+  user_corrected BOOLEAN DEFAULT false,
+  corrected_transcript TEXT,
+  
+  -- Context
+  previous_command_id UUID REFERENCES voice_commands_log(id),
+  session_id VARCHAR(255),
+  
+  -- Device
+  device_type VARCHAR(50),
+  browser VARCHAR(100),
+  
+  -- Training Data
+  used_for_training BOOLEAN DEFAULT false,
+  
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 

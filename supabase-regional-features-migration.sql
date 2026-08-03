@@ -169,9 +169,15 @@ CREATE INDEX IF NOT EXISTS idx_cache_last_accessed ON offline_cache_metadata(las
 CREATE TABLE IF NOT EXISTS voice_commands_log (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  voice_recording_id UUID REFERENCES voice_recordings(id),
+  command_type VARCHAR(50) NOT NULL DEFAULT 'unknown',
+  command_text TEXT NOT NULL DEFAULT '',
+  extracted_entities JSONB,
+  executed BOOLEAN DEFAULT false,
+  execution_result JSONB,
   
   -- Voice Input
-  transcript TEXT NOT NULL,
+  transcript TEXT,
   language VARCHAR(10) DEFAULT 'en-IN',  -- en-IN, hi-IN, te-IN, ta-IN
   confidence_score DECIMAL(5, 4),  -- 0.0000 to 1.0000
   
@@ -208,7 +214,7 @@ CREATE TABLE IF NOT EXISTS voice_commands_log (
   -- Training Data
   used_for_training BOOLEAN DEFAULT false,
   
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Add missing columns to existing voice_commands_log table
