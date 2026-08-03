@@ -40,7 +40,7 @@ export default function AuthLayout({
             </main>
 
             {/* Footer */}
-            <footer className="max-w-7xl w-full mx-auto text-center py-4 text-xs text-slate-500 font-medium">
+            <footer className="hidden md:block max-w-7xl w-full mx-auto text-center py-4 text-xs text-slate-500 font-medium">
                 BillBooky © 2026 BillBooky Inc. All rights reserved.
             </footer>
         </div>
