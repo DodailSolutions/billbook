@@ -8504,6 +8504,59 @@ CREATE TABLE IF NOT EXISTS whatsapp_messages (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Ensure all required columns exist in whatsapp_messages (in case table was created elsewhere)
+DO $$ 
+BEGIN
+  -- Add message_status if missing
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'whatsapp_messages' AND column_name = 'message_status'
+  ) THEN
+    ALTER TABLE whatsapp_messages ADD COLUMN message_status VARCHAR(50) DEFAULT 'pending';
+  END IF;
+
+  -- Add status if missing
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'whatsapp_messages' AND column_name = 'status'
+  ) THEN
+    ALTER TABLE whatsapp_messages ADD COLUMN status TEXT DEFAULT 'pending';
+  END IF;
+
+  -- Sync status and message_status values if either is missing
+  UPDATE whatsapp_messages SET message_status = status WHERE message_status IS NULL AND status IS NOT NULL;
+  UPDATE whatsapp_messages SET status = message_status WHERE status IS NULL AND message_status IS NOT NULL;
+
+  -- Add other potential missing columns
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'whatsapp_messages' AND column_name = 'recipient_phone') THEN
+    ALTER TABLE whatsapp_messages ADD COLUMN recipient_phone VARCHAR(50);
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'whatsapp_messages' AND column_name = 'recipient_name') THEN
+    ALTER TABLE whatsapp_messages ADD COLUMN recipient_name VARCHAR(255);
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'whatsapp_messages' AND column_name = 'media_urls') THEN
+    ALTER TABLE whatsapp_messages ADD COLUMN media_urls JSONB;
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'whatsapp_messages' AND column_name = 'attachment_url') THEN
+    ALTER TABLE whatsapp_messages ADD COLUMN attachment_url TEXT;
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'whatsapp_messages' AND column_name = 'media_type') THEN
+    ALTER TABLE whatsapp_messages ADD COLUMN media_type TEXT;
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'whatsapp_messages' AND column_name = 'phone_number') THEN
+    ALTER TABLE whatsapp_messages ADD COLUMN phone_number TEXT;
+  END IF;
+
+  -- Sync phone_number and recipient_phone
+  UPDATE whatsapp_messages SET recipient_phone = phone_number WHERE recipient_phone IS NULL AND phone_number IS NOT NULL;
+  UPDATE whatsapp_messages SET phone_number = recipient_phone WHERE phone_number IS NULL AND recipient_phone IS NOT NULL;
+END $$;
+
 -- Payment Nudges Configuration
 CREATE TABLE IF NOT EXISTS payment_nudge_settings (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
