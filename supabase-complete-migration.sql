@@ -7544,6 +7544,115 @@ CREATE TABLE IF NOT EXISTS inventory_items (
   UNIQUE(user_id, item_code)
 );
 
+-- Ensure all required columns exist (in case table was created elsewhere)
+DO $$ 
+BEGIN
+  -- Add name if missing
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'inventory_items' AND column_name = 'name'
+  ) THEN
+    ALTER TABLE inventory_items ADD COLUMN name VARCHAR(255);
+  END IF;
+
+  -- Add item_name if missing
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'inventory_items' AND column_name = 'item_name'
+  ) THEN
+    ALTER TABLE inventory_items ADD COLUMN item_name VARCHAR(255);
+  END IF;
+
+  -- Sync name and item_name values if either is missing
+  UPDATE inventory_items SET item_name = name WHERE item_name IS NULL AND name IS NOT NULL;
+  UPDATE inventory_items SET name = item_name WHERE name IS NULL AND item_name IS NOT NULL;
+  
+  -- Set defaults if both are null
+  UPDATE inventory_items SET item_name = 'Unnamed Item', name = 'Unnamed Item' WHERE item_name IS NULL AND name IS NULL;
+
+  -- Enforce not null constraint
+  ALTER TABLE inventory_items ALTER COLUMN name SET NOT NULL;
+  ALTER TABLE inventory_items ALTER COLUMN item_name SET NOT NULL;
+
+  -- Add item_type if missing
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'inventory_items' AND column_name = 'item_type'
+  ) THEN
+    ALTER TABLE inventory_items ADD COLUMN item_type VARCHAR(50) DEFAULT 'product' CHECK (item_type IN ('product', 'service', 'raw_material'));
+    UPDATE inventory_items SET item_type = 'product' WHERE item_type IS NULL;
+    ALTER TABLE inventory_items ALTER COLUMN item_type SET NOT NULL;
+  END IF;
+
+  -- Add item_code if missing
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'inventory_items' AND column_name = 'item_code'
+  ) THEN
+    ALTER TABLE inventory_items ADD COLUMN item_code VARCHAR(100);
+    UPDATE inventory_items SET item_code = COALESCE(sku, 'ITEM-' || id) WHERE item_code IS NULL;
+    ALTER TABLE inventory_items ALTER COLUMN item_code SET NOT NULL;
+  END IF;
+
+  -- Add unit_of_measurement if missing
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'inventory_items' AND column_name = 'unit_of_measurement'
+  ) THEN
+    ALTER TABLE inventory_items ADD COLUMN unit_of_measurement VARCHAR(50) DEFAULT 'pcs';
+    ALTER TABLE inventory_items ALTER COLUMN unit_of_measurement SET NOT NULL;
+  END IF;
+
+  -- Add unit if missing
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'inventory_items' AND column_name = 'unit'
+  ) THEN
+    ALTER TABLE inventory_items ADD COLUMN unit VARCHAR(30) DEFAULT 'pcs';
+    ALTER TABLE inventory_items ALTER COLUMN unit SET NOT NULL;
+  END IF;
+
+  -- Add minimum_stock_level if missing
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'inventory_items' AND column_name = 'minimum_stock_level'
+  ) THEN
+    ALTER TABLE inventory_items ADD COLUMN minimum_stock_level DECIMAL(15, 3) DEFAULT 0;
+  END IF;
+
+  -- Add minimum_selling_price if missing
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'inventory_items' AND column_name = 'minimum_selling_price'
+  ) THEN
+    ALTER TABLE inventory_items ADD COLUMN minimum_selling_price DECIMAL(15, 2);
+  END IF;
+
+  -- Add enable_batch_tracking if missing
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'inventory_items' AND column_name = 'enable_batch_tracking'
+  ) THEN
+    ALTER TABLE inventory_items ADD COLUMN enable_batch_tracking BOOLEAN DEFAULT false;
+  END IF;
+
+  -- Add enable_expiry_tracking if missing
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'inventory_items' AND column_name = 'enable_expiry_tracking'
+  ) THEN
+    ALTER TABLE inventory_items ADD COLUMN enable_expiry_tracking BOOLEAN DEFAULT false;
+  END IF;
+
+  -- Add enable_serial_tracking if missing
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'inventory_items' AND column_name = 'enable_serial_tracking'
+  ) THEN
+    ALTER TABLE inventory_items ADD COLUMN enable_serial_tracking BOOLEAN DEFAULT false;
+  END IF;
+END $$;
+
 -- Inventory Batches
 CREATE TABLE IF NOT EXISTS inventory_batches (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
