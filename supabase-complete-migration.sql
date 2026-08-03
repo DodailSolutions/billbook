@@ -244,184 +244,6 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 
 -- ==========================================
--- FILE: supabase-user-profiles-enhancement.sql
--- ==========================================
-
--- Enhanced User Profiles Migration
--- Add business information fields to user_profiles table
-
--- Add new columns to user_profiles table if they don't exist
-ALTER TABLE user_profiles 
-ADD COLUMN IF NOT EXISTS business_type VARCHAR(50),
-ADD COLUMN IF NOT EXISTS owner_name VARCHAR(255),
-ADD COLUMN IF NOT EXISTS business_address TEXT,
-ADD COLUMN IF NOT EXISTS business_phone VARCHAR(20),
-ADD COLUMN IF NOT EXISTS business_email VARCHAR(255),
-ADD COLUMN IF NOT EXISTS gstin VARCHAR(15);
-
--- Create index for business_type for analytics
-CREATE INDEX IF NOT EXISTS idx_user_profiles_business_type ON user_profiles(business_type);
-
--- Create a view for super admin analytics
-DROP VIEW IF EXISTS business_type_analytics;
-CREATE OR REPLACE VIEW business_type_analytics AS
-SELECT 
-    business_type,
-    COUNT(*) as total_users,
-    COUNT(CASE WHEN status = 'active' THEN 1 END) as active_users,
-    COUNT(DISTINCT CASE 
-        WHEN EXISTS (
-            SELECT 1 FROM user_subscriptions us 
-            WHERE us.user_id = user_profiles.id 
-            AND us.status = 'active'
-        ) THEN user_profiles.id 
-    END) as paying_users
-FROM user_profiles
-WHERE business_type IS NOT NULL
-GROUP BY business_type
-ORDER BY total_users DESC;
-
--- Grant access to authenticated users for their own profile
-ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
-
--- Policy for users to read their own profile
-DROP POLICY IF EXISTS "Users can view own profile" ON user_profiles;
-CREATE POLICY "Users can view own profile" 
-ON user_profiles FOR SELECT 
-USING (auth.uid() = id);
-
--- Policy for users to update their own profile
-DROP POLICY IF EXISTS "Users can update own profile" ON user_profiles;
-CREATE POLICY "Users can update own profile" 
-ON user_profiles FOR UPDATE 
-USING (auth.uid() = id);
-
--- Policy for inserting during signup
-DROP POLICY IF EXISTS "Users can insert own profile" ON user_profiles;
-CREATE POLICY "Users can insert own profile" 
-ON user_profiles FOR INSERT 
-WITH CHECK (auth.uid() = id);
-
--- Create super admin user
--- Run this after setting up your authentication
--- Replace 'your-email@example.com' with your actual email
-
--- First, you'll need to sign up through the UI, then run:
--- UPDATE auth.users SET email_confirmed_at = NOW() WHERE email = 'your-email@example.com';
--- INSERT INTO user_profiles (id, role, business_name, status) 
--- SELECT id, 'super_admin', 'BillBooky Admin', 'active' 
--- FROM auth.users 
--- WHERE email = 'your-email@example.com'
--- ON CONFLICT (id) DO UPDATE SET role = 'super_admin';
-
--- Create admin analytics table for tracking business insights
-CREATE TABLE IF NOT EXISTS business_analytics (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    business_type VARCHAR(50),
-    metric_name VARCHAR(100),
-    metric_value NUMERIC,
-    recorded_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
-CREATE INDEX IF NOT EXISTS idx_business_analytics_type ON business_analytics(business_type);
-CREATE INDEX IF NOT EXISTS idx_business_analytics_date ON business_analytics(recorded_at);
-
--- Function to update business analytics
-DROP FUNCTION IF EXISTS update_business_analytics();
-CREATE OR REPLACE FUNCTION update_business_analytics()
-RETURNS void AS $$
-BEGIN
-    -- Clear old analytics (keep last 30 days)
-    DELETE FROM business_analytics WHERE recorded_at < NOW() - INTERVAL '30 days';
-    
-    -- Insert current analytics
-    INSERT INTO business_analytics (business_type, metric_name, metric_value)
-    SELECT 
-        business_type,
-        'active_users',
-        COUNT(*)
-    FROM user_profiles
-    WHERE status = 'active' AND business_type IS NOT NULL
-    GROUP BY business_type;
-    
-    INSERT INTO business_analytics (business_type, metric_name, metric_value)
-    SELECT 
-        up.business_type,
-        'paying_users',
-        COUNT(DISTINCT us.user_id)
-    FROM user_subscriptions us
-    JOIN user_profiles up ON us.user_id = up.id
-    WHERE us.status = 'active' AND up.business_type IS NOT NULL
-    GROUP BY up.business_type;
-END;
-$$ LANGUAGE plpgsql;
-
-COMMENT ON TABLE user_profiles IS 'Enhanced user profiles with business information for analytics';
-COMMENT ON VIEW business_type_analytics IS 'Real-time analytics of business types using the platform';
-COMMENT ON FUNCTION update_business_analytics() IS 'Updates business analytics snapshot for historical tracking';
-
-
--- ==========================================
--- FILE: supabase-testimonials-schema.sql
--- ==========================================
-
--- Testimonials table for managing customer testimonials
-CREATE TABLE IF NOT EXISTS public.testimonials (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  name VARCHAR(255) NOT NULL,
-  company VARCHAR(255),
-  role VARCHAR(255),
-  content TEXT NOT NULL,
-  rating INTEGER CHECK (rating >= 1 AND rating <= 5) DEFAULT 5,
-  image_url TEXT,
-  is_active BOOLEAN DEFAULT true,
-  display_order INTEGER DEFAULT 0,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Add RLS policies
-ALTER TABLE public.testimonials ENABLE ROW LEVEL SECURITY;
-
--- Public can read active testimonials
-CREATE POLICY "Anyone can view active testimonials"
-  ON public.testimonials
-  FOR SELECT
-  USING (is_active = true);
-
--- Admin can manage all testimonials
-CREATE POLICY "Admins can manage testimonials"
-  ON public.testimonials
-  FOR ALL
-  USING (
-    EXISTS (
-      SELECT 1 FROM public.user_profiles
-      WHERE user_profiles.id = auth.uid()
-      AND user_profiles.role = 'super_admin'
-    )
-  );
-
--- Create index for faster queries
-CREATE INDEX IF NOT EXISTS idx_testimonials_active_order 
-  ON public.testimonials(is_active, display_order);
-
--- Insert sample testimonials
-INSERT INTO public.testimonials (name, company, role, content, rating, display_order, is_active) VALUES
-  ('Rajesh Kumar', 'Kumar Enterprises', 'Founder', 'BillBooky has transformed how we handle invoicing. The GST compliance feature is a lifesaver for our business!', 5, 1, true),
-  ('Priya Sharma', 'Sharma Consultancy', 'CEO', 'Simple, fast, and reliable. Creating invoices now takes less than a minute. Highly recommend for Indian businesses!', 5, 2, true),
-  ('Amit Patel', 'Patel Traders', 'Managing Director', 'The free plan is generous and the paid plans are very affordable. Perfect for small businesses like ours.', 5, 3, true),
-  ('Sneha Reddy', 'Reddy Designs', 'Creative Director', 'Love the customization options! Our invoices now match our brand perfectly. Great tool!', 5, 4, true),
-  ('Vikram Singh', 'Singh Logistics', 'Operations Manager', 'Payment tracking and automated reminders have improved our cash flow significantly. Worth every rupee!', 5, 5, true),
-  ('Meena Iyer', 'Iyer & Co', 'Partner', 'Cloud-based solution means I can create invoices from anywhere. The mobile experience is excellent too!', 5, 6, true),
-  ('Arjun Mehta', 'Mehta Electronics', 'Owner', 'Finally found an invoicing tool that understands Indian business needs. GST calculations are spot-on!', 5, 7, true),
-  ('Kavita Gupta', 'Gupta Fashion', 'Founder & Designer', 'The recurring invoice feature saves me hours every month. Absolutely fantastic for subscription-based services!', 5, 8, true),
-  ('Sanjay Desai', 'Desai Constructions', 'Project Manager', 'Professional invoices with my company logo make such a difference. Clients are impressed!', 5, 9, true),
-  ('Neha Kapoor', 'Kapoor Digital Marketing', 'CEO', 'Customer support is outstanding! They helped me set up everything in minutes. Highly satisfied!', 5, 10, true),
-  ('Rahul Nair', 'Nair Tech Solutions', 'Director', 'The analytics dashboard helps me track all payments effortlessly. This is exactly what my business needed!', 5, 11, true),
-  ('Divya Srinivasan', 'Srinivasan Interiors', 'Interior Designer', 'Beautiful invoice templates and easy customization. My clients love the professional look!', 5, 12, true);
-
-
--- ==========================================
 -- FILE: supabase-superadmin-schema.sql
 -- ==========================================
 
@@ -879,6 +701,184 @@ COMMENT ON TABLE payments IS 'Payment transactions and history';
 COMMENT ON TABLE refunds IS 'Refund requests and processing';
 COMMENT ON TABLE support_tickets IS 'Customer support tickets';
 COMMENT ON TABLE audit_logs IS 'System activity audit trail';
+
+
+-- ==========================================
+-- FILE: supabase-user-profiles-enhancement.sql
+-- ==========================================
+
+-- Enhanced User Profiles Migration
+-- Add business information fields to user_profiles table
+
+-- Add new columns to user_profiles table if they don't exist
+ALTER TABLE user_profiles 
+ADD COLUMN IF NOT EXISTS business_type VARCHAR(50),
+ADD COLUMN IF NOT EXISTS owner_name VARCHAR(255),
+ADD COLUMN IF NOT EXISTS business_address TEXT,
+ADD COLUMN IF NOT EXISTS business_phone VARCHAR(20),
+ADD COLUMN IF NOT EXISTS business_email VARCHAR(255),
+ADD COLUMN IF NOT EXISTS gstin VARCHAR(15);
+
+-- Create index for business_type for analytics
+CREATE INDEX IF NOT EXISTS idx_user_profiles_business_type ON user_profiles(business_type);
+
+-- Create a view for super admin analytics
+DROP VIEW IF EXISTS business_type_analytics;
+CREATE OR REPLACE VIEW business_type_analytics AS
+SELECT 
+    business_type,
+    COUNT(*) as total_users,
+    COUNT(CASE WHEN status = 'active' THEN 1 END) as active_users,
+    COUNT(DISTINCT CASE 
+        WHEN EXISTS (
+            SELECT 1 FROM user_subscriptions us 
+            WHERE us.user_id = user_profiles.id 
+            AND us.status = 'active'
+        ) THEN user_profiles.id 
+    END) as paying_users
+FROM user_profiles
+WHERE business_type IS NOT NULL
+GROUP BY business_type
+ORDER BY total_users DESC;
+
+-- Grant access to authenticated users for their own profile
+ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
+
+-- Policy for users to read their own profile
+DROP POLICY IF EXISTS "Users can view own profile" ON user_profiles;
+CREATE POLICY "Users can view own profile" 
+ON user_profiles FOR SELECT 
+USING (auth.uid() = id);
+
+-- Policy for users to update their own profile
+DROP POLICY IF EXISTS "Users can update own profile" ON user_profiles;
+CREATE POLICY "Users can update own profile" 
+ON user_profiles FOR UPDATE 
+USING (auth.uid() = id);
+
+-- Policy for inserting during signup
+DROP POLICY IF EXISTS "Users can insert own profile" ON user_profiles;
+CREATE POLICY "Users can insert own profile" 
+ON user_profiles FOR INSERT 
+WITH CHECK (auth.uid() = id);
+
+-- Create super admin user
+-- Run this after setting up your authentication
+-- Replace 'your-email@example.com' with your actual email
+
+-- First, you'll need to sign up through the UI, then run:
+-- UPDATE auth.users SET email_confirmed_at = NOW() WHERE email = 'your-email@example.com';
+-- INSERT INTO user_profiles (id, role, business_name, status) 
+-- SELECT id, 'super_admin', 'BillBooky Admin', 'active' 
+-- FROM auth.users 
+-- WHERE email = 'your-email@example.com'
+-- ON CONFLICT (id) DO UPDATE SET role = 'super_admin';
+
+-- Create admin analytics table for tracking business insights
+CREATE TABLE IF NOT EXISTS business_analytics (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    business_type VARCHAR(50),
+    metric_name VARCHAR(100),
+    metric_value NUMERIC,
+    recorded_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_business_analytics_type ON business_analytics(business_type);
+CREATE INDEX IF NOT EXISTS idx_business_analytics_date ON business_analytics(recorded_at);
+
+-- Function to update business analytics
+DROP FUNCTION IF EXISTS update_business_analytics();
+CREATE OR REPLACE FUNCTION update_business_analytics()
+RETURNS void AS $$
+BEGIN
+    -- Clear old analytics (keep last 30 days)
+    DELETE FROM business_analytics WHERE recorded_at < NOW() - INTERVAL '30 days';
+    
+    -- Insert current analytics
+    INSERT INTO business_analytics (business_type, metric_name, metric_value)
+    SELECT 
+        business_type,
+        'active_users',
+        COUNT(*)
+    FROM user_profiles
+    WHERE status = 'active' AND business_type IS NOT NULL
+    GROUP BY business_type;
+    
+    INSERT INTO business_analytics (business_type, metric_name, metric_value)
+    SELECT 
+        up.business_type,
+        'paying_users',
+        COUNT(DISTINCT us.user_id)
+    FROM user_subscriptions us
+    JOIN user_profiles up ON us.user_id = up.id
+    WHERE us.status = 'active' AND up.business_type IS NOT NULL
+    GROUP BY up.business_type;
+END;
+$$ LANGUAGE plpgsql;
+
+COMMENT ON TABLE user_profiles IS 'Enhanced user profiles with business information for analytics';
+COMMENT ON VIEW business_type_analytics IS 'Real-time analytics of business types using the platform';
+COMMENT ON FUNCTION update_business_analytics() IS 'Updates business analytics snapshot for historical tracking';
+
+
+-- ==========================================
+-- FILE: supabase-testimonials-schema.sql
+-- ==========================================
+
+-- Testimonials table for managing customer testimonials
+CREATE TABLE IF NOT EXISTS public.testimonials (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  company VARCHAR(255),
+  role VARCHAR(255),
+  content TEXT NOT NULL,
+  rating INTEGER CHECK (rating >= 1 AND rating <= 5) DEFAULT 5,
+  image_url TEXT,
+  is_active BOOLEAN DEFAULT true,
+  display_order INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Add RLS policies
+ALTER TABLE public.testimonials ENABLE ROW LEVEL SECURITY;
+
+-- Public can read active testimonials
+CREATE POLICY "Anyone can view active testimonials"
+  ON public.testimonials
+  FOR SELECT
+  USING (is_active = true);
+
+-- Admin can manage all testimonials
+CREATE POLICY "Admins can manage testimonials"
+  ON public.testimonials
+  FOR ALL
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.user_profiles
+      WHERE user_profiles.id = auth.uid()
+      AND user_profiles.role = 'super_admin'
+    )
+  );
+
+-- Create index for faster queries
+CREATE INDEX IF NOT EXISTS idx_testimonials_active_order 
+  ON public.testimonials(is_active, display_order);
+
+-- Insert sample testimonials
+INSERT INTO public.testimonials (name, company, role, content, rating, display_order, is_active) VALUES
+  ('Rajesh Kumar', 'Kumar Enterprises', 'Founder', 'BillBooky has transformed how we handle invoicing. The GST compliance feature is a lifesaver for our business!', 5, 1, true),
+  ('Priya Sharma', 'Sharma Consultancy', 'CEO', 'Simple, fast, and reliable. Creating invoices now takes less than a minute. Highly recommend for Indian businesses!', 5, 2, true),
+  ('Amit Patel', 'Patel Traders', 'Managing Director', 'The free plan is generous and the paid plans are very affordable. Perfect for small businesses like ours.', 5, 3, true),
+  ('Sneha Reddy', 'Reddy Designs', 'Creative Director', 'Love the customization options! Our invoices now match our brand perfectly. Great tool!', 5, 4, true),
+  ('Vikram Singh', 'Singh Logistics', 'Operations Manager', 'Payment tracking and automated reminders have improved our cash flow significantly. Worth every rupee!', 5, 5, true),
+  ('Meena Iyer', 'Iyer & Co', 'Partner', 'Cloud-based solution means I can create invoices from anywhere. The mobile experience is excellent too!', 5, 6, true),
+  ('Arjun Mehta', 'Mehta Electronics', 'Owner', 'Finally found an invoicing tool that understands Indian business needs. GST calculations are spot-on!', 5, 7, true),
+  ('Kavita Gupta', 'Gupta Fashion', 'Founder & Designer', 'The recurring invoice feature saves me hours every month. Absolutely fantastic for subscription-based services!', 5, 8, true),
+  ('Sanjay Desai', 'Desai Constructions', 'Project Manager', 'Professional invoices with my company logo make such a difference. Clients are impressed!', 5, 9, true),
+  ('Neha Kapoor', 'Kapoor Digital Marketing', 'CEO', 'Customer support is outstanding! They helped me set up everything in minutes. Highly satisfied!', 5, 10, true),
+  ('Rahul Nair', 'Nair Tech Solutions', 'Director', 'The analytics dashboard helps me track all payments effortlessly. This is exactly what my business needed!', 5, 11, true),
+  ('Divya Srinivasan', 'Srinivasan Interiors', 'Interior Designer', 'Beautiful invoice templates and easy customization. My clients love the professional look!', 5, 12, true);
 
 
 -- ==========================================
