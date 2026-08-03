@@ -348,42 +348,35 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
     }
 
     return (
-        <Card className="max-w-2xl mx-auto relative" suppressHydrationWarning>
-            <CardHeader className="space-y-1">
-                <CardTitle className="text-2xl font-bold">Create Your Account</CardTitle>
-                <CardDescription>
+        <Card className="max-w-2xl mx-auto relative bg-white rounded-[28px] p-2 sm:p-4 shadow-xl border border-slate-200/80" suppressHydrationWarning>
+            <CardHeader className="space-y-2">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 w-fit">
+                    <CheckCircle className="h-3.5 w-3.5 text-emerald-600" /> Free 14-Day Enterprise Trial
+                </span>
+                <CardTitle className="text-2xl sm:text-3xl font-black text-slate-950 -tracking-tight">Create Your Account</CardTitle>
+                <CardDescription className="text-xs sm:text-sm font-medium text-slate-600">
                     {paymentData ? (
-                        <span className="text-emerald-600 font-semibold">
-                            ✓ Payment successful! Complete signup to access your lifetime plan
+                        <span className="text-emerald-600 font-bold">
+                            ✓ Payment successful! Complete registration to access your lifetime account
                         </span>
                     ) : selectedPlan !== 'free' ? (
-                        <span className="text-emerald-600 font-semibold">
+                        <span className="text-emerald-700 font-bold">
                             Creating account for {selectedPlan} plan
                         </span>
                     ) : (
-                        'Get started with your free account'
+                        'Join 500+ Indian businesses managing invoicing, CRM & payroll on BillBooky'
                     )}
                 </CardDescription>
                 
                 {/* Error Messages - Show at top, always visible */}
                 {message && (
-                    <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                        <p className="text-sm font-semibold text-red-800 dark:text-red-200 mb-2">
+                    <div className="mt-4 p-4 bg-rose-50 border border-rose-200 rounded-2xl text-xs text-rose-800 font-medium">
+                        <p className="font-bold mb-1">
                             {message}
                         </p>
                         {message.toLowerCase().includes('already') && (
-                            <p className="text-xs text-red-700 dark:text-red-300">
-                                Already have an account? <a href="/login" className="underline font-semibold hover:text-red-900 dark:hover:text-red-100">Login here</a>
-                            </p>
-                        )}
-                        {message.toLowerCase().includes('registered') && (
-                            <p className="text-xs text-red-700 dark:text-red-300">
-                                This email is already registered. <a href="/login" className="underline font-semibold hover:text-red-900 dark:hover:text-red-100">Login instead</a>
-                            </p>
-                        )}
-                        {message.toLowerCase().includes('confirm') && (
-                            <p className="text-xs text-red-700 dark:text-red-300">
-                                Need to resend confirmation email? <a href="/resend-confirmation" className="underline font-semibold hover:text-red-900 dark:hover:text-red-100">Click here</a>
+                            <p className="mt-1">
+                                Already have an account? <a href="/login" className="underline font-bold text-slate-950">Log in here</a>
                             </p>
                         )}
                     </div>
@@ -392,42 +385,42 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
                 {/* Progress Bar */}
                 <div className="pt-4">
                     <div className="flex justify-between mb-2">
-                        <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                        <span className="text-xs font-bold text-slate-700">
                             Step {currentStep} of {totalSteps}
                         </span>
-                        <span className="text-xs font-medium text-emerald-600">
-                            {Math.round(progress)}%
+                        <span className="text-xs font-bold text-emerald-600">
+                            {Math.round(progress)}% Complete
                         </span>
                     </div>
-                    <Progress value={progress} />
+                    <Progress value={progress} className="h-2 bg-slate-100 [&>div]:bg-emerald-600" />
                     
                     {/* Step indicators */}
                     <div className="flex justify-between mt-4">
-                        <div className={`flex items-center gap-2 ${currentStep >= 1 ? 'text-emerald-600' : 'text-gray-400'}`}>
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${
-                                currentStep > 1 ? 'bg-emerald-600 border-emerald-600' : 
-                                currentStep === 1 ? 'border-emerald-600' : 'border-gray-300'
+                        <div className={`flex items-center gap-2 ${currentStep >= 1 ? 'text-slate-950 font-bold' : 'text-slate-400'}`}>
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all ${
+                                currentStep > 1 ? 'bg-emerald-600 border-emerald-600 text-white' : 
+                                currentStep === 1 ? 'border-emerald-600 text-emerald-600 font-bold' : 'border-slate-300 text-slate-400'
                             }`}>
-                                {currentStep > 1 ? <Check className="w-4 h-4 text-white" /> : <span className="text-sm font-semibold">1</span>}
+                                {currentStep > 1 ? <Check className="w-4 h-4 text-white" /> : <span className="text-xs">1</span>}
                             </div>
-                            <span className="text-xs font-medium hidden sm:inline">Personal</span>
+                            <span className="text-xs hidden sm:inline">Personal</span>
                         </div>
-                        <div className={`flex items-center gap-2 ${currentStep >= 2 ? 'text-emerald-600' : 'text-gray-400'}`}>
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${
-                                currentStep > 2 ? 'bg-emerald-600 border-emerald-600' : 
-                                currentStep === 2 ? 'border-emerald-600' : 'border-gray-300'
+                        <div className={`flex items-center gap-2 ${currentStep >= 2 ? 'text-slate-950 font-bold' : 'text-slate-400'}`}>
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all ${
+                                currentStep > 2 ? 'bg-emerald-600 border-emerald-600 text-white' : 
+                                currentStep === 2 ? 'border-emerald-600 text-emerald-600 font-bold' : 'border-slate-300 text-slate-400'
                             }`}>
-                                {currentStep > 2 ? <Check className="w-4 h-4 text-white" /> : <span className="text-sm font-semibold">2</span>}
+                                {currentStep > 2 ? <Check className="w-4 h-4 text-white" /> : <span className="text-xs">2</span>}
                             </div>
-                            <span className="text-xs font-medium hidden sm:inline">Business</span>
+                            <span className="text-xs hidden sm:inline">Business</span>
                         </div>
-                        <div className={`flex items-center gap-2 ${currentStep >= 3 ? 'text-emerald-600' : 'text-gray-400'}`}>
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${
-                                currentStep === 3 ? 'border-emerald-600' : 'border-gray-300'
+                        <div className={`flex items-center gap-2 ${currentStep >= 3 ? 'text-slate-950 font-bold' : 'text-slate-400'}`}>
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all ${
+                                currentStep === 3 ? 'border-emerald-600 text-emerald-600 font-bold' : 'border-slate-300 text-slate-400'
                             }`}>
-                                <span className="text-sm font-semibold">3</span>
+                                <span className="text-xs">3</span>
                             </div>
-                            <span className="text-xs font-medium hidden sm:inline">Review</span>
+                            <span className="text-xs hidden sm:inline">Review</span>
                         </div>
                     </div>
                 </div>
