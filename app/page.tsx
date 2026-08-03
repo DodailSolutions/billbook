@@ -246,48 +246,48 @@ export default function Home() {
                         {/* Free Plan */}
                         <div className="bg-slate-900 p-8 rounded-3xl border border-slate-800 space-y-6 flex flex-col justify-between hover:border-slate-700 transition-all">
                             <div className="space-y-4">
-                                <span className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Free Plan</span>
+                                <span className="text-sm font-bold text-slate-300 uppercase tracking-wider block">Free Plan</span>
                                 <div>
-                                    <span className="text-4xl font-extrabold text-white">₹0</span>
+                                    <span className="text-4xl font-black text-white">₹0</span>
                                     <span className="text-slate-400 text-xs font-semibold"> / forever</span>
                                 </div>
-                                <p className="text-xs text-slate-400">Ideal for freelancers and new startups.</p>
-                                <ul className="space-y-3 pt-4 border-t border-slate-800 text-xs text-slate-300">
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-emerald-400" /> 50 Invoices / Month</li>
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-emerald-400" /> GST Tax Compliance</li>
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-emerald-400" /> Customer & Items Directory</li>
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-emerald-400" /> Basic Financial Reports</li>
+                                <p className="text-xs text-slate-300">Ideal for freelancers and new startups.</p>
+                                <ul className="space-y-3 pt-4 border-t border-slate-800 text-xs text-slate-200 font-medium">
+                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-emerald-400 shrink-0" /> 50 Invoices / Month</li>
+                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-emerald-400 shrink-0" /> GST Tax Compliance</li>
+                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-emerald-400 shrink-0" /> Customer & Items Directory</li>
+                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-emerald-400 shrink-0" /> Basic Financial Reports</li>
                                 </ul>
                             </div>
                             <Link href="/signup">
-                                <Button variant="outline" className="w-full border-slate-700 text-slate-200 hover:bg-slate-800 min-h-[44px]">
+                                <Button className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold border border-slate-700 min-h-[44px]">
                                     Get Started Free
                                 </Button>
                             </Link>
                         </div>
 
                         {/* Pro Starter Plan */}
-                        <div className="bg-gradient-to-b from-blue-950/60 to-slate-900 p-8 rounded-3xl border-2 border-blue-500 space-y-6 flex flex-col justify-between shadow-2xl relative">
+                        <div className="bg-gradient-to-b from-blue-950/80 via-slate-900 to-slate-900 p-8 rounded-3xl border-2 border-blue-500 space-y-6 flex flex-col justify-between shadow-2xl relative">
                             <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-[10px] font-black px-4 py-1 rounded-full uppercase tracking-wider shadow-md">
                                 MOST POPULAR
                             </div>
                             <div className="space-y-4">
-                                <span className="text-xs font-extrabold text-blue-400 uppercase tracking-wider">Pro Starter</span>
+                                <span className="text-sm font-bold text-blue-400 uppercase tracking-wider block">Pro Starter</span>
                                 <div>
-                                    <span className="text-4xl font-extrabold text-white">₹299</span>
-                                    <span className="text-slate-400 text-xs font-semibold"> / month</span>
+                                    <span className="text-4xl font-black text-white">₹299</span>
+                                    <span className="text-slate-300 text-xs font-semibold"> / month</span>
                                 </div>
-                                <p className="text-xs text-slate-300">Everything growing SMBs need.</p>
-                                <ul className="space-y-3 pt-4 border-t border-blue-500/30 text-xs text-slate-200">
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-blue-400" /> <strong>Unlimited</strong> Invoices & Quotes</li>
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-blue-400" /> Full CRM & Deal Pipeline</li>
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-blue-400" /> Bookkeeping & General Ledger</li>
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-blue-400" /> Vendor Purchase Orders</li>
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-blue-400" /> WhatsApp Direct Sharing</li>
+                                <p className="text-xs text-slate-200">Everything growing SMBs need.</p>
+                                <ul className="space-y-3 pt-4 border-t border-blue-500/30 text-xs text-slate-100 font-medium">
+                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-blue-400 shrink-0" /> <strong>Unlimited</strong> Invoices & Quotes</li>
+                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-blue-400 shrink-0" /> Full CRM & Deal Pipeline</li>
+                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-blue-400 shrink-0" /> Bookkeeping & General Ledger</li>
+                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-blue-400 shrink-0" /> Vendor Purchase Orders</li>
+                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-blue-400 shrink-0" /> WhatsApp Direct Sharing</li>
                                 </ul>
                             </div>
                             <Link href="/signup">
-                                <Button className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold min-h-[44px]">
+                                <Button className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold min-h-[44px] shadow-lg shadow-blue-500/20">
                                     Start 14-Day Free Trial
                                 </Button>
                             </Link>
@@ -296,22 +296,22 @@ export default function Home() {
                         {/* Enterprise Plan */}
                         <div className="bg-slate-900 p-8 rounded-3xl border border-slate-800 space-y-6 flex flex-col justify-between hover:border-slate-700 transition-all">
                             <div className="space-y-4">
-                                <span className="text-xs font-extrabold text-purple-400 uppercase tracking-wider">Enterprise Suite</span>
+                                <span className="text-sm font-bold text-purple-400 uppercase tracking-wider block">Enterprise Suite</span>
                                 <div>
-                                    <span className="text-4xl font-extrabold text-white">₹599</span>
+                                    <span className="text-4xl font-black text-white">₹599</span>
                                     <span className="text-slate-400 text-xs font-semibold"> / month</span>
                                 </div>
-                                <p className="text-xs text-slate-400">Complete suite with AI & Payroll.</p>
-                                <ul className="space-y-3 pt-4 border-t border-slate-800 text-xs text-slate-300">
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-purple-400" /> Everything in Pro Starter</li>
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-purple-400" /> Full Payroll & Payslip Engine</li>
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-purple-400" /> AI Accountant Assistant</li>
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-purple-400" /> Multi-User Team Roles</li>
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-purple-400" /> Certified CA Marketplace Access</li>
+                                <p className="text-xs text-slate-300">Complete suite with AI & Payroll.</p>
+                                <ul className="space-y-3 pt-4 border-t border-slate-800 text-xs text-slate-200 font-medium">
+                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-purple-400 shrink-0" /> Everything in Pro Starter</li>
+                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-purple-400 shrink-0" /> Full Payroll & Payslip Engine</li>
+                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-purple-400 shrink-0" /> AI Accountant Assistant</li>
+                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-purple-400 shrink-0" /> Multi-User Team Roles</li>
+                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-purple-400 shrink-0" /> Certified CA Marketplace Access</li>
                                 </ul>
                             </div>
                             <Link href="/signup">
-                                <Button variant="outline" className="w-full border-slate-700 text-slate-200 hover:bg-slate-800 min-h-[44px]">
+                                <Button className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold border border-slate-700 min-h-[44px]">
                                     Get Enterprise Plan
                                 </Button>
                             </Link>
