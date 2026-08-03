@@ -43,45 +43,45 @@ export function FAQSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(null)
 
   return (
-    <section className="px-6 py-20 md:py-32 bg-white">
+    <section className="px-6 py-12 bg-slate-950 text-white">
       <div className="max-w-3xl mx-auto">
-        <div className="text-center mb-16">
-          <span className="inline-block px-4 py-1.5 bg-emerald-50 text-emerald-600 rounded-full text-sm font-medium mb-4">
+        <div className="text-center mb-12">
+          <span className="inline-block px-4 py-1.5 bg-emerald-500/10 text-emerald-400 rounded-full text-xs font-bold uppercase tracking-wider mb-3 border border-emerald-500/20">
             FAQ
           </span>
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl md:text-5xl font-black text-white mb-4 tracking-tight">
             Frequently Asked Questions
           </h2>
-          <p className="text-lg text-gray-600">
+          <p className="text-sm md:text-base text-slate-400">
             Everything you need to know about BillBooky
           </p>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3">
           {faqs.map((faq, index) => (
             <div
               key={index}
-              className="group bg-white border border-gray-200 rounded-xl hover:border-emerald-200 hover:shadow-sm transition-all duration-200"
+              className="group bg-slate-900 border border-slate-800 rounded-2xl hover:border-slate-700 transition-all duration-200"
             >
               <button
                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                className="w-full px-6 py-5 flex items-center justify-between text-left"
+                className="w-full px-6 py-4 flex items-center justify-between text-left min-h-[44px]"
               >
-                <span className="text-lg font-semibold text-gray-900 pr-8">
+                <span className="text-sm sm:text-base font-bold text-white pr-8">
                   {faq.question}
                 </span>
                 <ChevronDown
-                  className={`h-5 w-5 text-gray-500 shrink-0 transition-transform duration-200 ${
-                    openIndex === index ? 'rotate-180' : ''
+                  className={`h-5 w-5 text-slate-400 shrink-0 transition-transform duration-200 ${
+                    openIndex === index ? 'rotate-180 text-blue-400' : ''
                   }`}
                 />
               </button>
               <div
                 className={`overflow-hidden transition-all duration-200 ${
-                  openIndex === index ? 'max-h-48' : 'max-h-0'
+                  openIndex === index ? 'max-h-48 pb-5' : 'max-h-0'
                 }`}
               >
-                <p className="px-6 pb-5 text-gray-600 leading-relaxed">
+                <p className="px-6 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-slate-800/60 pt-3">
                   {faq.answer}
                 </p>
               </div>
@@ -89,9 +89,9 @@ export function FAQSection() {
           ))}
         </div>
 
-        <div className="mt-12 text-center">
-          <p className="text-gray-600 mb-4">Still have questions?</p>
-          <Link href="/contact" className="text-emerald-600 hover:text-emerald-700 font-semibold">
+        <div className="mt-10 text-center text-xs">
+          <p className="text-slate-400 mb-2">Still have questions?</p>
+          <Link href="/contact" className="text-emerald-400 hover:text-emerald-300 font-bold">
             Contact our support team →
           </Link>
         </div>

@@ -118,7 +118,7 @@ export default function Home() {
                                 </Button>
                             </Link>
                             <Link href="#showcase" className="w-full sm:w-auto">
-                                <Button size="lg" variant="outline" className="w-full sm:w-auto border-slate-700 text-slate-200 hover:bg-slate-800/80 hover:text-white font-bold px-8 py-6 rounded-2xl text-base min-h-[54px]">
+                                <Button size="lg" className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white border border-slate-700 font-bold px-8 py-6 rounded-2xl text-base min-h-[54px] shadow-md transition-all">
                                     Explore Features
                                 </Button>
                             </Link>
