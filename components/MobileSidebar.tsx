@@ -14,19 +14,19 @@ const routes = [
         label: 'Dashboard',
         icon: LayoutDashboard,
         href: '/dashboard',
-        color: "text-sky-500"
+        color: "text-slate-900"
     },
     {
         label: 'Invoices',
         icon: FileText,
         href: '/invoices',
-        color: "text-violet-500",
+        color: "text-slate-900",
     },
     {
         label: 'CRM & Pipeline',
         icon: Sparkles,
         href: '/crm',
-        color: "text-indigo-600",
+        color: "text-emerald-600",
         badge: 'NEW'
     },
     {
@@ -40,65 +40,65 @@ const routes = [
         label: 'Purchase Orders',
         icon: ShoppingBag,
         href: '/purchase-orders',
-        color: "text-indigo-500",
+        color: "text-slate-900",
         badge: 'NEW'
     },
     {
         label: 'Payroll & Salaries',
         icon: DollarSign,
         href: '/payroll',
-        color: "text-emerald-500",
+        color: "text-emerald-600",
         badge: 'NEW'
     },
     {
         label: 'Reminders',
         icon: Bell,
         href: '/reminders',
-        color: "text-yellow-500",
+        color: "text-slate-700",
     },
     {
         label: 'Customers',
         icon: Users,
         href: '/customers',
-        color: "text-pink-700",
+        color: "text-slate-900",
     },
     {
         label: 'Inventory',
         icon: Package,
         href: '/inventory',
-        color: "text-amber-500",
+        color: "text-slate-900",
     },
     {
         label: 'Expenses',
         icon: Receipt,
         href: '/expenses',
-        color: "text-rose-500",
+        color: "text-slate-700",
     },
     {
         label: 'AI Accountant',
         icon: Bot,
         href: '/ai-accountant',
-        color: "text-emerald-500",
+        color: "text-emerald-600",
         badge: 'PRO'
     },
     {
         label: 'Team',
         icon: UserCog,
         href: '/team',
-        color: "text-blue-500",
+        color: "text-slate-900",
         badge: 'PRO'
     },
     {
         label: 'Account',
         icon: User,
         href: '/settings',
-        color: "text-gray-400",
+        color: "text-slate-500",
     },
     {
         label: 'Invoice Settings',
         icon: Settings,
         href: '/invoices/settings',
-        color: "text-gray-400",
+        color: "text-slate-500",
     },
 ]
 
@@ -135,7 +135,7 @@ export function MobileSidebar() {
     return (
         <>
             {/* Mobile Header */}
-            <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-slate-900 border-b border-slate-700 px-4 py-3 flex items-center justify-between">
+            <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200/80 px-4 py-3 flex items-center justify-between">
                 <Link href="/dashboard" className="flex items-center gap-2">
                     <div className="relative w-8 h-8">
                         <Image 
@@ -145,17 +145,17 @@ export function MobileSidebar() {
                             height={32}
                         />
                     </div>
-                    <span className="text-lg font-bold text-white">BillBooky</span>
+                    <span className="text-lg font-black text-slate-950">BillBooky<span className="text-emerald-600">.</span></span>
                 </Link>
                 <button
                     onClick={() => setIsOpen(!isOpen)}
-                    className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                    className="p-2 rounded-lg hover:bg-slate-100 transition-colors"
                     aria-label="Toggle menu"
                 >
                     {isOpen ? (
-                        <X className="h-6 w-6 text-white" />
+                        <X className="h-6 w-6 text-slate-900" />
                     ) : (
-                        <Menu className="h-6 w-6 text-white" />
+                        <Menu className="h-6 w-6 text-slate-900" />
                     )}
                 </button>
             </div>
@@ -163,54 +163,51 @@ export function MobileSidebar() {
             {/* Backdrop */}
             {isOpen && (
                 <div 
-                    className="md:hidden fixed inset-0 bg-black/50 z-40 backdrop-blur-sm"
+                    className="md:hidden fixed inset-0 bg-black/40 z-40 backdrop-blur-xs"
                     onClick={closeSidebar}
                 />
             )}
 
-            {/* Mobile Sidebar */}
+            {/* Mobile Drawer Sidebar */}
             <div
                 className={cn(
-                    "md:hidden fixed top-0 left-0 bottom-0 z-50 w-72 bg-slate-900 text-white transform transition-transform duration-300 ease-in-out",
+                    "md:hidden fixed top-0 left-0 bottom-0 z-50 w-72 bg-white text-slate-950 border-r border-slate-200/80 transform transition-transform duration-300 ease-in-out shadow-2xl",
                     isOpen ? "translate-x-0" : "-translate-x-full"
                 )}
             >
                 <div className="flex flex-col h-full">
                     {/* Logo */}
-                    <div className="px-4 py-6 border-b border-slate-700">
+                    <div className="px-4 py-6 border-b border-slate-200/80">
                         <Link href="/dashboard" className="flex items-center gap-3" onClick={closeSidebar}>
-                            <div className="relative w-10 h-10">
+                            <div className="relative w-9 h-9">
                                 <Image 
                                     src="/logo-icon.svg" 
                                     alt="BillBooky" 
-                                    width={40} 
-                                    height={40}
+                                    width={36} 
+                                    height={36}
                                 />
                             </div>
-                            <h1 className="text-2xl font-bold bg-linear-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent">
-                                BillBooky
+                            <h1 className="text-2xl font-black text-slate-950 tracking-tight">
+                                BillBooky<span className="text-emerald-600">.</span>
                             </h1>
                         </Link>
                     </div>
 
                     {/* Navigation */}
                     <div className="flex-1 overflow-y-auto px-3 py-4">
-                        <div className="space-y-2">
+                        <div className="space-y-1.5">
                             {routes.map((route) => (
                                 <Link
                                     key={route.href}
                                     href={route.href}
                                     onClick={closeSidebar}
                                     className={cn(
-                                        "text-sm group flex p-3 w-full justify-start font-medium cursor-pointer rounded-lg transition-all duration-200 relative overflow-hidden",
+                                        "text-sm group flex p-3 w-full justify-start font-semibold cursor-pointer rounded-xl transition-all duration-200 relative overflow-hidden",
                                         pathname === route.href 
-                                            ? "text-white bg-white/10 shadow-lg" 
-                                            : "text-zinc-400 hover:text-white hover:bg-white/5",
+                                            ? "text-emerald-900 bg-emerald-50 border border-emerald-200/80 font-bold shadow-xs" 
+                                            : "text-slate-700 hover:text-slate-950 hover:bg-slate-100",
                                     )}
                                 >
-                                    {pathname === route.href && (
-                                        <div className="absolute inset-0 bg-linear-to-r from-blue-500/20 to-violet-500/20" />
-                                    )}
                                     <div className="flex items-center flex-1 relative z-10">
                                         <route.icon className={cn("h-5 w-5 mr-3", route.color)} />
                                         {route.label}
@@ -226,15 +223,15 @@ export function MobileSidebar() {
                     </div>
 
                     {/* Bottom Section */}
-                    <div className="px-3 pb-4 space-y-2 border-t border-slate-700 pt-4">
+                    <div className="px-3 pb-4 space-y-2 border-t border-slate-200/80 pt-4">
                         <PlanBanner />
                         <SignOutButton />
                     </div>
                 </div>
             </div>
 
-            {/* Bottom App Navigation */}
-            <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-slate-700 bg-slate-900/95 backdrop-blur supports-backdrop-filter:bg-slate-900/90">
+            {/* Bottom Mobile App Navigation */}
+            <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-slate-200/80 bg-white/95 backdrop-blur shadow-lg">
                 <div className="grid grid-cols-5 gap-1 px-2 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))]">
                     {mobileTabs.map((tab) => {
                         const active = isActive(tab.href)
@@ -244,13 +241,13 @@ export function MobileSidebar() {
                                 key={tab.href}
                                 href={tab.href}
                                 className={cn(
-                                    "flex flex-col items-center justify-center rounded-xl py-2 text-[10px] font-medium transition-colors min-h-[44px]",
+                                    "flex flex-col items-center justify-center rounded-xl py-2 text-[10px] font-bold transition-colors min-h-[44px]",
                                     active
-                                        ? "bg-linear-to-r from-blue-500/20 to-violet-500/20 text-white"
-                                        : "text-slate-400 hover:text-slate-200"
+                                        ? "bg-emerald-50 text-emerald-800 border border-emerald-200/80"
+                                        : "text-slate-600 hover:text-slate-900"
                                 )}
                             >
-                                <tab.icon className={cn("h-5 w-5 mb-0.5", active ? "text-blue-300" : "text-slate-500")} />
+                                <tab.icon className={cn("h-5 w-5 mb-0.5", active ? "text-emerald-600" : "text-slate-500")} />
                                 {tab.label}
                             </Link>
                         )
@@ -259,14 +256,14 @@ export function MobileSidebar() {
                     <button
                         onClick={() => setIsOpen(true)}
                         className={cn(
-                            "flex flex-col items-center justify-center rounded-xl py-2 text-[10px] font-medium transition-colors min-h-[44px]",
+                            "flex flex-col items-center justify-center rounded-xl py-2 text-[10px] font-bold transition-colors min-h-[44px]",
                             isOpen
-                                ? "bg-linear-to-r from-blue-500/20 to-violet-500/20 text-white"
-                                : "text-slate-400 hover:text-slate-200"
+                                ? "bg-emerald-50 text-emerald-800 border border-emerald-200/80"
+                                : "text-slate-600 hover:text-slate-900"
                         )}
                         aria-label="Open menu"
                     >
-                        <MoreHorizontal className={cn("h-5 w-5 mb-0.5", isOpen ? "text-blue-300" : "text-slate-500")} />
+                        <MoreHorizontal className={cn("h-5 w-5 mb-0.5", isOpen ? "text-emerald-600" : "text-slate-500")} />
                         More
                     </button>
                 </div>

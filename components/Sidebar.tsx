@@ -28,19 +28,19 @@ export function Sidebar() {
             label: 'Dashboard',
             icon: LayoutDashboard,
             href: '/dashboard',
-            color: "text-sky-500"
+            color: "text-slate-900"
         },
         {
             label: 'Invoices',
             icon: FileText,
             href: '/invoices',
-            color: "text-violet-500",
+            color: "text-slate-900",
         },
         {
             label: 'CRM & Pipeline',
             icon: Sparkles,
             href: '/crm',
-            color: "text-indigo-600",
+            color: "text-emerald-600",
             badge: 'NEW'
         },
         {
@@ -54,102 +54,102 @@ export function Sidebar() {
             label: 'Purchase Orders',
             icon: ShoppingBag,
             href: '/purchase-orders',
-            color: "text-indigo-500",
+            color: "text-slate-900",
             badge: 'NEW'
         },
         {
             label: 'Payroll & Salaries',
             icon: DollarSign,
             href: '/payroll',
-            color: "text-emerald-500",
+            color: "text-emerald-600",
             badge: 'NEW'
         },
         {
             label: 'Recurring',
             icon: RefreshCw,
             href: '/invoices/recurring',
-            color: "text-purple-500",
+            color: "text-slate-700",
         },
         {
             label: 'Reminders',
             icon: Bell,
             href: '/reminders',
-            color: "text-yellow-500",
+            color: "text-slate-700",
         },
         {
             label: 'Customers',
             icon: Users,
             href: '/customers',
-            color: "text-pink-700",
+            color: "text-slate-900",
         },
         {
             label: 'Items',
             icon: Package,
             href: '/items',
-            color: "text-teal-500",
+            color: "text-slate-700",
         },
         {
             label: 'Inventory',
             icon: Package,
             href: '/inventory',
-            color: "text-amber-600",
+            color: "text-slate-900",
         },
         {
             label: 'Expenses',
             icon: Receipt,
             href: '/expenses',
-            color: "text-rose-500",
+            color: "text-slate-700",
         },
         {
             label: 'AI Accountant',
             icon: Bot,
             href: '/ai-accountant',
-            color: "text-emerald-500",
+            color: "text-emerald-600",
             badge: 'PRO'
         },
         {
             label: 'Reports',
             icon: FileBarChart,
             href: '/reports',
-            color: "text-orange-500",
+            color: "text-slate-700",
         },
         // Conditional: Show "CA Dashboard" for CAs, "Hire CA" for regular users
         ...(isCA !== null ? [{
             label: isCA ? 'CA Dashboard' : 'Hire CA',
             icon: isCA ? Briefcase : UserPlus,
             href: isCA ? '/ca-dashboard' : '/reports/hire-ca',
-            color: "text-emerald-500",
+            color: "text-emerald-600",
         }] : []),
         {
             label: 'Team',
             icon: UserCog,
             href: '/team',
-            color: "text-blue-500",
+            color: "text-slate-900",
             badge: 'PRO'
         },
         {
             label: 'Support',
             icon: HelpCircle,
             href: '/help',
-            color: "text-cyan-500",
+            color: "text-slate-700",
         },
         {
             label: 'Account',
             icon: User,
             href: '/settings',
-            color: "text-gray-400",
+            color: "text-slate-500",
         },
         {
             label: 'Invoice Settings',
             icon: Settings,
             href: '/invoices/settings',
-            color: "text-gray-400",
+            color: "text-slate-500",
         },
     ]
 
     return (
         <div className={cn(
-            "space-y-4 py-4 flex flex-col h-full bg-white border-r border-gray-200 text-gray-900 transition-all duration-300 shadow-sm",
+            "space-y-4 py-4 flex flex-col h-full bg-white border-r border-slate-200/80 text-slate-950 transition-all duration-300 shadow-xs",
             isCollapsed ? "w-20" : "w-64"
         )}>
             <div className="px-3 py-2 flex-1 overflow-y-auto">
@@ -157,31 +157,31 @@ export function Sidebar() {
                 <div className="flex items-center justify-end mb-4">
                     <button
                         onClick={() => setIsCollapsed(!isCollapsed)}
-                        className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                        className="p-2 rounded-lg hover:bg-slate-100 transition-colors"
                         title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
                     >
                         {isCollapsed ? (
-                            <ChevronRight className="h-5 w-5 text-gray-600" />
+                            <ChevronRight className="h-5 w-5 text-slate-600" />
                         ) : (
-                            <ChevronLeft className="h-5 w-5 text-gray-600" />
+                            <ChevronLeft className="h-5 w-5 text-slate-600" />
                         )}
                     </button>
                 </div>
 
                 <Link href="/dashboard" className="flex items-center pl-3 mb-8 gap-3 group">
-                    <div className="relative w-10 h-10 shrink-0">
+                    <div className="relative w-9 h-9 shrink-0">
                         <Image 
                             src="/logo-icon.svg" 
                             alt="BillBooky Logo" 
-                            width={40} 
-                            height={40}
+                            width={36} 
+                            height={36}
                             className="transition-transform duration-200 group-hover:scale-110"
                         />
                     </div>
                     {!isCollapsed && (
-                        <h1 className="text-2xl font-bold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent transition-all duration-200 group-hover:scale-105">
-                            BillBooky
-                        </h1>
+                        <span className="text-2xl font-black text-slate-950 tracking-tight">
+                            BillBooky<span className="text-emerald-600">.</span>
+                        </span>
                     )}
                 </Link>
                 <div className="space-y-1">
@@ -190,16 +190,16 @@ export function Sidebar() {
                             key={route.href}
                             href={route.href}
                             className={cn(
-                                "text-sm group flex p-3 w-full justify-start font-medium cursor-pointer rounded-lg transition-all duration-200 relative overflow-hidden",
+                                "text-sm group flex p-3 w-full justify-start font-semibold cursor-pointer rounded-xl transition-all duration-200 relative overflow-hidden",
                                 pathname === route.href 
-                                    ? "text-blue-600 bg-blue-50 shadow-sm border border-blue-100" 
-                                    : "text-gray-700 hover:text-blue-600 hover:bg-gray-50",
+                                    ? "text-emerald-900 bg-emerald-50/90 shadow-xs border border-emerald-200/80 font-bold" 
+                                    : "text-slate-700 hover:text-slate-950 hover:bg-slate-100/80",
                                 isCollapsed && "justify-center"
                             )}
                             title={isCollapsed ? route.label : undefined}
                         >
                             {pathname === route.href && (
-                                <div className="absolute inset-0 bg-linear-to-r from-blue-50 to-purple-50" />
+                                <div className="absolute inset-0 bg-emerald-50/60" />
                             )}
                             <div className={cn(
                                 "flex items-center relative z-10",
@@ -210,7 +210,7 @@ export function Sidebar() {
                                     <>
                                         {route.label}
                                         {route.badge && (
-                                            <span className="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500 text-white shadow-sm">
+                                            <span className="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-600 text-white shadow-xs">
                                                 {route.badge}
                                             </span>
                                         )}
@@ -221,7 +221,7 @@ export function Sidebar() {
                     ))}
                 </div>
             </div>
-            <div className="px-3 pb-4 space-y-2 shrink-0 border-t border-gray-200 pt-4">
+            <div className="px-3 pb-4 space-y-2 shrink-0 border-t border-slate-200/80 pt-4">
                 {!isCollapsed && <PlanBanner />}
                 <SignOutButton />
             </div>
