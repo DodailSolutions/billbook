@@ -9,6 +9,7 @@ import {
     Bot, Layers, ChevronRight, ShieldCheck, Award
 } from 'lucide-react'
 import { InteractiveFeaturePreview } from './_components/InteractiveFeaturePreview'
+import Footer from '@/components/Footer'
 
 // Lazy load below-the-fold components for performance
 const FAQSection = dynamic(() => import('./_components/FAQSection').then(mod => ({ default: mod.FAQSection })), {
@@ -351,20 +352,7 @@ export default function Home() {
             </section>
 
             {/* Apple Footer */}
-            <footer className="py-12 bg-white border-t border-slate-200 text-xs text-slate-500">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <div className="flex items-center gap-2">
-                        <span className="font-bold text-slate-950 text-base">BillBooky</span>
-                        <span>© 2026 BillBooky Inc. All rights reserved.</span>
-                    </div>
-                    <div className="flex gap-6 font-medium">
-                        <Link href="/privacy" className="hover:text-black transition-colors">Privacy Policy</Link>
-                        <Link href="/terms" className="hover:text-black transition-colors">Terms of Service</Link>
-                        <Link href="/refund" className="hover:text-black transition-colors">Refund Policy</Link>
-                        <Link href="/contact" className="hover:text-black transition-colors">Support</Link>
-                    </div>
-                </div>
-            </footer>
+            <Footer />
         </div>
     )
 }
