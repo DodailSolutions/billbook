@@ -1,4 +1,4 @@
-const CACHE_NAME = 'billbooky-pwa-v1'
+const CACHE_NAME = 'billbooky-pwa-v2'
 const OFFLINE_URL = '/offline'
 const PRECACHE_URLS = [
   '/',
@@ -46,8 +46,14 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
-  const requestUrl = new URL(request.url)
-  // Skip non-HTTP(S) schemes such as chrome-extension://
+  let requestUrl
+  try {
+    requestUrl = new URL(request.url)
+  } catch {
+    return
+  }
+
+  // Skip non-HTTP(S) schemes such as chrome-extension://, moz-extension://, etc.
   if (requestUrl.protocol !== 'http:' && requestUrl.protocol !== 'https:') {
     return
   }
@@ -58,7 +64,9 @@ self.addEventListener('fetch', (event) => {
         .then((response) => {
           if (response && response.status === 200 && response.type === 'basic') {
             const responseClone = response.clone()
-            caches.open(CACHE_NAME).then((cache) => cache.put(request, responseClone))
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(request, responseClone).catch(() => {})
+            }).catch(() => {})
           }
           return response
         })
@@ -101,13 +109,17 @@ self.addEventListener('fetch', (event) => {
       }
 
       return fetch(request).then((response) => {
-        if (!response || response.status !== 200 || response.type === 'opaque') {
+        if (!response || response.status !== 200 || (response.type !== 'basic' && response.type !== 'cors')) {
           return response
         }
 
         const responseClone = response.clone()
-        caches.open(CACHE_NAME).then((cache) => cache.put(request, responseClone))
+        caches.open(CACHE_NAME).then((cache) => {
+          cache.put(request, responseClone).catch(() => {})
+        }).catch(() => {})
         return response
+      }).catch(() => {
+        return new Response(null, { status: 404 })
       })
     })
   )
