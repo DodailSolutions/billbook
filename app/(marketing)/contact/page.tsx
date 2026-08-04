@@ -179,7 +179,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-1">Email</h3>
-                  <p className="text-gray-600">support@dodail.com</p>
+                  <a href="mailto:billbookyapp@gmail.com" className="text-emerald-600 hover:text-emerald-700 font-medium">billbookyapp@gmail.com</a>
                   <p className="text-sm text-gray-500 mt-1">We&apos;ll respond within 24 hours</p>
                 </div>
               </div>

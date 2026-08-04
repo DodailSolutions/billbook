@@ -46,13 +46,13 @@ export async function submitContactForm(formData: FormData) {
     if (errorMessage.includes('535') || errorMessage.includes('Authentication') || errorMessage.includes('SMTP') || errorMessage.includes('EAUTH')) {
       return {
         success: false,
-        message: 'Email service authentication failed. Please email us directly at support@dodail.com',
+        message: 'Email server authentication pending (Google App Password required). Please email us directly at billbookyapp@gmail.com',
       }
     }
     
     return {
       success: false,
-      message: 'Failed to send message. Please try again or email us directly at support@dodail.com',
+      message: 'Failed to send message. Please email us directly at billbookyapp@gmail.com',
     }
   }
 }
