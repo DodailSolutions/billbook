@@ -14,18 +14,18 @@ const FALLBACK_FROM_NAME = process.env.SMTP_FROM_NAME || 'BillBooky Support'
 async function getSMTPSettings() {
   try {
     const supabase = await createClient()
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('smtp_settings')
       .select('*')
       .eq('is_active', true)
       .order('created_at', { ascending: false })
       .limit(1)
-      .single()
+      .maybeSingle()
 
-    if (data) {
+    if (data && !error) {
       return {
         host: data.smtp_host,
-        port: data.smtp_port,
+        port: Number(data.smtp_port),
         user: data.smtp_user,
         pass: data.smtp_password,
         from_email: data.smtp_from_email,
@@ -40,7 +40,7 @@ async function getSMTPSettings() {
   if (!FALLBACK_SMTP_USER || !FALLBACK_SMTP_PASSWORD) {
     console.error('❌ SMTP credentials are not configured')
     throw new Error(
-      'SMTP settings not configured. Please configure SMTP settings in Admin > Email Configuration.'
+      'SMTP settings not configured. Please configure SMTP settings in Admin > Email Configuration or set SMTP_USER and SMTP_PASSWORD in .env.local.'
     )
   }
 
@@ -65,6 +65,9 @@ async function getEmailTransporter() {
     auth: {
       user: settings.user,
       pass: settings.pass,
+    },
+    tls: {
+      rejectUnauthorized: false,
     },
   })
 }

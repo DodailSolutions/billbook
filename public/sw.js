@@ -46,12 +46,20 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
+  const requestUrl = new URL(request.url)
+  // Skip non-HTTP(S) schemes such as chrome-extension://
+  if (requestUrl.protocol !== 'http:' && requestUrl.protocol !== 'https:') {
+    return
+  }
+
   if (request.mode === 'navigate') {
     event.respondWith(
       fetch(request)
         .then((response) => {
-          const responseClone = response.clone()
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, responseClone))
+          if (response && response.status === 200 && response.type === 'basic') {
+            const responseClone = response.clone()
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, responseClone))
+          }
           return response
         })
         .catch(async () => {
@@ -75,7 +83,6 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
-  const requestUrl = new URL(request.url)
   const isStaticAsset =
     request.destination === 'script' ||
     request.destination === 'style' ||

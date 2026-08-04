@@ -41,12 +41,12 @@ export async function submitContactForm(formData: FormData) {
   } catch (error) {
     console.error('Error submitting contact form:', error)
     
-    // Check if it's a configuration error
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-    if (errorMessage.includes('SMTP')) {
+    // Check if it's an authentication or configuration error
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    if (errorMessage.includes('535') || errorMessage.includes('Authentication') || errorMessage.includes('SMTP') || errorMessage.includes('EAUTH')) {
       return {
         success: false,
-        message: 'Email service is not configured yet. Please email us directly at support@dodail.com',
+        message: 'Email service authentication failed. Please email us directly at support@dodail.com',
       }
     }
     
