@@ -1,6 +1,7 @@
 'use server'
 
 import nodemailer from 'nodemailer'
+import { Resend } from 'resend'
 import { createClient } from '@/lib/supabase/server'
 
 const FALLBACK_SMTP_HOST = process.env.SMTP_HOST || 'smtp-mail.outlook.com'
@@ -9,6 +10,8 @@ const FALLBACK_SMTP_USER = process.env.SMTP_USER
 const FALLBACK_SMTP_PASSWORD = process.env.SMTP_PASSWORD
 const FALLBACK_FROM_EMAIL = process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER || 'support@dodail.com'
 const FALLBACK_FROM_NAME = process.env.SMTP_FROM_NAME || 'BillBooky Support'
+
+const resendClient = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
 
 // Get SMTP settings from database or fallback to environment variables
 async function getSMTPSettings() {
@@ -37,10 +40,10 @@ async function getSMTPSettings() {
   }
 
   // Fallback to environment variables
-  if (!FALLBACK_SMTP_USER || !FALLBACK_SMTP_PASSWORD) {
-    console.error('❌ SMTP credentials are not configured')
+  if (!resendClient && (!FALLBACK_SMTP_USER || !FALLBACK_SMTP_PASSWORD)) {
+    console.error('❌ SMTP credentials or RESEND_API_KEY are not configured')
     throw new Error(
-      'SMTP settings not configured. Please configure SMTP settings in Admin > Email Configuration or set SMTP_USER and SMTP_PASSWORD in .env.local.'
+      'SMTP settings not configured. Please configure SMTP settings in Admin > Email Configuration or set RESEND_API_KEY / SMTP credentials in .env.local.'
     )
   }
 
@@ -75,9 +78,29 @@ async function getEmailTransporter() {
 // Helper function to safely send emails with error handling
 async function sendEmailSafely(emailParams: any) {
   try {
+    const settings = await getSMTPSettings()
+
+    if (resendClient) {
+      console.log('📧 Sending email via Resend API to:', emailParams.to)
+      const fromAddr = emailParams.from || `"${settings.from_name}" <${settings.from_email}>`
+      const res = await resendClient.emails.send({
+        from: fromAddr,
+        to: emailParams.to,
+        subject: emailParams.subject,
+        html: emailParams.html,
+        replyTo: emailParams.replyTo,
+      })
+      if (res.error) {
+        console.error('❌ Resend API Error:', res.error)
+        throw new Error(res.error.message || 'Failed to send email via Resend')
+      }
+      console.log('✅ Email sent via Resend successfully:', res.data?.id)
+      return { success: true, data: { id: res.data?.id } }
+    }
+
     const transporter = await getEmailTransporter()
     
-    console.log('📧 Sending email to:', emailParams.to)
+    console.log('📧 Sending email via SMTP to:', emailParams.to)
     console.log('📧 From:', emailParams.from)
     
     const info = await transporter.sendMail(emailParams)
@@ -102,10 +125,8 @@ export async function sendContactEmail({
   message: string
 }) {
   try {
-    const transporter = await getEmailTransporter()
     const settings = await getSMTPSettings()
-    
-    await transporter.sendMail({
+    const result = await sendEmailSafely({
       from: `"${settings.from_name}" <${settings.from_email}>`,
       to: settings.from_email, // Send to support email
       replyTo: email, // Allow replying to the customer
@@ -186,6 +207,10 @@ export async function sendContactEmail({
         </html>
       `,
     })
+
+    if (!result.success) {
+      throw result.error || new Error('Failed to send contact email')
+    }
 
     return { success: true, data: { id: 'sent' } }
   } catch (error) {
