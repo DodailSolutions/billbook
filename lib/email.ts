@@ -4,11 +4,11 @@ import nodemailer from 'nodemailer'
 import { Resend } from 'resend'
 import { createClient } from '@/lib/supabase/server'
 
-const FALLBACK_SMTP_HOST = process.env.SMTP_HOST || 'smtp-mail.outlook.com'
+const FALLBACK_SMTP_HOST = process.env.SMTP_HOST || 'smtp.gmail.com'
 const FALLBACK_SMTP_PORT = parseInt(process.env.SMTP_PORT || '587')
-const FALLBACK_SMTP_USER = process.env.SMTP_USER
+const FALLBACK_SMTP_USER = process.env.SMTP_USER || 'billbookyapp@gmail.com'
 const FALLBACK_SMTP_PASSWORD = process.env.SMTP_PASSWORD
-const FALLBACK_FROM_EMAIL = process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER || 'support@dodail.com'
+const FALLBACK_FROM_EMAIL = process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER || 'billbookyapp@gmail.com'
 const FALLBACK_FROM_NAME = process.env.SMTP_FROM_NAME || 'BillBooky Support'
 
 const resendClient = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
