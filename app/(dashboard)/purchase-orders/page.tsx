@@ -13,6 +13,7 @@ export default function PurchaseOrdersPage() {
     const [loading, setLoading] = useState(true)
     const [search, setSearch] = useState('')
     const [statusFilter, setStatusFilter] = useState<string>('all')
+    const [approvalFilter, setApprovalFilter] = useState<string>('all')
 
     const fetchOrders = async () => {
         setLoading(true)
@@ -29,12 +30,14 @@ export default function PurchaseOrdersPage() {
         const matchesSearch = po.po_number.toLowerCase().includes(search.toLowerCase()) ||
                               po.vendor_name.toLowerCase().includes(search.toLowerCase())
         const matchesStatus = statusFilter === 'all' || po.status === statusFilter
-        return matchesSearch && matchesStatus
+        const matchesApproval = approvalFilter === 'all' || po.approval_status === approvalFilter
+        return matchesSearch && matchesStatus && matchesApproval
     })
 
     const totalValue = orders.reduce((sum, po) => sum + po.total_amount, 0)
     const pendingCount = orders.filter(po => po.status === 'issued' || po.status === 'partially_received').length
     const receivedCount = orders.filter(po => po.status === 'received').length
+    const pendingApprovalCount = orders.filter(po => po.approval_status === 'pending').length
 
     const getStatusBadge = (status: string) => {
         switch (status) {
@@ -99,13 +102,28 @@ export default function PurchaseOrdersPage() {
                 <Card className="border-gray-100 shadow-2xs">
                     <CardContent className="p-4 flex items-center justify-between">
                         <div>
-                            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Pending Delivery</p>
+                            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Pending Approval</p>
                             <h3 className="text-xl sm:text-2xl font-bold text-amber-600 mt-1">
-                                {pendingCount}
+                                {pendingApprovalCount}
                             </h3>
-                            <p className="text-[11px] text-amber-700 mt-0.5">Issued or partial</p>
+                            <p className="text-[11px] text-amber-700 mt-0.5">Awaiting review</p>
                         </div>
                         <div className="p-3 bg-amber-50 text-amber-600 rounded-2xl">
+                            <Clock className="h-6 w-6" />
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card className="border-gray-100 shadow-2xs">
+                    <CardContent className="p-4 flex items-center justify-between">
+                        <div>
+                            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Pending Delivery</p>
+                            <h3 className="text-xl sm:text-2xl font-bold text-blue-600 mt-1">
+                                {pendingCount}
+                            </h3>
+                            <p className="text-[11px] text-blue-700 mt-0.5">Issued or partial</p>
+                        </div>
+                        <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl">
                             <Truck className="h-6 w-6" />
                         </div>
                     </CardContent>
@@ -153,6 +171,20 @@ export default function PurchaseOrdersPage() {
                         </button>
                     ))}
                 </div>
+                
+                <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 border-l pl-3">
+                    {['all', 'pending', 'approved', 'rejected'].map(st => (
+                        <button
+                            key={st}
+                            onClick={() => setApprovalFilter(st)}
+                            className={`px-3 py-2 text-xs font-semibold rounded-xl capitalize whitespace-nowrap transition-colors min-h-[44px] ${
+                                approvalFilter === st ? 'bg-indigo-600 text-white' : 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100'
+                            }`}
+                        >
+                            {st === 'all' ? 'All Approvals' : st}
+                        </button>
+                    ))}
+                </div>
             </div>
 
             {/* List */}
@@ -188,6 +220,13 @@ export default function PurchaseOrdersPage() {
                                             {po.po_number}
                                         </span>
                                         {getStatusBadge(po.status)}
+                                        {po.approval_status && po.approval_status !== 'approved' && (
+                                            <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold uppercase ${
+                                                po.approval_status === 'pending' ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700'
+                                            }`}>
+                                                {po.approval_status}
+                                            </span>
+                                        )}
                                     </div>
                                     <h4 className="font-bold text-gray-900 text-base mt-2">
                                         {po.vendor_name}

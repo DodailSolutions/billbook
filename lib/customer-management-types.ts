@@ -452,6 +452,7 @@ export interface CreateVendorData {
   bank_account_number?: string
   ifsc_code?: string
   vendor_category?: string
+  is_active?: boolean
   notes?: string
 }
 

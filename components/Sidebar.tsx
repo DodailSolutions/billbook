@@ -5,7 +5,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { LayoutDashboard, FileText, Users, RefreshCw, Bell, Settings, User, Bot, UserCog, FileBarChart, HelpCircle, MessageCircle, Briefcase, UserPlus, ChevronLeft, ChevronRight, Package, Receipt, Sparkles, BookOpen, ShoppingBag, DollarSign } from "lucide-react"
+import { LayoutDashboard, FileText, Users, RefreshCw, Bell, Settings, User, Bot, UserCog, FileBarChart, HelpCircle, MessageCircle, Briefcase, UserPlus, ChevronLeft, ChevronRight, Package, Receipt, Sparkles, BookOpen, ShoppingBag, DollarSign, Building2, CalendarDays, CalendarOff } from "lucide-react"
 import { SignOutButton } from "./SignOutButton"
 import { PlanBanner } from "./PlanBanner"
 import { getMyCAProfile } from "@/lib/ca-profile-actions"
@@ -58,11 +58,29 @@ export function Sidebar() {
             badge: 'NEW'
         },
         {
+            label: 'Vendors',
+            icon: Building2,
+            href: '/vendors',
+            color: "text-slate-700",
+        },
+        {
             label: 'Payroll & Salaries',
             icon: DollarSign,
             href: '/payroll',
             color: "text-emerald-600",
             badge: 'NEW'
+        },
+        {
+            label: 'Attendance',
+            icon: CalendarDays,
+            href: '/payroll/attendance',
+            color: "text-slate-700",
+        },
+        {
+            label: 'Leave Management',
+            icon: CalendarOff,
+            href: '/payroll/leaves',
+            color: "text-slate-700",
         },
         {
             label: 'Recurring',

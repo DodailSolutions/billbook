@@ -911,3 +911,203 @@ export async function generatePurchaseOrderPDF(po: PurchaseOrder): Promise<strin
     `
     return html
 }
+
+function numberToWords(num: number): string {
+    if (num === 0) return 'zero'
+    const a = ['', 'one ', 'two ', 'three ', 'four ', 'five ', 'six ', 'seven ', 'eight ', 'nine ', 'ten ', 'eleven ', 'twelve ', 'thirteen ', 'fourteen ', 'fifteen ', 'sixteen ', 'seventeen ', 'eighteen ', 'nineteen ']
+    const b = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety']
+    const n = ('000000000' + num).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/)
+    if (!n) return ''
+    let str = ''
+    str += (Number(n[1]) != 0) ? (a[Number(n[1])] || b[n[1][0] as any] + ' ' + a[n[1][1] as any]) + 'crore ' : ''
+    str += (Number(n[2]) != 0) ? (a[Number(n[2])] || b[n[2][0] as any] + ' ' + a[n[2][1] as any]) + 'lakh ' : ''
+    str += (Number(n[3]) != 0) ? (a[Number(n[3])] || b[n[3][0] as any] + ' ' + a[n[3][1] as any]) + 'thousand ' : ''
+    str += (Number(n[4]) != 0) ? (a[Number(n[4])] || b[n[4][0] as any] + ' ' + a[n[4][1] as any]) + 'hundred ' : ''
+    str += (Number(n[5]) != 0) ? ((str != '') ? 'and ' : '') + (a[Number(n[5])] || b[n[5][0] as any] + ' ' + a[n[5][1] as any]) : ''
+    return str.trim()
+}
+
+export async function generatePayslipPDF(payslip: any): Promise<string> {
+    const settings = await getInvoiceSettings()
+    
+    const primaryColor = settings?.primary_color || '#3B82F6'
+    const companyName = settings?.company_name || 'Your Company'
+    const companyAddress = settings?.company_address || ''
+    const companyLogoUrl = settings?.company_logo_url || ''
+    const companyNameColor = settings?.company_name_color || settings?.primary_color || primaryColor
+    const companyStampUrl = settings?.company_stamp_url || ''
+    const digitalSignatureUrl = settings?.digital_signature_url || ''
+    const showStamp = settings?.show_stamp ?? true
+    const showSignature = settings?.show_signature ?? true
+
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+    const monthName = monthNames[payslip.month - 1]
+    const emp = payslip.employee
+
+    const html = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payslip ${emp?.name}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 12px; padding: 40px; color: #1f2937; background: white; }
+        .payslip-container { max-width: 800px; margin: 0 auto; background: white; border: 1px solid #e5e7eb; padding: 40px; border-radius: 8px; }
+        .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid ${primaryColor}; padding-bottom: 20px; margin-bottom: 24px; }
+        .company-name { font-size: 24px; font-weight: 800; color: ${companyNameColor}; margin-bottom: 4px; }
+        .company-address { font-size: 11px; color: #6b7280; max-width: 250px; line-height: 1.5; white-space: pre-wrap; }
+        .payslip-title { text-align: right; }
+        .payslip-title h1 { font-size: 28px; font-weight: 900; color: #111827; letter-spacing: 1px; margin-bottom: 8px; text-transform: uppercase; }
+        .payslip-period { display: inline-block; padding: 4px 12px; background: #f3f4f6; color: #374151; font-weight: 700; font-size: 11px; border-radius: 9999px; }
+        
+        .emp-details { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; background: #f9fafb; padding: 16px; border-radius: 8px; margin-bottom: 24px; border: 1px solid #f3f4f6; }
+        .detail-item { display: flex; flex-direction: column; gap: 4px; }
+        .detail-label { font-size: 10px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; }
+        .detail-value { font-size: 12px; font-weight: 700; color: #111827; }
+        
+        .attendance-summary { display: flex; gap: 32px; padding: 12px 16px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; margin-bottom: 24px; }
+        .att-item { display: flex; gap: 8px; align-items: center; font-size: 11px; }
+        .att-label { color: #4b5563; font-weight: 600; }
+        .att-value { font-weight: 700; color: #1d4ed8; }
+        
+        .salary-breakdown { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+        .section-title { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; padding-bottom: 4px; border-bottom: 2px solid; }
+        .earnings-title { color: #047857; border-color: #34d399; }
+        .deductions-title { color: #be123c; border-color: #fb7185; }
+        
+        .line-item { display: flex; justify-content: space-between; padding: 6px 0; font-size: 12px; }
+        .line-label { color: #4b5563; }
+        .line-val { font-family: monospace; font-weight: 600; font-size: 13px; color: #111827; }
+        .deduction-val { color: #be123c; }
+        
+        .section-total { display: flex; justify-content: space-between; padding: 10px 0; font-weight: 800; font-size: 13px; border-top: 1px solid #e5e7eb; margin-top: 4px; }
+        
+        .net-pay-banner { background: ${primaryColor}; color: white; padding: 20px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+        .net-pay-label { font-size: 12px; font-weight: 600; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .net-pay-amount { font-size: 28px; font-weight: 900; }
+        .net-pay-words { font-size: 11px; font-style: italic; opacity: 0.9; text-transform: capitalize; }
+        
+        .footer-signatures { display: flex; justify-content: flex-end; gap: 48px; padding-top: 24px; border-top: 1px solid #e5e7eb; margin-top: 40px; page-break-inside: avoid; }
+        .sig-box { text-align: center; }
+        .sig-line { width: 150px; border-top: 1px solid #9ca3af; padding-top: 8px; margin-top: 60px; font-size: 11px; color: #4b5563; font-weight: 600; }
+        .img-container { height: 60px; display: flex; align-items: flex-end; justify-content: center; margin-bottom: -60px; }
+        .footer-note { text-align: center; font-size: 10px; color: #9ca3af; margin-top: 24px; }
+    </style>
+</head>
+<body>
+    <div class="payslip-container">
+        <div class="header">
+            <div>
+                ${companyLogoUrl ? `<img src="${companyLogoUrl}" alt="Logo" style="max-height: 40px; margin-bottom: 8px;">` : ''}
+                <div class="company-name">${companyName}</div>
+                <div class="company-address">${companyAddress}</div>
+            </div>
+            <div class="payslip-title">
+                <h1>PAYSLIP</h1>
+                <div class="payslip-period">${monthName.toUpperCase()} ${payslip.year}</div>
+            </div>
+        </div>
+
+        <div class="emp-details">
+            <div class="detail-item">
+                <span class="detail-label">Employee Name</span>
+                <span class="detail-value">${emp?.name}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Employee Code</span>
+                <span class="detail-value">${emp?.employee_code}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Designation</span>
+                <span class="detail-value">${emp?.designation || '-'}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Department</span>
+                <span class="detail-value">${emp?.department || '-'}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Date of Joining</span>
+                <span class="detail-value">${emp?.date_of_joining ? new Date(emp.date_of_joining).toLocaleDateString() : '-'}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">PAN Number</span>
+                <span class="detail-value">${emp?.pan_number || '-'}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Bank Account</span>
+                <span class="detail-value">${emp?.bank_account_number || '-'}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">IFSC Code</span>
+                <span class="detail-value">${emp?.ifsc_code || '-'}</span>
+            </div>
+        </div>
+
+        <div class="attendance-summary">
+            <div class="att-item"><span class="att-label">Total Working Days:</span> <span class="att-value">${payslip.working_days || '-'}</span></div>
+            <div class="att-item"><span class="att-label">Days Present:</span> <span class="att-value">${payslip.days_present || '-'}</span></div>
+            <div class="att-item"><span class="att-label">LOP Days:</span> <span class="att-value" style="color: #be123c;">${payslip.lop_days || 0}</span></div>
+        </div>
+
+        <div class="salary-breakdown">
+            <div>
+                <div class="section-title earnings-title">Earnings</div>
+                <div class="line-item"><span class="line-label">Basic Salary</span><span class="line-val">₹${Number(payslip.basic_salary).toFixed(2)}</span></div>
+                <div class="line-item"><span class="line-label">House Rent Allowance</span><span class="line-val">₹${Number(payslip.hra).toFixed(2)}</span></div>
+                <div class="line-item"><span class="line-label">Conveyance</span><span class="line-val">₹${Number(payslip.conveyance).toFixed(2)}</span></div>
+                ${payslip.medical_allowance ? `<div class="line-item"><span class="line-label">Medical Allowance</span><span class="line-val">₹${Number(payslip.medical_allowance).toFixed(2)}</span></div>` : ''}
+                ${payslip.travel_allowance ? `<div class="line-item"><span class="line-label">Travel Allowance</span><span class="line-val">₹${Number(payslip.travel_allowance).toFixed(2)}</span></div>` : ''}
+                <div class="line-item"><span class="line-label">Special Allowance</span><span class="line-val">₹${Number(payslip.special_allowance).toFixed(2)}</span></div>
+                <div class="section-total"><span>Gross Earnings (A)</span><span>₹${Number(payslip.gross_salary).toFixed(2)}</span></div>
+            </div>
+            <div>
+                <div class="section-title deductions-title">Deductions</div>
+                <div class="line-item"><span class="line-label">Provident Fund (PF)</span><span class="line-val deduction-val">₹${Number(payslip.pf_deduction).toFixed(2)}</span></div>
+                <div class="line-item"><span class="line-label">ESI</span><span class="line-val deduction-val">₹${Number(payslip.esi_deduction).toFixed(2)}</span></div>
+                <div class="line-item"><span class="line-label">Professional Tax (PT)</span><span class="line-val deduction-val">₹${Number(payslip.professional_tax || 0).toFixed(2)}</span></div>
+                <div class="line-item"><span class="line-label">TDS</span><span class="line-val deduction-val">₹${Number(payslip.tds_deduction).toFixed(2)}</span></div>
+                ${payslip.other_deduction > 0 ? `<div class="line-item"><span class="line-label">Other Deductions</span><span class="line-val deduction-val">₹${Number(payslip.other_deduction).toFixed(2)}</span></div>` : ''}
+                <div class="section-total"><span>Total Deductions (B)</span><span class="deduction-val">₹${Number(payslip.total_deductions).toFixed(2)}</span></div>
+            </div>
+        </div>
+
+        <div class="net-pay-banner">
+            <div>
+                <div class="net-pay-label">Net Take-Home Pay (A - B)</div>
+                <div class="net-pay-words">Rupees ${numberToWords(Math.round(payslip.net_salary))} Only</div>
+            </div>
+            <div class="net-pay-amount">₹${Number(payslip.net_salary).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</div>
+        </div>
+
+        ${(showStamp && companyStampUrl) || (showSignature && digitalSignatureUrl) ? `
+        <div class="footer-signatures">
+            ${showStamp && companyStampUrl ? `
+            <div class="sig-box">
+                <div class="img-container">
+                    <img src="${companyStampUrl}" alt="Company Stamp" style="max-height: 80px; opacity: 0.8;">
+                </div>
+                <div class="sig-line">Company Seal</div>
+            </div>
+            ` : ''}
+            ${showSignature && digitalSignatureUrl ? `
+            <div class="sig-box">
+                <div class="img-container">
+                    <img src="${digitalSignatureUrl}" alt="Signature" style="max-height: 60px;">
+                </div>
+                <div class="sig-line">Authorized Signatory</div>
+            </div>
+            ` : ''}
+        </div>
+        ` : ''}
+
+        <div class="footer-note">
+            This is a computer-generated document. No signature is required.
+        </div>
+    </div>
+</body>
+</html>
+    `
+    return html
+}

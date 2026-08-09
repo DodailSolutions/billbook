@@ -30,6 +30,12 @@ export interface PurchaseOrder {
     total_amount: number
     notes?: string | null
     terms?: string | null
+    approval_status?: 'pending' | 'approved' | 'rejected'
+    approved_by?: string | null
+    approved_at?: string | null
+    approval_notes?: string | null
+    amendment_number?: number
+    amended_from?: string | null
     created_at: string
     updated_at: string
     items?: PurchaseOrderItem[]
@@ -58,4 +64,8 @@ export interface CreatePOInput {
         unit_price: number
         gst_rate: number
     }[]
+}
+
+export interface UpdatePOInput extends CreatePOInput {
+    id: string
 }

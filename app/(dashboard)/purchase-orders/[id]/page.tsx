@@ -4,10 +4,10 @@ import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { PurchaseOrder } from '@/lib/po-types'
-import { getPurchaseOrder, updatePOStatus, receivePOItems } from '@/lib/po-actions'
+import { getPurchaseOrder, updatePOStatus, receivePOItems, approvePurchaseOrder, rejectPurchaseOrder, duplicatePurchaseOrder, amendPurchaseOrder } from '@/lib/po-actions'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent } from '@/components/ui/Card'
-import { ArrowLeft, Truck, CheckCircle2, XCircle, Printer, Calendar, Building2, PackageCheck, AlertCircle } from 'lucide-react'
+import { ArrowLeft, Truck, CheckCircle2, XCircle, Printer, Calendar, Building2, PackageCheck, AlertCircle, Edit, Copy, Check, X, FileEdit } from 'lucide-react'
 import { DownloadPOPDFButton } from './DownloadPOPDFButton'
 
 export default function ViewPurchaseOrderPage({ params }: { params: Promise<{ id: string }> }) {
@@ -18,6 +18,10 @@ export default function ViewPurchaseOrderPage({ params }: { params: Promise<{ id
     const [loading, setLoading] = useState(true)
     const [isReceiveModalOpen, setIsReceiveModalOpen] = useState(false)
     const [receiveState, setReceiveState] = useState<Record<string, { qty: number; batch: string; expiry: string }>>({})
+    const [actionLoading, setActionLoading] = useState(false)
+    const [isApproveModalOpen, setIsApproveModalOpen] = useState(false)
+    const [isRejectModalOpen, setIsRejectModalOpen] = useState(false)
+    const [approvalNotes, setApprovalNotes] = useState('')
 
     const fetchPO = async () => {
         setLoading(true)
@@ -57,6 +61,34 @@ export default function ViewPurchaseOrderPage({ params }: { params: Promise<{ id
         await receivePOItems(id, payload)
         setIsReceiveModalOpen(false)
         fetchPO()
+    }
+
+    const handleApprove = async () => {
+        setActionLoading(true)
+        await approvePurchaseOrder(id, approvalNotes)
+        setIsApproveModalOpen(false)
+        setApprovalNotes('')
+        fetchPO()
+        setActionLoading(false)
+    }
+
+    const handleReject = async () => {
+        if (!approvalNotes.trim()) return
+        setActionLoading(true)
+        await rejectPurchaseOrder(id, approvalNotes)
+        setIsRejectModalOpen(false)
+        setApprovalNotes('')
+        fetchPO()
+        setActionLoading(false)
+    }
+
+    const handleDuplicate = async () => {
+        setActionLoading(true)
+        const res = await duplicatePurchaseOrder(id)
+        if (res.success && res.id) {
+            router.push(`/purchase-orders/${res.id}`)
+        }
+        setActionLoading(false)
     }
 
     if (loading) {
@@ -100,21 +132,55 @@ export default function ViewPurchaseOrderPage({ params }: { params: Promise<{ id
                             <span className="text-xs px-3 py-1 rounded-full font-semibold uppercase bg-slate-100 text-slate-700">
                                 {po.status.replace('_', ' ')}
                             </span>
+                            {po.approval_status === 'pending' && (
+                                <span className="text-xs px-3 py-1 rounded-full font-semibold uppercase bg-amber-100 text-amber-700">
+                                    Pending Approval
+                                </span>
+                            )}
+                            {po.approval_status === 'approved' && (
+                                <span className="text-xs px-3 py-1 rounded-full font-semibold uppercase bg-emerald-100 text-emerald-700">
+                                    Approved
+                                </span>
+                            )}
+                            {po.approval_status === 'rejected' && (
+                                <span className="text-xs px-3 py-1 rounded-full font-semibold uppercase bg-rose-100 text-rose-700">
+                                    Rejected
+                                </span>
+                            )}
                         </div>
                         <p className="text-xs text-gray-500 mt-1">
                             Issued: {po.po_date} {po.expected_delivery_date ? `| Expected: ${po.expected_delivery_date}` : ''}
+                            {po.amended_from && ` | Amended from: PO`}
                         </p>
                     </div>
                 </div>
 
                 <div className="flex items-center gap-2 flex-wrap">
                     {po.status === 'draft' && (
-                        <Button 
-                            onClick={() => handleStatusChange('issued')} 
-                            className="bg-amber-600 hover:bg-amber-700 text-white gap-1 min-h-[44px]"
-                        >
-                            Mark as Issued
-                        </Button>
+                        <>
+                            <Link href={`/purchase-orders/${id}/edit`}>
+                                <Button variant="outline" className="gap-2 min-h-[44px]">
+                                    <Edit className="h-4 w-4" /> Edit PO
+                                </Button>
+                            </Link>
+                            {po.approval_status !== 'approved' && (
+                                <Button 
+                                    onClick={() => setIsApproveModalOpen(true)} 
+                                    className="bg-emerald-600 hover:bg-emerald-700 text-white gap-1 min-h-[44px]"
+                                >
+                                    <Check className="h-4 w-4" /> Approve PO
+                                </Button>
+                            )}
+                            {po.approval_status !== 'rejected' && (
+                                <Button 
+                                    onClick={() => setIsRejectModalOpen(true)} 
+                                    variant="outline"
+                                    className="text-rose-600 hover:bg-rose-50 border-rose-200 min-h-[44px]"
+                                >
+                                    <X className="h-4 w-4" /> Reject PO
+                                </Button>
+                            )}
+                        </>
                     )}
 
                     {(po.status === 'issued' || po.status === 'partially_received') && (
@@ -127,7 +193,7 @@ export default function ViewPurchaseOrderPage({ params }: { params: Promise<{ id
                         </Button>
                     )}
 
-                    {!isFullyReceived && !isCancelled && (
+                    {!isFullyReceived && !isCancelled && po.status !== 'draft' && (
                         <Button 
                             onClick={() => handleStatusChange('cancelled')} 
                             variant="outline" 
@@ -136,6 +202,15 @@ export default function ViewPurchaseOrderPage({ params }: { params: Promise<{ id
                             Cancel PO
                         </Button>
                     )}
+
+                    <Button 
+                        onClick={handleDuplicate}
+                        disabled={actionLoading}
+                        variant="outline" 
+                        className="gap-2 min-h-[44px]"
+                    >
+                        <Copy className="h-4 w-4" /> Duplicate
+                    </Button>
 
                     <DownloadPOPDFButton poId={id} poNumber={po.po_number} />
 
@@ -251,6 +326,98 @@ export default function ViewPurchaseOrderPage({ params }: { params: Promise<{ id
                         )}
                     </CardContent>
                 </Card>
+            )}
+
+            {/* Approval Details */}
+            {(po.approved_by || po.approval_notes) && (
+                <Card className="border-gray-100 shadow-2xs">
+                    <CardContent className="p-6">
+                        <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 flex items-center gap-2">
+                            <CheckCircle2 className="h-4 w-4 text-emerald-600" /> Approval Details
+                        </h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                            {po.approved_by && (
+                                <div>
+                                    <p className="font-bold text-gray-700 uppercase mb-1">Approved By</p>
+                                    <p className="text-gray-900">{po.approved_by}</p>
+                                    {po.approved_at && <p className="text-gray-500 mt-1">{new Date(po.approved_at).toLocaleString()}</p>}
+                                </div>
+                            )}
+                            {po.approval_notes && (
+                                <div>
+                                    <p className="font-bold text-gray-700 uppercase mb-1">Approval Notes</p>
+                                    <p className="text-gray-600 bg-slate-50 p-3 rounded-xl border border-gray-100">{po.approval_notes}</p>
+                                </div>
+                            )}
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
+
+            {/* Approve Modal */}
+            {isApproveModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden border border-gray-100">
+                        <div className="p-4 bg-emerald-600 text-white flex items-center justify-between">
+                            <h3 className="font-bold text-base">Approve Purchase Order</h3>
+                            <button onClick={() => setIsApproveModalOpen(false)} className="text-white/80 hover:text-white">✕</button>
+                        </div>
+                        <div className="p-6 space-y-4">
+                            <div>
+                                <label className="block text-xs font-semibold text-gray-700 mb-1">Notes (Optional)</label>
+                                <textarea
+                                    value={approvalNotes}
+                                    onChange={(e) => setApprovalNotes(e.target.value)}
+                                    placeholder="Add any approval notes..."
+                                    className="w-full text-sm p-3 border border-gray-200 rounded-xl min-h-[100px]"
+                                />
+                            </div>
+                            <div className="flex justify-end gap-3 pt-4">
+                                <Button variant="outline" onClick={() => setIsApproveModalOpen(false)}>Cancel</Button>
+                                <Button 
+                                    onClick={handleApprove} 
+                                    disabled={actionLoading}
+                                    className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                                >
+                                    {actionLoading ? 'Approving...' : 'Approve PO'}
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Reject Modal */}
+            {isRejectModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden border border-gray-100">
+                        <div className="p-4 bg-rose-600 text-white flex items-center justify-between">
+                            <h3 className="font-bold text-base">Reject Purchase Order</h3>
+                            <button onClick={() => setIsRejectModalOpen(false)} className="text-white/80 hover:text-white">✕</button>
+                        </div>
+                        <div className="p-6 space-y-4">
+                            <div>
+                                <label className="block text-xs font-semibold text-gray-700 mb-1">Reason for Rejection <span className="text-rose-500">*</span></label>
+                                <textarea
+                                    value={approvalNotes}
+                                    onChange={(e) => setApprovalNotes(e.target.value)}
+                                    placeholder="Please provide a reason for rejecting this PO..."
+                                    className="w-full text-sm p-3 border border-gray-200 rounded-xl min-h-[100px]"
+                                />
+                            </div>
+                            <div className="flex justify-end gap-3 pt-4">
+                                <Button variant="outline" onClick={() => setIsRejectModalOpen(false)}>Cancel</Button>
+                                <Button 
+                                    onClick={handleReject} 
+                                    disabled={actionLoading || !approvalNotes.trim()}
+                                    className="bg-rose-600 hover:bg-rose-700 text-white"
+                                >
+                                    {actionLoading ? 'Rejecting...' : 'Reject PO'}
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             )}
 
             {/* Receive Stock Modal */}
