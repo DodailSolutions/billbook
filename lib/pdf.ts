@@ -485,6 +485,11 @@ export async function generatePurchaseOrderPDF(po: PurchaseOrder): Promise<strin
     const companyStampUrl = settings?.company_stamp_url || ''
     const showStamp = settings?.show_stamp ?? true
     
+    // Determine if Intra-State (CGST+SGST) or Inter-State (IGST) transaction based on state codes
+    const buyerStateCode = companyGstin ? companyGstin.trim().slice(0, 2) : '';
+    const sellerStateCode = po.vendor?.gstin ? po.vendor.gstin.trim().slice(0, 2) : (po.vendor?.state_code || '');
+    const isIntraState = buyerStateCode && sellerStateCode ? buyerStateCode === sellerStateCode : true;
+
     // Generate HTML for PO PDF
     const html = `
 <!DOCTYPE html>
@@ -591,26 +596,15 @@ export async function generatePurchaseOrderPDF(po: PurchaseOrder): Promise<strin
             font-size: ${invoiceFontSize + 2}px;
             font-weight: 600;
         }
-        .vendor-section {
-            margin-top: 15px;
-        }
         .section-title {
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 11px;
+            font-weight: 700;
             margin-bottom: 8px;
             color: ${primaryColor};
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .vendor-details {
-            line-height: 1.6;
-            color: #4b5563;
-            font-size: ${invoiceFontSize}px;
-        }
-        .vendor-name {
-            font-weight: 600;
-            color: #1f2937;
-            font-size: ${invoiceFontSize + 1}px;
+            letter-spacing: 0.8px;
+            border-bottom: 1px solid #f3f4f6;
+            padding-bottom: 4px;
         }
         .gstin-highlight {
             background: #fef3c7;
@@ -711,12 +705,16 @@ export async function generatePurchaseOrderPDF(po: PurchaseOrder): Promise<strin
             body {
                 margin: 0;
                 padding: 20px;
+                background: white;
             }
             .po-container {
                 padding: 0;
+                max-width: 100% !important;
+                width: 100% !important;
+                margin: 0 !important;
             }
             .no-print {
-                display: none;
+                display: none !important;
             }
         }
     </style>
@@ -761,12 +759,42 @@ export async function generatePurchaseOrderPDF(po: PurchaseOrder): Promise<strin
                     </div>
                     ` : ''}
                 </div>
+            </div>
+        </div>
 
-                <div class="vendor-section">
-                    <div class="section-title">Vendor / Supplier:</div>
-                    <div class="vendor-details">
-                        <div class="vendor-name">${po.vendor_name}</div>
-                        ${po.vendor_email ? `<div>${po.vendor_email}</div>` : ''}
+        {/* Address Blocks Grid */}
+        <div style="display: flex; gap: 32px; margin-bottom: 25px; page-break-inside: avoid;">
+            {/* Vendor Details */}
+            <div style="flex: 1; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; background-color: #fafafa;">
+                <div class="section-title">Vendor / Supplier:</div>
+                <div style="font-size: ${invoiceFontSize}px; line-height: 1.5; color: #4b5563;">
+                    <div style="font-weight: 700; font-size: ${invoiceFontSize + 2}px; color: #111827; margin-bottom: 6px;">${po.vendor_name}</div>
+                    ${po.vendor?.contact_person ? `<div style="margin-bottom: 4px;"><span style="color: #9ca3af; font-weight: 500;">Attn:</span> ${po.vendor.contact_person}</div>` : ''}
+                    ${po.vendor?.address ? `<div style="margin-bottom: 6px; white-space: pre-line;">${po.vendor.address}</div>` : ''}
+                    ${po.vendor_email ? `<div style="margin-bottom: 4px;"><span style="color: #9ca3af; font-weight: 500;">Email:</span> ${po.vendor_email}</div>` : ''}
+                    ${po.vendor?.phone ? `<div style="margin-bottom: 4px;"><span style="color: #9ca3af; font-weight: 500;">Phone:</span> ${po.vendor.phone}</div>` : ''}
+                    ${po.vendor?.gstin ? `<div style="margin-top: 8px;"><span style="color: #9ca3af; font-weight: 500;">GSTIN:</span> <span class="gstin-highlight">${po.vendor.gstin}</span></div>` : ''}
+                </div>
+            </div>
+            
+            {/* Bill To & Ship To Details */}
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 16px;">
+                {/* Bill To */}
+                <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px 16px; flex: 1;">
+                    <div class="section-title">Bill To (Buyer):</div>
+                    <div style="font-size: ${invoiceFontSize}px; line-height: 1.4; color: #4b5563;">
+                        <strong style="color: #111827; font-size: ${invoiceFontSize + 1}px;">${companyName}</strong>
+                        ${companyAddress ? `<div style="margin-top: 3px; font-size: ${invoiceFontSize - 1}px;">${companyAddress}</div>` : ''}
+                        ${showGstin && companyGstin ? `<div style="margin-top: 6px; font-size: ${invoiceFontSize - 1}px;"><span style="color: #9ca3af; font-weight: 500;">GSTIN:</span> <span class="gstin-highlight">${companyGstin}</span></div>` : ''}
+                    </div>
+                </div>
+                
+                {/* Ship To */}
+                <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px 16px; flex: 1;">
+                    <div class="section-title">Ship To / Delivery Location:</div>
+                    <div style="font-size: ${invoiceFontSize}px; line-height: 1.4; color: #4b5563;">
+                        <strong style="color: #111827; font-size: ${invoiceFontSize + 1}px;">${companyName}</strong>
+                        ${companyAddress ? `<div style="margin-top: 3px; font-size: ${invoiceFontSize - 1}px;">${companyAddress}</div>` : ''}
                     </div>
                 </div>
             </div>
@@ -806,10 +834,28 @@ export async function generatePurchaseOrderPDF(po: PurchaseOrder): Promise<strin
                     <span>Subtotal:</span>
                     <span>₹${po.subtotal.toFixed(2)}</span>
                 </div>
+                ${po.tax_total > 0 ? (
+                    isIntraState ? `
+                    <div class="total-row">
+                        <span>CGST (${(po.items?.[0]?.gst_rate ? po.items[0].gst_rate / 2 : 9).toFixed(1)}%):</span>
+                        <span>₹${(po.tax_total / 2).toFixed(2)}</span>
+                    </div>
+                    <div class="total-row">
+                        <span>SGST (${(po.items?.[0]?.gst_rate ? po.items[0].gst_rate / 2 : 9).toFixed(1)}%):</span>
+                        <span>₹${(po.tax_total / 2).toFixed(2)}</span>
+                    </div>
+                    ` : `
+                    <div class="total-row">
+                        <span>IGST (${(po.items?.[0]?.gst_rate || 18).toFixed(1)}%):</span>
+                        <span>₹${po.tax_total.toFixed(2)}</span>
+                    </div>
+                    `
+                ) : `
                 <div class="total-row">
                     <span>GST Tax:</span>
                     <span>₹${po.tax_total.toFixed(2)}</span>
                 </div>
+                `}
                 <div class="total-row grand-total">
                     <span>Total Amount:</span>
                     <span>₹${po.total_amount.toFixed(2)}</span>

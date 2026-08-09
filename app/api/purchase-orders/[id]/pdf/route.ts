@@ -40,11 +40,17 @@ export async function GET(
                 padding: 0;
             }
             .content-wrapper {
-                margin-top: 0;
-                padding: 20px;
+                margin-top: 0 !important;
+                padding: 0 !important;
+                display: block !important;
             }
             .po-preview {
-                box-shadow: none;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                max-width: 100% !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
             }
             .no-print {
                 display: none !important;

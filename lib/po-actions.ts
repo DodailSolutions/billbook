@@ -51,7 +51,8 @@ export async function getPurchaseOrder(id: string): Promise<PurchaseOrder | null
         .from('purchase_orders')
         .select(`
             *,
-            items:purchase_order_items(*)
+            items:purchase_order_items(*),
+            vendor:vendors(address, gstin, phone, contact_person, state_code)
         `)
         .eq('id', id)
         .eq('user_id', user.id)

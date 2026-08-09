@@ -33,6 +33,13 @@ export interface PurchaseOrder {
     created_at: string
     updated_at: string
     items?: PurchaseOrderItem[]
+    vendor?: {
+        address?: string | null
+        gstin?: string | null
+        phone?: string | null
+        contact_person?: string | null
+        state_code?: string | null
+    } | null
 }
 
 export interface CreatePOInput {
