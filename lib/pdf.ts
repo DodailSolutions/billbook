@@ -581,14 +581,14 @@ export async function generatePurchaseOrderPDF(po: PurchaseOrder): Promise<strin
             margin-bottom: 12px;
         }
         .date-label {
-            font-size: \${Math.max(10, invoiceFontSize - 2)}px;
+            font-size: ${Math.max(10, invoiceFontSize - 2)}px;
             color: #6b7280;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin-bottom: 4px;
         }
         .date-value {
-            font-size: \${invoiceFontSize + 2}px;
+            font-size: ${invoiceFontSize + 2}px;
             font-weight: 600;
         }
         .vendor-section {
@@ -605,12 +605,12 @@ export async function generatePurchaseOrderPDF(po: PurchaseOrder): Promise<strin
         .vendor-details {
             line-height: 1.6;
             color: #4b5563;
-            font-size: \${invoiceFontSize}px;
+            font-size: ${invoiceFontSize}px;
         }
         .vendor-name {
             font-weight: 600;
             color: #1f2937;
-            font-size: \${invoiceFontSize + 1}px;
+            font-size: ${invoiceFontSize + 1}px;
         }
         .gstin-highlight {
             background: #fef3c7;
@@ -633,7 +633,7 @@ export async function generatePurchaseOrderPDF(po: PurchaseOrder): Promise<strin
         .items-table th {
             padding: 12px;
             text-align: left;
-            font-size: \${Math.max(10, invoiceFontSize - 1)}px;
+            font-size: ${Math.max(10, invoiceFontSize - 1)}px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -649,7 +649,7 @@ export async function generatePurchaseOrderPDF(po: PurchaseOrder): Promise<strin
             padding: 12px;
             border-bottom: 1px solid #f3f4f6;
             color: #4b5563;
-            font-size: \${invoiceFontSize}px;
+            font-size: ${invoiceFontSize}px;
         }
         .items-table td.text-right {
             text-align: right;
@@ -671,7 +671,7 @@ export async function generatePurchaseOrderPDF(po: PurchaseOrder): Promise<strin
             justify-content: space-between;
             padding: 8px 0;
             color: #4b5563;
-            font-size: \${invoiceFontSize}px;
+            font-size: ${invoiceFontSize}px;
         }
         .total-row.subtotal {
             border-bottom: 1px solid #e5e7eb;
@@ -680,7 +680,7 @@ export async function generatePurchaseOrderPDF(po: PurchaseOrder): Promise<strin
             border-top: 2px solid ${primaryColor};
             padding-top: 12px;
             margin-top: 8px;
-            font-size: \${invoiceFontSize + 6}px;
+            font-size: ${invoiceFontSize + 6}px;
             font-weight: bold;
             color: ${primaryColor};
         }
@@ -691,7 +691,7 @@ export async function generatePurchaseOrderPDF(po: PurchaseOrder): Promise<strin
             page-break-inside: avoid;
         }
         .notes-title {
-            font-size: \${invoiceFontSize + 2}px;
+            font-size: ${invoiceFontSize + 2}px;
             font-weight: 600;
             margin-bottom: 8px;
             color: ${primaryColor};
@@ -701,7 +701,7 @@ export async function generatePurchaseOrderPDF(po: PurchaseOrder): Promise<strin
             line-height: 1.6;
             white-space: pre-wrap;
             font-family: '${termsFontFamily}', sans-serif;
-            font-size: \${termsFontSize}px;
+            font-size: ${termsFontSize}px;
         }
         @media print {
             @page {
@@ -725,39 +725,39 @@ export async function generatePurchaseOrderPDF(po: PurchaseOrder): Promise<strin
     <div class="po-container">
         <div class="header">
             <div class="company-info">
-                \${showLogo && companyLogoUrl && companyLogoUrl.trim() && companyLogoUrl.startsWith('data:image') ? `
+                ${showLogo && companyLogoUrl && companyLogoUrl.trim() && companyLogoUrl.startsWith('data:image') ? `
                 <div style="margin-bottom: 12px;">
-                    <img src="\${companyLogoUrl}" alt="Company Logo" style="height: \${logoSize === 'large' ? '128px' : logoSize === 'small' ? '64px' : '96px'}; width: \${logoSize === 'large' ? '128px' : logoSize === 'small' ? '64px' : '96px'}; object-fit: contain;" onerror="this.style.display='none'" />
+                    <img src="${companyLogoUrl}" alt="Company Logo" style="height: ${logoSize === 'large' ? '128px' : logoSize === 'small' ? '64px' : '96px'}; width: ${logoSize === 'large' ? '128px' : logoSize === 'small' ? '64px' : '96px'}; object-fit: contain;" onerror="this.style.display='none'" />
                 </div>
                 ` : ''}
-                <div class="company-name">\${companyName}</div>
-                \${showCompanyDetails ? `
+                <div class="company-name">${companyName}</div>
+                ${showCompanyDetails ? `
                 <div class="company-details">
-                    \${companyAddress ? `<div>\${companyAddress}</div>` : ''}
-                    \${companyEmail ? `<div>Email: \${companyEmail}</div>` : ''}
-                    \${companyPhone ? `<div>Phone: \${companyPhone}</div>` : ''}
-                    \${showGstin && companyGstin ? `<div>GSTIN: <span class="gstin-highlight">\${companyGstin}</span></div>` : ''}
+                    ${companyAddress ? `<div>${companyAddress}</div>` : ''}
+                    ${companyEmail ? `<div>Email: ${companyEmail}</div>` : ''}
+                    ${companyPhone ? `<div>Phone: ${companyPhone}</div>` : ''}
+                    ${showGstin && companyGstin ? `<div>GSTIN: <span class="gstin-highlight">${companyGstin}</span></div>` : ''}
                 </div>
                 ` : ''}
             </div>
             <div class="header-right">
                 <div class="po-title">PURCHASE ORDER</div>
-                <div class="po-number">\${po.po_number}</div>
+                <div class="po-number">${po.po_number}</div>
                 <div class="po-status">
-                    <span class="status-badge status-\${po.status}">
-                        \${po.status.replace('_', ' ')}
+                    <span class="status-badge status-${po.status}">
+                        ${po.status.replace('_', ' ')}
                     </span>
                 </div>
                 
                 <div class="po-dates">
                     <div class="date-item">
                         <div class="date-label">Order Date</div>
-                        <div class="date-value">\${formatDate(po.po_date)}</div>
+                        <div class="date-value">${formatDate(po.po_date)}</div>
                     </div>
-                    \${po.expected_delivery_date ? `
+                    ${po.expected_delivery_date ? `
                     <div class="date-item">
                         <div class="date-label">Expected Delivery</div>
-                        <div class="date-value">\${formatDate(po.expected_delivery_date)}</div>
+                        <div class="date-value">${formatDate(po.expected_delivery_date)}</div>
                     </div>
                     ` : ''}
                 </div>
@@ -765,8 +765,8 @@ export async function generatePurchaseOrderPDF(po: PurchaseOrder): Promise<strin
                 <div class="vendor-section">
                     <div class="section-title">Vendor / Supplier:</div>
                     <div class="vendor-details">
-                        <div class="vendor-name">\${po.vendor_name}</div>
-                        \${po.vendor_email ? `<div>\${po.vendor_email}</div>` : ''}
+                        <div class="vendor-name">${po.vendor_name}</div>
+                        ${po.vendor_email ? `<div>${po.vendor_email}</div>` : ''}
                     </div>
                 </div>
             </div>
@@ -784,17 +784,17 @@ export async function generatePurchaseOrderPDF(po: PurchaseOrder): Promise<strin
                 </tr>
             </thead>
             <tbody>
-                \${po.items ? po.items.map((item, index) => `
+                ${po.items ? po.items.map((item, index) => `
                 <tr>
-                    <td class="text-center">\${index + 1}</td>
+                    <td class="text-center">${index + 1}</td>
                     <td>
-                        <div style="font-weight: 600; color: #1f2937;">\${item.item_name}</div>
-                        \${item.description ? `<div style="font-size: \${Math.max(9, invoiceFontSize - 2)}px; color: #6b7280; margin-top: 4px; white-space: pre-wrap;">\${item.description}</div>` : ''}
+                        <div style="font-weight: 600; color: #1f2937;">${item.item_name}</div>
+                        ${item.description ? `<div style="font-size: ${Math.max(9, invoiceFontSize - 2)}px; color: #6b7280; margin-top: 4px; white-space: pre-wrap;">${item.description}</div>` : ''}
                     </td>
-                    <td class="text-right">\${item.quantity}</td>
-                    <td class="text-right">₹\${item.unit_price.toFixed(2)}</td>
-                    <td class="text-right">\${item.gst_rate}%</td>
-                    <td class="text-right">₹\${item.total_amount.toFixed(2)}</td>
+                    <td class="text-right">${item.quantity}</td>
+                    <td class="text-right">₹${item.unit_price.toFixed(2)}</td>
+                    <td class="text-right">${item.gst_rate}%</td>
+                    <td class="text-right">₹${item.total_amount.toFixed(2)}</td>
                 </tr>
                 `).join('') : `<tr><td colspan="6" class="text-center">No items ordered</td></tr>`}
             </tbody>
@@ -804,30 +804,30 @@ export async function generatePurchaseOrderPDF(po: PurchaseOrder): Promise<strin
             <div class="totals">
                 <div class="total-row subtotal">
                     <span>Subtotal:</span>
-                    <span>₹\${po.subtotal.toFixed(2)}</span>
+                    <span>₹${po.subtotal.toFixed(2)}</span>
                 </div>
                 <div class="total-row">
                     <span>GST Tax:</span>
-                    <span>₹\${po.tax_total.toFixed(2)}</span>
+                    <span>₹${po.tax_total.toFixed(2)}</span>
                 </div>
                 <div class="total-row grand-total">
                     <span>Total Amount:</span>
-                    <span>₹\${po.total_amount.toFixed(2)}</span>
+                    <span>₹${po.total_amount.toFixed(2)}</span>
                 </div>
             </div>
         </div>
 
-        \${po.notes ? `
+        ${po.notes ? `
         <div class="notes-section">
             <div class="notes-title">Notes / Instructions:</div>
-            <div class="notes-content">\${po.notes}</div>
+            <div class="notes-content">${po.notes}</div>
         </div>
         ` : ''}
         
-        \${termsAndConditions ? `
+        ${termsAndConditions ? `
         <div class="notes-section">
             <div class="notes-title">Terms and Conditions:</div>
-            <div class="notes-content">\${termsAndConditions}</div>
+            <div class="notes-content">${termsAndConditions}</div>
         </div>
         ` : ''}
 
@@ -837,26 +837,26 @@ export async function generatePurchaseOrderPDF(po: PurchaseOrder): Promise<strin
                 <div style="font-size: 11px; color: #6b7280; font-weight: 600;">Vendor Acknowledgment</div>
                 <div style="font-size: 9px; color: #9ca3af; margin-top: 2px;">(Sign & date to accept this order)</div>
             </div>
-            \${showStamp && companyStampUrl && companyStampUrl.startsWith('data:image') ? `
+            ${showStamp && companyStampUrl && companyStampUrl.startsWith('data:image') ? `
             <div style="text-align: center;">
-                <img src="\${companyStampUrl}" alt="Company Stamp" style="max-height: 110px; max-width: 120px; width: auto; height: auto; object-fit: contain; opacity: 0.85; display: block; margin: 0 auto;" onerror="this.style.display='none'" />
+                <img src="${companyStampUrl}" alt="Company Stamp" style="max-height: 110px; max-width: 120px; width: auto; height: auto; object-fit: contain; opacity: 0.85; display: block; margin: 0 auto;" onerror="this.style.display='none'" />
                 <div style="font-size: 11px; color: #6b7280; margin-top: 8px;">Company Seal</div>
             </div>
             ` : ''}
-            \${showSignature && digitalSignatureUrl && digitalSignatureUrl.startsWith('data:image') ? `
+            ${showSignature && digitalSignatureUrl && digitalSignatureUrl.startsWith('data:image') ? `
             <div style="text-align: center; min-width: 170px;">
                 <div style="height: 65px; display: flex; align-items: flex-end; justify-content: center; margin-bottom: 8px;">
-                    <img src="\${digitalSignatureUrl}" alt="Signature" style="max-height: 65px; max-width: 190px; width: auto; height: auto; object-fit: contain;" onerror="this.style.display='none'" />
+                    <img src="${digitalSignatureUrl}" alt="Signature" style="max-height: 65px; max-width: 190px; width: auto; height: auto; object-fit: contain;" onerror="this.style.display='none'" />
                 </div>
-                <div style="border-top: 2px solid #374151; padding-top: 5px; font-size: 11px; color: #374151; font-weight: 600;">\${companyName}</div>
+                <div style="border-top: 2px solid #374151; padding-top: 5px; font-size: 11px; color: #374151; font-weight: 600;">${companyName}</div>
                 <div style="font-size: 10px; color: #6b7280; margin-top: 2px;">Authorized Buyer Signatory</div>
             </div>
             ` : ''}
         </div>
 
-        \${footerText ? `
+        ${footerText ? `
         <div class="notes-section" style="text-align: center; color: #9ca3af; font-size: 12px;">
-            \${footerText}
+            ${footerText}
         </div>
         ` : ''}
     </div>
