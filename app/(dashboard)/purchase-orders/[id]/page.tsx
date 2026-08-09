@@ -8,6 +8,7 @@ import { getPurchaseOrder, updatePOStatus, receivePOItems } from '@/lib/po-actio
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent } from '@/components/ui/Card'
 import { ArrowLeft, Truck, CheckCircle2, XCircle, Printer, Calendar, Building2, PackageCheck, AlertCircle } from 'lucide-react'
+import { DownloadPOPDFButton } from './DownloadPOPDFButton'
 
 export default function ViewPurchaseOrderPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params)
@@ -136,9 +137,13 @@ export default function ViewPurchaseOrderPage({ params }: { params: Promise<{ id
                         </Button>
                     )}
 
-                    <Button onClick={() => window.print()} variant="outline" className="gap-2 min-h-[44px]">
-                        <Printer className="h-4 w-4" /> Print PO
-                    </Button>
+                    <DownloadPOPDFButton poId={id} poNumber={po.po_number} />
+
+                    <Link href={`/api/purchase-orders/${id}/pdf`} target="_blank">
+                        <Button variant="outline" className="gap-2 min-h-[44px]">
+                            <Printer className="h-4 w-4" /> Print PO
+                        </Button>
+                    </Link>
                 </div>
             </div>
 
