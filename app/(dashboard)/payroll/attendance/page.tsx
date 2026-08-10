@@ -190,12 +190,12 @@ export default function AttendancePage() {
                         </div>
                     ) : (
                         <div className="overflow-x-auto border border-gray-200 rounded-xl">
-                            <table className="w-full text-left text-xs whitespace-nowrap">
+                            <table className="w-full text-left text-xs whitespace-nowrap table-fixed">
                                 <thead className="bg-slate-50 border-b border-gray-200">
                                     <tr>
-                                        <th className="p-3 font-semibold text-gray-500 sticky left-0 bg-slate-50 z-10 border-r border-gray-200 shadow-sm">Employee</th>
+                                        <th className="p-3 font-semibold text-gray-500 sticky left-0 bg-slate-50 z-20 border-r border-gray-200 shadow-sm min-w-[160px] w-[160px]">Employee</th>
                                         {Array.from({ length: daysInMonth }).map((_, i) => (
-                                            <th key={i} className="p-2 text-center min-w-[36px] font-semibold text-gray-500 border-r border-gray-100">
+                                            <th key={i} className="p-2 text-center min-w-[48px] w-[48px] font-semibold text-gray-500 border-r border-gray-100">
                                                 <div className="mb-1">{i + 1}</div>
                                                 <button onClick={() => markAllPresent(i + 1)} className="text-[9px] text-emerald-600 hover:bg-emerald-50 p-1 rounded-sm w-full font-bold" title="Mark All Present">
                                                     P All
@@ -207,18 +207,18 @@ export default function AttendancePage() {
                                 <tbody>
                                     {employees.map(emp => (
                                         <tr key={emp.id} className="border-b border-gray-100 hover:bg-slate-50/50">
-                                            <td className="p-3 sticky left-0 bg-white z-10 border-r border-gray-200 shadow-sm">
-                                                <p className="font-bold text-gray-900">{emp.name}</p>
+                                            <td className="p-3 sticky left-0 bg-white z-10 border-r border-gray-200 shadow-sm min-w-[160px] w-[160px]">
+                                                <p className="font-bold text-gray-900 truncate">{emp.name}</p>
                                                 <p className="text-[10px] text-gray-400">{emp.employee_code}</p>
                                             </td>
                                             {Array.from({ length: daysInMonth }).map((_, i) => {
                                                 const day = i + 1
                                                 const status = attendanceMap[emp.id]?.[day]
                                                 return (
-                                                    <td key={day} className="p-1 text-center border-r border-gray-100">
+                                                    <td key={day} className="p-1 text-center border-r border-gray-100 min-w-[48px] w-[48px]">
                                                         <button 
                                                             onClick={() => toggleStatus(emp.id, day)}
-                                                            className={`w-full aspect-square rounded-md font-bold text-xs flex items-center justify-center transition-colors ${getStatusColor(status)}`}
+                                                            className={`w-8 h-8 rounded-md font-bold text-xs flex items-center justify-center mx-auto transition-colors ${getStatusColor(status)}`}
                                                         >
                                                             {getStatusText(status)}
                                                         </button>
