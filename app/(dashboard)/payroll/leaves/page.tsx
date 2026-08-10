@@ -7,6 +7,7 @@ import { LeaveRequest, LeaveType, Employee, EmployeeLeaveBalance } from '@/lib/p
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent } from '@/components/ui/Card'
 import { ArrowLeft, Check, X, Plane, Calendar } from 'lucide-react'
+import { MigrationBanner } from '@/components/MigrationBanner'
 
 export default function LeavesPage() {
     const [tab, setTab] = useState<'requests' | 'balances' | 'apply'>('requests')
@@ -79,6 +80,7 @@ export default function LeavesPage() {
 
     return (
         <div className="space-y-6 max-w-5xl mx-auto pb-12">
+            <MigrationBanner />
             <div className="flex items-center gap-3">
                 <Link href="/payroll">
                     <Button variant="outline" size="sm" className="h-10 w-10 p-0 rounded-xl">

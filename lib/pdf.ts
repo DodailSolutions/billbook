@@ -251,7 +251,7 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
     <div class="invoice-container">
         <div class="header">
             <div class="company-info">
-                ${showLogo && companyLogoUrl && companyLogoUrl.trim() && companyLogoUrl.startsWith('data:image') ? `
+                ${showLogo && companyLogoUrl && companyLogoUrl.trim() ? `
                 <div style="margin-bottom: 12px;">
                     <img src="${companyLogoUrl}" alt="Company Logo" style="height: ${logoSize === 'large' ? '128px' : logoSize === 'small' ? '64px' : '96px'}; width: ${logoSize === 'large' ? '128px' : logoSize === 'small' ? '64px' : '96px'}; object-fit: contain;" onerror="this.style.display='none'" />
                 </div>
@@ -382,9 +382,9 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
         </div>
         ` : ''}
         
-        ${(paymentInstructions || (showQrCode && paymentQrCodeUrl && paymentQrCodeUrl.startsWith('data:image'))) ? `
+        ${(paymentInstructions || (showQrCode && paymentQrCodeUrl)) ? `
         <div class="notes-section" style="page-break-inside: avoid;">
-            ${paymentInstructions && (showQrCode && paymentQrCodeUrl && paymentQrCodeUrl.startsWith('data:image')) ? `
+            ${paymentInstructions && (showQrCode && paymentQrCodeUrl) ? `
             <div style="display: flex; gap: 24px; align-items: flex-start;">
                 <div style="flex: 1;">
                     <div class="notes-title">Payment Instructions:</div>
@@ -421,13 +421,13 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
                 <div style="border: 1.5px dashed #d1d5db; border-radius: 6px; height: 65px; margin-bottom: 8px;"></div>
                 <div style="font-size: 11px; color: #6b7280;">Customer Signature</div>
             </div>
-            ${showStamp && companyStampUrl && companyStampUrl.startsWith('data:image') ? `
+            ${showStamp && companyStampUrl ? `
             <div style="text-align: center;">
                 <img src="${companyStampUrl}" alt="Company Stamp" style="max-height: 110px; max-width: 120px; width: auto; height: auto; object-fit: contain; opacity: 0.85; display: block; margin: 0 auto;" onerror="this.style.display='none'" />
                 <div style="font-size: 11px; color: #6b7280; margin-top: 8px;">Company Seal</div>
             </div>
             ` : ''}
-            ${showSignature && digitalSignatureUrl && digitalSignatureUrl.startsWith('data:image') ? `
+            ${showSignature && digitalSignatureUrl ? `
             <div style="text-align: center; min-width: 170px;">
                 <div style="height: 65px; display: flex; align-items: flex-end; justify-content: center; margin-bottom: 8px;">
                     <img src="${digitalSignatureUrl}" alt="Signature" style="max-height: 65px; max-width: 190px; width: auto; height: auto; object-fit: contain;" onerror="this.style.display='none'" />
@@ -723,7 +723,7 @@ export async function generatePurchaseOrderPDF(po: PurchaseOrder): Promise<strin
     <div class="po-container">
         <div class="header">
             <div class="company-info">
-                ${showLogo && companyLogoUrl && companyLogoUrl.trim() && companyLogoUrl.startsWith('data:image') ? `
+                ${showLogo && companyLogoUrl && companyLogoUrl.trim() ? `
                 <div style="margin-bottom: 12px;">
                     <img src="${companyLogoUrl}" alt="Company Logo" style="height: ${logoSize === 'large' ? '128px' : logoSize === 'small' ? '64px' : '96px'}; width: ${logoSize === 'large' ? '128px' : logoSize === 'small' ? '64px' : '96px'}; object-fit: contain;" onerror="this.style.display='none'" />
                 </div>
@@ -762,9 +762,9 @@ export async function generatePurchaseOrderPDF(po: PurchaseOrder): Promise<strin
             </div>
         </div>
 
-        {/* Address Blocks Grid */}
+        <!-- Address Blocks Grid -->
         <div style="display: flex; gap: 32px; margin-bottom: 25px; page-break-inside: avoid;">
-            {/* Vendor Details */}
+            <!-- Vendor Details -->
             <div style="flex: 1; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; background-color: #fafafa;">
                 <div class="section-title">Vendor / Supplier:</div>
                 <div style="font-size: ${invoiceFontSize}px; line-height: 1.5; color: #4b5563;">
@@ -777,9 +777,9 @@ export async function generatePurchaseOrderPDF(po: PurchaseOrder): Promise<strin
                 </div>
             </div>
             
-            {/* Bill To & Ship To Details */}
+            <!-- Bill To & Ship To Details -->
             <div style="flex: 1; display: flex; flex-direction: column; gap: 16px;">
-                {/* Bill To */}
+                <!-- Bill To -->
                 <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px 16px; flex: 1;">
                     <div class="section-title">Bill To (Buyer):</div>
                     <div style="font-size: ${invoiceFontSize}px; line-height: 1.4; color: #4b5563;">
@@ -789,7 +789,7 @@ export async function generatePurchaseOrderPDF(po: PurchaseOrder): Promise<strin
                     </div>
                 </div>
                 
-                {/* Ship To */}
+                <!-- Ship To -->
                 <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px 16px; flex: 1;">
                     <div class="section-title">Ship To / Delivery Location:</div>
                     <div style="font-size: ${invoiceFontSize}px; line-height: 1.4; color: #4b5563;">
@@ -820,9 +820,9 @@ export async function generatePurchaseOrderPDF(po: PurchaseOrder): Promise<strin
                         ${item.description ? `<div style="font-size: ${Math.max(9, invoiceFontSize - 2)}px; color: #6b7280; margin-top: 4px; white-space: pre-wrap;">${item.description}</div>` : ''}
                     </td>
                     <td class="text-right">${item.quantity}</td>
-                    <td class="text-right">₹${item.unit_price.toFixed(2)}</td>
+                    <td class="text-right">₹${(item.unit_price || 0).toFixed(2)}</td>
                     <td class="text-right">${item.gst_rate}%</td>
-                    <td class="text-right">₹${item.total_amount.toFixed(2)}</td>
+                    <td class="text-right">₹${(item.total_amount || 0).toFixed(2)}</td>
                 </tr>
                 `).join('') : `<tr><td colspan="6" class="text-center">No items ordered</td></tr>`}
             </tbody>
@@ -832,33 +832,33 @@ export async function generatePurchaseOrderPDF(po: PurchaseOrder): Promise<strin
             <div class="totals">
                 <div class="total-row subtotal">
                     <span>Subtotal:</span>
-                    <span>₹${po.subtotal.toFixed(2)}</span>
+                    <span>₹${(po.subtotal || 0).toFixed(2)}</span>
                 </div>
-                ${po.tax_total > 0 ? (
+                ${(po.tax_total || 0) > 0 ? (
                     isIntraState ? `
                     <div class="total-row">
                         <span>CGST (${(po.items?.[0]?.gst_rate ? po.items[0].gst_rate / 2 : 9).toFixed(1)}%):</span>
-                        <span>₹${(po.tax_total / 2).toFixed(2)}</span>
+                        <span>₹${((po.tax_total || 0) / 2).toFixed(2)}</span>
                     </div>
                     <div class="total-row">
                         <span>SGST (${(po.items?.[0]?.gst_rate ? po.items[0].gst_rate / 2 : 9).toFixed(1)}%):</span>
-                        <span>₹${(po.tax_total / 2).toFixed(2)}</span>
+                        <span>₹${((po.tax_total || 0) / 2).toFixed(2)}</span>
                     </div>
                     ` : `
                     <div class="total-row">
                         <span>IGST (${(po.items?.[0]?.gst_rate || 18).toFixed(1)}%):</span>
-                        <span>₹${po.tax_total.toFixed(2)}</span>
+                        <span>₹${(po.tax_total || 0).toFixed(2)}</span>
                     </div>
                     `
                 ) : `
                 <div class="total-row">
                     <span>GST Tax:</span>
-                    <span>₹${po.tax_total.toFixed(2)}</span>
+                    <span>₹${(po.tax_total || 0).toFixed(2)}</span>
                 </div>
                 `}
                 <div class="total-row grand-total">
                     <span>Total Amount:</span>
-                    <span>₹${po.total_amount.toFixed(2)}</span>
+                    <span>₹${(po.total_amount || 0).toFixed(2)}</span>
                 </div>
             </div>
         </div>
@@ -883,13 +883,13 @@ export async function generatePurchaseOrderPDF(po: PurchaseOrder): Promise<strin
                 <div style="font-size: 11px; color: #6b7280; font-weight: 600;">Vendor Acknowledgment</div>
                 <div style="font-size: 9px; color: #9ca3af; margin-top: 2px;">(Sign & date to accept this order)</div>
             </div>
-            ${showStamp && companyStampUrl && companyStampUrl.startsWith('data:image') ? `
+            ${showStamp && companyStampUrl ? `
             <div style="text-align: center;">
                 <img src="${companyStampUrl}" alt="Company Stamp" style="max-height: 110px; max-width: 120px; width: auto; height: auto; object-fit: contain; opacity: 0.85; display: block; margin: 0 auto;" onerror="this.style.display='none'" />
                 <div style="font-size: 11px; color: #6b7280; margin-top: 8px;">Company Seal</div>
             </div>
             ` : ''}
-            ${showSignature && digitalSignatureUrl && digitalSignatureUrl.startsWith('data:image') ? `
+            ${showSignature && digitalSignatureUrl ? `
             <div style="text-align: center; min-width: 170px;">
                 <div style="height: 65px; display: flex; align-items: flex-end; justify-content: center; margin-bottom: 8px;">
                     <img src="${digitalSignatureUrl}" alt="Signature" style="max-height: 65px; max-width: 190px; width: auto; height: auto; object-fit: contain;" onerror="this.style.display='none'" />

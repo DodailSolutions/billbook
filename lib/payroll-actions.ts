@@ -4,6 +4,8 @@ import { createClient } from "@/lib/supabase/server"
 import { Employee, SalaryStructure, PayrollRun, Payslip, CreateEmployeeInput, UpdateEmployeeInput, AttendanceRecord, LeaveType, LeaveRequest, EmployeeLeaveBalance, SalaryRevision } from "./payroll-types"
 import { postPayrollJournalEntry } from "./bookkeeping-actions"
 import { revalidatePath } from "next/cache"
+import fs from 'fs'
+import path from 'path'
 
 function calculateStatutoryDeductions(basicSalary: number, grossSalary: number) {
     const pfBase = Math.min(basicSalary, 15000)
@@ -603,4 +605,22 @@ export async function getPayslip(id: string): Promise<Payslip | null> {
 
     if (error || !data) return null
     return data as Payslip
+}
+
+export async function checkMigrationStatus(): Promise<{ migrationRequired: boolean; sql: string }> {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { migrationRequired: false, sql: '' }
+
+    try {
+        const { error } = await supabase.from('attendance_records').select('id').limit(1)
+        if (error && (error.code === '42P01' || error.message?.includes('does not exist'))) {
+            const sqlPath = path.join(process.cwd(), 'supabase-erp-upgrade-migration.sql')
+            const sql = fs.existsSync(sqlPath) ? fs.readFileSync(sqlPath, 'utf8') : ''
+            return { migrationRequired: true, sql }
+        }
+        return { migrationRequired: false, sql: '' }
+    } catch (e) {
+        return { migrationRequired: false, sql: '' }
+    }
 }

@@ -11,6 +11,9 @@ export interface Employee {
     pan_number?: string | null
     bank_account_number?: string | null
     ifsc_code?: string | null
+    bank_name?: string | null
+    bank_branch?: string | null
+    address?: string | null
     status: 'active' | 'inactive' | 'terminated'
     created_at: string
     updated_at: string
@@ -96,31 +99,9 @@ export interface CreateEmployeeInput {
     pan_number?: string
     bank_account_number?: string
     ifsc_code?: string
-    salary_structure?: {
-        basic_salary: number
-        hra: number
-        conveyance: number
-        special_allowance: number
-        medical_allowance?: number
-        travel_allowance?: number
-        pf_deduction: number
-        esi_deduction: number
-        tds_deduction: number
-        other_deduction: number
-    }
-}
-
-export interface UpdateEmployeeInput {
-    employee_code: string
-    name: string
-    email?: string
-    phone?: string
-    designation?: string
-    department?: string
-    date_of_joining?: string
-    pan_number?: string
-    bank_account_number?: string
-    ifsc_code?: string
+    bank_name?: string
+    bank_branch?: string
+    address?: string
     status?: 'active' | 'inactive' | 'terminated'
     salary_structure?: {
         basic_salary: number
@@ -132,7 +113,36 @@ export interface UpdateEmployeeInput {
         pf_deduction: number
         esi_deduction: number
         tds_deduction: number
-        other_deduction: number
+        other_deduction?: number
+    }
+}
+
+export interface UpdateEmployeeInput {
+    employee_code?: string
+    name?: string
+    email?: string
+    phone?: string
+    designation?: string
+    department?: string
+    date_of_joining?: string
+    pan_number?: string
+    bank_account_number?: string
+    ifsc_code?: string
+    bank_name?: string
+    bank_branch?: string
+    address?: string
+    status?: 'active' | 'inactive' | 'terminated'
+    salary_structure?: {
+        basic_salary: number
+        hra: number
+        conveyance: number
+        special_allowance: number
+        medical_allowance?: number
+        travel_allowance?: number
+        pf_deduction: number
+        esi_deduction: number
+        tds_deduction: number
+        other_deduction?: number
     }
 }
 

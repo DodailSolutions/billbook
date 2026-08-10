@@ -7,6 +7,7 @@ import { Employee, AttendanceRecord } from '@/lib/payroll-types'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent } from '@/components/ui/Card'
 import { ArrowLeft, Save, Calendar, CheckSquare } from 'lucide-react'
+import { MigrationBanner } from '@/components/MigrationBanner'
 
 export default function AttendancePage() {
     const now = new Date()
@@ -130,6 +131,7 @@ export default function AttendancePage() {
 
     return (
         <div className="space-y-6 max-w-full mx-auto pb-12">
+            <MigrationBanner />
             <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                     <Link href="/payroll">

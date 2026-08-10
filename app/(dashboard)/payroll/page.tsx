@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/Button'
 import { Card, CardContent } from '@/components/ui/Card'
 import { Users, DollarSign, Calendar, FileText, CheckCircle2, ChevronRight, UserPlus, Play, Plane, CalendarClock } from 'lucide-react'
 
+import { MigrationBanner } from '@/components/MigrationBanner'
+
 export default function PayrollDashboardPage() {
     const [employees, setEmployees] = useState<Employee[]>([])
     const [runs, setRuns] = useState<PayrollRun[]>([])
@@ -36,6 +38,7 @@ export default function PayrollDashboardPage() {
 
     return (
         <div className="space-y-6 max-w-5xl mx-auto pb-12">
+            <MigrationBanner />
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>

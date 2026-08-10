@@ -7,6 +7,7 @@ import { Employee } from '@/lib/payroll-types'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent } from '@/components/ui/Card'
 import { ArrowLeft, UserPlus, Users, DollarSign, Building2, Search, Sparkles, User, Edit, FileText } from 'lucide-react'
+import { MigrationBanner } from '@/components/MigrationBanner'
 
 export default function EmployeeDirectoryPage() {
     const [employees, setEmployees] = useState<Employee[]>([])
@@ -18,34 +19,37 @@ export default function EmployeeDirectoryPage() {
     const [deptFilter, setDeptFilter] = useState<string>('all')
 
     const [isAddModalOpen, setIsAddModalOpen] = useState(false)
-    const [editMode, setEditMode] = useState<string | null>(null) // null if add, employee_id if edit
-
-    // Form state
-    const [empCode, setEmpCode] = useState('')
-    const [name, setName] = useState('')
-    const [email, setEmail] = useState('')
-    const [phone, setPhone] = useState('')
-    const [designation, setDesignation] = useState('')
-    const [department, setDepartment] = useState('')
-    const [doj, setDoj] = useState(new Date().toISOString().slice(0, 10))
-    const [pan, setPan] = useState('')
-    const [bankAcc, setBankAcc] = useState('')
-    const [ifsc, setIfsc] = useState('')
-    const [status, setStatus] = useState<'active' | 'inactive' | 'terminated'>('active')
-
-    // Salary Structure
-    const [basic, setBasic] = useState<number>(30000)
-    const [hra, setHra] = useState<number>(12000)
-    const [conveyance, setConveyance] = useState<number>(2000)
-    const [special, setSpecial] = useState<number>(6000)
-    const [medical, setMedical] = useState<number>(0)
-    const [travel, setTravel] = useState<number>(0)
-    const [pf, setPf] = useState<number>(1800)
-    const [esi, setEsi] = useState<number>(0)
-    const [tds, setTds] = useState<number>(1000)
-
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false)
     const [formLoading, setFormLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
+
+    // Form fields
+    const [editMode, setEditMode] = useState<string | null>(null)
+    const [name, setName] = useState('')
+    const [employeeCode, setEmployeeCode] = useState('')
+    const [designation, setDesignation] = useState('')
+    const [department, setDepartment] = useState('')
+    const [email, setEmail] = useState('')
+    const [phone, setPhone] = useState('')
+    const [address, setAddress] = useState('')
+    const [dateOfJoining, setDateOfJoining] = useState(new Date().toISOString().slice(0, 10))
+    const [panNumber, setPanNumber] = useState('')
+    const [bankName, setBankName] = useState('')
+    const [bankAccountNumber, setBankAccountNumber] = useState('')
+    const [ifscCode, setIfscCode] = useState('')
+    const [bankBranch, setBankBranch] = useState('')
+    const [status, setStatus] = useState<'active' | 'inactive' | 'terminated'>('active')
+
+    // Salary fields
+    const [basic, setBasic] = useState('')
+    const [hra, setHra] = useState('')
+    const [conveyance, setConveyance] = useState('')
+    const [special, setSpecial] = useState('')
+    const [medical, setMedical] = useState('')
+    const [travel, setTravel] = useState('')
+    const [pf, setPf] = useState('')
+    const [esi, setEsi] = useState('')
+    const [tds, setTds] = useState('')
 
     const fetchEmp = async () => {
         setLoading(true)
@@ -60,93 +64,112 @@ export default function EmployeeDirectoryPage() {
 
     const openAddModal = () => {
         setEditMode(null)
-        setEmpCode('')
         setName('')
-        setEmail('')
-        setPhone('')
+        setEmployeeCode(`EMP-${Date.now().toString().slice(-6)}`)
         setDesignation('')
         setDepartment('')
-        setDoj(new Date().toISOString().slice(0, 10))
-        setPan('')
-        setBankAcc('')
-        setIfsc('')
+        setEmail('')
+        setPhone('')
+        setAddress('')
+        setDateOfJoining(new Date().toISOString().slice(0, 10))
+        setPanNumber('')
+        setBankName('')
+        setBankAccountNumber('')
+        setIfscCode('')
+        setBankBranch('')
         setStatus('active')
-        setBasic(30000)
-        setHra(12000)
-        setConveyance(2000)
-        setSpecial(6000)
-        setMedical(0)
-        setTravel(0)
-        setPf(1800)
-        setEsi(0)
-        setTds(1000)
+        setBasic('')
+        setHra('')
+        setConveyance('')
+        setSpecial('')
+        setMedical('')
+        setTravel('')
+        setPf('')
+        setEsi('')
+        setTds('')
+        setError(null)
         setIsAddModalOpen(true)
     }
 
     const openEditModal = (emp: Employee) => {
         setEditMode(emp.id)
-        setEmpCode(emp.employee_code)
         setName(emp.name)
-        setEmail(emp.email || '')
-        setPhone(emp.phone || '')
+        setEmployeeCode(emp.employee_code)
         setDesignation(emp.designation || '')
         setDepartment(emp.department || '')
-        setDoj(emp.date_of_joining)
-        setPan(emp.pan_number || '')
-        setBankAcc(emp.bank_account_number || '')
-        setIfsc(emp.ifsc_code || '')
-        setStatus(emp.status)
-        
-        if (emp.salary_structure) {
-            setBasic(emp.salary_structure.basic_salary)
-            setHra(emp.salary_structure.hra)
-            setConveyance(emp.salary_structure.conveyance)
-            setSpecial(emp.salary_structure.special_allowance)
-            setMedical(emp.salary_structure.medical_allowance || 0)
-            setTravel(emp.salary_structure.travel_allowance || 0)
-            setPf(emp.salary_structure.pf_deduction)
-            setEsi(emp.salary_structure.esi_deduction)
-            setTds(emp.salary_structure.tds_deduction)
+        setEmail(emp.email || '')
+        setPhone(emp.phone || '')
+        setAddress(emp.address || '')
+        setDateOfJoining(emp.date_of_joining ? new Date(emp.date_of_joining).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10))
+        setPanNumber(emp.pan_number || '')
+        setBankName(emp.bank_name || '')
+        setBankAccountNumber(emp.bank_account_number || '')
+        setIfscCode(emp.ifsc_code || '')
+        setBankBranch(emp.bank_branch || '')
+        setStatus(emp.status as any)
+
+        const sal = emp.salary_structure
+        if (sal) {
+            setBasic(sal.basic_salary.toString())
+            setHra(sal.hra.toString())
+            setConveyance(sal.conveyance.toString())
+            setSpecial(sal.special_allowance.toString())
+            setMedical(sal.medical_allowance ? sal.medical_allowance.toString() : '')
+            setTravel(sal.travel_allowance ? sal.travel_allowance.toString() : '')
+            setPf(sal.pf_deduction.toString())
+            setEsi(sal.esi_deduction.toString())
+            setTds(sal.tds_deduction.toString())
         } else {
-            setBasic(0); setHra(0); setConveyance(0); setSpecial(0); setMedical(0); setTravel(0); setPf(0); setEsi(0); setTds(0)
+            setBasic('')
+            setHra('')
+            setConveyance('')
+            setSpecial('')
+            setMedical('')
+            setTravel('')
+            setPf('')
+            setEsi('')
+            setTds('')
         }
+        setError(null)
         setIsAddModalOpen(true)
     }
 
-    const handleFormSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        if (!name.trim() || !empCode.trim()) {
-            setError('Employee Name and Employee Code are required.')
+        if (!name.trim() || !employeeCode.trim()) {
+            setError('Please enter name and employee code.')
             return
         }
 
         setFormLoading(true)
         setError(null)
 
-        const salData = {
-            basic_salary: Number(basic || 0),
-            hra: Number(hra || 0),
-            conveyance: Number(conveyance || 0),
-            special_allowance: Number(special || 0),
-            medical_allowance: Number(medical || 0),
-            travel_allowance: Number(travel || 0),
-            pf_deduction: Number(pf || 0),
-            esi_deduction: Number(esi || 0),
-            tds_deduction: Number(tds || 0),
-            other_deduction: 0
-        }
+        const salData = basic ? {
+            basic_salary: Number(basic),
+            hra: Number(hra) || 0,
+            conveyance: Number(conveyance) || 0,
+            special_allowance: Number(special) || 0,
+            medical_allowance: Number(medical) || 0,
+            travel_allowance: Number(travel) || 0,
+            pf_deduction: Number(pf) || 0,
+            esi_deduction: Number(esi) || 0,
+            tds_deduction: Number(tds) || 0,
+        } : undefined
 
         const baseData = {
-            employee_code: empCode,
             name,
-            email: email || undefined,
-            phone: phone || undefined,
+            employee_code: employeeCode,
             designation: designation || undefined,
             department: department || undefined,
-            date_of_joining: doj,
-            pan_number: pan || undefined,
-            bank_account_number: bankAcc || undefined,
-            ifsc_code: ifsc || undefined,
+            email: email || undefined,
+            phone: phone || undefined,
+            address: address || undefined,
+            date_of_joining: dateOfJoining,
+            pan_number: panNumber || undefined,
+            bank_name: bankName || undefined,
+            bank_account_number: bankAccountNumber || undefined,
+            ifsc_code: ifscCode || undefined,
+            bank_branch: bankBranch || undefined,
             salary_structure: salData
         }
 
@@ -154,7 +177,7 @@ export default function EmployeeDirectoryPage() {
         if (editMode) {
             res = await updateEmployee(editMode, { ...baseData, status })
         } else {
-            res = await createEmployee(baseData)
+            res = await createEmployee({ ...baseData, status })
         }
 
         setFormLoading(false)
@@ -185,6 +208,7 @@ export default function EmployeeDirectoryPage() {
 
     return (
         <div className="space-y-6 max-w-5xl mx-auto pb-12">
+            <MigrationBanner />
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
@@ -323,7 +347,7 @@ export default function EmployeeDirectoryPage() {
                             <button onClick={() => setIsAddModalOpen(false)} className="text-white/80 hover:text-white">✕</button>
                         </div>
 
-                        <form onSubmit={handleFormSubmit} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+                        <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
                             {error && (
                                 <div className="p-3 text-xs bg-rose-50 text-rose-600 rounded-xl font-medium">
                                     {error}
@@ -340,8 +364,8 @@ export default function EmployeeDirectoryPage() {
                                             type="text"
                                             required
                                             placeholder="EMP-001"
-                                            value={empCode}
-                                            onChange={(e) => setEmpCode(e.target.value)}
+                                            value={employeeCode}
+                                            onChange={(e) => setEmployeeCode(e.target.value)}
                                             className="w-full p-2 border border-gray-200 rounded-lg"
                                         />
                                     </div>
@@ -404,42 +428,42 @@ export default function EmployeeDirectoryPage() {
                                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                                     <div>
                                         <label className="block font-semibold text-gray-600 mb-1">Basic Salary (₹)</label>
-                                        <input type="number" value={basic} onChange={(e) => setBasic(parseFloat(e.target.value) || 0)} className="w-full p-2 border border-gray-200 rounded-lg" />
+                                        <input type="number" value={basic} onChange={(e) => setBasic(e.target.value)} className="w-full p-2 border border-gray-200 rounded-lg" />
                                     </div>
                                     <div>
                                         <label className="block font-semibold text-gray-600 mb-1">HRA (₹)</label>
-                                        <input type="number" value={hra} onChange={(e) => setHra(parseFloat(e.target.value) || 0)} className="w-full p-2 border border-gray-200 rounded-lg" />
+                                        <input type="number" value={hra} onChange={(e) => setHra(e.target.value)} className="w-full p-2 border border-gray-200 rounded-lg" />
                                     </div>
                                     <div>
                                         <label className="block font-semibold text-gray-600 mb-1">Conveyance (₹)</label>
-                                        <input type="number" value={conveyance} onChange={(e) => setConveyance(parseFloat(e.target.value) || 0)} className="w-full p-2 border border-gray-200 rounded-lg" />
+                                        <input type="number" value={conveyance} onChange={(e) => setConveyance(e.target.value)} className="w-full p-2 border border-gray-200 rounded-lg" />
                                     </div>
                                     <div>
                                         <label className="block font-semibold text-gray-600 mb-1">Special (₹)</label>
-                                        <input type="number" value={special} onChange={(e) => setSpecial(parseFloat(e.target.value) || 0)} className="w-full p-2 border border-gray-200 rounded-lg" />
+                                        <input type="number" value={special} onChange={(e) => setSpecial(e.target.value)} className="w-full p-2 border border-gray-200 rounded-lg" />
                                     </div>
                                     <div>
                                         <label className="block font-semibold text-gray-600 mb-1">Medical (₹)</label>
-                                        <input type="number" value={medical} onChange={(e) => setMedical(parseFloat(e.target.value) || 0)} className="w-full p-2 border border-gray-200 rounded-lg" />
+                                        <input type="number" value={medical} onChange={(e) => setMedical(e.target.value)} className="w-full p-2 border border-gray-200 rounded-lg" />
                                     </div>
                                     <div>
                                         <label className="block font-semibold text-gray-600 mb-1">Travel (₹)</label>
-                                        <input type="number" value={travel} onChange={(e) => setTravel(parseFloat(e.target.value) || 0)} className="w-full p-2 border border-gray-200 rounded-lg" />
+                                        <input type="number" value={travel} onChange={(e) => setTravel(e.target.value)} className="w-full p-2 border border-gray-200 rounded-lg" />
                                     </div>
                                 </div>
 
                                 <div className="grid grid-cols-3 gap-2 text-xs mt-3">
                                     <div>
                                         <label className="block font-semibold text-gray-600 mb-1">PF Deduction (₹)</label>
-                                        <input type="number" value={pf} onChange={(e) => setPf(parseFloat(e.target.value) || 0)} className="w-full p-2 border border-gray-200 rounded-lg" />
+                                        <input type="number" value={pf} onChange={(e) => setPf(e.target.value)} className="w-full p-2 border border-gray-200 rounded-lg" />
                                     </div>
                                     <div>
                                         <label className="block font-semibold text-gray-600 mb-1">ESI Deduction (₹)</label>
-                                        <input type="number" value={esi} onChange={(e) => setEsi(parseFloat(e.target.value) || 0)} className="w-full p-2 border border-gray-200 rounded-lg" />
+                                        <input type="number" value={esi} onChange={(e) => setEsi(e.target.value)} className="w-full p-2 border border-gray-200 rounded-lg" />
                                     </div>
                                     <div>
                                         <label className="block font-semibold text-gray-600 mb-1">TDS Tax (₹)</label>
-                                        <input type="number" value={tds} onChange={(e) => setTds(parseFloat(e.target.value) || 0)} className="w-full p-2 border border-gray-200 rounded-lg" />
+                                        <input type="number" value={tds} onChange={(e) => setTds(e.target.value)} className="w-full p-2 border border-gray-200 rounded-lg" />
                                     </div>
                                 </div>
 

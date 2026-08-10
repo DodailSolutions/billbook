@@ -8,6 +8,7 @@ import { Employee, AttendanceRecord } from '@/lib/payroll-types'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent } from '@/components/ui/Card'
 import { ArrowLeft, Play, CheckCircle2, AlertCircle, DollarSign, Users, ShieldCheck, CalendarClock } from 'lucide-react'
+import { MigrationBanner } from '@/components/MigrationBanner'
 
 export default function RunPayrollPage() {
     const router = useRouter()
@@ -96,6 +97,7 @@ export default function RunPayrollPage() {
 
     return (
         <div className="space-y-6 max-w-5xl mx-auto pb-12">
+            <MigrationBanner />
             <div className="flex items-center gap-3">
                 <Link href="/payroll">
                     <Button variant="outline" size="sm" className="h-10 w-10 p-0 rounded-xl">
