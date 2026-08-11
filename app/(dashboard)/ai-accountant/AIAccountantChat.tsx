@@ -13,9 +13,10 @@ interface Message {
 interface AIAccountantChatProps {
   userId: string
   businessName: string
+  isDemoMode: boolean
 }
 
-export function AIAccountantChat({ businessName }: AIAccountantChatProps) {
+export function AIAccountantChat({ businessName, isDemoMode }: AIAccountantChatProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
@@ -96,7 +97,14 @@ export function AIAccountantChat({ businessName }: AIAccountantChatProps) {
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-white rounded-xl border-2 border-gray-200 overflow-hidden">
+    <div className="flex-1 flex flex-col bg-white rounded-xl border-2 border-gray-200 overflow-hidden shadow-xs">
+      {/* Demo Warning Banner */}
+      {isDemoMode && (
+        <div className="p-3 bg-amber-50 text-amber-800 text-[10px] font-extrabold border-b border-amber-200/50 flex items-center justify-between animate-pulse">
+          <span>⚠️ Running in Heuristic Demo Mode. Add GEMINI_API_KEY or OPENAI_API_KEY to your .env.local file to connect the live AI Assistant.</span>
+        </div>
+      )}
+
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
         {messages.map((message, index) => (

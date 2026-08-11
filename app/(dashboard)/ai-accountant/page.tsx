@@ -75,6 +75,8 @@ export default async function AIAccountantPage() {
     )
   }
 
+  const isDemoMode = !process.env.GEMINI_API_KEY && !process.env.OPENAI_API_KEY
+
   return (
     <div className="h-[calc(100vh-5rem)] p-4 sm:p-8">
       <div className="max-w-6xl mx-auto h-full flex flex-col">
@@ -86,7 +88,11 @@ export default async function AIAccountantPage() {
             Your personal AI accountant for {profile?.business_name || 'your business'}. Ask about bookkeeping, cash flow, or financial insights.
           </p>
         </div>
-        <AIAccountantChat userId={user.id} businessName={profile?.business_name || profile?.owner_name || 'your business'} />
+        <AIAccountantChat 
+          userId={user.id} 
+          businessName={profile?.business_name || profile?.owner_name || 'your business'} 
+          isDemoMode={isDemoMode} 
+        />
       </div>
     </div>
   )
