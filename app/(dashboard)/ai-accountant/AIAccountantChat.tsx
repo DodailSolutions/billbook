@@ -26,8 +26,15 @@ export function AIAccountantChat({ businessName, isDemoMode }: AIAccountantChatP
   ])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [localDemoMode, setLocalDemoMode] = useState(isDemoMode)
+  const [providerName, setProviderName] = useState(isDemoMode ? 'Demo Rules Engine' : 'Checking...')
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  useEffect(() => {
+    setLocalDemoMode(isDemoMode)
+    setProviderName(isDemoMode ? 'Demo Rules Engine' : 'AI Model')
+  }, [isDemoMode])
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -76,6 +83,10 @@ export function AIAccountantChat({ businessName, isDemoMode }: AIAccountantChatP
       }
 
       setMessages(prev => [...prev, assistantMessage])
+      setLocalDemoMode(!!data.isDemoMode)
+      if (data.provider) {
+        setProviderName(data.provider)
+      }
     } catch (error) {
       console.error('Error:', error)
       const errorMessage: Message = {
@@ -98,10 +109,15 @@ export function AIAccountantChat({ businessName, isDemoMode }: AIAccountantChatP
 
   return (
     <div className="flex-1 flex flex-col bg-white rounded-xl border-2 border-gray-200 overflow-hidden shadow-xs">
-      {/* Demo Warning Banner */}
-      {isDemoMode && (
+      {/* Demo Warning / Live Banner */}
+      {localDemoMode ? (
         <div className="p-3 bg-amber-50 text-amber-800 text-[10px] font-extrabold border-b border-amber-200/50 flex items-center justify-between animate-pulse">
-          <span>⚠️ Running in Heuristic Demo Mode. Add GEMINI_API_KEY or OPENAI_API_KEY to your .env.local file to connect the live AI Assistant.</span>
+          <span>⚠️ Running in Heuristic Demo Mode. Start Ollama on http://localhost:11434 or add GEMINI_API_KEY to your .env.local file to connect the live AI.</span>
+        </div>
+      ) : (
+        <div className="p-2 px-4 bg-emerald-50 text-emerald-800 text-[10px] font-bold border-b border-emerald-100/50 flex items-center gap-1.5">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 animate-ping shrink-0" />
+          <span>Connected to live AI assistant via {providerName}</span>
         </div>
       )}
 

@@ -183,15 +183,51 @@ ${history?.map((msg: Message) => `${msg.role}: ${msg.content}`).join('\n') || 'N
 User's query: ${message}`
 
     // ==========================================
-    // Call LLM API (Gemini or OpenAI)
+    // Call LLM API (Ollama, Gemini, or OpenAI)
     // ==========================================
     let aiResponse = ''
     let isDemoMode = true
+    let usedProvider = ''
 
+    // 1. Connect to local Ollama server if available
+    const ollamaUrl = process.env.OLLAMA_URL || 'http://127.0.0.1:11434'
+    const ollamaModel = process.env.OLLAMA_MODEL || 'llama3'
+
+    try {
+      const messagesPayload = [
+        { role: 'system', content: systemContext },
+        ...(history || []).map((msg: any) => ({
+          role: msg.role === 'assistant' ? 'assistant' : 'user',
+          content: msg.content
+        })),
+        { role: 'user', content: message }
+      ]
+
+      const response = await fetch(`${ollamaUrl}/api/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: ollamaModel,
+          messages: messagesPayload,
+          stream: false
+        }),
+        signal: AbortSignal.timeout(5000) // 5s timeout
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        aiResponse = data.message?.content || ''
+        isDemoMode = false
+        usedProvider = `Ollama (${ollamaModel})`
+      }
+    } catch (e) {
+      // Ollama not running locally, try fallback providers
+      console.log('Ollama local server not responding, trying cloud LLM fallback...')
+    }
+
+    // 2. Fallback to Gemini Cloud API
     const geminiApiKey = process.env.GEMINI_API_KEY
-    const openaiApiKey = process.env.OPENAI_API_KEY
-
-    if (geminiApiKey) {
+    if (!aiResponse && geminiApiKey) {
       try {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`
         const response = await fetch(url, {
@@ -215,14 +251,15 @@ User's query: ${message}`
           const data = await response.json()
           aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || ''
           isDemoMode = false
-        } else {
-          console.error("Gemini API error response:", await response.text())
+          usedProvider = 'Gemini API'
         }
       } catch (e) {
         console.error("Gemini API call failed:", e)
       }
     }
 
+    // 3. Fallback to OpenAI Cloud API
+    const openaiApiKey = process.env.OPENAI_API_KEY
     if (!aiResponse && openaiApiKey) {
       try {
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -245,20 +282,20 @@ User's query: ${message}`
           const data = await response.json()
           aiResponse = data.choices?.[0]?.message?.content || ''
           isDemoMode = false
-        } else {
-          console.error("OpenAI API error response:", await response.text())
+          usedProvider = 'OpenAI GPT API'
         }
       } catch (e) {
         console.error("OpenAI API call failed:", e)
       }
     }
 
-    // Fallback to structured heuristics engine if no API keys are available
+    // Fallback to structured heuristics engine if no live API model responded
     if (!aiResponse) {
       aiResponse = generateDemoResponse(message, totalRevenue, unpaidRevenue, invoiceCount || 0, customerCount || 0)
+      usedProvider = 'Demo Rules Engine'
     }
 
-    // Optional: Save history to database
+    // Save history to database
     try {
       await supabase
         .from('ai_chat_history')
@@ -275,6 +312,7 @@ User's query: ${message}`
     return NextResponse.json({
       message: aiResponse,
       isDemoMode,
+      provider: usedProvider,
       success: true
     })
 
