@@ -45,8 +45,19 @@ export async function login(formData: FormData) {
         redirect('/login?message=' + encodeURIComponent('Please check your email to confirm your account first'))
     }
 
+    const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('role')
+        .eq('id', data.user.id)
+        .single()
+
     revalidatePath('/', 'layout')
-    redirect('/dashboard')
+    
+    if (profile?.role === 'employee') {
+        redirect('/employee/dashboard')
+    } else {
+        redirect('/dashboard')
+    }
 }
 
 export async function signup(formData: FormData) {

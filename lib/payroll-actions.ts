@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from "@/lib/supabase/server"
+import { createClient, createAdminClient } from "@/lib/supabase/server"
 import { Employee, SalaryStructure, PayrollRun, Payslip, CreateEmployeeInput, UpdateEmployeeInput, AttendanceRecord, LeaveType, LeaveRequest, EmployeeLeaveBalance, SalaryRevision } from "./payroll-types"
 import { postPayrollJournalEntry } from "./bookkeeping-actions"
 import { revalidatePath } from "next/cache"
@@ -84,6 +84,36 @@ export async function createEmployee(input: CreateEmployeeInput): Promise<{ succ
 
     if (!user) return { success: false, error: 'Unauthorized' }
 
+    let employeeUserId: string | null = null
+
+    if (input.allow_login && input.email && input.password) {
+        try {
+            const adminSupabase = await createAdminClient()
+            const { data: authData, error: authError } = await adminSupabase.auth.admin.createUser({
+                email: input.email,
+                password: input.password,
+                email_confirm: true
+            })
+            
+            if (authError || !authData.user) {
+                console.error("Auth creation failed:", authError)
+                return { success: false, error: authError?.message || 'Failed to create auth user for employee' }
+            }
+            
+            employeeUserId = authData.user.id
+            
+            // Insert profile into user_profiles
+            await adminSupabase.from('user_profiles').insert({
+                id: employeeUserId,
+                role: 'employee',
+                status: 'active'
+            })
+        } catch (e: any) {
+            console.error("Admin client creation failed:", e)
+            return { success: false, error: 'Failed to initialize admin auth client. Please ensure SUPABASE_SERVICE_ROLE_KEY is set.' }
+        }
+    }
+
     const { data: emp, error: empError } = await supabase
         .from('employees')
         .insert({
@@ -98,7 +128,11 @@ export async function createEmployee(input: CreateEmployeeInput): Promise<{ succ
             pan_number: input.pan_number || null,
             bank_account_number: input.bank_account_number || null,
             ifsc_code: input.ifsc_code || null,
-            status: 'active'
+            bank_name: input.bank_name || null,
+            bank_branch: input.bank_branch || null,
+            address: input.address || null,
+            status: 'active',
+            employee_user_id: employeeUserId
         })
         .select()
         .single()
@@ -144,6 +178,45 @@ export async function updateEmployee(id: string, input: UpdateEmployeeInput): Pr
 
     if (!user) return { success: false, error: 'Unauthorized' }
 
+    let employeeUserId: string | null = null
+
+    // Check if employee already has a linked login account
+    const { data: existingEmp } = await supabase
+        .from('employees')
+        .select('employee_user_id')
+        .eq('id', id)
+        .single()
+
+    if (input.allow_login && input.email && input.password) {
+        if (existingEmp && !existingEmp.employee_user_id) {
+            try {
+                const adminSupabase = await createAdminClient()
+                const { data: authData, error: authError } = await adminSupabase.auth.admin.createUser({
+                    email: input.email,
+                    password: input.password,
+                    email_confirm: true
+                })
+                
+                if (authError || !authData.user) {
+                    console.error("Auth creation failed:", authError)
+                    return { success: false, error: authError?.message || 'Failed to create auth user for employee' }
+                }
+                
+                employeeUserId = authData.user.id
+                
+                // Insert profile into user_profiles
+                await adminSupabase.from('user_profiles').insert({
+                    id: employeeUserId,
+                    role: 'employee',
+                    status: 'active'
+                })
+            } catch (e: any) {
+                console.error("Admin client creation failed:", e)
+                return { success: false, error: 'Failed to initialize admin auth client. Please ensure SUPABASE_SERVICE_ROLE_KEY is set.' }
+            }
+        }
+    }
+
     const updateData: any = {
         employee_code: input.employee_code,
         name: input.name,
@@ -156,7 +229,11 @@ export async function updateEmployee(id: string, input: UpdateEmployeeInput): Pr
     if (input.pan_number !== undefined) updateData.pan_number = input.pan_number || null
     if (input.bank_account_number !== undefined) updateData.bank_account_number = input.bank_account_number || null
     if (input.ifsc_code !== undefined) updateData.ifsc_code = input.ifsc_code || null
+    if (input.bank_name !== undefined) updateData.bank_name = input.bank_name || null
+    if (input.bank_branch !== undefined) updateData.bank_branch = input.bank_branch || null
+    if (input.address !== undefined) updateData.address = input.address || null
     if (input.status !== undefined) updateData.status = input.status
+    if (employeeUserId) updateData.employee_user_id = employeeUserId
 
     const { error: empError } = await supabase
         .from('employees')
@@ -619,8 +696,151 @@ export async function checkMigrationStatus(): Promise<{ migrationRequired: boole
             const sql = fs.existsSync(sqlPath) ? fs.readFileSync(sqlPath, 'utf8') : ''
             return { migrationRequired: true, sql }
         }
+
+        // Check if employee_user_id column exists
+        const { error: colError } = await supabase.from('employees').select('employee_user_id').limit(1)
+        if (colError && (colError.message?.includes('column') || colError.message?.includes('does not exist'))) {
+            const sqlPath = path.join(process.cwd(), 'supabase-employee-login-migration.sql')
+            const sql = fs.existsSync(sqlPath) ? fs.readFileSync(sqlPath, 'utf8') : ''
+            return { migrationRequired: true, sql }
+        }
+
         return { migrationRequired: false, sql: '' }
     } catch (e) {
         return { migrationRequired: false, sql: '' }
     }
+}
+
+export async function getEmployeePortalData(): Promise<{ employee: Employee | null; attendanceStats: { present: number; absent: number; halfDay: number; total: number }; leaveBalances: EmployeeLeaveBalance[] }> {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) return { employee: null, attendanceStats: { present: 0, absent: 0, halfDay: 0, total: 0 }, leaveBalances: [] }
+
+    const { data: emp, error } = await supabase
+        .from('employees')
+        .select(`
+            *,
+            salary_structure:salary_structures(*)
+        `)
+        .eq('employee_user_id', user.id)
+        .single()
+
+    if (error || !emp) {
+        return { employee: null, attendanceStats: { present: 0, absent: 0, halfDay: 0, total: 0 }, leaveBalances: [] }
+    }
+
+    const employee = {
+        ...emp,
+        salary_structure: Array.isArray(emp.salary_structure) ? emp.salary_structure[0] : emp.salary_structure
+    } as Employee
+
+    const now = new Date()
+    const month = now.getMonth() + 1
+    const year = now.getFullYear()
+    const startDate = `${year}-${month.toString().padStart(2, '0')}-01`
+    const endDate = `${year}-${month.toString().padStart(2, '0')}-${new Date(year, month, 0).getDate()}`
+
+    const { data: att } = await supabase
+        .from('attendance_records')
+        .select('*')
+        .eq('employee_id', emp.id)
+        .gte('attendance_date', startDate)
+        .lte('attendance_date', endDate)
+
+    const stats = { present: 0, absent: 0, halfDay: 0, total: 0 }
+    if (att) {
+        stats.total = att.length
+        att.forEach(r => {
+            if (r.status === 'present') stats.present++
+            else if (r.status === 'absent') stats.absent++
+            else if (r.status === 'half_day') stats.halfDay++
+        })
+    }
+
+    const leaveBalances = await getLeaveBalances(emp.id, year)
+
+    return { employee, attendanceStats: stats, leaveBalances }
+}
+
+export async function getEmployeeLeaves(): Promise<LeaveRequest[]> {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return []
+
+    const { data: emp } = await supabase
+        .from('employees')
+        .select('id')
+        .eq('employee_user_id', user.id)
+        .single()
+
+    if (!emp) return []
+
+    const { data } = await supabase
+        .from('leave_requests')
+        .select(`*, leave_type:leave_types(*)`)
+        .eq('employee_id', emp.id)
+        .order('created_at', { ascending: false })
+
+    return (data || []) as LeaveRequest[]
+}
+
+export async function getEmployeePayslips(): Promise<Payslip[]> {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return []
+
+    const { data: emp } = await supabase
+        .from('employees')
+        .select('id')
+        .eq('employee_user_id', user.id)
+        .single()
+
+    if (!emp) return []
+
+    const { data } = await supabase
+        .from('payslips')
+        .select('*')
+        .eq('employee_id', emp.id)
+        .order('year', { ascending: false })
+        .order('month', { ascending: false })
+
+    return (data || []) as Payslip[]
+}
+
+export async function applyEmployeeLeave(input: { leaveTypeId: string; fromDate: string; toDate: string; reason?: string }): Promise<{ success: boolean; error?: string }> {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { success: false, error: 'Unauthorized' }
+
+    const { data: emp } = await supabase
+        .from('employees')
+        .select('id, user_id')
+        .eq('employee_user_id', user.id)
+        .single()
+
+    if (!emp) return { success: false, error: 'Employee record not found.' }
+
+    const from = new Date(input.fromDate)
+    const to = new Date(input.toDate)
+    const diffTime = Math.abs(to.getTime() - from.getTime())
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1
+
+    const { error } = await supabase
+        .from('leave_requests')
+        .insert({
+            user_id: emp.user_id,
+            employee_id: emp.id,
+            leave_type_id: input.leaveTypeId,
+            from_date: input.fromDate,
+            to_date: input.toDate,
+            total_days: diffDays,
+            reason: input.reason || null,
+            status: 'pending'
+        })
+
+    if (error) return { success: false, error: error.message }
+
+    revalidatePath('/employee/leaves')
+    return { success: true }
 }

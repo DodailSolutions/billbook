@@ -15,6 +15,7 @@ export interface Employee {
     bank_branch?: string | null
     address?: string | null
     status: 'active' | 'inactive' | 'terminated'
+    employee_user_id?: string | null
     created_at: string
     updated_at: string
     salary_structure?: SalaryStructure | null
@@ -103,6 +104,8 @@ export interface CreateEmployeeInput {
     bank_branch?: string
     address?: string
     status?: 'active' | 'inactive' | 'terminated'
+    allow_login?: boolean
+    password?: string
     salary_structure?: {
         basic_salary: number
         hra: number
@@ -132,6 +135,8 @@ export interface UpdateEmployeeInput {
     bank_branch?: string
     address?: string
     status?: 'active' | 'inactive' | 'terminated'
+    allow_login?: boolean
+    password?: string
     salary_structure?: {
         basic_salary: number
         hra: number

@@ -40,6 +40,10 @@ export default function EmployeeDirectoryPage() {
     const [bankBranch, setBankBranch] = useState('')
     const [status, setStatus] = useState<'active' | 'inactive' | 'terminated'>('active')
 
+    // Login credentials
+    const [allowLogin, setAllowLogin] = useState(false)
+    const [password, setPassword] = useState('')
+
     // Salary fields
     const [basic, setBasic] = useState('')
     const [hra, setHra] = useState('')
@@ -78,6 +82,8 @@ export default function EmployeeDirectoryPage() {
         setIfscCode('')
         setBankBranch('')
         setStatus('active')
+        setAllowLogin(false)
+        setPassword('')
         setBasic('')
         setHra('')
         setConveyance('')
@@ -107,6 +113,8 @@ export default function EmployeeDirectoryPage() {
         setIfscCode(emp.ifsc_code || '')
         setBankBranch(emp.bank_branch || '')
         setStatus(emp.status as any)
+        setAllowLogin(!!emp.employee_user_id)
+        setPassword('')
 
         const sal = emp.salary_structure
         if (sal) {
@@ -170,14 +178,16 @@ export default function EmployeeDirectoryPage() {
             bank_account_number: bankAccountNumber || undefined,
             ifsc_code: ifscCode || undefined,
             bank_branch: bankBranch || undefined,
-            salary_structure: salData
+            salary_structure: salData,
+            allow_login: allowLogin,
+            password: allowLogin ? password : undefined
         }
 
         let res;
         if (editMode) {
             res = await updateEmployee(editMode, { ...baseData, status })
         } else {
-            res = await createEmployee({ ...baseData, status })
+            res = await createEmployee(baseData)
         }
 
         setFormLoading(false)
@@ -420,6 +430,57 @@ export default function EmployeeDirectoryPage() {
                                         />
                                     </div>
                                 </div>
+                            </div>
+
+                            {/* Login Credentials */}
+                            <div className="border-t border-gray-200 pt-4">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <input 
+                                        type="checkbox" 
+                                        id="allowLogin" 
+                                        checked={allowLogin} 
+                                        onChange={(e) => setAllowLogin(e.target.checked)} 
+                                        disabled={!!editMode && !!employees.find(e => e.id === editMode)?.employee_user_id}
+                                        className="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 h-4 w-4" 
+                                    />
+                                    <label htmlFor="allowLogin" className="text-xs font-bold text-gray-750 uppercase tracking-wider cursor-pointer select-none">
+                                        Enable Employee Login Dashboard
+                                    </label>
+                                </div>
+                                {allowLogin && (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                                        <div>
+                                            <label className="block font-semibold text-gray-600 mb-1">Email * (Username)</label>
+                                            <input 
+                                                type="email" 
+                                                required={allowLogin}
+                                                placeholder="employee@business.com" 
+                                                value={email} 
+                                                onChange={(e) => setEmail(e.target.value)} 
+                                                disabled={!!editMode && !!employees.find(e => e.id === editMode)?.employee_user_id}
+                                                className="w-full p-2 border border-gray-200 rounded-lg" 
+                                            />
+                                        </div>
+                                        {(!editMode || !employees.find(e => e.id === editMode)?.employee_user_id) && (
+                                            <div>
+                                                <label className="block font-semibold text-gray-600 mb-1">Password *</label>
+                                                <input 
+                                                    type="password" 
+                                                    required={allowLogin && (!editMode || !employees.find(e => e.id === editMode)?.employee_user_id)}
+                                                    placeholder="Minimum 6 characters" 
+                                                    value={password} 
+                                                    onChange={(e) => setPassword(e.target.value)} 
+                                                    className="w-full p-2 border border-gray-200 rounded-lg" 
+                                                />
+                                            </div>
+                                        )}
+                                        {editMode && employees.find(e => e.id === editMode)?.employee_user_id && (
+                                            <div className="sm:col-span-2 p-2 bg-slate-50 text-slate-650 rounded-lg text-[10px]">
+                                                ✓ Employee already has login credentials configured. Email cannot be edited here.
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
                             </div>
 
                             {/* Salary Components */}
