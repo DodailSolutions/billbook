@@ -1,124 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { LayoutDashboard, FileText, Users, Bell, Settings, User, Menu, X, Bot, UserCog, Package, Receipt, Sparkles, BookOpen, MoreHorizontal, ShoppingBag, DollarSign, Building2, CalendarDays, CalendarOff } from "lucide-react"
+import { LayoutDashboard, FileText, Users, Bell, Settings, User, Menu, X, Bot, UserCog, Package, Receipt, Sparkles, BookOpen, MoreHorizontal, ShoppingBag, DollarSign, Building2, CalendarDays, CalendarOff, Briefcase, UserPlus } from "lucide-react"
 import { SignOutButton } from "./SignOutButton"
 import { PlanBanner } from "./PlanBanner"
-
-const routes = [
-    {
-        label: 'Dashboard',
-        icon: LayoutDashboard,
-        href: '/dashboard',
-        color: "text-slate-900"
-    },
-    {
-        label: 'Invoices',
-        icon: FileText,
-        href: '/invoices',
-        color: "text-slate-900",
-    },
-    {
-        label: 'CRM & Pipeline',
-        icon: Sparkles,
-        href: '/crm',
-        color: "text-emerald-600",
-        badge: 'NEW'
-    },
-    {
-        label: 'Bookkeeping',
-        icon: BookOpen,
-        href: '/bookkeeping',
-        color: "text-emerald-600",
-        badge: 'NEW'
-    },
-    {
-        label: 'Purchase Orders',
-        icon: ShoppingBag,
-        href: '/purchase-orders',
-        color: "text-slate-900",
-        badge: 'NEW'
-    },
-    {
-        label: 'Vendors',
-        icon: Building2,
-        href: '/vendors',
-        color: "text-slate-700",
-    },
-    {
-        label: 'Payroll & Salaries',
-        icon: DollarSign,
-        href: '/payroll',
-        color: "text-emerald-600",
-        badge: 'NEW'
-    },
-    {
-        label: 'Attendance',
-        icon: CalendarDays,
-        href: '/payroll/attendance',
-        color: "text-slate-700",
-    },
-    {
-        label: 'Leave Management',
-        icon: CalendarOff,
-        href: '/payroll/leaves',
-        color: "text-slate-700",
-    },
-    {
-        label: 'Reminders',
-        icon: Bell,
-        href: '/reminders',
-        color: "text-slate-700",
-    },
-    {
-        label: 'Customers',
-        icon: Users,
-        href: '/customers',
-        color: "text-slate-900",
-    },
-    {
-        label: 'Inventory',
-        icon: Package,
-        href: '/inventory',
-        color: "text-slate-900",
-    },
-    {
-        label: 'Expenses',
-        icon: Receipt,
-        href: '/expenses',
-        color: "text-slate-700",
-    },
-    {
-        label: 'AI Accountant',
-        icon: Bot,
-        href: '/ai-accountant',
-        color: "text-emerald-600",
-        badge: 'PRO'
-    },
-    {
-        label: 'Team',
-        icon: UserCog,
-        href: '/team',
-        color: "text-slate-900",
-        badge: 'PRO'
-    },
-    {
-        label: 'Account',
-        icon: User,
-        href: '/settings',
-        color: "text-slate-500",
-    },
-    {
-        label: 'Invoice Settings',
-        icon: Settings,
-        href: '/invoices/settings',
-        color: "text-slate-500",
-    },
-]
+import { getMyCAProfile } from "@/lib/ca-profile-actions"
 
 const mobileTabs = [
     {
@@ -145,10 +35,175 @@ const mobileTabs = [
 
 export function MobileSidebar() {
     const [isOpen, setIsOpen] = useState(false)
+    const [isCA, setIsCA] = useState<boolean | null>(null)
     const pathname = usePathname()
+
+    useEffect(() => {
+        async function checkCAStatus() {
+            const profile = await getMyCAProfile()
+            setIsCA(!!profile)
+        }
+        checkCAStatus()
+    }, [])
 
     const closeSidebar = () => setIsOpen(false)
     const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`)
+
+    const sections = [
+        {
+            title: "Core",
+            items: [
+                {
+                    label: 'Dashboard',
+                    icon: LayoutDashboard,
+                    href: '/dashboard',
+                    color: "text-slate-900"
+                },
+                {
+                    label: 'AI Accountant',
+                    icon: Bot,
+                    href: '/ai-accountant',
+                    color: "text-emerald-600",
+                    badge: 'PRO'
+                }
+            ]
+        },
+        {
+            title: "Sales & Customers",
+            items: [
+                {
+                    label: 'Invoices',
+                    icon: FileText,
+                    href: '/invoices',
+                    color: "text-slate-900"
+                },
+                {
+                    label: 'Customers',
+                    icon: Users,
+                    href: '/customers',
+                    color: "text-slate-900"
+                },
+                {
+                    label: 'CRM & Pipeline',
+                    icon: Sparkles,
+                    href: '/crm',
+                    color: "text-emerald-650",
+                    badge: 'NEW'
+                }
+            ]
+        },
+        {
+            title: "Purchasing & Expenses",
+            items: [
+                {
+                    label: 'Purchase Orders',
+                    icon: ShoppingBag,
+                    href: '/purchase-orders',
+                    color: "text-slate-900"
+                },
+                {
+                    label: 'Vendors',
+                    icon: Building2,
+                    href: '/vendors',
+                    color: "text-slate-700"
+                },
+                {
+                    label: 'Expenses',
+                    icon: Receipt,
+                    href: '/expenses',
+                    color: "text-slate-705"
+                }
+            ]
+        },
+        {
+            title: "Inventory & Items",
+            items: [
+                {
+                    label: 'Items',
+                    icon: Package,
+                    href: '/items',
+                    color: "text-slate-700"
+                },
+                {
+                    label: 'Inventory',
+                    icon: Package,
+                    href: '/inventory',
+                    color: "text-slate-900"
+                }
+            ]
+        },
+        {
+            title: "HR & Payroll",
+            items: [
+                {
+                    label: 'Payroll & Salaries',
+                    icon: DollarSign,
+                    href: '/payroll',
+                    color: "text-emerald-600"
+                },
+                {
+                    label: 'Attendance Tracking',
+                    icon: CalendarDays,
+                    href: '/payroll/attendance',
+                    color: "text-slate-700"
+                },
+                {
+                    label: 'Leave Management',
+                    icon: CalendarOff,
+                    href: '/payroll/leaves',
+                    color: "text-slate-705"
+                },
+                {
+                    label: 'Team Directory',
+                    icon: UserCog,
+                    href: '/team',
+                    color: "text-slate-900",
+                    badge: 'PRO'
+                }
+            ]
+        },
+        {
+            title: "Finance & Advisory",
+            items: [
+                {
+                    label: 'Bookkeeping',
+                    icon: BookOpen,
+                    href: '/bookkeeping',
+                    color: "text-emerald-650",
+                    badge: 'NEW'
+                },
+                {
+                    label: 'Reminders',
+                    icon: Bell,
+                    href: '/reminders',
+                    color: "text-slate-700"
+                },
+                ...(isCA !== null ? [{
+                    label: isCA ? 'CA Dashboard' : 'Hire CA',
+                    icon: isCA ? Briefcase : UserPlus,
+                    href: isCA ? '/ca-dashboard' : '/reports/hire-ca',
+                    color: "text-emerald-600"
+                }] : [])
+            ]
+        },
+        {
+            title: "Settings",
+            items: [
+                {
+                    label: 'Invoice Settings',
+                    icon: Settings,
+                    href: '/invoices/settings',
+                    color: "text-slate-500"
+                },
+                {
+                    label: 'Account Settings',
+                    icon: User,
+                    href: '/settings',
+                    color: "text-slate-500"
+                }
+            ]
+        }
+    ]
 
     return (
         <>
@@ -189,13 +244,13 @@ export function MobileSidebar() {
             {/* Mobile Drawer Sidebar */}
             <div
                 className={cn(
-                    "md:hidden fixed top-0 left-0 bottom-0 z-50 w-72 bg-white text-slate-950 border-r border-slate-200/80 transform transition-transform duration-300 ease-in-out shadow-2xl",
+                    "md:hidden fixed top-0 left-0 bottom-0 z-50 w-72 bg-white text-slate-955 border-r border-slate-200/80 transform transition-transform duration-300 ease-in-out shadow-2xl",
                     isOpen ? "translate-x-0" : "-translate-x-full"
                 )}
             >
                 <div className="flex flex-col h-full">
                     {/* Logo */}
-                    <div className="px-4 py-6 border-b border-slate-200/80">
+                    <div className="px-4 py-5 border-b border-slate-150">
                         <Link href="/dashboard" className="flex items-center gap-3" onClick={closeSidebar}>
                             <div className="relative w-9 h-9">
                                 <Image 
@@ -212,36 +267,50 @@ export function MobileSidebar() {
                     </div>
 
                     {/* Navigation */}
-                    <div className="flex-1 overflow-y-auto px-3 py-4">
-                        <div className="space-y-1.5">
-                            {routes.map((route) => (
-                                <Link
-                                    key={route.href}
-                                    href={route.href}
-                                    onClick={closeSidebar}
-                                    className={cn(
-                                        "text-sm group flex p-3 w-full justify-start font-semibold cursor-pointer rounded-xl transition-all duration-200 relative overflow-hidden",
-                                        pathname === route.href 
-                                            ? "text-emerald-900 bg-emerald-50 border border-emerald-200/80 font-bold shadow-xs" 
-                                            : "text-slate-700 hover:text-slate-950 hover:bg-slate-100",
-                                    )}
-                                >
-                                    <div className="flex items-center flex-1 relative z-10">
-                                        <route.icon className={cn("h-5 w-5 mr-3", route.color)} />
-                                        {route.label}
-                                        {route.badge && (
-                                            <span className="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-600 text-white">
-                                                {route.badge}
-                                            </span>
-                                        )}
+                    <div className="flex-1 overflow-y-auto px-3 py-4 custom-scrollbar">
+                        <div className="space-y-4">
+                            {sections.map((section) => {
+                                if (section.items.length === 0) return null
+
+                                return (
+                                    <div key={section.title} className="space-y-1">
+                                        <h5 className="px-3 text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mt-2 mb-1">
+                                            {section.title}
+                                        </h5>
+                                        {section.items.map((route) => {
+                                            const isActiveRoute = pathname === route.href
+                                            return (
+                                                <Link
+                                                    key={route.href}
+                                                    href={route.href}
+                                                    onClick={closeSidebar}
+                                                    className={cn(
+                                                        "text-xs group flex p-2.5 w-full justify-start font-bold cursor-pointer rounded-xl transition-all duration-200 relative overflow-hidden",
+                                                        isActiveRoute 
+                                                            ? "text-emerald-900 bg-emerald-50 border border-emerald-200/50 font-bold shadow-2xs" 
+                                                            : "text-slate-650 hover:text-slate-950 hover:bg-slate-50",
+                                                    )}
+                                                >
+                                                    <div className="flex items-center flex-1 relative z-10">
+                                                        <route.icon className={cn("h-4 w-4 mr-2.5", route.color)} />
+                                                        {route.label}
+                                                        {route.badge && (
+                                                            <span className="ml-auto text-[9px] font-black px-1.5 py-0.5 rounded-full bg-emerald-600 text-white">
+                                                                {route.badge}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </Link>
+                                            )
+                                        })}
                                     </div>
-                                </Link>
-                            ))}
+                                )
+                            })}
                         </div>
                     </div>
 
                     {/* Bottom Section */}
-                    <div className="px-3 pb-4 space-y-2 border-t border-slate-200/80 pt-4">
+                    <div className="px-3 pb-4 space-y-2 border-t border-slate-150 pt-4">
                         <PlanBanner />
                         <SignOutButton />
                     </div>
@@ -261,7 +330,7 @@ export function MobileSidebar() {
                                 className={cn(
                                     "flex flex-col items-center justify-center rounded-xl py-2 text-[10px] font-bold transition-colors min-h-[44px]",
                                     active
-                                        ? "bg-emerald-50 text-emerald-800 border border-emerald-200/80"
+                                        ? "bg-emerald-50 text-emerald-855 border border-emerald-200/80"
                                         : "text-slate-600 hover:text-slate-900"
                                 )}
                             >
@@ -276,7 +345,7 @@ export function MobileSidebar() {
                         className={cn(
                             "flex flex-col items-center justify-center rounded-xl py-2 text-[10px] font-bold transition-colors min-h-[44px]",
                             isOpen
-                                ? "bg-emerald-50 text-emerald-800 border border-emerald-200/80"
+                                ? "bg-emerald-50 text-emerald-855 border border-emerald-200/80"
                                 : "text-slate-600 hover:text-slate-900"
                         )}
                         aria-label="Open menu"
