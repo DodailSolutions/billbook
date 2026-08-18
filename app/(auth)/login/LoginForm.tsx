@@ -38,7 +38,7 @@ interface FormErrors {
     general?: string
 }
 
-export default function LoginForm({ message }: { message?: string }) {
+export default function LoginForm({ message, redirect: redirectUrl }: { message?: string; redirect?: string }) {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false)
@@ -106,6 +106,9 @@ export default function LoginForm({ message }: { message?: string }) {
         const formData = new FormData()
         formData.append('email', email.trim())
         formData.append('password', password)
+        if (redirectUrl) {
+            formData.append('redirect', redirectUrl)
+        }
 
         try {
             await login(formData)
@@ -243,7 +246,7 @@ export default function LoginForm({ message }: { message?: string }) {
                     <p className="text-xs text-slate-600 font-medium">
                         Don&apos;t have a BillBooky account?{' '}
                         <Link 
-                            href="/signup" 
+                            href={`/signup${redirectUrl ? `?redirect=${encodeURIComponent(redirectUrl)}` : ''}`} 
                             className="text-emerald-700 font-bold hover:underline"
                         >
                             Create Free Account

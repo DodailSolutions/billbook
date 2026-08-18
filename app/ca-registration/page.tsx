@@ -234,7 +234,7 @@ export default function CARegistrationPage() {
       const serialized = JSON.stringify(formData)
       localStorage.setItem(STORAGE_KEY, serialized)
       sessionStorage.setItem(STORAGE_KEY, serialized)
-      router.push('/signup?returnTo=/ca-registration&message=Please sign up or log in to complete your CA registration')
+      router.push('/signup?redirect=/ca-registration&message=Please sign up or log in to complete your CA registration')
       return
     }
 
@@ -306,7 +306,7 @@ export default function CARegistrationPage() {
                 BillBooky<span className="text-emerald-600">.</span>
               </span>
             </Link>
-
+ 
             {/* Navigation Links */}
             <div className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
               <Link href="/" className="hover:text-black transition-colors">Home</Link>
@@ -315,12 +315,12 @@ export default function CARegistrationPage() {
               <Link href="/pricing" className="hover:text-black transition-colors">Pricing</Link>
               <Link href="/contact" className="hover:text-black transition-colors">Contact</Link>
             </div>
-
+ 
             {/* Actions */}
             <div className="flex items-center gap-3">
               <span className="text-xs text-slate-600 font-medium hidden sm:inline">Already a partner?</span>
               <Button 
-                onClick={() => router.push('/login')}
+                onClick={() => router.push('/login?redirect=/ca-registration')}
                 className="bg-black hover:bg-slate-900 text-white rounded-full font-bold px-5 py-2 text-xs shadow-sm hover:scale-[1.02] transition-all"
               >
                 Sign In

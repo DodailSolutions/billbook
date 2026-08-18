@@ -10,6 +10,7 @@ export async function login(formData: FormData) {
 
     const email = formData.get('email') as string
     const password = formData.get('password') as string
+    const redirectUrl = formData.get('redirect') as string
 
     if (!email || !password) {
         redirect('/login?message=' + encodeURIComponent('Email and password are required'))
@@ -38,11 +39,14 @@ export async function login(formData: FormData) {
             errorMessage = error.message || 'Could not authenticate user'
         }
         
-        redirect('/login?message=' + encodeURIComponent(errorMessage))
+        // Propagate redirect URL on login failure too
+        const failureRedirectSuffix = redirectUrl ? `&redirect=${encodeURIComponent(redirectUrl)}` : ''
+        redirect(`/login?message=${encodeURIComponent(errorMessage)}${failureRedirectSuffix}`)
     }
 
     if (!data.session) {
-        redirect('/login?message=' + encodeURIComponent('Please check your email to confirm your account first'))
+        const failureRedirectSuffix = redirectUrl ? `&redirect=${encodeURIComponent(redirectUrl)}` : ''
+        redirect(`/login?message=${encodeURIComponent('Please check your email to confirm your account first')}${failureRedirectSuffix}`)
     }
 
     const { data: profile } = await supabase
@@ -53,10 +57,23 @@ export async function login(formData: FormData) {
 
     revalidatePath('/', 'layout')
     
-    if (profile?.role === 'employee') {
+    if (redirectUrl) {
+        redirect(redirectUrl)
+    } else if (profile?.role === 'employee') {
         redirect('/employee/dashboard')
     } else {
-        redirect('/dashboard')
+        // Check if the user is a CA
+        const { data: caProfile } = await supabase
+            .from('ca_professionals')
+            .select('id')
+            .eq('user_id', data.user.id)
+            .single()
+
+        if (caProfile) {
+            redirect('/ca-dashboard')
+        } else {
+            redirect('/dashboard')
+        }
     }
 }
 
@@ -176,6 +193,9 @@ export async function signup(formData: FormData) {
         }
 
         revalidatePath('/', 'layout')
+        if (redirectAfter) {
+            return redirect(redirectAfter)
+        }
         return redirect('/dashboard')
     } catch (error) {
         // All redirect() calls throw NEXT_REDIRECT errors - we must let them through

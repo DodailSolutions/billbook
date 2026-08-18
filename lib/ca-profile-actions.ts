@@ -57,6 +57,26 @@ export async function createCAProfile(formData: {
     return { success: false, error: error.message }
   }
 
+  // Also sync to ca_profiles so CA dashboard works immediately
+  const { error: syncError } = await supabase
+    .from('ca_profiles')
+    .upsert({
+      user_id: user.id,
+      ca_name: formData.full_name,
+      ca_firm_name: formData.firm_name || null,
+      membership_number: formData.icai_membership_number,
+      email: formData.email,
+      phone: formData.phone,
+      address: `${formData.office_address}, ${formData.city}, ${formData.state} - ${formData.pincode}`,
+      specializations: formData.specializations,
+      is_verified: false,
+      is_active: true
+    }, { onConflict: 'user_id' })
+
+  if (syncError) {
+    console.error('Error syncing to ca_profiles:', syncError)
+  }
+
   return { success: true, data }
 }
 
@@ -126,6 +146,29 @@ export async function updateCAProfile(updates: {
   if (error) {
     console.error('Error updating CA profile:', error)
     return { success: false, error: error.message }
+  }
+
+  // Also update ca_profiles
+  const profileUpdates: any = {}
+  if (updates.full_name) profileUpdates.ca_name = updates.full_name
+  if (updates.firm_name !== undefined) profileUpdates.ca_firm_name = updates.firm_name
+  if (updates.email) profileUpdates.email = updates.email
+  if (updates.phone) profileUpdates.phone = updates.phone
+  if (updates.specializations) profileUpdates.specializations = updates.specializations
+  
+  if (updates.office_address || updates.city || updates.state || updates.pincode) {
+    const current = data // use the updated data from ca_professionals
+    profileUpdates.address = `${current.office_address}, ${current.city}, ${current.state} - ${current.pincode}`
+  }
+
+  if (Object.keys(profileUpdates).length > 0) {
+    const { error: syncError } = await supabase
+      .from('ca_profiles')
+      .update(profileUpdates)
+      .eq('user_id', user.id)
+    if (syncError) {
+      console.error('Error syncing updates to ca_profiles:', syncError)
+    }
   }
 
   return { success: true, data }
