@@ -4,7 +4,7 @@ import { getCAClients } from '@/lib/gst-advanced-actions'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/Button'
-import { ArrowLeft, AlertTriangle, FileText, IndianRupee, Activity, Shield } from 'lucide-react'
+import { ArrowLeft, AlertTriangle, FileText, IndianRupee, Activity, Shield, Brain } from 'lucide-react'
 import Link from 'next/link'
 
 interface ClientDetailsPageProps {
@@ -289,7 +289,13 @@ export default async function ClientDetailsPage({ params }: ClientDetailsPagePro
           <CardTitle>Quick Actions</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+            <Link href={`/ca-dashboard/clients/${params.clientId}/ai-audit`}>
+              <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white dark:bg-emerald-700 dark:hover:bg-emerald-600">
+                <Brain className="h-4 w-4 mr-2" />
+                AI Transaction Audit
+              </Button>
+            </Link>
             <Link href={`/ca-dashboard/clients/${params.clientId}/reports`}>
               <Button variant="outline" className="w-full">
                 <FileText className="h-4 w-4 mr-2" />
