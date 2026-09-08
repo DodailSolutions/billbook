@@ -14,7 +14,7 @@ export default function Icon() {
     (
       <div
         style={{
-          background: 'linear-gradient(135deg, #0072BC 0%, #00A651 100%)',
+          background: 'linear-gradient(135deg, #005DEE 0%, #0038A9 100%)',
           width: '100%',
           height: '100%',
           display: 'flex',
@@ -23,32 +23,21 @@ export default function Icon() {
           borderRadius: '40px',
         }}
       >
-        {/* Simplified invoice icon */}
-        <svg width="120" height="120" viewBox="0 0 120 120">
-          {/* Notebook binding */}
-          <rect x="15" y="20" width="5" height="22" rx="2.5" fill="#00A651"/>
-          <rect x="15" y="50" width="5" height="22" rx="2.5" fill="#00A651"/>
-          <rect x="15" y="80" width="5" height="22" rx="2.5" fill="#00A651"/>
+        <svg width="120" height="120" viewBox="0 0 340 340">
+          {/* White invoice/document forming B */}
+          <rect x="70" y="55" width="200" height="230" rx="28" fill="white"/>
           
-          {/* Document/Page */}
-          <rect x="30" y="28" width="70" height="75" rx="5" fill="white"/>
+          {/* Document lines */}
+          <rect x="105" y="105" width="105" height="20" rx="10" fill="#4B6B94"/>
+          <rect x="105" y="145" width="130" height="20" rx="10" fill="#4B6B94"/>
+          <rect x="105" y="185" width="75" height="20" rx="10" fill="#4B6B94"/>
+          
+          {/* Bold vibrant electric blue checkmark */}
+          <path d="M 175 210 L 205 240 L 255 170" 
+                stroke="#005DEE" strokeWidth="28" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
           
           {/* Folded corner */}
-          <path d="M 100 28 L 100 43 L 85 28 Z" fill="#E0E0E0"/>
-          
-          {/* Rupee symbol */}
-          <path d="M 42 42 L 70 42 M 42 50 L 70 50 M 42 58 L 54 58 L 64 83" 
-                stroke="#0072BC" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-          <path d="M 42 42 L 42 58" stroke="#0072BC" strokeWidth="4.5" strokeLinecap="round"/>
-          
-          {/* Invoice lines */}
-          <rect x="42" y="85" width="42" height="3" rx="1.5" fill="#0072BC" opacity="0.3"/>
-          <rect x="42" y="92" width="32" height="3" rx="1.5" fill="#0072BC" opacity="0.3"/>
-          <rect x="42" y="99" width="36" height="3" rx="1.5" fill="#0072BC" opacity="0.3"/>
-          
-          {/* Checkmark */}
-          <path d="M 72 90 L 80 98 L 95 80" 
-                stroke="#00A651" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+          <path d="M 270 245 L 270 285 L 230 285 Z" fill="#38B6FF" opacity="0.9"/>
         </svg>
       </div>
     ),

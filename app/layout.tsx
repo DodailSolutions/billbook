@@ -95,7 +95,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#0072BC',
+  themeColor: '#005DEE',
 };
 
 export default function RootLayout({
@@ -163,7 +163,7 @@ export default function RootLayout({
               name: 'BillBooky',
               legalName: 'Dodail Solutions Private Limited',
               url: 'https://billbooky.dodail.com',
-              logo: 'https://billbooky.dodail.com/logo-icon.svg',
+              logo: 'https://billbooky.dodail.com/logo-full.png',
               foundingDate: '2024',
               description: 'Free GST-compliant invoice generator for Indian businesses',
               address: {

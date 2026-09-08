@@ -231,7 +231,7 @@ export function Sidebar() {
                     </div>
                     {!isCollapsed && (
                         <span className="text-2xl font-black text-slate-950 tracking-tight">
-                            BillBooky<span className="text-emerald-600">.</span>
+                            Bill<span className="text-blue-600">Booky</span>
                         </span>
                     )}
                 </Link>

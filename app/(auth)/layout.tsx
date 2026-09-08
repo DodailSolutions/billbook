@@ -22,13 +22,13 @@ export default function AuthLayout({
                         />
                     </div>
                     <span className="text-2xl font-black tracking-tight text-slate-950">
-                        BillBooky<span className="text-emerald-600">.</span>
+                        Bill<span className="text-blue-600">Booky</span>
                     </span>
                 </Link>
 
                 <div className="flex items-center gap-3 text-xs font-semibold text-slate-600">
                     <span>Need assistance?</span>
-                    <Link href="/contact" className="text-emerald-600 hover:text-emerald-700 font-bold transition-colors">
+                    <Link href="/contact" className="text-blue-600 hover:text-blue-700 font-bold transition-colors">
                         Support →
                     </Link>
                 </div>

@@ -53,7 +53,7 @@ export default function Home() {
                                 />
                             </div>
                             <span className="text-xl sm:text-2xl font-black tracking-tight text-slate-950">
-                                BillBooky<span className="text-emerald-600">.</span>
+                                Bill<span className="text-blue-600">Booky</span>
                             </span>
                         </Link>
                         

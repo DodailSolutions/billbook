@@ -218,7 +218,7 @@ export function MobileSidebar() {
                             height={32}
                         />
                     </div>
-                    <span className="text-lg font-black text-slate-950">BillBooky<span className="text-emerald-600">.</span></span>
+                    <span className="text-lg font-black text-slate-950">Bill<span className="text-blue-600">Booky</span></span>
                 </Link>
                 <button
                     onClick={() => setIsOpen(!isOpen)}
@@ -261,7 +261,7 @@ export function MobileSidebar() {
                                 />
                             </div>
                             <h1 className="text-2xl font-black text-slate-950 tracking-tight">
-                                BillBooky<span className="text-emerald-600">.</span>
+                                Bill<span className="text-blue-600">Booky</span>
                             </h1>
                         </Link>
                     </div>

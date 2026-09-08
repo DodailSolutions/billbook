@@ -18,7 +18,7 @@ export default function Footer() {
                 />
               </div>
               <h4 className="text-xl font-black text-slate-950 tracking-tight">
-                BillBooky<span className="text-emerald-600">.</span>
+                Bill<span className="text-blue-600">Booky</span>
               </h4>
             </div>
             <p className="text-xs text-slate-600 font-medium leading-relaxed max-w-xs">
@@ -30,9 +30,9 @@ export default function Footer() {
           <div>
             <h5 className="font-bold text-slate-950 mb-4 text-sm">Product</h5>
             <ul className="space-y-2.5 text-xs text-slate-600 font-medium">
-              <li><Link href="/features" className="hover:text-emerald-600 transition-colors">Features</Link></li>
-              <li><Link href="/pricing" className="hover:text-emerald-600 transition-colors">Pricing</Link></li>
-              <li><Link href="/faq" className="hover:text-emerald-600 transition-colors">FAQ</Link></li>
+              <li><Link href="/features" className="hover:text-blue-600 transition-colors">Features</Link></li>
+              <li><Link href="/pricing" className="hover:text-blue-600 transition-colors">Pricing</Link></li>
+              <li><Link href="/faq" className="hover:text-blue-600 transition-colors">FAQ</Link></li>
             </ul>
           </div>
           
@@ -40,9 +40,9 @@ export default function Footer() {
           <div>
             <h5 className="font-bold text-slate-950 mb-4 text-sm">Company</h5>
             <ul className="space-y-2.5 text-xs text-slate-600 font-medium">
-              <li><Link href="/about" className="hover:text-emerald-600 transition-colors">About Us</Link></li>
-              <li><Link href="/contact" className="hover:text-emerald-600 transition-colors">Contact</Link></li>
-              <li><Link href="/support" className="hover:text-emerald-600 transition-colors">Support</Link></li>
+              <li><Link href="/about" className="hover:text-blue-600 transition-colors">About Us</Link></li>
+              <li><Link href="/contact" className="hover:text-blue-600 transition-colors">Contact</Link></li>
+              <li><Link href="/support" className="hover:text-blue-600 transition-colors">Support</Link></li>
             </ul>
           </div>
           
@@ -50,9 +50,9 @@ export default function Footer() {
           <div>
             <h5 className="font-bold text-slate-950 mb-4 text-sm">Legal</h5>
             <ul className="space-y-2.5 text-xs text-slate-600 font-medium">
-              <li><Link href="/privacy" className="hover:text-emerald-600 transition-colors">Privacy Policy</Link></li>
-              <li><Link href="/terms" className="hover:text-emerald-600 transition-colors">Terms of Service</Link></li>
-              <li><Link href="/refund" className="hover:text-emerald-600 transition-colors">Refund Policy</Link></li>
+              <li><Link href="/privacy" className="hover:text-blue-600 transition-colors">Privacy Policy</Link></li>
+              <li><Link href="/terms" className="hover:text-blue-600 transition-colors">Terms of Service</Link></li>
+              <li><Link href="/refund" className="hover:text-blue-600 transition-colors">Refund Policy</Link></li>
             </ul>
           </div>
         </div>
@@ -60,7 +60,7 @@ export default function Footer() {
         {/* Bottom Bar matching screenshot */}
         <div className="pt-8 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-600 font-medium">
           <div className="flex items-center gap-2">
-            <span className="font-extrabold text-slate-950 text-base">BillBooky</span>
+            <span className="font-extrabold text-slate-950 text-base">Bill<span className="text-blue-600">Booky</span></span>
             <span className="text-slate-500">© 2026 BillBooky Inc. All rights reserved.</span>
           </div>
           <p className="text-slate-500 font-medium">Made in India 🇮🇳</p>
