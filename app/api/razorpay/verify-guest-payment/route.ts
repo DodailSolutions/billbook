@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
                 data: {
                     full_name: fullName
                 },
-                emailRedirectTo: undefined
+                emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://billbooky.dodail.com'}/auth/callback`
             }
         })
 

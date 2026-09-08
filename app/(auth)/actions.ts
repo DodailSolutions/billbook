@@ -116,7 +116,7 @@ export async function signup(formData: FormData) {
                     gstin: gstin,
                     selected_plan: selectedPlan || 'free',
                 },
-                emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://billbooky.dodail.com'}/auth/callback`
+                emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://billbooky.dodail.com'}/auth/callback`
             }
         })
 
@@ -326,7 +326,7 @@ export async function resendConfirmationEmail(formData: FormData) {
     }
 
     const supabase = await createClient()
-    const redirectUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://billbooky.dodail.com'}/auth/callback`
+    const redirectUrl = `${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://billbooky.dodail.com'}/auth/callback`
 
     const { error } = await supabase.auth.resend({
         type: 'signup',
