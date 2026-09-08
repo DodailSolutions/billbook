@@ -122,7 +122,8 @@ export async function signup(formData: FormData) {
 
         if (error) {
             console.error('Supabase signup error:', error)
-            return redirect('/signup?message=' + encodeURIComponent(error.message))
+            const errorMsg = error.message && error.message !== '{}' ? error.message : 'Signup failed. Please check your details and try again.'
+            return redirect('/signup?message=' + encodeURIComponent(errorMsg))
         }
 
         // Check if email confirmation is required
@@ -207,7 +208,10 @@ export async function signup(formData: FormData) {
         
         // Only catch and handle actual errors
         console.error('Signup exception:', error)
-        const errorMessage = error instanceof Error ? error.message : 'An error occurred during signup'
+        let errorMessage = error instanceof Error ? error.message : 'An error occurred during signup'
+        if (!errorMessage || errorMessage === '{}' || typeof errorMessage !== 'string') {
+            errorMessage = 'An error occurred during signup. Please try again.'
+        }
         return redirect('/signup?message=' + encodeURIComponent(errorMessage))
     }
 }

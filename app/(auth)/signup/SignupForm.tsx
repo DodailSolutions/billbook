@@ -73,12 +73,14 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
         setIsMounted(true)
     }, [])
 
+    const validMessage = message && message !== '{}' && message !== 'null' && message !== 'undefined' && message.trim() !== '' ? message : undefined
+
     // Reset submitting state if there's an error message (means we've been redirected back)
     useEffect(() => {
-        if (message) {
+        if (validMessage) {
             setIsSubmitting(false)
         }
-    }, [message])
+    }, [validMessage])
 
     const totalSteps = 3
     const progress = (currentStep / totalSteps) * 100
@@ -369,12 +371,12 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
                 </CardDescription>
                 
                 {/* Error Messages - Show at top, always visible */}
-                {message && (
+                {validMessage && (
                     <div className="mt-4 p-4 bg-rose-50 border border-rose-200 rounded-2xl text-xs text-rose-800 font-medium">
                         <p className="font-bold mb-1">
-                            {message}
+                            {validMessage}
                         </p>
-                        {message.toLowerCase().includes('already') && (
+                        {validMessage.toLowerCase().includes('already') && (
                             <p className="mt-1">
                                 Already have an account? <a href="/login" className="underline font-bold text-slate-950">Log in here</a>
                             </p>
@@ -446,19 +448,6 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
                         <p className="text-sm font-semibold text-red-800 dark:text-red-200">
                             {validationError}
                         </p>
-                    </div>
-                )}
-
-                {message && (
-                    <div className="mb-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
-                        <p className="text-sm font-semibold text-amber-800 dark:text-amber-200 mb-2">
-                            ℹ️ {message}
-                        </p>
-                        {message.toLowerCase().includes('registered') && (
-                            <p className="text-xs text-amber-700 dark:text-amber-300 mt-2">
-                                This email is already in use. <a href="/login" className="underline font-semibold hover:text-amber-900 dark:hover:text-amber-100">Please login instead</a>
-                            </p>
-                        )}
                     </div>
                 )}
 
