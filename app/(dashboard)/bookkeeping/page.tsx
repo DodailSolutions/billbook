@@ -48,7 +48,7 @@ export default function BookkeepingPage() {
                         </h2>
                     </div>
                     <p className="text-sm text-gray-500 mt-1">
-                        Double-entry accounting, Chart of Accounts, Trial Balance, P&L, Balance Sheet & Bank Reconciliation.
+                        Double-entry accounting, Chart of Accounts, P&L, Balance Sheet, Cash Flow, Trial Balance & General Ledger.
                     </p>
                 </div>
 
@@ -97,8 +97,8 @@ export default function BookkeepingPage() {
                         }`}
                     >
                         <FileText className="h-4 w-4 hidden sm:block" />
-                        <span className="sm:hidden">P&L</span>
-                        <span className="hidden sm:inline">Financial Statements (P&L & BS)</span>
+                        <span className="sm:hidden">Financials</span>
+                        <span className="hidden sm:inline">Financial Statements & Reports</span>
                     </button>
 
                     <button

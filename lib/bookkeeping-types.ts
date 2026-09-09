@@ -45,34 +45,160 @@ export interface JournalEntry {
     total_credit?: number
 }
 
+export interface DateFilterOptions {
+    fromDate?: string
+    toDate?: string
+    asOnDate?: string
+}
+
 export interface TrialBalanceItem {
     account_id: string
     account_code: string
     account_name: string
     account_type: AccountType
     category: string
+    opening_debit: number
+    opening_credit: number
+    period_debit: number
+    period_credit: number
+    closing_debit: number
+    closing_credit: number
     total_debit: number
     total_credit: number
     net_balance: number
 }
 
+export interface TrialBalanceReport {
+    fromDate: string
+    toDate: string
+    items: TrialBalanceItem[]
+    totalOpeningDebit: number
+    totalOpeningCredit: number
+    totalPeriodDebit: number
+    totalPeriodCredit: number
+    totalClosingDebit: number
+    totalClosingCredit: number
+    difference: number
+    isBalanced: boolean
+}
+
+export interface PnLAccountItem {
+    accountId: string
+    code: string
+    name: string
+    category: string
+    amount: number
+}
+
 export interface ProfitAndLossReport {
-    revenueAccounts: { code: string; name: string; amount: number }[]
+    fromDate: string
+    toDate: string
+    directIncomeAccounts: PnLAccountItem[]
+    totalDirectIncome: number
+    indirectIncomeAccounts: PnLAccountItem[]
+    totalIndirectIncome: number
     totalRevenue: number
-    expenseAccounts: { code: string; name: string; amount: number }[]
+    directExpenseAccounts: PnLAccountItem[]
+    totalDirectExpenses: number
+    indirectExpenseAccounts: PnLAccountItem[]
+    totalIndirectExpenses: number
     totalExpense: number
+    grossProfit: number
     netProfit: number
+    netProfitMargin: number
+    revenueAccounts: { code: string; name: string; amount: number }[]
+    expenseAccounts: { code: string; name: string; amount: number }[]
+}
+
+export interface BalanceSheetAccountItem {
+    accountId: string
+    code: string
+    name: string
+    category: string
+    amount: number
 }
 
 export interface BalanceSheetReport {
-    assetAccounts: { code: string; name: string; amount: number }[]
+    asOnDate: string
+    fromDate: string
+    toDate: string
+    cashAndBankAccounts: BalanceSheetAccountItem[]
+    totalCashAndBank: number
+    currentAssetAccounts: BalanceSheetAccountItem[]
+    totalCurrentAssets: number
+    fixedAssetAccounts: BalanceSheetAccountItem[]
+    totalFixedAssets: number
     totalAssets: number
-    liabilityAccounts: { code: string; name: string; amount: number }[]
+    currentLiabilityAccounts: BalanceSheetAccountItem[]
+    totalCurrentLiabilities: number
+    nonCurrentLiabilityAccounts: BalanceSheetAccountItem[]
+    totalNonCurrentLiabilities: number
     totalLiabilities: number
-    equityAccounts: { code: string; name: string; amount: number }[]
+    capitalAccounts: BalanceSheetAccountItem[]
+    totalCapital: number
+    retainedEarningsPrior: number
+    currentPeriodPnL: number
+    totalReservesAndSurplus: number
     totalEquity: number
-    retainedEarnings: number
+    totalLiabilitiesAndEquity: number
+    difference: number
     isBalanced: boolean
+    assetAccounts: { code: string; name: string; amount: number }[]
+    liabilityAccounts: { code: string; name: string; amount: number }[]
+    equityAccounts: { code: string; name: string; amount: number }[]
+    retainedEarnings: number
+}
+
+export interface CashFlowLineItem {
+    description: string
+    amount: number
+    isSubtotal?: boolean
+}
+
+export interface CashFlowStatementReport {
+    fromDate: string
+    toDate: string
+    operatingActivities: CashFlowLineItem[]
+    netCashFromOperating: number
+    investingActivities: CashFlowLineItem[]
+    netCashFromInvesting: number
+    financingActivities: CashFlowLineItem[]
+    netCashFromFinancing: number
+    netChangeInCash: number
+    openingCashBalance: number
+    closingCashBalance: number
+    reconciledBalanceSheetCash: number
+    isReconciled: boolean
+}
+
+export interface GeneralLedgerLine {
+    id: string
+    entryDate: string
+    voucherType: string
+    voucherNo: string
+    oppositeAccount: string
+    description: string
+    debitAmount: number
+    creditAmount: number
+    runningBalance: number
+    balanceType: 'Dr' | 'Cr'
+}
+
+export interface GeneralLedgerReport {
+    accountId: string
+    accountCode: string
+    accountName: string
+    accountType: AccountType
+    category: string
+    fromDate: string
+    toDate: string
+    openingBalance: number
+    openingBalanceType: 'Dr' | 'Cr'
+    totalDebit: number
+    totalCredit: number
+    closingBalance: number
+    closingBalanceType: 'Dr' | 'Cr'
+    lines: GeneralLedgerLine[]
 }
 
 export interface BankAccount {
