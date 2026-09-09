@@ -32,7 +32,7 @@ export function FinancialStatementsView() {
     if (loading) {
         return (
             <div className="flex items-center justify-center py-20">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
             </div>
         )
     }
@@ -47,7 +47,7 @@ export function FinancialStatementsView() {
                 <button
                     onClick={() => setSubTab('pnl')}
                     className={`flex items-center gap-2 px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
-                        subTab === 'pnl' ? 'bg-emerald-600 text-white' : 'text-gray-600 hover:bg-gray-100'
+                        subTab === 'pnl' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'
                     }`}
                 >
                     <PieChart className="h-4 w-4" />
@@ -56,7 +56,7 @@ export function FinancialStatementsView() {
                 <button
                     onClick={() => setSubTab('balance_sheet')}
                     className={`flex items-center gap-2 px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
-                        subTab === 'balance_sheet' ? 'bg-emerald-600 text-white' : 'text-gray-600 hover:bg-gray-100'
+                        subTab === 'balance_sheet' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'
                     }`}
                 >
                     <Scale className="h-4 w-4" />
@@ -65,7 +65,7 @@ export function FinancialStatementsView() {
                 <button
                     onClick={() => setSubTab('trial_balance')}
                     className={`flex items-center gap-2 px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
-                        subTab === 'trial_balance' ? 'bg-emerald-600 text-white' : 'text-gray-600 hover:bg-gray-100'
+                        subTab === 'trial_balance' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'
                     }`}
                 >
                     <FileSpreadsheet className="h-4 w-4" />

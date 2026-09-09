@@ -230,7 +230,7 @@ export default function TestimonialsAdmin() {
           </div>
 
           <div className="flex gap-2">
-            <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700">
+            <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
               {editingId ? 'Update' : 'Add'} Testimonial
             </Button>
             {editingId && (

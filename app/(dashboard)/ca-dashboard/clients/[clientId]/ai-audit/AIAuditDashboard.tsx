@@ -275,12 +275,12 @@ export function AIAuditDashboard({
   return (
     <div className="space-y-6">
       {/* Run Audit Controls */}
-      <Card className="border-2 border-dashed border-emerald-300 dark:border-emerald-700 bg-emerald-50/20 dark:bg-emerald-950/5">
+      <Card className="border-2 border-dashed border-blue-300 dark:border-blue-700 bg-blue-50/20 dark:bg-blue-950/5">
         <CardContent className="p-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="space-y-1">
               <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                <Brain className="h-6 w-6 text-emerald-600 dark:text-emerald-400 animate-pulse" />
+                <Brain className="h-6 w-6 text-blue-600 dark:text-blue-400 animate-pulse" />
                 AI Audit Transaction Engine
               </h2>
               <p className="text-sm text-gray-600">
@@ -291,7 +291,7 @@ export function AIAuditDashboard({
               <Button
                 onClick={triggerAudit}
                 disabled={isAuditing}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-5 rounded-lg flex items-center gap-2 shadow-sm transition-all"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-5 rounded-lg flex items-center gap-2 shadow-sm transition-all"
               >
                 <RefreshCw className={`h-4 w-4 ${isAuditing ? 'animate-spin' : ''}`} />
                 {isAuditing ? 'Auditing ledger population...' : 'Execute Full AI Audit'}
@@ -303,7 +303,7 @@ export function AIAuditDashboard({
           {isAuditing && (
             <div className="mt-4 p-4 bg-white border border-gray-200 rounded-lg space-y-3 dark:bg-gray-800">
               <div className="flex items-center justify-between text-sm">
-                <span className="font-semibold text-emerald-700 dark:text-emerald-400">
+                <span className="font-semibold text-blue-700 dark:text-blue-400">
                   Step {auditStep + 1} of {steps.length}
                 </span>
                 <span className="text-gray-500 font-medium">
@@ -312,7 +312,7 @@ export function AIAuditDashboard({
               </div>
               <div className="w-full bg-gray-100 dark:bg-gray-700 h-2.5 rounded-full overflow-hidden">
                 <div
-                  className="bg-emerald-600 h-full transition-all duration-300"
+                  className="bg-blue-600 h-full transition-all duration-300"
                   style={{ width: `${((auditStep + 1) / steps.length) * 100}%` }}
                 />
               </div>
@@ -356,7 +356,7 @@ export function AIAuditDashboard({
                   onClick={() => setActiveTab(tab.id as any)}
                   className={`w-full flex items-center justify-between p-3 rounded-lg text-left text-sm font-medium transition-all ${
                     isSelected
-                      ? 'bg-emerald-600 text-white shadow-md'
+                      ? 'bg-blue-600 text-white shadow-md'
                       : 'bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700/50'
                   }`}
                 >
@@ -365,7 +365,7 @@ export function AIAuditDashboard({
                     {tab.label}
                   </span>
                   {tab.issues > 0 && (
-                    <Badge className={`${isSelected ? 'bg-white text-emerald-800' : tab.badgeColor}`}>
+                    <Badge className={`${isSelected ? 'bg-white text-blue-800' : tab.badgeColor}`}>
                       {tab.issues}
                     </Badge>
                   )}
@@ -848,8 +848,8 @@ export function AIAuditDashboard({
       {!auditComplete && !isAuditing && (
         <Card className="p-12 text-center border-gray-200">
           <CardContent className="space-y-4">
-            <div className="w-16 h-16 mx-auto bg-emerald-100 rounded-full flex items-center justify-center">
-              <Brain className="h-8 w-8 text-emerald-600" />
+            <div className="w-16 h-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center">
+              <Brain className="h-8 w-8 text-blue-600" />
             </div>
             <h3 className="text-xl font-bold text-gray-900 dark:text-white">AI Transaction Audit Suite</h3>
             <p className="text-gray-600 max-w-xl mx-auto">
@@ -857,7 +857,7 @@ export function AIAuditDashboard({
             </p>
             <Button
               onClick={triggerAudit}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-8 py-6 text-base"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-6 text-base"
             >
               Start Diagnostic Audit Scan
             </Button>

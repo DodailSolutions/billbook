@@ -37,7 +37,7 @@ export function Sidebar() {
                     label: 'AI Accountant',
                     icon: Bot,
                     href: '/ai-accountant',
-                    color: "text-emerald-600",
+                    color: "text-blue-600",
                     badge: 'PRO'
                 },
                 {
@@ -73,7 +73,7 @@ export function Sidebar() {
                     label: 'CRM & Pipeline',
                     icon: Sparkles,
                     href: '/crm',
-                    color: "text-emerald-650",
+                    color: "text-blue-600",
                     badge: 'NEW'
                 }
             ]
@@ -125,7 +125,7 @@ export function Sidebar() {
                     label: 'Payroll & Salaries',
                     icon: DollarSign,
                     href: '/payroll',
-                    color: "text-emerald-600"
+                    color: "text-blue-600"
                 },
                 {
                     label: 'Attendance Tracking',
@@ -155,7 +155,7 @@ export function Sidebar() {
                     label: 'Bookkeeping',
                     icon: BookOpen,
                     href: '/bookkeeping',
-                    color: "text-emerald-650",
+                    color: "text-blue-600",
                     badge: 'NEW'
                 },
                 {
@@ -168,7 +168,7 @@ export function Sidebar() {
                     label: isCA ? 'CA Dashboard' : 'Hire CA',
                     icon: isCA ? Briefcase : UserPlus,
                     href: isCA ? '/ca-dashboard' : '/reports/hire-ca',
-                    color: "text-emerald-600"
+                    color: "text-blue-600"
                 }] : [])
             ]
         },
@@ -260,7 +260,7 @@ export function Sidebar() {
                                             className={cn(
                                                 "text-xs group flex p-2.5 w-full justify-start font-bold cursor-pointer rounded-xl transition-all duration-200 relative overflow-hidden",
                                                 isActive 
-                                                    ? "text-emerald-900 bg-emerald-50 border border-emerald-200/50 shadow-2xs font-bold" 
+                                                    ? "text-blue-900 bg-blue-50 border border-blue-200/50 shadow-2xs font-bold" 
                                                     : "text-slate-600 hover:text-slate-900 hover:bg-slate-50",
                                                 isCollapsed && "justify-center"
                                             )}
@@ -279,7 +279,7 @@ export function Sidebar() {
                                                     <>
                                                         <span className="truncate">{route.label}</span>
                                                         {route.badge && (
-                                                            <span className="ml-auto text-[9px] font-black px-1.5 py-0.5 rounded-full bg-emerald-600 text-white shadow-2xs">
+                                                            <span className="ml-auto text-[9px] font-black px-1.5 py-0.5 rounded-full bg-blue-600 text-white shadow-2xs">
                                                                 {route.badge}
                                                             </span>
                                                         )}

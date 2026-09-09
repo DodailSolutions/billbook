@@ -157,7 +157,7 @@ export default function UserManagementTable({
                                                         })
                                                         setSelectedUser(null)
                                                     }}
-                                                    className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 text-emerald-600"
+                                                    className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 text-blue-600"
                                                 >
                                                     <Crown className="h-4 w-4" />
                                                     Upgrade Plan

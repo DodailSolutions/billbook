@@ -29,7 +29,7 @@ export default function SupportPage() {
               </Button>
             </Link>
             <Link href="/signup">
-              <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
                 Get Started
               </Button>
             </Link>
@@ -50,15 +50,15 @@ export default function SupportPage() {
       {/* Support Options */}
       <section className="px-6 pb-24 max-w-6xl mx-auto">
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-          <Link href="/faq" className="bg-white border-2 border-gray-200 rounded-2xl p-6 hover:border-emerald-600 hover:shadow-lg transition-all group">
-            <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-              <Book className="h-6 w-6 text-emerald-600" />
+          <Link href="/faq" className="bg-white border-2 border-gray-200 rounded-2xl p-6 hover:border-blue-600 hover:shadow-lg transition-all group">
+            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+              <Book className="h-6 w-6 text-blue-600" />
             </div>
             <h3 className="text-lg font-bold text-gray-900 mb-2">FAQ</h3>
             <p className="text-gray-600 text-sm">Quick answers to common questions</p>
           </Link>
 
-          <Link href="/contact" className="bg-white border-2 border-gray-200 rounded-2xl p-6 hover:border-emerald-600 hover:shadow-lg transition-all group">
+          <Link href="/contact" className="bg-white border-2 border-gray-200 rounded-2xl p-6 hover:border-blue-600 hover:shadow-lg transition-all group">
             <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
               <Mail className="h-6 w-6 text-blue-600" />
             </div>
@@ -96,7 +96,7 @@ export default function SupportPage() {
               </ul>
             </div>
 
-            <div className="bg-emerald-50 border-2 border-emerald-600 rounded-xl p-6">
+            <div className="bg-blue-50 border-2 border-blue-600 rounded-xl p-6">
               <h3 className="text-xl font-bold text-gray-900 mb-4">Starter & Professional</h3>
               <ul className="space-y-3 text-gray-600">
                 <li>• Priority email support</li>
@@ -154,7 +154,7 @@ export default function SupportPage() {
             Our support team is ready to assist you
           </p>
           <Link href="/contact">
-            <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 text-white">
+            <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white">
               Contact Support
             </Button>
           </Link>

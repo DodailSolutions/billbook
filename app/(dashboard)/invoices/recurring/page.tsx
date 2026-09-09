@@ -40,7 +40,7 @@ export default async function RecurringInvoicesPage() {
                             </p>
                             
                             <Link href="/invoices/recurring/new" className="w-full sm:w-auto">
-                                <Button className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white px-6 sm:px-8 py-5 sm:py-6 text-base sm:text-lg font-medium rounded-lg shadow-lg hover:shadow-xl transition-all">
+                                <Button className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-6 sm:px-8 py-5 sm:py-6 text-base sm:text-lg font-medium rounded-lg shadow-lg hover:shadow-xl transition-all">
                                     CREATE NEW RECURRING INVOICE
                                 </Button>
                             </Link>
@@ -100,8 +100,8 @@ export default async function RecurringInvoicesPage() {
                                     <span className="text-sm font-semibold text-gray-900 dark:text-white">SENT INVOICES</span>
                                 </div>
 
-                                <div className="flex flex-col items-center p-6 bg-emerald-50 dark:bg-emerald-900/20 border-2 border-emerald-500 dark:border-emerald-400 rounded-lg">
-                                    <svg className="w-8 h-8 text-emerald-600 dark:text-emerald-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <div className="flex flex-col items-center p-6 bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-500 dark:border-blue-400 rounded-lg">
+                                    <svg className="w-8 h-8 text-blue-600 dark:text-blue-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                     <span className="text-sm font-semibold text-gray-900 dark:text-white">CHARGE AUTOMATICALLY</span>

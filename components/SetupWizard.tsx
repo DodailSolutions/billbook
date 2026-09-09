@@ -68,7 +68,7 @@ export function SetupWizard({ onComplete, initialStep = 1 }: SetupWizardProps) {
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-12 h-12 bg-emerald-600 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center">
               <Zap className="w-6 h-6 text-white" />
             </div>
             <div>
@@ -90,7 +90,7 @@ export function SetupWizard({ onComplete, initialStep = 1 }: SetupWizardProps) {
               <Card className="p-8">
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-3">
-                    <CheckCircle className="w-6 h-6 text-emerald-600" />
+                    <CheckCircle className="w-6 h-6 text-blue-600" />
                     <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                       1. How do you want your invoices to look?
                     </h2>
@@ -323,7 +323,7 @@ export function SetupWizard({ onComplete, initialStep = 1 }: SetupWizardProps) {
                   </Button>
                   <Button
                     onClick={handleComplete}
-                    className="bg-emerald-600 hover:bg-emerald-700"
+                    className="bg-blue-600 hover:bg-blue-700"
                   >
                     Start Invoicing
                   </Button>
@@ -394,9 +394,9 @@ export function SetupWizard({ onComplete, initialStep = 1 }: SetupWizardProps) {
                     .map(([key]) => (
                       <div
                         key={key}
-                        className="flex items-center gap-2 p-2 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg"
+                        className="flex items-center gap-2 p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg"
                       >
-                        <CheckCircle className="w-4 h-4 text-emerald-600" />
+                        <CheckCircle className="w-4 h-4 text-blue-600" />
                         <span className="text-sm font-medium text-gray-900 dark:text-white capitalize">
                           {key.replace(/([A-Z])/g, ' $1').trim()}
                         </span>

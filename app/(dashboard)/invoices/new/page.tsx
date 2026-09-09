@@ -56,7 +56,7 @@ export default async function NewInvoicePage() {
                         
                         <div className="flex gap-3">
                             <Link href="/pricing">
-                                <Button className="bg-emerald-600 hover:bg-emerald-700">
+                                <Button className="bg-blue-600 hover:bg-blue-700">
                                     View Plans & Upgrade
                                 </Button>
                             </Link>

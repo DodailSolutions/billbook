@@ -86,12 +86,12 @@ export function UAEPricingToggleSection() {
             <div 
               key={plan.name}
               className={`bg-white dark:bg-gray-800 rounded-2xl p-6 hover:shadow-lg transition-all ${
-                plan.popular ? 'border-2 border-emerald-600 relative' : 'border-2 border-gray-200 dark:border-gray-700'
+                plan.popular ? 'border-2 border-blue-600 relative' : 'border-2 border-gray-200 dark:border-gray-700'
               }`}
             >
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                  <span className="bg-emerald-600 text-white px-4 py-1 rounded-full text-sm font-semibold">
+                  <span className="bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-semibold">
                     Most Popular
                   </span>
                 </div>
@@ -100,7 +100,7 @@ export function UAEPricingToggleSection() {
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{plan.name}</h3>
               
               {isYearly && savings > 0 && (
-                <div className="text-emerald-600 dark:text-emerald-400 text-xs font-semibold mb-2">
+                <div className="text-blue-600 dark:text-blue-400 text-xs font-semibold mb-2">
                   Save AED {savings} per year
                 </div>
               )}
@@ -125,7 +125,7 @@ export function UAEPricingToggleSection() {
               <ul className="space-y-3 mb-6">
                 {plan.features.map((feature, index) => (
                   <li key={index} className="flex items-start gap-2">
-                    <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
+                    <CheckCircle className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
                     <span className="text-sm text-gray-700 dark:text-gray-200">
                       {feature.includes('Up to') || feature.includes('Everything') ? (
                         <strong>{feature}</strong>
@@ -141,7 +141,7 @@ export function UAEPricingToggleSection() {
                 <Button 
                   className={`w-full ${
                     plan.popular 
-                      ? 'bg-emerald-600 hover:bg-emerald-700 text-white' 
+                      ? 'bg-blue-600 hover:bg-blue-700 text-white' 
                       : 'bg-gray-900 hover:bg-gray-800 text-white'
                   }`}
                 >

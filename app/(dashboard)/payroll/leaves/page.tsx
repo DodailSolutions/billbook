@@ -89,7 +89,7 @@ export default function LeavesPage() {
                 </Link>
                 <div>
                     <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
-                        <Plane className="h-5 w-5 text-emerald-600" />
+                        <Plane className="h-5 w-5 text-blue-600" />
                         Leave Management
                     </h2>
                     <p className="text-xs text-gray-500 mt-0.5">
@@ -99,14 +99,14 @@ export default function LeavesPage() {
             </div>
 
             <div className="flex bg-slate-100 p-1 rounded-xl w-fit">
-                <button onClick={() => setTab('requests')} className={`px-4 py-2 text-xs font-bold rounded-lg transition-colors ${tab === 'requests' ? 'bg-white shadow-xs text-emerald-700' : 'text-gray-500 hover:text-gray-900'}`}>Leave Requests</button>
-                <button onClick={() => setTab('balances')} className={`px-4 py-2 text-xs font-bold rounded-lg transition-colors ${tab === 'balances' ? 'bg-white shadow-xs text-emerald-700' : 'text-gray-500 hover:text-gray-900'}`}>Leave Balances</button>
-                <button onClick={() => setTab('apply')} className={`px-4 py-2 text-xs font-bold rounded-lg transition-colors ${tab === 'apply' ? 'bg-white shadow-xs text-emerald-700' : 'text-gray-500 hover:text-gray-900'}`}>Apply Leave</button>
+                <button onClick={() => setTab('requests')} className={`px-4 py-2 text-xs font-bold rounded-lg transition-colors ${tab === 'requests' ? 'bg-white shadow-xs text-blue-700' : 'text-gray-500 hover:text-gray-900'}`}>Leave Requests</button>
+                <button onClick={() => setTab('balances')} className={`px-4 py-2 text-xs font-bold rounded-lg transition-colors ${tab === 'balances' ? 'bg-white shadow-xs text-blue-700' : 'text-gray-500 hover:text-gray-900'}`}>Leave Balances</button>
+                <button onClick={() => setTab('apply')} className={`px-4 py-2 text-xs font-bold rounded-lg transition-colors ${tab === 'apply' ? 'bg-white shadow-xs text-blue-700' : 'text-gray-500 hover:text-gray-900'}`}>Apply Leave</button>
             </div>
 
             {loading ? (
                 <div className="flex justify-center py-12">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
                 </div>
             ) : (
                 <>
@@ -214,7 +214,7 @@ export default function LeavesPage() {
                                         <label className="block font-semibold text-gray-700 mb-1">Reason (Optional)</label>
                                         <textarea value={reason} onChange={e => setReason(e.target.value)} className="w-full p-2 border border-gray-200 rounded-lg h-24" />
                                     </div>
-                                    <Button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">Submit Leave Request</Button>
+                                    <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white">Submit Leave Request</Button>
                                 </form>
                             </CardContent>
                         </Card>

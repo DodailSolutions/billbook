@@ -62,7 +62,7 @@ export function MigrationBanner() {
                             >
                                 {copied ? (
                                     <>
-                                        <Check className="h-3.5 w-3.5 text-emerald-600" /> Copied!
+                                        <Check className="h-3.5 w-3.5 text-blue-600" /> Copied!
                                     </>
                                 ) : (
                                     <>

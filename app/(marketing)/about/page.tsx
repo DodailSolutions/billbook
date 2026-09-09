@@ -29,7 +29,7 @@ export default function AboutPage() {
               </Button>
             </Link>
             <Link href="/signup">
-              <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
                 Get Started
               </Button>
             </Link>
@@ -41,7 +41,7 @@ export default function AboutPage() {
       <section className="px-6 py-16 md:py-24 max-w-4xl mx-auto text-center">
         <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
           Simplifying Invoicing for
-          <span className="block text-emerald-600 mt-2">Indian Businesses</span>
+          <span className="block text-blue-600 mt-2">Indian Businesses</span>
         </h1>
         <p className="text-xl text-gray-600 max-w-3xl mx-auto">
           BillBooky was created with one mission: to help small businesses in India manage their invoicing effortlessly.
@@ -74,8 +74,8 @@ export default function AboutPage() {
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-12 text-center">Our Values</h2>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Zap className="h-8 w-8 text-emerald-600" />
+              <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Zap className="h-8 w-8 text-blue-600" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">Simplicity First</h3>
               <p className="text-gray-600">
@@ -84,8 +84,8 @@ export default function AboutPage() {
             </div>
             
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Heart className="h-8 w-8 text-blue-600" />
+              <div className="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Heart className="h-8 w-8 text-indigo-600" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">Built for India</h3>
               <p className="text-gray-600">
@@ -110,15 +110,15 @@ export default function AboutPage() {
       <section className="px-6 py-16 max-w-6xl mx-auto">
         <div className="grid md:grid-cols-3 gap-8 text-center">
           <div>
-            <div className="text-4xl md:text-5xl font-bold text-emerald-600 mb-2">100%</div>
+            <div className="text-4xl md:text-5xl font-bold text-blue-600 mb-2">100%</div>
             <div className="text-gray-600">GST Compliant</div>
           </div>
           <div>
-            <div className="text-4xl md:text-5xl font-bold text-emerald-600 mb-2">60sec</div>
+            <div className="text-4xl md:text-5xl font-bold text-blue-600 mb-2">60sec</div>
             <div className="text-gray-600">Average Invoice Creation</div>
           </div>
           <div>
-            <div className="text-4xl md:text-5xl font-bold text-emerald-600 mb-2">24/7</div>
+            <div className="text-4xl md:text-5xl font-bold text-blue-600 mb-2">24/7</div>
             <div className="text-gray-600">Cloud Access</div>
           </div>
         </div>
@@ -126,13 +126,13 @@ export default function AboutPage() {
 
       {/* CTA */}
       <section className="px-6 py-16 md:py-24 max-w-5xl mx-auto">
-        <div className="bg-linear-to-br from-emerald-600 to-emerald-700 rounded-3xl p-12 text-center text-white">
+        <div className="bg-linear-to-br from-blue-600 to-indigo-700 rounded-3xl p-12 text-center text-white">
           <h3 className="text-3xl md:text-4xl font-bold mb-4">Join Us on This Journey</h3>
-          <p className="text-lg text-emerald-100 mb-8">
+          <p className="text-lg text-blue-100 mb-8">
             Start creating professional invoices today
           </p>
           <Link href="/signup">
-            <Button size="lg" className="bg-white text-emerald-700 hover:bg-gray-100 font-bold px-10">
+            <Button size="lg" className="bg-white text-blue-700 hover:bg-gray-100 font-bold px-10">
               Get Started Free
             </Button>
           </Link>

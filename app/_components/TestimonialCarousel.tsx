@@ -62,7 +62,7 @@ export function TestimonialCarousel() {
     <section className="px-6 py-20 md:py-32 bg-white dark:bg-gray-950">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-16">
-          <span className="inline-block px-4 py-1.5 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full text-sm font-medium mb-4">
+          <span className="inline-block px-4 py-1.5 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-full text-sm font-medium mb-4">
             Testimonials
           </span>
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
@@ -75,7 +75,7 @@ export function TestimonialCarousel() {
 
         <div className="relative">
           <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 md:p-12 shadow-lg border border-gray-200 dark:border-gray-700">
-            <Quote className="h-12 w-12 text-emerald-600 mb-6" />
+            <Quote className="h-12 w-12 text-blue-600 mb-6" />
             
             <div className="mb-6">
               <div className="flex gap-1 mb-4">
@@ -142,7 +142,7 @@ export function TestimonialCarousel() {
                 onClick={() => setCurrentIndex(index)}
                 className={`h-2 rounded-full transition-all ${
                   index === currentIndex
-                    ? 'w-8 bg-emerald-600'
+                    ? 'w-8 bg-blue-600'
                     : 'w-2 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400'
                 }`}
                 aria-label={`Go to testimonial ${index + 1}`}

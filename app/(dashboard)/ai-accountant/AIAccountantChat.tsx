@@ -111,12 +111,13 @@ export function AIAccountantChat({ businessName, isDemoMode }: AIAccountantChatP
     <div className="flex-1 flex flex-col bg-white rounded-xl border-2 border-gray-200 overflow-hidden shadow-xs">
       {/* Demo Warning / Live Banner */}
       {localDemoMode ? (
-        <div className="p-3 bg-amber-50 text-amber-800 text-[10px] font-extrabold border-b border-amber-200/50 flex items-center justify-between animate-pulse">
+        <div className="p-2 px-4 bg-amber-50 text-amber-800 text-[10px] font-bold border-b border-amber-100/50 flex items-center gap-1.5">
+          <span className="h-1.5 w-1.5 rounded-full bg-amber-500 shrink-0" />
           <span>⚠️ Running in Heuristic Demo Mode. Start Ollama on http://localhost:11434 or add GEMINI_API_KEY to your .env.local file to connect the live AI.</span>
         </div>
       ) : (
-        <div className="p-2 px-4 bg-emerald-50 text-emerald-800 text-[10px] font-bold border-b border-emerald-100/50 flex items-center gap-1.5">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 animate-ping shrink-0" />
+        <div className="p-2 px-4 bg-blue-50 text-blue-800 text-[10px] font-bold border-b border-blue-100/50 flex items-center gap-1.5">
+          <span className="h-1.5 w-1.5 rounded-full bg-blue-600 animate-ping shrink-0" />
           <span>Connected to live AI assistant via {providerName}</span>
         </div>
       )}
@@ -129,14 +130,14 @@ export function AIAccountantChat({ businessName, isDemoMode }: AIAccountantChatP
             className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             {message.role === 'assistant' && (
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-600 flex items-center justify-center shrink-0">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
                 <Bot className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
               </div>
             )}
             <div
               className={`max-w-[80%] sm:max-w-[70%] rounded-2xl px-4 py-3 ${
                 message.role === 'user'
-                  ? 'bg-emerald-600 text-white'
+                  ? 'bg-blue-600 text-white'
                   : 'bg-gray-100 text-gray-900 dark:text-white'
               }`}
             >
@@ -154,11 +155,11 @@ export function AIAccountantChat({ businessName, isDemoMode }: AIAccountantChatP
         ))}
         {isLoading && (
           <div className="flex gap-3 justify-start">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-emerald-600 flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
               <Bot className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
             </div>
             <div className="bg-gray-100 rounded-2xl px-4 py-3">
-              <Loader2 className="h-5 w-5 animate-spin text-emerald-600" />
+              <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
             </div>
           </div>
         )}
@@ -174,14 +175,14 @@ export function AIAccountantChat({ businessName, isDemoMode }: AIAccountantChatP
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Ask about bookkeeping, cash flow, or financial insights..."
-            className="flex-1 resize-none rounded-lg border-2 border-gray-200 bg-white px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-emerald-500 dark:focus:border-emerald-500 min-h-13 max-h-32"
+            className="flex-1 resize-none rounded-lg border-2 border-gray-200 bg-white px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-blue-500 dark:focus:border-blue-500 min-h-13 max-h-32"
             rows={1}
             disabled={isLoading}
           />
           <Button
             type="submit"
             disabled={!input.trim() || isLoading}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 sm:px-6 h-13 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-6 h-13 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? (
               <Loader2 className="h-5 w-5 animate-spin" />

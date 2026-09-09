@@ -194,7 +194,7 @@ export default function EditPurchaseOrderPage() {
                 <Card className="border-gray-100 shadow-2xs">
                     <CardContent className="p-4 sm:p-6 space-y-4">
                         <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider flex items-center gap-2">
-                            <Building2 className="h-4 w-4 text-indigo-600" /> Vendor Details
+                            <Building2 className="h-4 w-4 text-blue-600" /> Vendor Details
                         </h3>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -205,7 +205,7 @@ export default function EditPurchaseOrderPage() {
                                 <select
                                     value={vendorId}
                                     onChange={(e) => handleVendorSelect(e.target.value)}
-                                    className="w-full text-xs p-2.5 border border-gray-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-indigo-500 min-h-[44px]"
+                                    className="w-full text-xs p-2.5 border border-gray-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500 min-h-[44px]"
                                 >
                                     <option value="">-- Choose Vendor --</option>
                                     {vendors.map(v => (
@@ -224,7 +224,7 @@ export default function EditPurchaseOrderPage() {
                                     placeholder="Company / Vendor Name"
                                     value={vendorName}
                                     onChange={(e) => setVendorName(e.target.value)}
-                                    className="w-full text-xs p-2.5 border border-gray-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-indigo-500 min-h-[44px]"
+                                    className="w-full text-xs p-2.5 border border-gray-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500 min-h-[44px]"
                                 />
                             </div>
 
@@ -235,7 +235,7 @@ export default function EditPurchaseOrderPage() {
                                     required
                                     value={poDate}
                                     onChange={(e) => setPoDate(e.target.value)}
-                                    className="w-full text-xs p-2.5 border border-gray-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-indigo-500 min-h-[44px]"
+                                    className="w-full text-xs p-2.5 border border-gray-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500 min-h-[44px]"
                                 />
                             </div>
 
@@ -245,7 +245,7 @@ export default function EditPurchaseOrderPage() {
                                     type="date"
                                     value={expectedDeliveryDate}
                                     onChange={(e) => setExpectedDeliveryDate(e.target.value)}
-                                    className="w-full text-xs p-2.5 border border-gray-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-indigo-500 min-h-[44px]"
+                                    className="w-full text-xs p-2.5 border border-gray-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500 min-h-[44px]"
                                 />
                             </div>
                         </div>
@@ -257,7 +257,7 @@ export default function EditPurchaseOrderPage() {
                     <CardContent className="p-4 sm:p-6 space-y-4">
                         <div className="flex items-center justify-between">
                             <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider flex items-center gap-2">
-                                <ShoppingBag className="h-4 w-4 text-indigo-600" /> Line Items
+                                <ShoppingBag className="h-4 w-4 text-blue-600" /> Line Items
                             </h3>
                             <Button type="button" onClick={handleAddItem} size="sm" variant="outline" className="gap-1 text-xs min-h-[40px]">
                                 <Plus className="h-3.5 w-3.5" /> Add Item
@@ -371,7 +371,7 @@ export default function EditPurchaseOrderPage() {
                             </div>
                             <div className="flex justify-between w-48 text-sm font-bold text-gray-900 border-t border-gray-200 pt-1">
                                 <span>Grand Total:</span>
-                                <span className="text-indigo-600">₹{grandTotal.toFixed(2)}</span>
+                                <span className="text-blue-600">₹{grandTotal.toFixed(2)}</span>
                             </div>
                         </div>
                     </CardContent>
@@ -408,7 +408,7 @@ export default function EditPurchaseOrderPage() {
                     <Link href="/purchase-orders">
                         <Button type="button" variant="outline" className="min-h-[44px]">Cancel</Button>
                     </Link>
-                    <Button type="submit" disabled={loading} className="bg-indigo-600 hover:bg-indigo-700 text-white min-h-[44px]">
+                    <Button type="submit" disabled={loading} className="bg-blue-600 hover:bg-blue-700 text-white min-h-[44px]">
                         {loading ? 'Saving PO...' : 'Save Draft Changes'}
                     </Button>
                 </div>

@@ -74,10 +74,10 @@ function QuickPaymentModal({ invoice, onClose, onSuccess }: QuickPaymentModalPro
     return (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => !submitting && onClose()}>
             <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-sm w-full border border-gray-200 dark:border-gray-700 overflow-hidden" onClick={e => e.stopPropagation()}>
-                <div className="bg-linear-to-r from-green-600 to-emerald-600 px-5 py-4 flex items-center justify-between">
+                <div className="bg-linear-to-r from-blue-600 to-indigo-600 px-5 py-4 flex items-center justify-between">
                     <div>
                         <h3 className="text-base font-bold text-white">Record Payment</h3>
-                        <p className="text-xs text-green-100">{invoice.invoice_number}</p>
+                        <p className="text-xs text-blue-100">{invoice.invoice_number}</p>
                     </div>
                     <button onClick={onClose} className="text-white/80 hover:text-white"><X className="h-5 w-5" /></button>
                 </div>

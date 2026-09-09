@@ -99,7 +99,7 @@ export function JournalEntryModal({ isOpen, onClose, accounts, onSuccess }: Jour
             <div className="bg-white sm:rounded-2xl shadow-xl w-full h-full sm:h-auto max-w-2xl overflow-hidden border border-gray-100 animate-in fade-in zoom-in duration-200 flex flex-col">
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-slate-50/50">
                     <div className="flex items-center gap-2">
-                        <Scale className="h-5 w-5 text-emerald-600" />
+                        <Scale className="h-5 w-5 text-blue-600" />
                         <h3 className="text-lg font-bold text-gray-900">
                             New Double-Entry Journal Entry
                         </h3>
@@ -129,7 +129,7 @@ export function JournalEntryModal({ isOpen, onClose, accounts, onSuccess }: Jour
                                 required
                                 value={entryDate}
                                 onChange={(e) => setEntryDate(e.target.value)}
-                                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20"
+                                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500/20"
                             />
                         </div>
                         <div>
@@ -142,7 +142,7 @@ export function JournalEntryModal({ isOpen, onClose, accounts, onSuccess }: Jour
                                 placeholder="e.g. Office Rent Payment"
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
-                                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20"
+                                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500/20"
                             />
                         </div>
                         <div>
@@ -154,7 +154,7 @@ export function JournalEntryModal({ isOpen, onClose, accounts, onSuccess }: Jour
                                 placeholder="e.g. REF-1092"
                                 value={reference}
                                 onChange={(e) => setReference(e.target.value)}
-                                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20"
+                                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500/20"
                             />
                         </div>
                     </div>
@@ -170,7 +170,7 @@ export function JournalEntryModal({ isOpen, onClose, accounts, onSuccess }: Jour
                                 size="sm"
                                 variant="outline"
                                 onClick={handleAddLine}
-                                className="gap-1 text-xs text-emerald-700 border-emerald-200 hover:bg-emerald-50"
+                                className="gap-1 text-xs text-blue-700 border-blue-200 hover:bg-blue-50"
                             >
                                 <Plus className="h-3.5 w-3.5" />
                                 Add Line
@@ -197,7 +197,7 @@ export function JournalEntryModal({ isOpen, onClose, accounts, onSuccess }: Jour
                                                     <select
                                                         value={line.account_id}
                                                         onChange={(e) => handleLineChange(idx, 'account_id', e.target.value)}
-                                                        className="w-full p-1.5 border border-gray-200 rounded-lg text-xs bg-white focus:ring-2 focus:ring-emerald-500/20"
+                                                        className="w-full p-1.5 border border-gray-200 rounded-lg text-xs bg-white focus:ring-2 focus:ring-blue-500/20"
                                                     >
                                                         {accounts.map(acc => (
                                                             <option key={acc.id} value={acc.id}>
@@ -213,7 +213,7 @@ export function JournalEntryModal({ isOpen, onClose, accounts, onSuccess }: Jour
                                                         min="0"
                                                         value={line.debit_amount}
                                                         onChange={(e) => handleLineChange(idx, 'debit_amount', e.target.value)}
-                                                        className="w-full p-1.5 border border-gray-200 rounded-lg text-xs font-semibold text-gray-900 focus:ring-2 focus:ring-emerald-500/20"
+                                                        className="w-full p-1.5 border border-gray-200 rounded-lg text-xs font-semibold text-gray-900 focus:ring-2 focus:ring-blue-500/20"
                                                     />
                                                 </td>
                                                 <td className="p-2">
@@ -223,7 +223,7 @@ export function JournalEntryModal({ isOpen, onClose, accounts, onSuccess }: Jour
                                                         min="0"
                                                         value={line.credit_amount}
                                                         onChange={(e) => handleLineChange(idx, 'credit_amount', e.target.value)}
-                                                        className="w-full p-1.5 border border-gray-200 rounded-lg text-xs font-semibold text-gray-900 focus:ring-2 focus:ring-emerald-500/20"
+                                                        className="w-full p-1.5 border border-gray-200 rounded-lg text-xs font-semibold text-gray-900 focus:ring-2 focus:ring-blue-500/20"
                                                     />
                                                 </td>
                                                 <td className="p-2">
@@ -232,7 +232,7 @@ export function JournalEntryModal({ isOpen, onClose, accounts, onSuccess }: Jour
                                                         placeholder="Line detail..."
                                                         value={line.memo}
                                                         onChange={(e) => handleLineChange(idx, 'memo', e.target.value)}
-                                                        className="w-full p-1.5 border border-gray-200 rounded-lg text-xs text-gray-600 focus:ring-2 focus:ring-emerald-500/20"
+                                                        className="w-full p-1.5 border border-gray-200 rounded-lg text-xs text-gray-600 focus:ring-2 focus:ring-blue-500/20"
                                                     />
                                                 </td>
                                                 <td className="p-2 text-center">
@@ -350,7 +350,7 @@ export function JournalEntryModal({ isOpen, onClose, accounts, onSuccess }: Jour
                         <Button 
                             type="submit" 
                             disabled={loading || !isBalanced} 
-                            className="bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-50"
+                            className="bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50"
                         >
                             {loading ? 'Posting Entry...' : 'Post Journal Entry'}
                         </Button>

@@ -80,8 +80,8 @@ export function UpgradePlanModal({
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-800">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-emerald-100 dark:bg-emerald-900 rounded-lg">
-              <Crown className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+            <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
+              <Crown className="h-6 w-6 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -123,8 +123,8 @@ export function UpgradePlanModal({
                   onClick={() => setSelectedPlan(plan.id)}
                   className={`p-4 border-2 rounded-xl text-left transition-all ${
                     selectedPlan === plan.id
-                      ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/20'
-                      : 'border-gray-200 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-700'
+                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-950/20'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-700'
                   }`}
                 >
                   <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
@@ -150,8 +150,8 @@ export function UpgradePlanModal({
                   onClick={() => setDuration(days)}
                   className={`py-2 px-3 border-2 rounded-lg text-sm font-medium transition-all ${
                     duration === days
-                      ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-300'
-                      : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-emerald-300 dark:hover:border-emerald-700'
+                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-950/20 text-blue-700 dark:text-blue-300'
+                      : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-blue-300 dark:hover:border-blue-700'
                   }`}
                 >
                   {days}d
@@ -201,7 +201,7 @@ export function UpgradePlanModal({
             </Button>
             <Button
               onClick={handleUpgrade}
-              className="flex-1 bg-emerald-600 hover:bg-emerald-700"
+              className="flex-1 bg-blue-600 hover:bg-blue-700"
               disabled={isLoading || !selectedPlan}
             >
               {isLoading ? (

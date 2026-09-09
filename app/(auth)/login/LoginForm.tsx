@@ -19,7 +19,7 @@ function SubmitButton() {
         >
             {pending ? (
                 <span className="flex items-center justify-center gap-2">
-                    <svg className="animate-spin h-4 w-4 text-emerald-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <svg className="animate-spin h-4 w-4 text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
@@ -133,8 +133,8 @@ export default function LoginForm({ message, redirect: redirectUrl }: { message?
 
             <div className="bg-white rounded-[28px] p-6 sm:p-8 shadow-xl border border-slate-200/80 space-y-6">
                 <div className="space-y-2">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                        <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" /> Secure Business Login
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-blue-50 text-blue-800 border border-blue-200">
+                        <ShieldCheck className="h-3.5 w-3.5 text-blue-600" /> Secure Business Login
                     </span>
                     <h2 className="text-2xl sm:text-3xl font-black text-slate-950 -tracking-tight">
                         Welcome Back
@@ -176,7 +176,7 @@ export default function LoginForm({ message, redirect: redirectUrl }: { message?
                                 errors.email 
                                     ? 'border-rose-500 focus:ring-rose-500' 
                                     : email && !errors.email
-                                    ? 'border-emerald-500 focus:ring-emerald-500'
+                                    ? 'border-blue-500 focus:ring-blue-500'
                                     : 'border-slate-300'
                             }`}
                             required
@@ -197,7 +197,7 @@ export default function LoginForm({ message, redirect: redirectUrl }: { message?
                             </label>
                             <Link 
                                 href="/forgot-password" 
-                                className="text-[11px] text-emerald-600 font-bold hover:underline transition-colors"
+                                className="text-[11px] text-blue-600 font-bold hover:underline transition-colors"
                             >
                                 Forgot password?
                             </Link>
@@ -214,7 +214,7 @@ export default function LoginForm({ message, redirect: redirectUrl }: { message?
                                     errors.password 
                                         ? 'border-rose-500 focus:ring-rose-500' 
                                         : password && !errors.password
-                                        ? 'border-emerald-500 focus:ring-emerald-500'
+                                        ? 'border-blue-500 focus:ring-blue-500'
                                         : 'border-slate-300'
                                 }`}
                                 required
@@ -247,7 +247,7 @@ export default function LoginForm({ message, redirect: redirectUrl }: { message?
                         Don&apos;t have a BillBooky account?{' '}
                         <Link 
                             href={`/signup${redirectUrl ? `?redirect=${encodeURIComponent(redirectUrl)}` : ''}`} 
-                            className="text-emerald-700 font-bold hover:underline"
+                            className="text-blue-700 font-bold hover:underline"
                         >
                             Create Free Account
                         </Link>
@@ -256,9 +256,9 @@ export default function LoginForm({ message, redirect: redirectUrl }: { message?
                     <div className="pt-1">
                         <Link 
                             href="/ca-registration" 
-                            className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-emerald-700 font-medium transition-colors"
+                            className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-blue-700 font-medium transition-colors"
                         >
-                            Are you a Chartered Accountant? <span className="font-bold text-emerald-600 hover:underline">Register as CA →</span>
+                            Are you a Chartered Accountant? <span className="font-bold text-blue-600 hover:underline">Register as CA →</span>
                         </Link>
                     </div>
                 </div>

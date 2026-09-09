@@ -18,7 +18,7 @@ function SubmitButton() {
     return (
         <Button 
             type="submit" 
-            className="w-full bg-emerald-600 hover:bg-emerald-700"
+            className="w-full bg-blue-600 hover:bg-blue-700"
             disabled={pending}
         >
             {pending ? (
@@ -40,7 +40,7 @@ export function ResetPasswordForm({ message }: ResetPasswordFormProps) {
         <Card className="max-w-md mx-auto">
             <CardHeader className="space-y-1">
                 <div className="flex items-center gap-2">
-                    <Lock className="h-6 w-6 text-emerald-600" />
+                    <Lock className="h-6 w-6 text-blue-600" />
                     <CardTitle className="text-2xl font-bold">Reset Password</CardTitle>
                 </div>
                 <CardDescription>
@@ -51,7 +51,7 @@ export function ResetPasswordForm({ message }: ResetPasswordFormProps) {
                 {message && (
                     <div className={`mb-4 p-3 rounded-lg text-sm flex gap-2 ${
                         message.includes('success') || message.includes('updated')
-                            ? 'bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200'
+                            ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-200'
                             : 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-200'
                     }`}>
                         <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />

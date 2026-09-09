@@ -83,7 +83,7 @@ export default function FeaturesPage() {
               </Button>
             </Link>
             <Link href="/signup">
-              <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
                 Get Started
               </Button>
             </Link>
@@ -95,13 +95,13 @@ export default function FeaturesPage() {
       <section className="px-6 py-16 md:py-24 max-w-7xl mx-auto text-center">
         <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
           All the Features You Need to
-          <span className="block text-emerald-600 mt-2">Manage Your Business</span>
+          <span className="block text-blue-600 mt-2">Manage Your Business</span>
         </h1>
         <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
           BillBooky provides everything you need to create professional invoices, manage customers, and get paid faster.
         </p>
         <Link href="/signup">
-          <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 text-white px-8">
+          <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8">
             Start Free Trial
           </Button>
         </Link>
@@ -119,8 +119,8 @@ export default function FeaturesPage() {
                 const Icon = feature.icon
                 return (
                   <div key={feature.title} className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all">
-                    <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center mb-4">
-                      <Icon className="h-6 w-6 text-emerald-600" />
+                    <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                      <Icon className="h-6 w-6 text-blue-600" />
                     </div>
                     <h3 className="text-xl font-bold text-gray-900 mb-2">{feature.title}</h3>
                     <p className="text-gray-600">{feature.desc}</p>
@@ -134,11 +134,11 @@ export default function FeaturesPage() {
 
       {/* CTA */}
       <section className="px-6 py-16 md:py-24 max-w-5xl mx-auto">
-        <div className="bg-linear-to-br from-emerald-600 to-emerald-700 rounded-3xl p-12 text-center text-white">
+        <div className="bg-linear-to-br from-blue-600 to-indigo-700 rounded-3xl p-12 text-center text-white">
           <h3 className="text-3xl md:text-4xl font-bold mb-4">Ready to Get Started?</h3>
-          <p className="text-lg text-emerald-100 mb-8">Start creating professional invoices today</p>
+          <p className="text-lg text-blue-100 mb-8">Start creating professional invoices today</p>
           <Link href="/signup">
-            <Button size="lg" className="bg-white text-emerald-700 hover:bg-gray-100 font-bold px-10">
+            <Button size="lg" className="bg-white text-blue-700 hover:bg-gray-100 font-bold px-10">
               Start Free Trial
             </Button>
           </Link>

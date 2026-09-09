@@ -15,7 +15,7 @@ export default function ResendConfirmationPage({ searchParams }: { searchParams:
             <Card className="max-w-md mx-auto">
                 <CardHeader className="space-y-1">
                     <div className="flex items-center gap-2">
-                        <Mail className="h-6 w-6 text-emerald-600" />
+                        <Mail className="h-6 w-6 text-blue-600" />
                         <CardTitle className="text-2xl font-bold">Verify Email</CardTitle>
                     </div>
                     <CardDescription>
@@ -26,7 +26,7 @@ export default function ResendConfirmationPage({ searchParams }: { searchParams:
                     {searchParams.message && (
                         <div className={`mb-4 p-3 rounded-lg text-sm ${
                             searchParams.message.includes('sent') || searchParams.message.includes('Check')
-                                ? 'bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200'
+                                ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-200'
                                 : 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-200'
                         }`}>
                             {searchParams.message}

@@ -63,7 +63,7 @@ export function MobileSidebar() {
                     label: 'AI Accountant',
                     icon: Bot,
                     href: '/ai-accountant',
-                    color: "text-emerald-600",
+                    color: "text-blue-600",
                     badge: 'PRO'
                 }
             ]
@@ -87,7 +87,7 @@ export function MobileSidebar() {
                     label: 'CRM & Pipeline',
                     icon: Sparkles,
                     href: '/crm',
-                    color: "text-emerald-650",
+                    color: "text-blue-600",
                     badge: 'NEW'
                 }
             ]
@@ -139,7 +139,7 @@ export function MobileSidebar() {
                     label: 'Payroll & Salaries',
                     icon: DollarSign,
                     href: '/payroll',
-                    color: "text-emerald-600"
+                    color: "text-blue-600"
                 },
                 {
                     label: 'Attendance Tracking',
@@ -169,7 +169,7 @@ export function MobileSidebar() {
                     label: 'Bookkeeping',
                     icon: BookOpen,
                     href: '/bookkeeping',
-                    color: "text-emerald-650",
+                    color: "text-blue-600",
                     badge: 'NEW'
                 },
                 {
@@ -182,7 +182,7 @@ export function MobileSidebar() {
                     label: isCA ? 'CA Dashboard' : 'Hire CA',
                     icon: isCA ? Briefcase : UserPlus,
                     href: isCA ? '/ca-dashboard' : '/reports/hire-ca',
-                    color: "text-emerald-600"
+                    color: "text-blue-600"
                 }] : [])
             ]
         },
@@ -287,7 +287,7 @@ export function MobileSidebar() {
                                                     className={cn(
                                                         "text-xs group flex p-2.5 w-full justify-start font-bold cursor-pointer rounded-xl transition-all duration-200 relative overflow-hidden",
                                                         isActiveRoute 
-                                                            ? "text-emerald-900 bg-emerald-50 border border-emerald-200/50 font-bold shadow-2xs" 
+                                                            ? "text-blue-900 bg-blue-50 border border-blue-200/50 font-bold shadow-2xs" 
                                                             : "text-slate-650 hover:text-slate-950 hover:bg-slate-50",
                                                     )}
                                                 >
@@ -295,7 +295,7 @@ export function MobileSidebar() {
                                                         <route.icon className={cn("h-4 w-4 mr-2.5", route.color)} />
                                                         {route.label}
                                                         {route.badge && (
-                                                            <span className="ml-auto text-[9px] font-black px-1.5 py-0.5 rounded-full bg-emerald-600 text-white">
+                                                            <span className="ml-auto text-[9px] font-black px-1.5 py-0.5 rounded-full bg-blue-600 text-white">
                                                                 {route.badge}
                                                             </span>
                                                         )}
@@ -330,11 +330,11 @@ export function MobileSidebar() {
                                 className={cn(
                                     "flex flex-col items-center justify-center rounded-xl py-2 text-[10px] font-bold transition-colors min-h-[44px]",
                                     active
-                                        ? "bg-emerald-50 text-emerald-855 border border-emerald-200/80"
+                                        ? "bg-blue-50 text-blue-900 border border-blue-200/80"
                                         : "text-slate-600 hover:text-slate-900"
                                 )}
                             >
-                                <tab.icon className={cn("h-5 w-5 mb-0.5", active ? "text-emerald-600" : "text-slate-500")} />
+                                <tab.icon className={cn("h-5 w-5 mb-0.5", active ? "text-blue-600" : "text-slate-500")} />
                                 {tab.label}
                             </Link>
                         )
@@ -345,12 +345,12 @@ export function MobileSidebar() {
                         className={cn(
                             "flex flex-col items-center justify-center rounded-xl py-2 text-[10px] font-bold transition-colors min-h-[44px]",
                             isOpen
-                                ? "bg-emerald-50 text-emerald-855 border border-emerald-200/80"
+                                ? "bg-blue-50 text-blue-900 border border-blue-200/80"
                                 : "text-slate-600 hover:text-slate-900"
                         )}
                         aria-label="Open menu"
                     >
-                        <MoreHorizontal className={cn("h-5 w-5 mb-0.5", isOpen ? "text-emerald-600" : "text-slate-500")} />
+                        <MoreHorizontal className={cn("h-5 w-5 mb-0.5", isOpen ? "text-blue-600" : "text-slate-500")} />
                         More
                     </button>
                 </div>

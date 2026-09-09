@@ -43,29 +43,29 @@ export default async function AIAccountantPage() {
             <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
               Upgrade to Professional, Lifetime, or Enterprise plan to get access to your personal AI Accountant assistant that helps with bookkeeping, cash flow analysis, and financial insights.
             </p>
-            <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-xl p-6 mb-8 text-left max-w-md mx-auto">
-              <h3 className="font-semibold text-emerald-900 dark:text-emerald-300 mb-3">With AI Accountant you can:</h3>
-              <ul className="space-y-2 text-sm text-emerald-800 dark:text-emerald-400">
+            <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6 mb-8 text-left max-w-md mx-auto">
+              <h3 className="font-semibold text-blue-900 dark:text-blue-300 mb-3">With AI Accountant you can:</h3>
+              <ul className="space-y-2 text-sm text-blue-800 dark:text-blue-400">
                 <li className="flex items-start gap-2">
-                  <span className="text-emerald-600 dark:text-emerald-500">✓</span>
+                  <span className="text-blue-600 dark:text-blue-500">✓</span>
                   <span>Get instant bookkeeping assistance</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-emerald-600 dark:text-emerald-500">✓</span>
+                  <span className="text-blue-600 dark:text-blue-500">✓</span>
                   <span>Analyze cash flow and financial trends</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-emerald-600 dark:text-emerald-500">✓</span>
+                  <span className="text-blue-600 dark:text-blue-500">✓</span>
                   <span>Get answers to accounting questions</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-emerald-600 dark:text-emerald-500">✓</span>
+                  <span className="text-blue-600 dark:text-blue-500">✓</span>
                   <span>Receive financial reports and insights</span>
                 </li>
               </ul>
             </div>
             <Link href="/pricing">
-              <Button className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-6 text-lg">
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 text-lg">
                 Upgrade Now →
               </Button>
             </Link>

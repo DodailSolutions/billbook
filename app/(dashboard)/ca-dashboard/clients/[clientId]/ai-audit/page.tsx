@@ -60,7 +60,7 @@ export default async function AIAuditPage({ params }: AIAuditPageProps) {
         </Link>
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-            <Brain className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
+            <Brain className="h-8 w-8 text-blue-600 dark:text-blue-400" />
             AI Transaction Audit Suite
           </h1>
           <p className="text-gray-600 mt-1">

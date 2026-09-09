@@ -59,7 +59,7 @@ export default function PrivacyPolicyPage() {
           {/* Introduction */}
           <div className="mb-12">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-              <Eye className="h-6 w-6 text-emerald-600" />
+              <Eye className="h-6 w-6 text-blue-600" />
               Introduction
             </h2>
             <p className="text-gray-700 dark:text-gray-300 mb-4">
@@ -150,7 +150,7 @@ export default function PrivacyPolicyPage() {
           </div>
 
           {/* Legal Basis for Processing */}
-          <div className="mb-12 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl p-6">
+          <div className="mb-12 bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
               3. Legal Basis for Processing (UAE & GDPR)
             </h2>
@@ -312,7 +312,7 @@ export default function PrivacyPolicyPage() {
           {/* Contact */}
           <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-6">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-              <Lock className="h-6 w-6 text-emerald-600" />
+              <Lock className="h-6 w-6 text-blue-600" />
               12. Contact Us
             </h2>
             <p className="text-gray-700 dark:text-gray-300 mb-4">
@@ -337,7 +337,7 @@ export default function PrivacyPolicyPage() {
               <span className="font-bold text-gray-900 dark:text-white">BillBooky UAE</span>
             </Link>
             <div className="flex gap-6 text-sm">
-              <Link href="/ae/privacy" className="text-emerald-600 hover:text-emerald-700 font-medium">
+              <Link href="/ae/privacy" className="text-blue-600 hover:text-blue-700 font-medium">
                 Privacy Policy
               </Link>
               <Link href="/ae/terms" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">

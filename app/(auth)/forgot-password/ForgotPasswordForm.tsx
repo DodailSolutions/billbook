@@ -20,7 +20,7 @@ function SubmitButton({ success }: { success?: boolean }) {
     return (
         <Button 
             type="submit" 
-            className="w-full bg-emerald-600 hover:bg-emerald-700"
+            className="w-full bg-blue-600 hover:bg-blue-700"
             disabled={pending || success}
         >
             {pending ? (
@@ -46,7 +46,7 @@ export function ForgotPasswordForm({ message, error, success, email }: ForgotPas
         <Card className="max-w-md mx-auto">
             <CardHeader className="space-y-1">
                 <div className="flex items-center gap-2">
-                    <Mail className="h-6 w-6 text-emerald-600" />
+                    <Mail className="h-6 w-6 text-blue-600" />
                     <CardTitle className="text-2xl font-bold">Forgot Password</CardTitle>
                 </div>
                 <CardDescription>
@@ -58,7 +58,7 @@ export function ForgotPasswordForm({ message, error, success, email }: ForgotPas
                 {message && (
                     <div className={`mb-4 p-3 rounded-lg text-sm ${
                         message.includes('sent') || message.includes('Check') 
-                            ? 'bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200'
+                            ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-200'
                             : 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-200'
                     }`}>
                         {message}
@@ -67,18 +67,18 @@ export function ForgotPasswordForm({ message, error, success, email }: ForgotPas
 
                 {/* Success Message */}
                 {success && (
-                    <div className="mb-4 p-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg">
+                    <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                         <div className="flex items-start gap-3">
-                            <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
+                            <CheckCircle className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
                             <div>
-                                <h4 className="text-sm font-semibold text-emerald-800 dark:text-emerald-200 mb-1">
+                                <h4 className="text-sm font-semibold text-blue-800 dark:text-blue-200 mb-1">
                                     Check your email
                                 </h4>
-                                <p className="text-sm text-emerald-700 dark:text-emerald-300">
+                                <p className="text-sm text-blue-700 dark:text-blue-300">
                                     We&apos;ve sent a password reset link to <strong>{email}</strong>. 
                                     Click the link in the email to reset your password.
                                 </p>
-                                <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-2">
+                                <p className="text-xs text-blue-600 dark:text-blue-400 mt-2">
                                     Don&apos;t see it? Check your spam folder.
                                 </p>
                             </div>
@@ -127,7 +127,7 @@ export function ForgotPasswordForm({ message, error, success, email }: ForgotPas
                 <div className="mt-6 text-center">
                     <p className="text-sm text-gray-600 dark:text-gray-400">
                         Remember your password?{" "}
-                        <a href="/login" className="text-emerald-600 hover:underline font-semibold">
+                        <a href="/login" className="text-blue-600 hover:underline font-semibold">
                             Login here
                         </a>
                     </p>

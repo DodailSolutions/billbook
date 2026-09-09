@@ -32,7 +32,7 @@ export default function EmployeePayslipsPage() {
     if (loading) {
         return (
             <div className="flex justify-center items-center py-24">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
             </div>
         )
     }
@@ -70,7 +70,7 @@ export default function EmployeePayslipsPage() {
                                 {payslips.map(p => (
                                     <tr key={p.id} className="hover:bg-slate-50/50">
                                         <td className="p-4 font-bold flex items-center gap-2">
-                                            <Calendar className="h-4 w-4 text-emerald-600 shrink-0" />
+                                            <Calendar className="h-4 w-4 text-blue-600 shrink-0" />
                                             <span>{monthNames[p.month - 1]} {p.year}</span>
                                         </td>
                                         <td className="p-4 font-semibold text-gray-900">₹{p.gross_salary.toLocaleString('en-IN')}</td>
@@ -79,7 +79,7 @@ export default function EmployeePayslipsPage() {
                                         <td className="p-4 text-right whitespace-nowrap space-x-2">
                                             <Button
                                                 onClick={() => handleDownloadPDF(p.id)}
-                                                className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-8 px-3 text-xs inline-flex items-center gap-1.5"
+                                                className="bg-blue-600 hover:bg-blue-700 text-white font-bold h-8 px-3 text-xs inline-flex items-center gap-1.5"
                                             >
                                                 <Download className="h-3.5 w-3.5" />
                                                 Download PDF

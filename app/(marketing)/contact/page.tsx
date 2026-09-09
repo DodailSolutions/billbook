@@ -51,7 +51,7 @@ export default function ContactPage() {
               </Button>
             </Link>
             <Link href="/signup">
-              <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
                 Get Started
               </Button>
             </Link>
@@ -101,7 +101,7 @@ export default function ContactPage() {
                   type="text"
                   id="name"
                   name="name"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="John Doe"
                   required
                   disabled={isPending}
@@ -116,7 +116,7 @@ export default function ContactPage() {
                   type="email"
                   id="email"
                   name="email"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="john@example.com"
                   required
                   disabled={isPending}
@@ -131,7 +131,7 @@ export default function ContactPage() {
                   type="text"
                   id="subject"
                   name="subject"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="How can we help?"
                   required
                   disabled={isPending}
@@ -146,7 +146,7 @@ export default function ContactPage() {
                   id="message"
                   name="message"
                   rows={5}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Tell us more about your inquiry..."
                   required
                   disabled={isPending}
@@ -155,7 +155,7 @@ export default function ContactPage() {
               
               <Button 
                 type="submit" 
-                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-50"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50"
                 disabled={isPending}
               >
                 {isPending ? 'Sending...' : 'Send Message'}
@@ -174,12 +174,12 @@ export default function ContactPage() {
 
             <div className="space-y-6">
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center shrink-0">
-                  <Mail className="h-6 w-6 text-emerald-600" />
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center shrink-0">
+                  <Mail className="h-6 w-6 text-blue-600" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-1">Email</h3>
-                  <a href="mailto:billbookyapp@gmail.com" className="text-emerald-600 hover:text-emerald-700 font-medium">billbookyapp@gmail.com</a>
+                  <a href="mailto:billbookyapp@gmail.com" className="text-blue-600 hover:text-blue-700 font-medium">billbookyapp@gmail.com</a>
                   <p className="text-sm text-gray-500 mt-1">We&apos;ll respond within 24 hours</p>
                 </div>
               </div>

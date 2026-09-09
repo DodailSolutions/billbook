@@ -54,7 +54,7 @@ const adminRoutes = [
         label: 'Payments',
         icon: CreditCard,
         href: '/admin/payments',
-        color: "text-emerald-500",
+        color: "text-blue-500",
     },
     {
         label: 'Refunds',

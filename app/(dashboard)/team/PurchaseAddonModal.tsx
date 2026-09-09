@@ -210,7 +210,7 @@ export function PurchaseAddonModal({ isLifetimePlan, currentSlots }: PurchaseAdd
                     key={option.id}
                     className={`cursor-pointer transition-all ${
                       isSelected
-                        ? 'border-2 border-emerald-500 bg-emerald-50 dark:bg-emerald-950/20'
+                        ? 'border-2 border-blue-500 bg-blue-50 dark:bg-blue-950/20'
                         : 'border-2 border-transparent hover:border-gray-300'
                     }`}
                     onClick={() => setSelectedPeriod(option.billing_period)}
@@ -221,14 +221,14 @@ export function PurchaseAddonModal({ isLifetimePlan, currentSlots }: PurchaseAdd
                           {option.billing_period}
                         </CardTitle>
                         {isSelected && (
-                          <div className="h-6 w-6 rounded-full bg-emerald-600 flex items-center justify-center">
+                          <div className="h-6 w-6 rounded-full bg-blue-600 flex items-center justify-center">
                             <Check className="h-4 w-4 text-white" />
                           </div>
                         )}
                       </div>
                       {savings > 0 && (
                         <div className="inline-block">
-                          <span className="text-xs bg-emerald-600 text-white px-2 py-0.5 rounded-full">
+                          <span className="text-xs bg-blue-600 text-white px-2 py-0.5 rounded-full">
                             Save {savings}%
                           </span>
                         </div>
@@ -298,7 +298,7 @@ export function PurchaseAddonModal({ isLifetimePlan, currentSlots }: PurchaseAdd
             <Button
               onClick={handlePurchase}
               disabled={loading || !selectedPricing}
-              className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white"
+              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
             >
               {loading ? (
                 <>

@@ -19,6 +19,14 @@
 }
 
 @theme {
+  --color-brand-blue: #005DEE;
+  --color-brand-navy: #051635;
+  --color-brand-cyan: #38B6FF;
+  --color-brand-steel: #4B6B94;
+  --color-blue-600: #005DEE;
+  --color-blue-700: #004ecc;
+  --color-blue-500: #1a73e8;
+
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);

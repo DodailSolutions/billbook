@@ -186,7 +186,7 @@ export default function ViewPurchaseOrderPage({ params }: { params: Promise<{ id
                     {(po.status === 'issued' || po.status === 'partially_received') && (
                         <Button 
                             onClick={() => setIsReceiveModalOpen(true)} 
-                            className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 min-h-[44px]"
+                            className="bg-blue-600 hover:bg-blue-700 text-white gap-2 min-h-[44px]"
                         >
                             <PackageCheck className="h-4 w-4" />
                             Receive Stock
@@ -424,7 +424,7 @@ export default function ViewPurchaseOrderPage({ params }: { params: Promise<{ id
             {isReceiveModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
                     <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden border border-gray-100">
-                        <div className="p-4 bg-emerald-600 text-white flex items-center justify-between">
+                        <div className="p-4 bg-blue-600 text-white flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <PackageCheck className="h-5 w-5" />
                                 <h3 className="font-bold text-base">Receive Delivery Items</h3>
@@ -495,7 +495,7 @@ export default function ViewPurchaseOrderPage({ params }: { params: Promise<{ id
 
                             <div className="pt-3 border-t flex justify-end gap-2">
                                 <Button type="button" variant="outline" onClick={() => setIsReceiveModalOpen(false)}>Cancel</Button>
-                                <Button type="submit" className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                                <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white">
                                     Confirm Receipt & Update Stock
                                 </Button>
                             </div>

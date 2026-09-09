@@ -123,7 +123,7 @@ export default async function CADashboardPage() {
         </div>
       </div>
 
-      <Card className="border-blue-200 bg-linear-to-r from-blue-50 via-white to-emerald-50">
+      <Card className="border-blue-200 bg-linear-to-r from-blue-50 via-white to-indigo-50">
         <CardContent className="p-6">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-2xl">
@@ -282,13 +282,13 @@ export default async function CADashboardPage() {
           </CardHeader>
           <CardContent>
             {urgentClients.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700">
+              <div className="rounded-xl border border-dashed border-blue-200 bg-blue-50 p-4 text-sm text-blue-700">
                 No urgent client issues right now.
               </div>
             ) : (
               <div className="space-y-3">
                 {urgentClients.slice(0, 3).map((client) => (
-                  <Link key={client.client_user_id} href={`/ca-dashboard/clients/${client.client_user_id}`} className="block rounded-xl border border-gray-200 p-3 hover:border-emerald-300 transition-colors">
+                  <Link key={client.client_user_id} href={`/ca-dashboard/clients/${client.client_user_id}`} className="block rounded-xl border border-gray-200 p-3 hover:border-blue-300 transition-colors">
                     <div className="flex items-center justify-between gap-3">
                       <div>
                         <p className="font-medium text-gray-900 dark:text-white">{client.client_email}</p>
@@ -332,7 +332,7 @@ export default async function CADashboardPage() {
                     href={`/ca-dashboard/clients/${client.client_user_id}`}
                     className="block"
                   >
-                    <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-emerald-300 dark:hover:border-emerald-500 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                    <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-blue-300 dark:hover:border-blue-500 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
                       <div className="flex items-center gap-4">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">

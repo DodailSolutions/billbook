@@ -57,7 +57,7 @@ export default async function CAActivityPage() {
               </p>
             </div>
             <div className="flex items-start gap-2 rounded-xl border border-white/80 bg-white/80 p-3">
-              <Shield className="mt-0.5 h-4 w-4 text-emerald-600" />
+              <Shield className="mt-0.5 h-4 w-4 text-blue-600" />
               <p className="text-sm text-gray-700">
                 Use this timeline to track return filing, data access activity, and important client updates.
               </p>

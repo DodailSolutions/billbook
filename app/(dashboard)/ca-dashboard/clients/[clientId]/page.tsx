@@ -254,7 +254,7 @@ export default async function ClientDetailsPage({ params }: ClientDetailsPagePro
               {invoices.map((invoice) => (
                 <div
                   key={invoice.id}
-                  className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:border-emerald-300 dark:hover:border-emerald-500 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                  className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:border-blue-300 dark:hover:border-blue-500 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
                 >
                   <div>
                     <div className="font-medium text-gray-900 dark:text-white">
@@ -291,7 +291,7 @@ export default async function ClientDetailsPage({ params }: ClientDetailsPagePro
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
             <Link href={`/ca-dashboard/clients/${params.clientId}/ai-audit`}>
-              <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white dark:bg-emerald-700 dark:hover:bg-emerald-600">
+              <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-700 dark:hover:bg-blue-600">
                 <Brain className="h-4 w-4 mr-2" />
                 AI Transaction Audit
               </Button>

@@ -73,7 +73,7 @@ export default function CAProfilePage({ params }: { params: { caId: string } }) 
                   />
                 </div>
                 <span className="text-2xl font-black text-slate-950 tracking-tight">
-                  BillBooky<span className="text-emerald-600">.</span>
+                  BillBooky<span className="text-blue-600">.</span>
                 </span>
               </Link>
             </div>
@@ -178,7 +178,7 @@ export default function CAProfilePage({ params }: { params: { caId: string } }) 
                 </section>
 
                 <section className="border-t pt-6">
-                  <h3 className="text-lg font-bold mb-3 text-emerald-600 dark:text-emerald-400">For Chartered Accountants</h3>
+                  <h3 className="text-lg font-bold mb-3 text-blue-600 dark:text-blue-400">For Chartered Accountants</h3>
                   <div className="space-y-4">
                     <div>
                       <h4 className="font-semibold mb-2">1. Professional Standards</h4>

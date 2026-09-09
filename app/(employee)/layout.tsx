@@ -72,7 +72,7 @@ export default function EmployeePortalLayout({
         return (
             <div className="flex h-screen items-center justify-center bg-slate-50">
                 <div className="flex flex-col items-center gap-3">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
                     <span className="text-xs text-gray-500 font-semibold">Loading Employee Portal...</span>
                 </div>
             </div>
@@ -94,17 +94,17 @@ export default function EmployeePortalLayout({
                                 className="transition-transform duration-200 group-hover:scale-110"
                             />
                             <span className="text-xl font-black text-slate-950 tracking-tight">
-                                BillBooky<span className="text-emerald-600">.</span>
+                                BillBooky<span className="text-blue-600">.</span>
                             </span>
                         </Link>
                         
                         <div className="px-6 mb-6">
-                            <div className="p-3 bg-emerald-50 rounded-2xl border border-emerald-100 flex items-center gap-2.5">
-                                <div className="p-2 bg-emerald-600 text-white rounded-lg">
+                            <div className="p-3 bg-blue-50 rounded-2xl border border-blue-100 flex items-center gap-2.5">
+                                <div className="p-2 bg-blue-600 text-white rounded-lg">
                                     <DollarSign className="h-4 w-4" />
                                 </div>
                                 <div className="overflow-hidden">
-                                    <p className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider">Employee Portal</p>
+                                    <p className="text-[10px] font-bold text-blue-800 uppercase tracking-wider">Employee Portal</p>
                                     <p className="text-xs font-bold text-gray-900 truncate" title={userName}>{userName}</p>
                                 </div>
                             </div>
@@ -119,11 +119,11 @@ export default function EmployeePortalLayout({
                                         href={item.href}
                                         className={`group flex items-center px-4 py-3 text-xs font-bold rounded-xl transition-all ${
                                             isActive
-                                                ? 'bg-emerald-50 text-emerald-900 border border-emerald-200/50'
+                                                ? 'bg-blue-50 text-blue-900 border border-blue-200/50'
                                                 : 'text-gray-600 hover:bg-slate-100 hover:text-gray-900'
                                         }`}
                                     >
-                                        <item.icon className={`mr-3 h-5 w-5 shrink-0 ${isActive ? 'text-emerald-700' : 'text-gray-400 group-hover:text-gray-600'}`} />
+                                        <item.icon className={`mr-3 h-5 w-5 shrink-0 ${isActive ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'}`} />
                                         {item.name}
                                     </Link>
                                 )
@@ -171,7 +171,7 @@ export default function EmployeePortalLayout({
                                             onClick={() => setIsMobileOpen(false)}
                                             className={`group flex items-center px-4 py-3 text-xs font-bold rounded-xl ${
                                                 isActive
-                                                    ? 'bg-emerald-50 text-emerald-900 border border-emerald-200/50'
+                                                    ? 'bg-blue-50 text-blue-900 border border-blue-200/50'
                                                     : 'text-gray-600 hover:bg-slate-100'
                                             }`}
                                         >

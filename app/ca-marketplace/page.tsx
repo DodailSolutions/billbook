@@ -283,7 +283,7 @@ export default function CAMarketplacePage() {
 
                 {/* For CAs */}
                 <section className="border-t pt-6">
-                  <h3 className="text-lg font-bold mb-3 text-emerald-600 dark:text-emerald-400">For Chartered Accountants</h3>
+                  <h3 className="text-lg font-bold mb-3 text-blue-600 dark:text-blue-400">For Chartered Accountants</h3>
                   
                   <div className="space-y-4">
                     <div>
@@ -424,7 +424,7 @@ export default function CAMarketplacePage() {
                 />
               </div>
               <span className="text-2xl font-black text-slate-950 tracking-tight">
-                BillBooky<span className="text-emerald-600">.</span>
+                BillBooky<span className="text-blue-600">.</span>
               </span>
             </Link>
             <div className="flex items-center gap-3">
@@ -461,10 +461,10 @@ export default function CAMarketplacePage() {
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           <Link href="/reports/hire-ca">
-            <Card className="p-5 hover:shadow-xl transition-all duration-300 cursor-pointer border-slate-200/80 hover:border-emerald-500/50 bg-white rounded-2xl">
+            <Card className="p-5 hover:shadow-xl transition-all duration-300 cursor-pointer border-slate-200/80 hover:border-blue-500/50 bg-white rounded-2xl">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center justify-center">
-                  <Briefcase className="w-6 h-6 text-emerald-600" />
+                <div className="w-12 h-12 bg-blue-50 border border-blue-100 rounded-xl flex items-center justify-center">
+                  <Briefcase className="w-6 h-6 text-blue-600" />
                 </div>
                 <div>
                   <h3 className="font-bold text-slate-950 text-lg">Post Your Requirements</h3>
@@ -474,10 +474,10 @@ export default function CAMarketplacePage() {
             </Card>
           </Link>
           <Link href="/reports/my-ca-requests">
-            <Card className="p-5 hover:shadow-xl transition-all duration-300 cursor-pointer border-slate-200/80 hover:border-emerald-500/50 bg-white rounded-2xl">
+            <Card className="p-5 hover:shadow-xl transition-all duration-300 cursor-pointer border-slate-200/80 hover:border-blue-500/50 bg-white rounded-2xl">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center justify-center">
-                  <Users className="w-6 h-6 text-emerald-600" />
+                <div className="w-12 h-12 bg-blue-50 border border-blue-100 rounded-xl flex items-center justify-center">
+                  <Users className="w-6 h-6 text-blue-600" />
                 </div>
                 <div>
                   <h3 className="font-bold text-slate-950 text-lg">View My Requests</h3>
@@ -508,7 +508,7 @@ export default function CAMarketplacePage() {
             <Filter className="w-4 h-4" />
             Filters
             {Object.values(filters).filter(Boolean).length > 0 && (
-              <span className="ml-1 px-2 py-0.5 bg-emerald-600 text-white text-xs rounded-full font-bold">
+              <span className="ml-1 px-2 py-0.5 bg-blue-600 text-white text-xs rounded-full font-bold">
                 {Object.values(filters).filter(Boolean).length}
               </span>
             )}
@@ -626,7 +626,7 @@ export default function CAMarketplacePage() {
                     onClick={() => toggleSpecialization(spec)}
                     className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
                       filters.specializations?.includes(spec)
-                        ? 'bg-emerald-600 text-white shadow-xs'
+                        ? 'bg-blue-600 text-white shadow-xs'
                         : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
                     }`}
                   >
@@ -716,7 +716,7 @@ export default function CAMarketplacePage() {
               {SPECIALIZATIONS.slice(0, 8).map(spec => (
                 <button
                   key={spec}
-                  className={`px-3 py-1 rounded-full text-xs border ${specializationChip === spec ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-700'}`}
+                  className={`px-3 py-1 rounded-full text-xs border ${specializationChip === spec ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-700'}`}
                   onClick={() => setSpecializationChip(specializationChip === spec ? undefined : spec)}
                 >
                   {spec}

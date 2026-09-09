@@ -106,7 +106,7 @@ export default function RunPayrollPage() {
                 </Link>
                 <div>
                     <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
-                        <Play className="h-5 w-5 text-emerald-600 fill-emerald-600" />
+                        <Play className="h-5 w-5 text-blue-600 fill-blue-600" />
                         Run Monthly Payroll
                     </h2>
                     <p className="text-xs text-gray-500 mt-0.5">
@@ -151,7 +151,7 @@ export default function RunPayrollPage() {
                     </div>
 
                     {loading ? (
-                        <div className="flex justify-center py-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" /></div>
+                        <div className="flex justify-center py-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" /></div>
                     ) : employees.length === 0 ? (
                         <div className="text-center py-8 text-xs text-amber-600">No active employees with configured salary structures found.</div>
                     ) : (
@@ -215,7 +215,7 @@ export default function RunPayrollPage() {
 
             <div className="flex justify-end gap-3">
                 <Link href="/payroll"><Button variant="outline" className="min-h-[44px]">Cancel</Button></Link>
-                <Button onClick={handleRunPayroll} disabled={processing || employees.length === 0} className="bg-emerald-600 hover:bg-emerald-700 text-white min-h-[44px] gap-2">
+                <Button onClick={handleRunPayroll} disabled={processing || employees.length === 0} className="bg-blue-600 hover:bg-blue-700 text-white min-h-[44px] gap-2">
                     <Play className="h-4 w-4 fill-white" />
                     {processing ? 'Processing Payroll...' : `Approve Payroll (${monthNames[month - 1]} ${year})`}
                 </Button>

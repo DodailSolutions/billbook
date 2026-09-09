@@ -96,7 +96,7 @@ export default async function GSTHealthScorePage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-            <Target className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
+            <Target className="h-8 w-8 text-blue-600 dark:text-blue-400" />
             GST Health Score
           </h1>
           <p className="text-gray-600 mt-1">

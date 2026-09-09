@@ -45,7 +45,7 @@ export function PlanBanner() {
     if (planStatus.planSlug === 'free') {
         return (
             <Link href="/pricing" className="block">
-                <div className="bg-linear-to-r from-emerald-500 to-blue-500 rounded-lg p-3 shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer">
+                <div className="bg-linear-to-r from-blue-600 to-indigo-600 rounded-lg p-3 shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer">
                     <div className="flex items-center gap-2 mb-1">
                         <Zap className="h-4 w-4 text-white" />
                         <p className="text-xs font-bold text-white">FREE PLAN</p>

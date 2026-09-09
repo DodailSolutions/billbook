@@ -6,8 +6,8 @@ import { ThemeToggle } from '@/components/ThemeToggle'
 import { createClient } from '@/lib/supabase/server'
 
 const FEATURES = [
-  { icon: FileText, title: 'Quick Invoice Creation', desc: 'Create professional VAT-compliant invoices in under 60 seconds', color: 'emerald', badge: 'Popular' as const },
-  { icon: DollarSign, title: 'VAT Compliant', desc: 'Automatic 5% VAT calculations, TRN validation, and compliant invoicing', color: 'blue', badge: 'Essential' as const },
+  { icon: FileText, title: 'Quick Invoice Creation', desc: 'Create professional VAT-compliant invoices in under 60 seconds', color: 'blue', badge: 'Popular' as const },
+  { icon: DollarSign, title: 'VAT Compliant', desc: 'Automatic 5% VAT calculations, TRN validation, and compliant invoicing', color: 'indigo', badge: 'Essential' as const },
   { icon: Users, title: 'Smart Customer Management', desc: 'Client portal, payment tracking, and automated reminders', color: 'purple', badge: 'New' as const },
   { icon: CheckCircle, title: 'Custom Branding', desc: 'Add logo, fonts, colors in English and Arabic', color: 'orange', badge: undefined },
   { icon: RefreshCw, title: 'Recurring Billing', desc: 'Automated invoices for subscriptions and retainer clients', color: 'teal', badge: 'Pro' as const },
@@ -53,7 +53,7 @@ export default async function UAELandingPage() {
             <ThemeToggle />
             {isAuthenticated ? (
               <Link href="/dashboard">
-                <Button className="bg-emerald-600 hover:bg-emerald-700 text-white text-sm md:text-base">
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white text-sm md:text-base">
                   Dashboard
                 </Button>
               </Link>
@@ -65,7 +65,7 @@ export default async function UAELandingPage() {
                 </Button>
                 </Link>
                 <Link href="/signup">
-                  <Button className="bg-emerald-600 hover:bg-emerald-700 text-white text-sm md:text-base">
+                  <Button className="bg-blue-600 hover:bg-blue-700 text-white text-sm md:text-base">
                     Get Started
                   </Button>
                 </Link>
@@ -76,22 +76,22 @@ export default async function UAELandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative px-6 py-20 md:py-32 bg-linear-to-b from-emerald-50/50 to-white dark:from-gray-900 dark:to-gray-950">
+      <section className="relative px-6 py-20 md:py-32 bg-linear-to-b from-blue-50/50 to-white dark:from-gray-900 dark:to-gray-950">
         <div className="absolute inset-0 bg-grid-slate-100/50 dark:bg-grid-slate-800/50 opacity-30" />
         
         <div className="relative max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Left Content */}
             <div className="space-y-8">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20">
-                <Globe className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                <span className="text-sm font-medium text-emerald-700 dark:text-emerald-300">🇦🇪 Built for UAE Businesses</span>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20">
+                <Globe className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                <span className="text-sm font-medium text-blue-700 dark:text-blue-300">🇦🇪 Built for UAE Businesses</span>
               </div>
               
               <div className="space-y-4">
                 <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-gray-900 dark:text-white">
                   VAT-Compliant
-                  <span className="block mt-2 text-emerald-600">
+                  <span className="block mt-2 text-blue-600">
                     Invoice Generator
                   </span>
                   <span className="block mt-2 text-2xl md:text-4xl">
@@ -100,7 +100,7 @@ export default async function UAELandingPage() {
                 </h1>
                 <p className="text-xl text-gray-600 dark:text-gray-300 leading-relaxed max-w-xl">
                   Professional invoicing solution designed for <strong className="text-gray-900 dark:text-white">Dubai & UAE</strong> businesses. 
-                  Full <span className="text-emerald-600 font-semibold">VAT compliance</span>, Arabic support, and multi-currency capabilities.
+                  Full <span className="text-blue-600 font-semibold">VAT compliance</span>, Arabic support, and multi-currency capabilities.
                 </p>
               </div>
 
@@ -110,7 +110,7 @@ export default async function UAELandingPage() {
                     <Link href="/dashboard">
                       <Button 
                         size="lg" 
-                        className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white px-8 shadow-sm hover:shadow-md transition-all duration-200"
+                        className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-8 shadow-sm hover:shadow-md transition-all duration-200"
                       >
                         <span className="flex items-center gap-2">
                           Go to Dashboard
@@ -133,7 +133,7 @@ export default async function UAELandingPage() {
                     <Link href="/signup">
                       <Button 
                         size="lg" 
-                        className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white px-8 shadow-sm hover:shadow-md transition-all duration-200"
+                        className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-8 shadow-sm hover:shadow-md transition-all duration-200"
                       >
                         <span className="flex items-center gap-2">
                           Start Free Trial
@@ -157,7 +157,7 @@ export default async function UAELandingPage() {
               <div className="flex flex-wrap gap-4 pt-6">
                 {BENEFITS.map((benefit) => (
                   <div key={benefit} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-                    <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0" />
+                    <CheckCircle className="h-4 w-4 text-blue-600 shrink-0" />
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{benefit}</span>
                   </div>
                 ))}
@@ -170,7 +170,7 @@ export default async function UAELandingPage() {
                 <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-6 space-y-4">
                   <div className="flex items-center justify-between pb-3 border-b border-gray-200 dark:border-gray-700">
                     <span className="text-xs font-semibold text-gray-500 uppercase">Tax Invoice | فاتورة ضريبية</span>
-                    <span className="text-sm font-bold text-emerald-600">#INV-2026-0001</span>
+                    <span className="text-sm font-bold text-blue-600">#INV-2026-0001</span>
                   </div>
                   
                   <div className="space-y-3">
@@ -189,12 +189,12 @@ export default async function UAELandingPage() {
                     </div>
                     <div className="flex justify-between items-center pt-2 border-t border-gray-200 dark:border-gray-700">
                       <span className="font-bold text-gray-900 dark:text-white">Total</span>
-                      <span className="font-bold text-emerald-600 text-lg">AED 1,050</span>
+                      <span className="font-bold text-blue-600 text-lg">AED 1,050</span>
                     </div>
                   </div>
 
                   <div className="pt-4">
-                    <div className="bg-emerald-600 text-white text-center py-2 rounded-lg text-sm font-semibold hover:bg-emerald-700 transition-colors">
+                    <div className="bg-blue-600 text-white text-center py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors">
                       Pay Now
                     </div>
                   </div>
@@ -204,8 +204,8 @@ export default async function UAELandingPage() {
               {/* Floating badges */}
               <div className="absolute -top-4 -right-4 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-3 border border-gray-200 dark:border-gray-700 animate-in fade-in slide-in-from-top-2 duration-500">
                 <div className="flex items-center gap-2">
-                  <div className="p-1.5 bg-emerald-50 dark:bg-emerald-500/10 rounded-lg">
-                    <Shield className="h-5 w-5 text-emerald-600" />
+                  <div className="p-1.5 bg-blue-50 dark:bg-blue-500/10 rounded-lg">
+                    <Shield className="h-5 w-5 text-blue-600" />
                   </div>
                   <span className="text-sm font-semibold text-gray-900 dark:text-white">VAT Ready</span>
                 </div>
@@ -230,7 +230,7 @@ export default async function UAELandingPage() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="group relative rounded-2xl bg-white dark:bg-gray-800 p-6 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-200">
               <div className="relative">
-                <div className="text-4xl md:text-5xl font-bold mb-2 text-emerald-600">60sec</div>
+                <div className="text-4xl md:text-5xl font-bold mb-2 text-blue-600">60sec</div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">Invoice Creation</div>
               </div>
             </div>
@@ -260,8 +260,8 @@ export default async function UAELandingPage() {
       <section id="features" className="px-6 py-20 md:py-32 max-w-7xl mx-auto">
         <div className="text-center mb-16 space-y-4">
           <div className="inline-block">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 mb-4">
-              <span className="text-sm font-medium text-emerald-600">Features</span>
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 mb-4">
+              <span className="text-sm font-medium text-blue-600">Features</span>
             </div>
           </div>
           <h2 className="text-4xl md:text-6xl font-bold tracking-tight text-gray-900 dark:text-white">
@@ -276,19 +276,18 @@ export default async function UAELandingPage() {
           {FEATURES.map((feature) => {
             const Icon = feature.icon
             const iconColorClasses = {
-              emerald: 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600',
               blue: 'bg-blue-100 dark:bg-blue-500/10 text-blue-600',
+              indigo: 'bg-indigo-100 dark:bg-indigo-500/10 text-indigo-600',
               purple: 'bg-purple-100 dark:bg-purple-500/10 text-purple-600',
               orange: 'bg-orange-100 dark:bg-orange-500/10 text-orange-600',
               teal: 'bg-teal-100 dark:bg-teal-500/10 text-teal-600',
               rose: 'bg-rose-100 dark:bg-rose-500/10 text-rose-600',
               amber: 'bg-amber-100 dark:bg-amber-500/10 text-amber-600',
-              indigo: 'bg-indigo-100 dark:bg-indigo-500/10 text-indigo-600',
               sky: 'bg-sky-100 dark:bg-sky-500/10 text-sky-600',
             }
             const badgeColorClasses = {
-              'Popular': 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300',
-              'Essential': 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300',
+              'Popular': 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300',
+              'Essential': 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300',
               'New': 'bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300',
               'Pro': 'bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-300',
               'AI': 'bg-linear-to-r from-violet-100 to-fuchsia-100 text-violet-700 dark:from-violet-900/50 dark:to-fuchsia-900/50 dark:text-violet-300',
@@ -296,7 +295,7 @@ export default async function UAELandingPage() {
             return (
               <div 
                 key={feature.title}
-                className="group bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md hover:border-emerald-200 dark:hover:border-emerald-700 transition-all duration-200"
+                className="group bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md hover:border-blue-200 dark:hover:border-blue-700 transition-all duration-200"
               >
                 <div>
                   {feature.badge && (
@@ -320,18 +319,18 @@ export default async function UAELandingPage() {
 
       {/* CTA Section */}
       <section className="px-6 py-16 md:py-24 max-w-5xl mx-auto">
-        <div className="bg-linear-to-br from-emerald-600 to-emerald-700 rounded-3xl p-12 md:p-16 text-center text-white shadow-2xl">
+        <div className="bg-linear-to-br from-blue-600 to-indigo-700 rounded-3xl p-12 md:p-16 text-center text-white shadow-2xl">
           <h3 className="text-3xl md:text-5xl font-bold mb-4">
             Ready to Start Invoicing?
           </h3>
-          <p className="text-lg text-emerald-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-lg text-blue-100 mb-8 max-w-2xl mx-auto">
             Join UAE businesses using BillBooky for professional, VAT-compliant invoicing.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/signup">
               <Button 
                 size="lg" 
-                className="bg-white text-emerald-700 hover:bg-gray-100 font-bold text-lg px-10 shadow-xl"
+                className="bg-white text-blue-700 hover:bg-gray-100 font-bold text-lg px-10 shadow-xl"
               >
                 Start Free Trial →
               </Button>
@@ -346,7 +345,7 @@ export default async function UAELandingPage() {
               </Button>
             </Link>
           </div>
-          <p className="text-sm text-emerald-100 mt-6">No credit card required • Full VAT compliance • Arabic support included</p>
+          <p className="text-sm text-blue-100 mt-6">No credit card required • Full VAT compliance • Arabic support included</p>
         </div>
       </section>
 
@@ -374,26 +373,26 @@ export default async function UAELandingPage() {
             <div>
               <h5 className="font-bold text-gray-900 dark:text-white mb-4">Product</h5>
               <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                <li><Link href="/ae#features" className="hover:text-emerald-600 transition-colors">Features</Link></li>
-                <li><Link href="/ae/pricing" className="hover:text-emerald-600 transition-colors">Pricing</Link></li>
-                <li><Link href="/dashboard" className="hover:text-emerald-600 transition-colors">Dashboard</Link></li>
+                <li><Link href="/ae#features" className="hover:text-blue-600 transition-colors">Features</Link></li>
+                <li><Link href="/ae/pricing" className="hover:text-blue-600 transition-colors">Pricing</Link></li>
+                <li><Link href="/dashboard" className="hover:text-blue-600 transition-colors">Dashboard</Link></li>
               </ul>
             </div>
             
             <div>
               <h5 className="font-bold text-gray-900 dark:text-white mb-4">Support</h5>
               <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                <li><Link href="/support" className="hover:text-emerald-600 transition-colors">Help Center</Link></li>
-                <li><Link href="/contact" className="hover:text-emerald-600 transition-colors">Contact Us</Link></li>
-                <li><a href="mailto:support@billbooky.com" className="hover:text-emerald-600 transition-colors">Email Support</a></li>
+                <li><Link href="/support" className="hover:text-blue-600 transition-colors">Help Center</Link></li>
+                <li><Link href="/contact" className="hover:text-blue-600 transition-colors">Contact Us</Link></li>
+                <li><a href="mailto:support@billbooky.com" className="hover:text-blue-600 transition-colors">Email Support</a></li>
               </ul>
             </div>
             
             <div>
               <h5 className="font-bold text-gray-900 dark:text-white mb-4">Legal</h5>
               <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                <li><Link href="/privacy" className="hover:text-emerald-600 transition-colors">Privacy Policy</Link></li>
-                <li><Link href="/terms" className="hover:text-emerald-600 transition-colors">Terms of Service</Link></li>
+                <li><Link href="/privacy" className="hover:text-blue-600 transition-colors">Privacy Policy</Link></li>
+                <li><Link href="/terms" className="hover:text-blue-600 transition-colors">Terms of Service</Link></li>
               </ul>
             </div>
           </div>

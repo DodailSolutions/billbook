@@ -28,7 +28,7 @@ export default function EmployeeDashboard() {
     if (loading) {
         return (
             <div className="flex justify-center items-center py-24">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
             </div>
         )
     }
@@ -70,7 +70,7 @@ export default function EmployeeDashboard() {
                 <Card className="border-gray-100 shadow-xs md:col-span-2">
                     <CardContent className="p-5 sm:p-6 space-y-4">
                         <div className="flex items-center gap-2 border-b border-gray-100 pb-3">
-                            <User className="h-5 w-5 text-emerald-600" />
+                            <User className="h-5 w-5 text-blue-600" />
                             <h3 className="font-bold text-sm text-gray-800 uppercase tracking-wider">Employment Profile</h3>
                         </div>
                         <div className="grid grid-cols-2 gap-4 text-xs">
@@ -102,7 +102,7 @@ export default function EmployeeDashboard() {
                 <Card className="border-gray-100 shadow-xs">
                     <CardContent className="p-5 sm:p-6 space-y-4">
                         <div className="flex items-center gap-2 border-b border-gray-100 pb-3">
-                            <Landmark className="h-5 w-5 text-emerald-600" />
+                            <Landmark className="h-5 w-5 text-blue-600" />
                             <h3 className="font-bold text-sm text-gray-800 uppercase tracking-wider">Salary Summary</h3>
                         </div>
                         {sal ? (
@@ -135,10 +135,10 @@ export default function EmployeeDashboard() {
                     <CardContent className="p-5 sm:p-6 space-y-4">
                         <div className="flex items-center justify-between border-b border-gray-100 pb-3">
                             <div className="flex items-center gap-2">
-                                <Calendar className="h-5 w-5 text-emerald-600" />
+                                <Calendar className="h-5 w-5 text-blue-600" />
                                 <h3 className="font-bold text-sm text-gray-800 uppercase tracking-wider">Attendance (Current Month)</h3>
                             </div>
-                            <Link href="/employee/leaves" className="text-xs text-emerald-600 hover:underline font-bold">Details</Link>
+                            <Link href="/employee/leaves" className="text-xs text-blue-600 hover:underline font-bold">Details</Link>
                         </div>
                         <div className="grid grid-cols-3 gap-2 text-center">
                             <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-100">
@@ -188,7 +188,7 @@ export default function EmployeeDashboard() {
                 <Link href="/employee/leaves">
                     <Button variant="outline" className="w-full justify-between p-6 h-auto border-slate-200/80 bg-white hover:bg-slate-50 rounded-2xl group transition-all shadow-2xs">
                         <div className="flex items-center gap-3">
-                            <div className="p-2.5 bg-emerald-50 text-emerald-650 rounded-xl">
+                            <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl">
                                 <Plane className="h-5 w-5" />
                             </div>
                             <div className="text-left">
@@ -196,7 +196,7 @@ export default function EmployeeDashboard() {
                                 <p className="text-[10px] text-gray-450 font-normal">Apply for leave, check approval status</p>
                             </div>
                         </div>
-                        <span className="text-lg font-bold text-emerald-600 transition-transform group-hover:translate-x-1">→</span>
+                        <span className="text-lg font-bold text-blue-600 transition-transform group-hover:translate-x-1">→</span>
                     </Button>
                 </Link>
                 <Link href="/employee/payslips">

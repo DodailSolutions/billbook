@@ -87,7 +87,7 @@ export default function EmployeeLeavesPage() {
     if (loading) {
         return (
             <div className="flex justify-center items-center py-24">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
             </div>
         )
     }
@@ -116,7 +116,7 @@ export default function EmployeeLeavesPage() {
                             </div>
                             <div className="w-full bg-slate-100 h-1.5 rounded-full mt-3 overflow-hidden">
                                 <div 
-                                    className="bg-emerald-600 h-full rounded-full transition-all duration-300"
+                                    className="bg-blue-600 h-full rounded-full transition-all duration-300"
                                     style={{ width: `${Math.max(0, Math.min(100, (b.remaining / b.total_quota) * 100))}%` }}
                                 />
                             </div>
@@ -141,7 +141,7 @@ export default function EmployeeLeavesPage() {
                     <CardContent className="p-5">
                         <form onSubmit={handleApplyLeave} className="space-y-4 text-xs">
                             {successMessage && (
-                                <div className="p-3 bg-emerald-50 text-emerald-850 rounded-xl font-medium border border-emerald-100 flex items-start gap-2">
+                                <div className="p-3 bg-blue-50 text-blue-800 rounded-xl font-medium border border-blue-100 flex items-start gap-2">
                                     <CheckCircle2 className="h-4 w-4 shrink-0 mt-0.5" />
                                     <span>{successMessage}</span>
                                 </div>
@@ -203,7 +203,7 @@ export default function EmployeeLeavesPage() {
 
                             <Button 
                                 type="submit" 
-                                className="w-full bg-emerald-650 hover:bg-emerald-700 text-white font-bold"
+                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold"
                                 disabled={formLoading}
                             >
                                 {formLoading ? 'Submitting...' : 'Submit Request'}

@@ -161,7 +161,7 @@ export default function SMTPSettingsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <Loader className="h-8 w-8 animate-spin text-emerald-600" />
+        <Loader className="h-8 w-8 animate-spin text-blue-600" />
       </div>
     )
   }
@@ -171,7 +171,7 @@ export default function SMTPSettingsPage() {
       <div className="max-w-2xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-            <Mail className="h-8 w-8 text-emerald-600" />
+            <Mail className="h-8 w-8 text-blue-600" />
             Email Configuration
           </h1>
           <p className="text-gray-600 mt-2">
@@ -251,7 +251,7 @@ export default function SMTPSettingsPage() {
                     setFormData({ ...formData, smtp_host: e.target.value })
                   }
                   placeholder="smtp-mail.outlook.com"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   required
                 />
                 <p className="text-sm text-gray-600 mt-1">
@@ -271,7 +271,7 @@ export default function SMTPSettingsPage() {
                     setFormData({ ...formData, smtp_port: parseInt(e.target.value) })
                   }
                   placeholder="587"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   required
                 />
                 <p className="text-sm text-gray-600 mt-1">Common ports: 587 (TLS), 465 (SSL)</p>
@@ -289,7 +289,7 @@ export default function SMTPSettingsPage() {
                     setFormData({ ...formData, smtp_user: e.target.value })
                   }
                   placeholder="your-email@outlook.com"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   required
                 />
               </div>
@@ -306,7 +306,7 @@ export default function SMTPSettingsPage() {
                     setFormData({ ...formData, smtp_password: e.target.value })
                   }
                   placeholder="••••••••••••••••"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   required
                 />
                 <p className="text-sm text-gray-600 mt-1">
@@ -326,7 +326,7 @@ export default function SMTPSettingsPage() {
                     setFormData({ ...formData, smtp_from_email: e.target.value })
                   }
                   placeholder="support@dodail.com"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   required
                 />
                 <p className="text-sm text-gray-600 mt-1">
@@ -346,7 +346,7 @@ export default function SMTPSettingsPage() {
                     setFormData({ ...formData, smtp_from_name: e.target.value })
                   }
                   placeholder="BillBooky Support"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   required
                 />
                 <p className="text-sm text-gray-600 mt-1">
@@ -375,7 +375,7 @@ export default function SMTPSettingsPage() {
                 <Button
                   type="submit"
                   disabled={saving || testing}
-                  className="flex-1 bg-emerald-600 hover:bg-emerald-700"
+                  className="flex-1 bg-blue-600 hover:bg-blue-700"
                 >
                   {saving ? (
                     <>

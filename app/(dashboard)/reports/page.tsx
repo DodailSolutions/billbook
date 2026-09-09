@@ -57,31 +57,31 @@ export default function ReportsPage() {
             </div>
 
             {/* Hire a CA Card */}
-            <Card className="bg-linear-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border-emerald-200 dark:border-emerald-800">
+            <Card className="bg-linear-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-800">
                 <CardContent className="pt-6">
                     <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
                         <div className="shrink-0">
-                            <div className="h-16 w-16 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
-                                <Briefcase className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
+                            <div className="h-16 w-16 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                                <Briefcase className="h-8 w-8 text-blue-600 dark:text-blue-400" />
                             </div>
                         </div>
                         <div className="flex-1 text-center md:text-left w-full">
-                            <h3 className="text-xl font-bold text-emerald-900 dark:text-emerald-100 mb-2 flex items-center gap-2 justify-center md:justify-start">
+                            <h3 className="text-xl font-bold text-blue-900 dark:text-blue-100 mb-2 flex items-center gap-2 justify-center md:justify-start">
                                 <UserPlus className="h-5 w-5" />
                                 Need Professional Help?
                             </h3>
-                            <p className="text-sm text-emerald-700 dark:text-emerald-300 mb-4">
+                            <p className="text-sm text-blue-700 dark:text-blue-300 mb-4">
                                 Hire a Chartered Accountant for GST filing, tax compliance, financial planning, and expert accounting services. Get matched with verified CAs in your area.
                             </p>
                             <div className="flex flex-wrap gap-3 justify-center md:justify-start">
                                 <Link href="/reports/hire-ca" className="w-full sm:w-auto">
-                                    <Button className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white">
+                                    <Button className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white">
                                         <UserPlus className="h-4 w-4 mr-2" />
                                         Hire a CA Now
                                     </Button>
                                 </Link>
                                 <Link href="/ca-marketplace" className="w-full sm:w-auto">
-                                    <Button variant="outline" className="w-full sm:w-auto border-emerald-600 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20">
+                                    <Button variant="outline" className="w-full sm:w-auto border-blue-600 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20">
                                         Browse CA Marketplace
                                     </Button>
                                 </Link>

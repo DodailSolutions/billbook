@@ -43,8 +43,8 @@ export default function PayrollDashboardPage() {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                     <div className="flex items-center gap-2">
-                        <div className="p-2 bg-emerald-50 rounded-xl">
-                            <DollarSign className="h-6 w-6 text-emerald-600" />
+                        <div className="p-2 bg-blue-50 rounded-xl">
+                            <DollarSign className="h-6 w-6 text-blue-600" />
                         </div>
                         <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-900">
                             Payroll & Salary Hub
@@ -63,7 +63,7 @@ export default function PayrollDashboardPage() {
                         </Button>
                     </Link>
                     <Link href="/payroll/run">
-                        <Button className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white min-h-[44px]">
+                        <Button className="gap-2 bg-blue-600 hover:bg-blue-700 text-white min-h-[44px]">
                             <Play className="h-4 w-4 fill-white" />
                             Run Monthly Payroll
                         </Button>
@@ -74,14 +74,14 @@ export default function PayrollDashboardPage() {
             {/* Metrics */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <Link href="/payroll/employees">
-                    <Card className="border-gray-100 shadow-2xs hover:border-emerald-200 transition-all cursor-pointer h-full">
+                    <Card className="border-gray-100 shadow-2xs hover:border-blue-200 transition-all cursor-pointer h-full">
                         <CardContent className="p-4 flex items-center justify-between">
                             <div>
                                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Employees</p>
                                 <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mt-1">{activeEmpCount}</h3>
                                 <p className="text-[11px] text-gray-400 mt-0.5">Active staff on payroll</p>
                             </div>
-                            <div className="p-3 bg-emerald-50 text-emerald-600 rounded-2xl"><Users className="h-6 w-6" /></div>
+                            <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl"><Users className="h-6 w-6" /></div>
                         </CardContent>
                     </Card>
                 </Link>
@@ -133,13 +133,13 @@ export default function PayrollDashboardPage() {
                     </div>
 
                     {loading ? (
-                        <div className="flex justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" /></div>
+                        <div className="flex justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" /></div>
                     ) : runs.length === 0 ? (
                         <div className="text-center py-12 bg-slate-50 rounded-2xl border border-gray-100">
                             <FileText className="h-10 w-10 text-gray-300 mx-auto mb-2" />
                             <p className="text-xs text-gray-500">No payroll runs processed yet.</p>
                             <Link href="/payroll/run" className="mt-3 inline-block">
-                                <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white min-h-[40px]">Process First Payroll Run</Button>
+                                <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white min-h-[40px]">Process First Payroll Run</Button>
                             </Link>
                         </div>
                     ) : (
@@ -164,12 +164,12 @@ export default function PayrollDashboardPage() {
                                         <p className="text-[11px] font-bold text-gray-500 uppercase">Individual Payslips</p>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                                             {run.payslips?.map(ps => (
-                                                <Link key={ps.id} href={`/payroll/payslips/${ps.id}`} className="p-2.5 bg-white rounded-xl border border-gray-200 hover:border-emerald-300 shadow-2xs flex items-center justify-between text-xs group transition-all">
+                                                <Link key={ps.id} href={`/payroll/payslips/${ps.id}`} className="p-2.5 bg-white rounded-xl border border-gray-200 hover:border-blue-300 shadow-2xs flex items-center justify-between text-xs group transition-all">
                                                     <div>
-                                                        <p className="font-bold text-gray-900 group-hover:text-emerald-600 transition-colors">{ps.employee?.name}</p>
+                                                        <p className="font-bold text-gray-900 group-hover:text-blue-600 transition-colors">{ps.employee?.name}</p>
                                                         <p className="text-[10px] text-gray-500">Net: ₹{Number(ps.net_salary).toLocaleString('en-IN')}</p>
                                                     </div>
-                                                    <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-emerald-600 transition-colors" />
+                                                    <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-blue-600 transition-colors" />
                                                 </Link>
                                             ))}
                                         </div>

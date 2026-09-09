@@ -49,7 +49,7 @@ export function PricingToggleSection({ isAuthenticated, currentPlan }: PricingTo
               <>
                 <div className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm mb-1">
                   <span className="line-through">₹3,588</span>
-                  <span className="ml-2 bg-emerald-500 text-white text-xs px-2 py-0.5 rounded font-semibold">Save ₹600</span>
+                  <span className="ml-2 bg-blue-600 text-white text-xs px-2 py-0.5 rounded font-semibold">Save ₹600</span>
                 </div>
                 <div className="flex items-baseline gap-1">
                   <span className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white">₹2,988</span>
@@ -75,7 +75,7 @@ export function PricingToggleSection({ isAuthenticated, currentPlan }: PricingTo
           planId={isYearly ? "starter-yearly" : "starter"}
           isPopular={true}
           buttonText="Start Free Trial"
-          buttonClass="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+          buttonClass="w-full bg-blue-600 hover:bg-blue-700 text-white"
           isAuthenticated={isAuthenticated}
           currentPlan={currentPlan}
         />
@@ -88,7 +88,7 @@ export function PricingToggleSection({ isAuthenticated, currentPlan }: PricingTo
               <>
                 <div className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm mb-1">
                   <span className="line-through">₹7,188</span>
-                  <span className="ml-2 bg-emerald-500 text-white text-xs px-2 py-0.5 rounded font-semibold">Save ₹1,200</span>
+                  <span className="ml-2 bg-blue-600 text-white text-xs px-2 py-0.5 rounded font-semibold">Save ₹1,200</span>
                 </div>
                 <div className="flex items-baseline gap-1">
                   <span className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white">₹5,988</span>

@@ -32,7 +32,7 @@ export default async function UAEPricingPage() {
             <ThemeToggle />
             {isAuthenticated ? (
               <Link href="/dashboard">
-                <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white">
                   Dashboard
                 </Button>
               </Link>
@@ -42,7 +42,7 @@ export default async function UAEPricingPage() {
                   <Button variant="secondary">Sign In</Button>
                 </Link>
                 <Link href="/signup">
-                  <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                  <Button className="bg-blue-600 hover:bg-blue-700 text-white">
                     Get Started
                   </Button>
                 </Link>
@@ -53,7 +53,7 @@ export default async function UAEPricingPage() {
       </nav>
 
       {/* Hero */}
-      <section className="px-6 py-16 md:py-24 bg-linear-to-b from-emerald-50 to-white dark:from-gray-900 dark:to-gray-950">
+      <section className="px-6 py-16 md:py-24 bg-linear-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-950">
         <div className="max-w-7xl mx-auto text-center">
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4">
             UAE Pricing Plans
@@ -110,23 +110,23 @@ export default async function UAEPricingPage() {
               
               <ul className="space-y-2 mb-6">
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
                   <span className="text-xs text-gray-700 dark:text-gray-200">1 user</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
                   <span className="text-xs text-gray-700 dark:text-gray-200">300 invoices/year</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
                   <span className="text-xs text-gray-700 dark:text-gray-200">VAT-compliant</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
                   <span className="text-xs text-gray-700 dark:text-gray-200">Client management</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
                   <span className="text-xs text-gray-700 dark:text-gray-200">Email support</span>
                 </li>
                 <li className="flex items-start gap-2">
@@ -143,9 +143,9 @@ export default async function UAEPricingPage() {
             </div>
 
             {/* Growth Lifetime - MOST POPULAR */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border-2 border-emerald-600 shadow-xl relative">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border-2 border-blue-600 shadow-xl relative">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                <span className="bg-emerald-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
                   MOST POPULAR
                 </span>
               </div>
@@ -159,33 +159,33 @@ export default async function UAEPricingPage() {
               
               <ul className="space-y-2 mb-6">
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
                   <span className="text-xs text-gray-700 dark:text-gray-200"><strong>Up to 3 users</strong></span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
                   <span className="text-xs text-gray-700 dark:text-gray-200">1,200 invoices/year</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
                   <span className="text-xs text-gray-700 dark:text-gray-200">Recurring invoices</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
                   <span className="text-xs text-gray-700 dark:text-gray-200">Payment reminders</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
                   <span className="text-xs text-gray-700 dark:text-gray-200">VAT reports</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
                   <span className="text-xs text-gray-700 dark:text-gray-200">Priority support</span>
                 </li>
               </ul>
               
               <Link href="/signup">
-                <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-sm">
+                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm">
                   Get Lifetime Access
                 </Button>
               </Link>
@@ -202,27 +202,27 @@ export default async function UAEPricingPage() {
               
               <ul className="space-y-2 mb-6">
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
                   <span className="text-xs text-gray-700 dark:text-gray-200"><strong>Up to 5 users</strong></span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
                   <span className="text-xs text-gray-700 dark:text-gray-200">3,000 invoices/year</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
                   <span className="text-xs text-gray-700 dark:text-gray-200">Advanced VAT reports</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
                   <span className="text-xs text-gray-700 dark:text-gray-200">Multi-currency</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
                   <span className="text-xs text-gray-700 dark:text-gray-200">Custom templates</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
                   <span className="text-xs text-gray-700 dark:text-gray-200">API access</span>
                 </li>
               </ul>
@@ -245,27 +245,27 @@ export default async function UAEPricingPage() {
               
               <ul className="space-y-2 mb-6">
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
                   <span className="text-xs text-gray-700 dark:text-gray-200"><strong>Up to 10 users</strong></span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
                   <span className="text-xs text-gray-700 dark:text-gray-200">10,000 invoices/year</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
                   <span className="text-xs text-gray-700 dark:text-gray-200">White-label</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
                   <span className="text-xs text-gray-700 dark:text-gray-200">Client portal</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
                   <span className="text-xs text-gray-700 dark:text-gray-200">Advanced analytics</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
                   <span className="text-xs text-gray-700 dark:text-gray-200">Dedicated onboarding</span>
                 </li>
               </ul>
@@ -286,19 +286,19 @@ export default async function UAEPricingPage() {
             </h3>
             <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
               <li className="flex items-start gap-2">
-                <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
                 <span>Invoice limits reset yearly</span>
               </li>
               <li className="flex items-start gap-2">
-                <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
                 <span>Lifetime = software access, infrastructure follows fair-usage policy</span>
               </li>
               <li className="flex items-start gap-2">
-                <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
                 <span>All future feature updates included</span>
               </li>
               <li className="flex items-start gap-2">
-                <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
                 <span>Add-ons (AI Copilot, WhatsApp, extra users) available for additional fee</span>
               </li>
             </ul>
@@ -321,31 +321,31 @@ export default async function UAEPricingPage() {
           <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-4 max-w-5xl mx-auto">
             <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
               <div className="text-sm font-semibold text-gray-900 dark:text-white mb-1">AI Copilot</div>
-              <div className="text-2xl font-bold text-emerald-600 mb-2">AED 29<span className="text-sm text-gray-600">/mo</span></div>
+              <div className="text-2xl font-bold text-blue-600 mb-2">AED 29<span className="text-sm text-gray-600">/mo</span></div>
               <p className="text-xs text-gray-600 dark:text-gray-400">Smart invoice assistant</p>
             </div>
 
             <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
               <div className="text-sm font-semibold text-gray-900 dark:text-white mb-1">WhatsApp</div>
-              <div className="text-2xl font-bold text-emerald-600 mb-2">AED 39<span className="text-sm text-gray-600">/mo</span></div>
+              <div className="text-2xl font-bold text-blue-600 mb-2">AED 39<span className="text-sm text-gray-600">/mo</span></div>
               <p className="text-xs text-gray-600 dark:text-gray-400">Automated messaging</p>
             </div>
 
             <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
               <div className="text-sm font-semibold text-gray-900 dark:text-white mb-1">Extra Users</div>
-              <div className="text-2xl font-bold text-emerald-600 mb-2">AED 20<span className="text-sm text-gray-600">/user/mo</span></div>
+              <div className="text-2xl font-bold text-blue-600 mb-2">AED 20<span className="text-sm text-gray-600">/user/mo</span></div>
               <p className="text-xs text-gray-600 dark:text-gray-400">Add team members</p>
             </div>
 
             <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
               <div className="text-sm font-semibold text-gray-900 dark:text-white mb-1">Extra Invoices</div>
-              <div className="text-2xl font-bold text-emerald-600 mb-2">AED 99<span className="text-sm text-gray-600">/1k</span></div>
+              <div className="text-2xl font-bold text-blue-600 mb-2">AED 99<span className="text-sm text-gray-600">/1k</span></div>
               <p className="text-xs text-gray-600 dark:text-gray-400">For lifetime plans</p>
             </div>
 
             <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
               <div className="text-sm font-semibold text-gray-900 dark:text-white mb-1">White-label</div>
-              <div className="text-2xl font-bold text-emerald-600 mb-2">AED 399<span className="text-sm text-gray-600">/yr</span></div>
+              <div className="text-2xl font-bold text-blue-600 mb-2">AED 399<span className="text-sm text-gray-600">/yr</span></div>
               <p className="text-xs text-gray-600 dark:text-gray-400">Custom branding</p>
             </div>
           </div>
@@ -354,17 +354,17 @@ export default async function UAEPricingPage() {
 
       {/* CTA */}
       <section className="px-6 py-16 max-w-5xl mx-auto">
-        <div className="bg-linear-to-br from-emerald-600 to-emerald-700 rounded-3xl p-12 text-center text-white shadow-2xl">
+        <div className="bg-linear-to-br from-blue-600 to-indigo-700 rounded-3xl p-12 text-center text-white shadow-2xl">
           <h3 className="text-3xl md:text-5xl font-bold mb-4">
             Ready to Get Started?
           </h3>
-          <p className="text-lg text-emerald-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-lg text-blue-100 mb-8 max-w-2xl mx-auto">
             Start with our free trial. No credit card required. Full VAT compliance included.
           </p>
           <Link href="/signup">
             <Button 
               size="lg" 
-              className="bg-white text-emerald-700 hover:bg-gray-100 font-bold text-lg px-10 shadow-xl"
+              className="bg-white text-blue-700 hover:bg-gray-100 font-bold text-lg px-10 shadow-xl"
             >
               Start Free Trial →
             </Button>

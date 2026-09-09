@@ -37,11 +37,11 @@ export default function TermsOfServicePage() {
       </nav>
 
       {/* Hero */}
-      <section className="px-6 py-16 bg-linear-to-b from-emerald-50 to-white dark:from-gray-900 dark:to-gray-950">
+      <section className="px-6 py-16 bg-linear-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-950">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 dark:bg-emerald-500/10 rounded-full border border-emerald-100 dark:border-emerald-500/20 mb-6">
-            <Scale className="h-4 w-4 text-emerald-600" />
-            <span className="text-sm font-medium text-emerald-600">UAE Commercial Law Compliant</span>
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-500/10 rounded-full border border-blue-100 dark:border-blue-500/20 mb-6">
+            <Scale className="h-4 w-4 text-blue-600" />
+            <span className="text-sm font-medium text-blue-600">UAE Commercial Law Compliant</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
             Terms of Service
@@ -59,7 +59,7 @@ export default function TermsOfServicePage() {
           {/* Introduction */}
           <div className="mb-12">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-              <FileText className="h-6 w-6 text-emerald-600" />
+              <FileText className="h-6 w-6 text-blue-600" />
               Agreement to Terms
             </h2>
             <p className="text-gray-700 dark:text-gray-300 mb-4">
@@ -235,7 +235,7 @@ export default function TermsOfServicePage() {
           </div>
 
           {/* VAT Compliance */}
-          <div className="mb-12 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl p-6">
+          <div className="mb-12 bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
               6. VAT Compliance and Tax Obligations
             </h2>
@@ -407,7 +407,7 @@ export default function TermsOfServicePage() {
           {/* Contact */}
           <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-6">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-              <FileText className="h-6 w-6 text-emerald-600" />
+              <FileText className="h-6 w-6 text-blue-600" />
               14. Contact Information
             </h2>
             <p className="text-gray-700 dark:text-gray-300 mb-4">
@@ -436,7 +436,7 @@ export default function TermsOfServicePage() {
               <Link href="/ae/privacy" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
                 Privacy Policy
               </Link>
-              <Link href="/ae/terms" className="text-emerald-600 hover:text-emerald-700 font-medium">
+              <Link href="/ae/terms" className="text-blue-600 hover:text-blue-700 font-medium">
                 Terms of Service
               </Link>
             </div>

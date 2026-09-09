@@ -428,12 +428,12 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
 
                 {/* Section: Items */}
                 <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm overflow-hidden">
-                    <div className="bg-linear-to-r from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                    <div className="bg-linear-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                         <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                            <span className="h-5 w-5 rounded-full bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400 flex items-center justify-center text-xs font-bold">2</span>
+                            <span className="h-5 w-5 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xs font-bold">2</span>
                             Items
                         </h3>
-                        <Button type="button" onClick={addItem} size="sm" className="gap-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg h-8 text-xs px-3">
+                        <Button type="button" onClick={addItem} size="sm" className="gap-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg h-8 text-xs px-3">
                             <Plus className="h-3.5 w-3.5" /> Add Item
                         </Button>
                     </div>
@@ -458,11 +458,11 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                 )}
 
                 {inventoryItems.length > 0 && (
-                    <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg p-3">
-                        <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-300 mb-2">Inventory Items</p>
+                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+                        <p className="text-xs font-semibold text-blue-700 dark:text-blue-300 mb-2">Inventory Items</p>
                         <div className="flex flex-wrap gap-2">
                             {inventoryItems.slice(0, 12).map((inventoryItem) => (
-                                <button type="button" key={inventoryItem.id} onClick={() => addInventoryItem(inventoryItem)} className="rounded-full border border-emerald-200 bg-white px-2.5 py-1 text-xs font-medium text-emerald-700 hover:bg-emerald-100">
+                                <button type="button" key={inventoryItem.id} onClick={() => addInventoryItem(inventoryItem)} className="rounded-full border border-blue-200 bg-white px-2.5 py-1 text-xs font-medium text-blue-700 hover:bg-blue-100">
                                     + {inventoryItem.name} ({inventoryItem.current_stock})
                                 </button>
                             ))}

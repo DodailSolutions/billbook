@@ -43,7 +43,7 @@ export function SignupPageContent({ searchParams }: SignupPageContentProps) {
 
             <div className="pt-2 text-center text-xs text-slate-600 font-medium">
                 Already have an account?{' '}
-                <Link href="/login" className="text-emerald-700 font-bold hover:underline">
+                <Link href="/login" className="text-blue-700 font-bold hover:underline">
                     Sign in to your account
                 </Link>
             </div>

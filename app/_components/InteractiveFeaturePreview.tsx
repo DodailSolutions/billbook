@@ -37,7 +37,7 @@ export function InteractiveFeaturePreview() {
                                     : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
                             }`}
                         >
-                            <Icon className={`h-4 w-4 ${isActive ? 'text-emerald-400' : 'text-slate-500'}`} />
+                            <Icon className={`h-4 w-4 ${isActive ? 'text-blue-400' : 'text-slate-500'}`} />
                             {tab.label}
                         </button>
                     )
@@ -47,13 +47,13 @@ export function InteractiveFeaturePreview() {
             {/* Apple-style Feature Display Card */}
             <div className="bg-white rounded-[32px] p-6 sm:p-12 shadow-[0_20px_50px_rgba(0,0,0,0.06)] border border-slate-200/70 relative overflow-hidden transition-all duration-500">
                 {/* Decorative background aura */}
-                <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
                 <div className="absolute bottom-0 left-0 w-96 h-96 bg-slate-900/5 rounded-full blur-3xl pointer-events-none" />
 
                 {activeTab === 'invoicing' && (
                     <div className="grid lg:grid-cols-2 gap-10 items-center animate-in fade-in duration-500">
                         <div className="space-y-5">
-                            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200/60">
                                 <FileText className="h-3.5 w-3.5" /> Instant GST Invoicing
                             </div>
                             <h3 className="text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-tight leading-tight">
@@ -63,10 +63,10 @@ export function InteractiveFeaturePreview() {
                                 Automated CGST, SGST & IGST tax split calculations, instant QR payment links, and direct WhatsApp PDF delivery.
                             </p>
                             <div className="grid grid-cols-2 gap-3 pt-2 text-xs font-medium text-slate-700">
-                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> Auto Tax Breakdown</div>
-                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> Custom Logo Branding</div>
-                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> WhatsApp Direct Share</div>
-                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> E-Way Bill Ready</div>
+                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-blue-600" /> Auto Tax Breakdown</div>
+                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-blue-600" /> Custom Logo Branding</div>
+                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-blue-600" /> WhatsApp Direct Share</div>
+                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-blue-600" /> E-Way Bill Ready</div>
                             </div>
                         </div>
 
@@ -102,7 +102,7 @@ export function InteractiveFeaturePreview() {
                 {activeTab === 'crm' && (
                     <div className="grid lg:grid-cols-2 gap-10 items-center animate-in fade-in duration-500">
                         <div className="space-y-5">
-                            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200/60">
                                 <Sparkles className="h-3.5 w-3.5" /> Sales Growth Engine
                             </div>
                             <h3 className="text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-tight leading-tight">
@@ -112,10 +112,10 @@ export function InteractiveFeaturePreview() {
                                 Track deals from Lead to Won, log activity follow-ups, and forecast monthly sales revenue effortlessly.
                             </p>
                             <div className="grid grid-cols-2 gap-3 pt-2 text-xs font-medium text-slate-700">
-                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> Kanban Deal Stages</div>
-                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> Activity Follow-up Log</div>
-                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> Win Rate Forecasts</div>
-                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> Revenue Analytics</div>
+                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-blue-600" /> Kanban Deal Stages</div>
+                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-blue-600" /> Activity Follow-up Log</div>
+                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-blue-600" /> Win Rate Forecasts</div>
+                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-blue-600" /> Revenue Analytics</div>
                             </div>
                         </div>
 
@@ -123,13 +123,13 @@ export function InteractiveFeaturePreview() {
                         <div className="bg-slate-50/80 rounded-2xl p-6 border border-slate-200/80 shadow-sm space-y-3">
                             <div className="flex justify-between items-center pb-2 border-b border-slate-200 text-xs font-bold">
                                 <span className="text-slate-900">Active Deals Pipeline</span>
-                                <span className="text-emerald-600 font-mono">₹12.5L Total Value</span>
+                                <span className="text-blue-600 font-mono">₹12.5L Total Value</span>
                             </div>
                             <div className="grid grid-cols-2 gap-3 text-xs">
                                 <div className="p-3.5 bg-white rounded-xl border border-slate-200 shadow-xs">
                                     <span className="text-[10px] font-bold text-slate-500 uppercase">Proposal Sent</span>
                                     <p className="font-bold text-slate-900 mt-1">Enterprise Retainer</p>
-                                    <p className="text-emerald-600 font-mono font-bold mt-0.5">₹3,50,000</p>
+                                    <p className="text-blue-600 font-mono font-bold mt-0.5">₹3,50,000</p>
                                 </div>
                                 <div className="p-3.5 bg-white rounded-xl border border-emerald-200 shadow-xs">
                                     <span className="text-[10px] font-bold text-emerald-600 uppercase">Won Deal 🎉</span>
@@ -144,7 +144,7 @@ export function InteractiveFeaturePreview() {
                 {activeTab === 'bookkeeping' && (
                     <div className="grid lg:grid-cols-2 gap-10 items-center animate-in fade-in duration-500">
                         <div className="space-y-5">
-                            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200/60">
                                 <BookOpen className="h-3.5 w-3.5" /> General Ledger
                             </div>
                             <h3 className="text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-tight leading-tight">
@@ -154,10 +154,10 @@ export function InteractiveFeaturePreview() {
                                 Complete Chart of Accounts, Journal Entries, Trial Balance, P&L, Balance Sheet, and Bank Statement audit.
                             </p>
                             <div className="grid grid-cols-2 gap-3 pt-2 text-xs font-medium text-slate-700">
-                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> Chart of Accounts (CoA)</div>
-                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> Trial Balance Checker</div>
-                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> Automated P&L & Balance Sheet</div>
-                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> Bank Reconciliation</div>
+                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-blue-600" /> Chart of Accounts (CoA)</div>
+                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-blue-600" /> Trial Balance Checker</div>
+                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-blue-600" /> Automated P&L & Balance Sheet</div>
+                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-blue-600" /> Bank Reconciliation</div>
                             </div>
                         </div>
 
@@ -184,7 +184,7 @@ export function InteractiveFeaturePreview() {
                 {activeTab === 'po' && (
                     <div className="grid lg:grid-cols-2 gap-10 items-center animate-in fade-in duration-500">
                         <div className="space-y-5">
-                            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200/60">
                                 <ShoppingBag className="h-3.5 w-3.5" /> Vendor Procurement
                             </div>
                             <h3 className="text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-tight leading-tight">
@@ -194,10 +194,10 @@ export function InteractiveFeaturePreview() {
                                 Issue purchase orders to suppliers, manage partial delivery receipts, and auto-increment inventory levels.
                             </p>
                             <div className="grid grid-cols-2 gap-3 pt-2 text-xs font-medium text-slate-700">
-                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> Vendor PO Generation</div>
-                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> Auto Inventory Stock-In</div>
-                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> Batch/Lot Numbering</div>
-                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> Fulfillment Logs</div>
+                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-blue-600" /> Vendor PO Generation</div>
+                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-blue-600" /> Auto Inventory Stock-In</div>
+                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-blue-600" /> Batch/Lot Numbering</div>
+                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-blue-600" /> Fulfillment Logs</div>
                             </div>
                         </div>
 
@@ -205,7 +205,7 @@ export function InteractiveFeaturePreview() {
                         <div className="bg-slate-50/80 rounded-2xl p-6 border border-slate-200/80 shadow-sm space-y-3 text-xs">
                             <div className="flex justify-between items-center pb-2 border-b border-slate-200">
                                 <span className="font-mono font-bold text-black">PO-20260803-902</span>
-                                <span className="px-3 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800 text-[10px]">
+                                <span className="px-3 py-0.5 rounded-full font-bold bg-blue-100 text-blue-800 text-[10px]">
                                     PARTIALLY RECEIVED
                                 </span>
                             </div>
@@ -216,7 +216,7 @@ export function InteractiveFeaturePreview() {
                                 </div>
                                 <div className="flex justify-between text-[11px] text-slate-500">
                                     <span>Received: 60 / 100</span>
-                                    <span className="text-emerald-600 font-mono font-bold">Stock +60</span>
+                                    <span className="text-blue-600 font-mono font-bold">Stock +60</span>
                                 </div>
                             </div>
                         </div>
@@ -226,7 +226,7 @@ export function InteractiveFeaturePreview() {
                 {activeTab === 'payroll' && (
                     <div className="grid lg:grid-cols-2 gap-10 items-center animate-in fade-in duration-500">
                         <div className="space-y-5">
-                            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200/60">
                                 <DollarSign className="h-3.5 w-3.5" /> Staff Management
                             </div>
                             <h3 className="text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-tight leading-tight">
@@ -236,10 +236,10 @@ export function InteractiveFeaturePreview() {
                                 Manage employee salary components (Basic, HRA, PF, TDS), process monthly payroll runs, and print salary payslips.
                             </p>
                             <div className="grid grid-cols-2 gap-3 pt-2 text-xs font-medium text-slate-700">
-                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> Employee Directory</div>
-                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> PF, ESI & TDS Deductions</div>
-                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> PDF Salary Payslips</div>
-                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> Auto Journal Entry</div>
+                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-blue-600" /> Employee Directory</div>
+                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-blue-600" /> PF, ESI & TDS Deductions</div>
+                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-blue-600" /> PDF Salary Payslips</div>
+                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-blue-600" /> Auto Journal Entry</div>
                             </div>
                         </div>
 
@@ -247,7 +247,7 @@ export function InteractiveFeaturePreview() {
                         <div className="bg-slate-50/80 rounded-2xl p-6 border border-slate-200/80 shadow-sm space-y-3 text-xs">
                             <div className="flex justify-between items-center pb-2 border-b border-slate-200 font-bold">
                                 <span className="text-slate-900">Monthly Payslip (August 2026)</span>
-                                <span className="text-emerald-600 font-mono font-bold">Net Pay: ₹42,200</span>
+                                <span className="text-blue-600 font-mono font-bold">Net Pay: ₹42,200</span>
                             </div>
                             <div className="space-y-1.5 text-[11px] text-slate-700">
                                 <div className="flex justify-between">
@@ -266,7 +266,7 @@ export function InteractiveFeaturePreview() {
                 {activeTab === 'ai' && (
                     <div className="grid lg:grid-cols-2 gap-10 items-center animate-in fade-in duration-500">
                         <div className="space-y-5">
-                            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200/60">
                                 <Bot className="h-3.5 w-3.5" /> AI Accountant
                             </div>
                             <h3 className="text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-tight leading-tight">
@@ -276,10 +276,10 @@ export function InteractiveFeaturePreview() {
                                 Ask questions in plain English or Hindi about tax liabilities, outstanding invoices, and GST compliance rules.
                             </p>
                             <div className="grid grid-cols-2 gap-3 pt-2 text-xs font-medium text-slate-700">
-                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> Instant GST Q&A</div>
-                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> Revenue Forecasting</div>
-                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> Expense Anomaly Alert</div>
-                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> CA Verified Logic</div>
+                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-blue-600" /> Instant GST Q&A</div>
+                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-blue-600" /> Revenue Forecasting</div>
+                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-blue-600" /> Expense Anomaly Alert</div>
+                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-blue-600" /> CA Verified Logic</div>
                             </div>
                         </div>
 
@@ -288,9 +288,9 @@ export function InteractiveFeaturePreview() {
                             <div className="p-3 bg-white rounded-xl border border-slate-200 text-slate-900 font-medium">
                                 💬 "What is my GST tax liability for this quarter?"
                             </div>
-                            <div className="p-3 bg-emerald-50/60 rounded-xl border border-emerald-200/60 text-slate-800 space-y-1">
-                                <p className="font-bold text-emerald-800">AI Assistant:</p>
-                                <p>Based on your 24 invoices (₹4.2L revenue) and ₹1.1L eligible input tax credit, your net GST payable is <strong className="text-emerald-700">₹32,400</strong>.</p>
+                            <div className="p-3 bg-blue-50/60 rounded-xl border border-blue-200/60 text-slate-800 space-y-1">
+                                <p className="font-bold text-blue-800">AI Assistant:</p>
+                                <p>Based on your 24 invoices (₹4.2L revenue) and ₹1.1L eligible input tax credit, your net GST payable is <strong className="text-blue-700">₹32,400</strong>.</p>
                             </div>
                         </div>
                     </div>

@@ -189,7 +189,7 @@ export default function RefundPage() {
             </p>
           </section>
 
-          <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-6 mt-8">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mt-8">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">💡 Try Before You Buy</h3>
             <p className="text-gray-600">
               Start with our Free plan (up to 50 invoices) to test BillBooky risk-free before committing to a paid plan. 

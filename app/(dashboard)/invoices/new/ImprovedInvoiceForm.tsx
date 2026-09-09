@@ -864,15 +864,15 @@ export function ImprovedInvoiceForm({ customers: initialCustomers, savedItems = 
                   )}
 
                   {inventoryItems.length > 0 && (
-                    <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
-                      <p className="text-xs font-semibold text-emerald-700 mb-2">Inventory items</p>
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                      <p className="text-xs font-semibold text-blue-700 mb-2">Inventory items</p>
                       <div className="flex flex-wrap gap-2">
                         {inventoryItems.slice(0, 12).map((inventoryItem) => (
                           <button
                             key={inventoryItem.id}
                             type="button"
                             onClick={() => addInventoryItemToForm(inventoryItem)}
-                            className="rounded-full border border-emerald-200 bg-white px-2.5 py-1 text-xs font-medium text-emerald-700 hover:bg-emerald-100"
+                            className="rounded-full border border-blue-200 bg-white px-2.5 py-1 text-xs font-medium text-blue-700 hover:bg-blue-100"
                           >
                             + {inventoryItem.name} ({inventoryItem.current_stock})
                           </button>
@@ -1140,7 +1140,7 @@ export function ImprovedInvoiceForm({ customers: initialCustomers, savedItems = 
                   </div>
 
                   {/* Payment Collection Section */}
-                  <Card className="bg-linear-to-br from-emerald-50 to-teal-50 border-emerald-200 dark:bg-white">
+                  <Card className="bg-linear-to-br from-blue-50 to-indigo-50 border-blue-200 dark:bg-white">
                     <CardContent className="p-6 space-y-4">
                       <div className="flex items-center gap-3">
                         <input
@@ -1152,7 +1152,7 @@ export function ImprovedInvoiceForm({ customers: initialCustomers, savedItems = 
                             mark_as_paid: e.target.checked,
                             payment_method: e.target.checked && !formData.payment_method ? 'cash' : formData.payment_method
                           })}
-                          className="w-5 h-5 text-emerald-600 focus:ring-2 focus:ring-emerald-500 rounded"
+                          className="w-5 h-5 text-blue-600 focus:ring-2 focus:ring-blue-500 rounded"
                         />
                         <label htmlFor="mark_as_paid" className="text-lg font-semibold text-gray-900 cursor-pointer">
                           💰 Collect Payment Now
@@ -1160,7 +1160,7 @@ export function ImprovedInvoiceForm({ customers: initialCustomers, savedItems = 
                       </div>
 
                       {formData.mark_as_paid && (
-                        <div className="space-y-4 mt-4 pt-4 border-t border-emerald-200">
+                        <div className="space-y-4 mt-4 pt-4 border-t border-blue-200">
                           <div className="grid md:grid-cols-2 gap-4">
                             <div className="space-y-2">
                               <label className="text-sm font-semibold text-gray-900">
@@ -1188,7 +1188,7 @@ export function ImprovedInvoiceForm({ customers: initialCustomers, savedItems = 
                               <select
                                 value={formData.payment_method}
                                 onChange={(e) => setFormData({...formData, payment_method: e.target.value as 'cash' | 'bank_transfer' | 'upi' | 'card' | 'cheque'})}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 bg-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 required={formData.mark_as_paid}
                               >
                                 <option value="">Select method</option>
@@ -1218,7 +1218,7 @@ export function ImprovedInvoiceForm({ customers: initialCustomers, savedItems = 
                               value={formData.payment_notes}
                               onChange={(e) => setFormData({...formData, payment_notes: e.target.value})}
                               rows={2}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-gray-900 bg-white"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white"
                             />
                           </div>
 

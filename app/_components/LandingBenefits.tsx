@@ -3,11 +3,11 @@
 import { TrendingUp, Zap, Shield, CheckCircle, BarChart3 } from 'lucide-react'
 
 const BENEFITS = [
-  { icon: TrendingUp, text: 'No credit card required', color: 'emerald' },
-  { icon: Zap, text: 'Free forever plan', color: 'blue' },
+  { icon: TrendingUp, text: 'No credit card required', color: 'blue' },
+  { icon: Zap, text: 'Free forever plan', color: 'indigo' },
   { icon: Shield, text: 'Secure cloud storage', color: 'purple' },
   { icon: CheckCircle, text: 'Instant PDF download', color: 'orange' },
-  { icon: BarChart3, text: 'Mobile responsive', color: 'teal' },
+  { icon: BarChart3, text: 'Mobile responsive', color: 'cyan' },
 ]
 
 export function LandingBenefits() {

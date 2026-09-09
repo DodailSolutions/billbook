@@ -75,7 +75,7 @@ export default function PurchaseOrdersPage() {
                 </div>
 
                 <Link href="/purchase-orders/new" className="w-full sm:w-auto">
-                    <Button className="w-full sm:w-auto gap-2 bg-indigo-600 hover:bg-indigo-700 text-white min-h-[44px]">
+                    <Button className="w-full sm:w-auto gap-2 bg-blue-600 hover:bg-blue-700 text-white min-h-[44px]">
                         <Plus className="h-4 w-4" />
                         Create Purchase Order
                     </Button>

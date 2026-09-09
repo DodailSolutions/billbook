@@ -63,7 +63,7 @@ export function ChartOfAccountsView({ accounts, onRefresh }: ChartOfAccountsView
             <div className="flex items-center justify-between">
                 <div>
                     <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                        <FolderTree className="h-5 w-5 text-emerald-600" />
+                        <FolderTree className="h-5 w-5 text-blue-600" />
                         Chart of Accounts (GL Ledger)
                     </h3>
                     <p className="text-xs text-gray-500 mt-0.5">
@@ -72,7 +72,7 @@ export function ChartOfAccountsView({ accounts, onRefresh }: ChartOfAccountsView
                 </div>
                 <Button
                     onClick={() => setIsCreating(!isCreating)}
-                    className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
+                    className="gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-xs"
                 >
                     <Plus className="h-4 w-4" />
                     New Account
@@ -80,8 +80,8 @@ export function ChartOfAccountsView({ accounts, onRefresh }: ChartOfAccountsView
             </div>
 
             {isCreating && (
-                <form onSubmit={handleCreate} className="bg-slate-50 p-4 rounded-xl border border-emerald-200 space-y-3 animate-in fade-in duration-200">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-900">Create Custom General Ledger Account</h4>
+                <form onSubmit={handleCreate} className="bg-slate-50 p-4 rounded-xl border border-blue-200 space-y-3 animate-in fade-in duration-200">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-blue-900">Create Custom General Ledger Account</h4>
                     
                     {error && (
                         <div className="p-2.5 text-xs bg-rose-50 text-rose-600 rounded-lg border border-rose-100">
@@ -163,7 +163,7 @@ export function ChartOfAccountsView({ accounts, onRefresh }: ChartOfAccountsView
                         <Button type="button" size="sm" variant="ghost" onClick={() => setIsCreating(false)} className="text-xs">
                             Cancel
                         </Button>
-                        <Button type="submit" size="sm" disabled={loading} className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs">
+                        <Button type="submit" size="sm" disabled={loading} className="bg-blue-600 hover:bg-blue-700 text-white text-xs">
                             {loading ? 'Saving...' : 'Add Account'}
                         </Button>
                     </div>
@@ -211,7 +211,7 @@ export function ChartOfAccountsView({ accounts, onRefresh }: ChartOfAccountsView
                                                     ₹{Number(acc.current_balance || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                                                 </span>
                                                 {acc.is_system && (
-                                                    <p className="text-[9px] text-emerald-600 font-semibold uppercase tracking-wider">System Default</p>
+                                                    <p className="text-[9px] text-blue-600 font-semibold uppercase tracking-wider">System Default</p>
                                                 )}
                                             </div>
                                         </div>

@@ -40,8 +40,8 @@ export default function BookkeepingPage() {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                     <div className="flex items-center gap-2">
-                        <div className="p-2 bg-emerald-50 rounded-xl">
-                            <BookOpen className="h-6 w-6 text-emerald-600" />
+                        <div className="p-2 bg-blue-50 rounded-xl">
+                            <BookOpen className="h-6 w-6 text-blue-600" />
                         </div>
                         <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-900">
                             Bookkeeping & General Ledger
@@ -54,7 +54,7 @@ export default function BookkeepingPage() {
 
                 <Button 
                     onClick={() => setIsJournalModalOpen(true)}
-                    className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-200"
+                    className="gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-200"
                 >
                     <Plus className="h-4 w-4" />
                     New Journal Entry
@@ -68,7 +68,7 @@ export default function BookkeepingPage() {
                         onClick={() => setActiveTab('accounts')}
                         className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl transition-colors whitespace-nowrap ${
                             activeTab === 'accounts' 
-                                ? 'bg-emerald-600 text-white shadow-xs' 
+                                ? 'bg-blue-600 text-white shadow-xs' 
                                 : 'text-gray-600 hover:bg-gray-100'
                         }`}
                     >
@@ -80,7 +80,7 @@ export default function BookkeepingPage() {
                         onClick={() => setActiveTab('journal')}
                         className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl transition-colors whitespace-nowrap ${
                             activeTab === 'journal' 
-                                ? 'bg-emerald-600 text-white shadow-xs' 
+                                ? 'bg-blue-600 text-white shadow-xs' 
                                 : 'text-gray-600 hover:bg-gray-100'
                         }`}
                     >
@@ -92,7 +92,7 @@ export default function BookkeepingPage() {
                         onClick={() => setActiveTab('statements')}
                         className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl transition-colors whitespace-nowrap ${
                             activeTab === 'statements' 
-                                ? 'bg-emerald-600 text-white shadow-xs' 
+                                ? 'bg-blue-600 text-white shadow-xs' 
                                 : 'text-gray-600 hover:bg-gray-100'
                         }`}
                     >
@@ -105,7 +105,7 @@ export default function BookkeepingPage() {
                         onClick={() => setActiveTab('bank')}
                         className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl transition-colors whitespace-nowrap ${
                             activeTab === 'bank' 
-                                ? 'bg-emerald-600 text-white shadow-xs' 
+                                ? 'bg-blue-600 text-white shadow-xs' 
                                 : 'text-gray-600 hover:bg-gray-100'
                         }`}
                     >
@@ -118,7 +118,7 @@ export default function BookkeepingPage() {
             {/* Content Area */}
             {loading ? (
                 <div className="flex items-center justify-center py-20">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
                 </div>
             ) : activeTab === 'accounts' ? (
                 <ChartOfAccountsView 
@@ -136,7 +136,7 @@ export default function BookkeepingPage() {
                             <Button 
                                 size="sm" 
                                 onClick={() => setIsJournalModalOpen(true)}
-                                className="bg-emerald-600 hover:bg-emerald-700 text-xs"
+                                className="bg-blue-600 hover:bg-blue-700 text-xs"
                             >
                                 <Plus className="h-3.5 w-3.5 mr-1" /> Post Entry
                             </Button>
@@ -152,7 +152,7 @@ export default function BookkeepingPage() {
                                     <div key={entry.id} className="p-4 space-y-2 hover:bg-slate-50/50 transition-colors">
                                         <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs gap-2 sm:gap-0">
                                             <div className="flex items-center gap-2">
-                                                <span className="font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100">
+                                                <span className="font-mono font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100">
                                                     {entry.entry_number}
                                                 </span>
                                                 <span className="font-bold text-gray-900">{entry.description}</span>

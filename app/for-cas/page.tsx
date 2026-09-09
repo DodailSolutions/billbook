@@ -14,7 +14,8 @@ import {
   Clock,
   Star,
   Building2,
-  UserCheck
+  UserCheck,
+  Sparkles
 } from 'lucide-react'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { createClient } from '@/lib/supabase/server'
@@ -24,7 +25,7 @@ const BENEFITS = [
     icon: Users,
     title: 'Access to Quality Clients',
     description: 'Connect with verified businesses actively seeking CA services. No cold calling needed.',
-    color: 'emerald'
+    color: 'indigo'
   },
   {
     icon: TrendingUp,
@@ -134,7 +135,7 @@ export default async function ForCAsPage() {
             <ThemeToggle />
             {isAuthenticated ? (
               <Link href="/dashboard">
-                <Button className="bg-emerald-600 hover:bg-emerald-700 text-white text-sm md:text-base">
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white text-sm md:text-base">
                   Dashboard
                 </Button>
               </Link>
@@ -147,7 +148,7 @@ export default async function ForCAsPage() {
                 </Link>
                 <Link href="/ca-registration">
                   <Button className="bg-blue-600 hover:bg-blue-700 text-white text-sm md:text-base">
-                    Register Now
+                    Register as CA
                   </Button>
                 </Link>
               </>
@@ -157,74 +158,57 @@ export default async function ForCAsPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative px-6 py-20 md:py-32 bg-linear-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-950">
-        <div className="absolute inset-0 bg-grid-slate-100/50 dark:bg-grid-slate-800/50 opacity-30" />
-        
-        <div className="relative max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 mb-6">
-              <Award className="h-4 w-4 text-blue-600" />
-              <span className="text-sm font-medium text-blue-600">For Chartered Accountants</span>
+      <section className="relative px-6 py-20 md:py-32 bg-linear-to-b from-blue-50/50 to-white dark:from-gray-900 dark:to-gray-950 overflow-hidden">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center max-w-3xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 mb-8">
+              <Sparkles className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+              <span className="text-sm font-medium text-blue-700 dark:text-blue-300">Join 500+ Chartered Accountants</span>
             </div>
-            
+
             <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-gray-900 mb-6">
-              Grow Your CA Practice
-              <span className="block mt-2 text-blue-600">
-                Connect with Clients
+              Grow Your CA Practice with
+              <span className="block mt-2 bg-linear-to-r from-blue-600 via-indigo-600 to-blue-600 bg-clip-text text-transparent">
+                BillBooky Network
               </span>
             </h1>
-            
-            <p className="text-xl text-gray-600 dark:text-gray-300 leading-relaxed max-w-3xl mx-auto mb-8">
-              Join India&apos;s leading platform connecting Chartered Accountants with businesses seeking expert financial services. 
-              Expand your practice, work on your terms, and build lasting client relationships.
+
+            <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
+              Connect with businesses looking for GST filing, accounting, audit, and tax consulting services. Expand your reach across India.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              {isAuthenticated ? (
-                <Link href="/dashboard">
-                  <Button 
-                    size="lg" 
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-8 shadow-sm hover:shadow-md transition-all duration-200"
-                  >
-                    Go to Dashboard
-                  </Button>
-                </Link>
-              ) : (
-                <>
-                  <Link href="/ca-registration">
-                    <Button 
-                      size="lg" 
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-8 shadow-sm hover:shadow-md transition-all duration-200"
-                    >
-                      <Award className="h-4 w-4 mr-2" />
-                      Register as CA
-                    </Button>
-                  </Link>
-                  <Link href="/login">
-                    <Button 
-                      size="lg" 
-                      variant="outline"
-                      className="border-2 border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
-                    >
-                      Already Registered? Sign In
-                    </Button>
-                  </Link>
-                </>
-              )}
+              <Link href="/ca-registration">
+                <Button 
+                  size="lg" 
+                  className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-8 shadow-sm hover:shadow-md transition-all duration-200"
+                >
+                  Register as CA Now →
+                </Button>
+              </Link>
+              <Link href="/ca-marketplace">
+                <Button 
+                  size="lg" 
+                  variant="secondary" 
+                  className="w-full sm:w-auto bg-white dark:bg-gray-800 border-gray-300 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
+                >
+                  Browse Marketplace
+                </Button>
+              </Link>
             </div>
 
             {/* Trust Badge */}
             <div className="mt-8 flex items-center justify-center gap-6 text-sm text-gray-600">
               <div className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-emerald-600" />
+                <CheckCircle className="h-5 w-5 text-blue-600" />
                 <span>ICAI Verified</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-emerald-600" />
+                <CheckCircle className="h-5 w-5 text-blue-600" />
                 <span>Secure Platform</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-emerald-600" />
+                <CheckCircle className="h-5 w-5 text-blue-600" />
                 <span>Fair Payments</span>
               </div>
             </div>
@@ -265,7 +249,7 @@ export default async function ForCAsPage() {
           {BENEFITS.map((benefit) => {
             const Icon = benefit.icon
             const iconColorClasses = {
-              emerald: 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600',
+              indigo: 'bg-indigo-100 dark:bg-indigo-500/10 text-indigo-600',
               blue: 'bg-blue-100 dark:bg-blue-500/10 text-blue-600',
               purple: 'bg-purple-100 dark:bg-purple-500/10 text-purple-600',
               orange: 'bg-orange-100 dark:bg-orange-500/10 text-orange-600',
@@ -342,7 +326,7 @@ export default async function ForCAsPage() {
               key={service}
               className="flex items-center gap-3 bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 shadow-sm hover:shadow-md hover:border-blue-200 dark:hover:border-blue-700 transition-all duration-200"
             >
-              <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0" />
+              <CheckCircle className="h-5 w-5 text-blue-600 shrink-0" />
               <span className="text-gray-900 font-medium">{service}</span>
             </div>
           ))}

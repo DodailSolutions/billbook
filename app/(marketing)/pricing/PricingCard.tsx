@@ -54,16 +54,16 @@ export function PricingCard({
     const cardClass = isDeal
         ? "bg-gradient-to-br from-amber-50 via-orange-50 to-amber-50 dark:from-amber-950/30 dark:via-orange-950/30 dark:to-amber-950/30 border-2 sm:border-3 border-amber-400 dark:border-amber-600 rounded-xl sm:rounded-2xl p-6 sm:p-8 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 relative mt-6 sm:mt-8 h-full flex flex-col"
         : isCurrentPlan
-        ? "bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 border-2 sm:border-3 border-emerald-500 dark:border-emerald-500 rounded-xl sm:rounded-2xl p-6 sm:p-8 shadow-xl shadow-emerald-500/20 transition-all duration-300 relative mt-6 sm:mt-8 ring-2 ring-emerald-400/50 h-full flex flex-col"
+        ? "bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border-2 sm:border-3 border-blue-500 dark:border-blue-500 rounded-xl sm:rounded-2xl p-6 sm:p-8 shadow-xl shadow-blue-500/20 transition-all duration-300 relative mt-6 sm:mt-8 ring-2 ring-blue-400/50 h-full flex flex-col"
         : isPopular
-        ? "bg-white dark:bg-gray-900 border-2 border-emerald-600 dark:border-emerald-500 rounded-xl sm:rounded-2xl p-6 sm:p-8 hover:shadow-2xl hover:shadow-emerald-500/20 hover:-translate-y-1 transition-all duration-300 relative mt-6 sm:mt-8 ring-2 ring-emerald-500/10 h-full flex flex-col"
-        : "bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-800 rounded-xl sm:rounded-2xl p-6 sm:p-8 hover:shadow-xl hover:-translate-y-1 hover:border-emerald-300 dark:hover:border-emerald-700 transition-all duration-300 mt-6 sm:mt-8 h-full flex flex-col"
+        ? "bg-white dark:bg-gray-900 border-2 border-blue-600 dark:border-blue-500 rounded-xl sm:rounded-2xl p-6 sm:p-8 hover:shadow-2xl hover:shadow-blue-500/20 hover:-translate-y-1 transition-all duration-300 relative mt-6 sm:mt-8 ring-2 ring-blue-500/10 h-full flex flex-col"
+        : "bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-800 rounded-xl sm:rounded-2xl p-6 sm:p-8 hover:shadow-xl hover:-translate-y-1 hover:border-blue-300 dark:hover:border-blue-700 transition-all duration-300 mt-6 sm:mt-8 h-full flex flex-col"
 
     return (
         <div className={cardClass}>
             {isCurrentPlan && (
                 <div className="absolute -top-4 sm:-top-5 left-1/2 -translate-x-1/2 whitespace-nowrap">
-                    <span className="bg-linear-to-r from-emerald-600 to-teal-600 text-white px-4 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold shadow-lg">
+                    <span className="bg-linear-to-r from-blue-600 to-indigo-600 text-white px-4 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold shadow-lg">
                         ✓ Current Plan
                     </span>
                 </div>
@@ -71,7 +71,7 @@ export function PricingCard({
 
             {isPopular && !isDeal && !isCurrentPlan && (
                 <div className="absolute -top-4 sm:-top-5 left-1/2 -translate-x-1/2 whitespace-nowrap">
-                    <span className="bg-linear-to-r from-emerald-600 to-teal-600 text-white px-4 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold shadow-lg animate-pulse">
+                    <span className="bg-linear-to-r from-blue-600 to-indigo-600 text-white px-4 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold shadow-lg animate-pulse">
                         ⭐ Most Popular
                     </span>
                 </div>
@@ -101,7 +101,7 @@ export function PricingCard({
                 {features.map((feature, index) => (
                     <li key={index} className="flex items-start gap-2 sm:gap-3">
                         <CheckCircle className={`h-4 w-4 sm:h-5 sm:w-5 shrink-0 mt-0.5 ${
-                            isDeal ? 'text-amber-600' : 'text-emerald-600 dark:text-emerald-400'
+                            isDeal ? 'text-amber-600' : 'text-blue-600 dark:text-blue-400'
                         }`} />
                         <span className={`text-sm sm:text-base ${isDeal ? 'text-gray-700' : 'text-gray-700 dark:text-gray-300'}`}>
                             {feature}

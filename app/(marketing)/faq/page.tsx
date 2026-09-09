@@ -159,7 +159,7 @@ export default function FAQPage() {
               </Button>
             </Link>
             <Link href="/signup">
-              <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
                 Get Started
               </Button>
             </Link>
@@ -174,7 +174,7 @@ export default function FAQPage() {
         </h1>
         <p className="text-xl text-gray-600 mb-8">
           Everything you need to know about BillBooky. Can&apos;t find what you&apos;re looking for? {' '}
-          <Link href="/contact" className="text-emerald-600 hover:text-emerald-700 font-semibold">
+          <Link href="/contact" className="text-blue-600 hover:text-blue-700 font-semibold">
             Contact us
           </Link>
         </p>
@@ -209,7 +209,7 @@ export default function FAQPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/contact">
-              <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 text-white">
+              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white">
                 Contact Support
               </Button>
             </Link>

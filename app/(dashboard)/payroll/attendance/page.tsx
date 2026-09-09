@@ -141,7 +141,7 @@ export default function AttendancePage() {
                     </Link>
                     <div>
                         <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
-                            <Calendar className="h-5 w-5 text-emerald-600" />
+                            <Calendar className="h-5 w-5 text-blue-600" />
                             Attendance Tracking
                         </h2>
                         <p className="text-xs text-gray-500 mt-0.5">
@@ -150,8 +150,8 @@ export default function AttendancePage() {
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
-                    {msg && <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">{msg}</span>}
-                    <Button onClick={saveAttendance} disabled={saving} className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2">
+                    {msg && <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">{msg}</span>}
+                    <Button onClick={saveAttendance} disabled={saving} className="bg-blue-600 hover:bg-blue-700 text-white gap-2">
                         <Save className="h-4 w-4" /> {saving ? 'Saving...' : 'Save Attendance'}
                     </Button>
                 </div>
@@ -186,7 +186,7 @@ export default function AttendancePage() {
 
                     {loading ? (
                         <div className="flex justify-center py-12">
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
                         </div>
                     ) : (
                         <div className="overflow-x-auto border border-gray-200 rounded-xl">
@@ -197,7 +197,7 @@ export default function AttendancePage() {
                                         {Array.from({ length: daysInMonth }).map((_, i) => (
                                             <th key={i} className="p-2 text-center min-w-[48px] w-[48px] font-semibold text-gray-500 border-r border-gray-100">
                                                 <div className="mb-1">{i + 1}</div>
-                                                <button onClick={() => markAllPresent(i + 1)} className="text-[9px] text-emerald-600 hover:bg-emerald-50 p-1 rounded-sm w-full font-bold" title="Mark All Present">
+                                                <button onClick={() => markAllPresent(i + 1)} className="text-[9px] text-blue-600 hover:bg-blue-50 p-1 rounded-sm w-full font-bold" title="Mark All Present">
                                                     P All
                                                 </button>
                                             </th>

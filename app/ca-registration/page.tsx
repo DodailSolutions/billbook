@@ -303,7 +303,7 @@ export default function CARegistrationPage() {
                 />
               </div>
               <span className="text-xl sm:text-2xl font-black tracking-tight text-slate-950">
-                BillBooky<span className="text-emerald-600">.</span>
+                BillBooky<span className="text-blue-600">.</span>
               </span>
             </Link>
  
@@ -352,9 +352,9 @@ export default function CARegistrationPage() {
               </div>
             </div>
           </Card>
-          <Card className="p-4 bg-white border-emerald-100">
+          <Card className="p-4 bg-white border-indigo-100">
             <div className="flex items-center gap-3">
-              <Clock3 className="h-5 w-5 text-emerald-600" />
+              <Clock3 className="h-5 w-5 text-indigo-600" />
               <div>
                 <p className="font-semibold">Fast setup</p>
                 <p className="text-sm text-gray-600">Finish in about 3 minutes and continue anytime.</p>
@@ -403,7 +403,7 @@ export default function CARegistrationPage() {
                     isCurrent
                       ? 'border-blue-300 bg-blue-50'
                       : isComplete
-                        ? 'border-emerald-200 bg-emerald-50'
+                        ? 'border-blue-200 bg-blue-50/70'
                         : 'border-gray-200 bg-gray-50'
                   }`}
                 >
@@ -412,7 +412,7 @@ export default function CARegistrationPage() {
                       isCurrent
                         ? 'bg-blue-600 text-white'
                         : isComplete
-                          ? 'bg-emerald-600 text-white'
+                          ? 'bg-blue-600 text-white'
                           : 'bg-gray-200 text-gray-600'
                     }`}>
                       {stepNumber}
@@ -427,7 +427,7 @@ export default function CARegistrationPage() {
         </Card>
 
         {draftRestored && (
-          <div className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+          <div className="mb-4 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
             Your saved CA application draft has been restored.
           </div>
         )}

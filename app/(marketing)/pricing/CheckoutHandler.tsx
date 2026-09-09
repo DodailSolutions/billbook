@@ -199,7 +199,7 @@ export function CheckoutHandler() {
                     contact: userInfo.contact,
                 },
                 theme: {
-                    color: '#10b981'
+                    color: '#005DEE'
                 },
                 modal: {
                     ondismiss: function() {
@@ -230,7 +230,7 @@ export function CheckoutHandler() {
                 <Card className="max-w-md w-full">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
-                            <CreditCard className="h-5 w-5 text-emerald-600" />
+                            <CreditCard className="h-5 w-5 text-blue-600" />
                             Complete Purchase - {planDetails.name}
                         </CardTitle>
                         <CardDescription>
@@ -245,7 +245,7 @@ export function CheckoutHandler() {
                             </div>
                             <div className="flex justify-between items-baseline">
                                 <span className="text-gray-600 dark:text-gray-400">Amount</span>
-                                <span className="text-2xl font-bold text-emerald-600">
+                                <span className="text-2xl font-bold text-blue-600">
                                     {planDetails.currency === 'AED' ? 'AED' : planDetails.currency === 'USD' ? '$' : '₹'} {planDetails.amount.toLocaleString(planDetails.currency === 'AED' ? 'en-AE' : planDetails.currency === 'USD' ? 'en-US' : 'en-IN')}
                                 </span>
                             </div>
@@ -253,11 +253,11 @@ export function CheckoutHandler() {
 
                         <div className="space-y-2">
                             <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
-                                <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                                <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
                                 <span>Account will be created after payment</span>
                             </div>
                             <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
-                                <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                                <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
                                 <span>Instant activation with premium features</span>
                             </div>
                         </div>
@@ -272,7 +272,7 @@ export function CheckoutHandler() {
                             </Button>
                             <Button
                                 onClick={() => router.push(`/signup?plan=${checkoutPlan}&redirect=checkout`)}
-                                className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white"
+                                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
                             >
                                 Continue →
                             </Button>
@@ -294,7 +294,7 @@ export function CheckoutHandler() {
             <Card className="max-w-md w-full">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                        <CreditCard className="h-5 w-5 text-emerald-600" />
+                        <CreditCard className="h-5 w-5 text-blue-600" />
                         Upgrade to {planDetails.name}
                     </CardTitle>
                     <CardDescription>
@@ -309,7 +309,7 @@ export function CheckoutHandler() {
                         </div>
                         <div className="flex justify-between items-baseline">
                             <span className="text-gray-600 dark:text-gray-400">Amount</span>
-                            <span className="text-2xl font-bold text-emerald-600">
+                            <span className="text-2xl font-bold text-blue-600">
                                 {planDetails.currency === 'AED' ? 'AED' : planDetails.currency === 'USD' ? '$' : '₹'} {planDetails.amount.toLocaleString(planDetails.currency === 'AED' ? 'en-AE' : planDetails.currency === 'USD' ? 'en-US' : 'en-IN')}
                             </span>
                         </div>
@@ -317,19 +317,19 @@ export function CheckoutHandler() {
 
                     <div className="space-y-2">
                         <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
-                            <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                            <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
                             <span>Secure payment via Razorpay</span>
                         </div>
                         <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
-                            <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                            <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
                             <span>Instant activation after payment</span>
                         </div>
                         <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
-                            <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                            <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
                             <span>{checkoutPlan === 'lifetime' ? 'One-time payment, lifetime access' : '14-day free trial included'}</span>
                         </div>
                         <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
-                            <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                            <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
                             <span>14-day money-back guarantee</span>
                         </div>
                     </div>
@@ -352,7 +352,7 @@ export function CheckoutHandler() {
                         <Button
                             onClick={handleCheckout}
                             disabled={loading}
-                            className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white"
+                            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
                         >
                             {loading ? (
                                 <>

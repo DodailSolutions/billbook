@@ -237,7 +237,7 @@ export default function EmployeeDirectoryPage() {
                     </div>
                 </div>
 
-                <Button onClick={openAddModal} className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white min-h-[44px]">
+                <Button onClick={openAddModal} className="gap-2 bg-blue-600 hover:bg-blue-700 text-white min-h-[44px]">
                     <UserPlus className="h-4 w-4" /> Add Employee
                 </Button>
             </div>
@@ -259,9 +259,9 @@ export default function EmployeeDirectoryPage() {
                     onChange={(e) => setStatusFilter(e.target.value as any)}
                     className="p-2.5 text-xs border border-gray-200 rounded-xl min-h-[44px]"
                 >
-                    <option value="all">All Status</option>
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
+                    <option value="all">All Statuses</option>
+                    <option value="active">Active Only</option>
+                    <option value="inactive">Inactive Only</option>
                     <option value="terminated">Terminated</option>
                 </select>
                 <select
@@ -279,7 +279,7 @@ export default function EmployeeDirectoryPage() {
             {/* List */}
             {loading ? (
                 <div className="flex justify-center py-16">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
                 </div>
             ) : filtered.length === 0 ? (
                 <div className="text-center py-16 bg-white rounded-2xl border border-gray-100">
@@ -292,7 +292,7 @@ export default function EmployeeDirectoryPage() {
                     {filtered.map(emp => {
                         const sal = emp.salary_structure
                         return (
-                            <Card key={emp.id} className="border-gray-100 shadow-2xs hover:border-emerald-200 transition-all group">
+                            <Card key={emp.id} className="border-gray-100 shadow-2xs hover:border-blue-200 transition-all group">
                                 <CardContent className="p-4 space-y-4">
                                     <div className="flex items-start justify-between">
                                         <div>
@@ -349,7 +349,7 @@ export default function EmployeeDirectoryPage() {
             {isAddModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
                     <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl overflow-hidden border border-gray-100">
-                        <div className="p-4 bg-emerald-600 text-white flex items-center justify-between">
+                        <div className="p-4 bg-blue-600 text-white flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <UserPlus className="h-5 w-5" />
                                 <h3 className="font-bold text-base">{editMode ? 'Edit Employee Profile' : 'Add New Employee Profile'}</h3>
@@ -441,7 +441,7 @@ export default function EmployeeDirectoryPage() {
                                         checked={allowLogin} 
                                         onChange={(e) => setAllowLogin(e.target.checked)} 
                                         disabled={!!editMode && !!employees.find(e => e.id === editMode)?.employee_user_id}
-                                        className="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 h-4 w-4" 
+                                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4" 
                                     />
                                     <label htmlFor="allowLogin" className="text-xs font-bold text-gray-750 uppercase tracking-wider cursor-pointer select-none">
                                         Enable Employee Login Dashboard
@@ -529,7 +529,7 @@ export default function EmployeeDirectoryPage() {
                                 </div>
 
                                 {/* Live Preview */}
-                                <div className="mt-3 p-3 bg-emerald-50 rounded-xl text-xs space-y-1 font-semibold">
+                                <div className="mt-3 p-3 bg-blue-50/60 rounded-xl text-xs space-y-1 font-semibold">
                                     <div className="flex justify-between text-gray-700">
                                         <span>Gross Monthly Pay:</span>
                                         <span>₹{grossPreview.toLocaleString('en-IN')}</span>
@@ -538,7 +538,7 @@ export default function EmployeeDirectoryPage() {
                                         <span>Total Deductions:</span>
                                         <span>-₹{deductionsPreview.toLocaleString('en-IN')}</span>
                                     </div>
-                                    <div className="flex justify-between text-emerald-800 text-sm font-bold border-t border-emerald-200 pt-1">
+                                    <div className="flex justify-between text-blue-900 text-sm font-bold border-t border-blue-200 pt-1">
                                         <span>Net Payout:</span>
                                         <span>₹{netPreview.toLocaleString('en-IN')}</span>
                                     </div>
@@ -547,7 +547,7 @@ export default function EmployeeDirectoryPage() {
 
                             <div className="pt-3 border-t flex justify-end gap-2">
                                 <Button type="button" variant="outline" onClick={() => setIsAddModalOpen(false)}>Cancel</Button>
-                                <Button type="submit" disabled={formLoading} className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                                <Button type="submit" disabled={formLoading} className="bg-blue-600 hover:bg-blue-700 text-white">
                                     {formLoading ? 'Saving...' : 'Save Employee Profile'}
                                 </Button>
                             </div>

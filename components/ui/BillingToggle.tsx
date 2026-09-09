@@ -24,9 +24,9 @@ export function BillingToggle({ onToggle, defaultYearly = false }: BillingToggle
       
       <button
         onClick={handleToggle}
-        className="relative inline-flex h-8 w-16 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:focus:ring-offset-gray-950"
+        className="relative inline-flex h-8 w-16 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-950"
         style={{
-          backgroundColor: isYearly ? '#10b981' : '#d1d5db'
+          backgroundColor: isYearly ? '#005DEE' : '#d1d5db'
         }}
         role="switch"
         aria-checked={isYearly}
@@ -42,7 +42,7 @@ export function BillingToggle({ onToggle, defaultYearly = false }: BillingToggle
         <span className={`text-sm font-medium transition-colors ${isYearly ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}>
           Yearly
         </span>
-        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300">
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
           Save 17%
         </span>
       </div>

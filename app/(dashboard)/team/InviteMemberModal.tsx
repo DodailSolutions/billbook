@@ -76,7 +76,7 @@ export function InviteMemberModal({ canAdd, currentCount, maxAllowed, roles }: I
       <DialogTrigger asChild>
         <Button 
           disabled={!canAdd}
-          className="bg-emerald-600 hover:bg-emerald-700 text-white"
+          className="bg-blue-600 hover:bg-blue-700 text-white"
         >
           <UserPlus className="h-4 w-4 mr-2" />
           Invite Member
@@ -156,7 +156,7 @@ export function InviteMemberModal({ canAdd, currentCount, maxAllowed, roles }: I
               <Button
                 onClick={handleInvite}
                 disabled={loading}
-                className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white"
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
               >
                 {loading ? (
                   <>
@@ -178,7 +178,7 @@ export function InviteMemberModal({ canAdd, currentCount, maxAllowed, roles }: I
           <div className="py-4">
             <Button
               onClick={() => window.location.href = '/pricing'}
-              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
             >
               Upgrade Plan
             </Button>

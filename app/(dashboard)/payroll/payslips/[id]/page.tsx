@@ -25,7 +25,7 @@ export default function PayslipDetailPage({ params }: { params: Promise<{ id: st
 
     const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
-    if (loading) return <div className="flex justify-center py-20"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" /></div>
+    if (loading) return <div className="flex justify-center py-20"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" /></div>
     if (!payslip) return <div className="text-center py-20"><h3 className="text-lg font-bold">Payslip Not Found</h3><Link href="/payroll" className="mt-4 inline-block"><Button variant="outline">Back to Payroll</Button></Link></div>
 
     const emp = payslip.employee
@@ -50,7 +50,7 @@ export default function PayslipDetailPage({ params }: { params: Promise<{ id: st
                         <Printer className="h-4 w-4" /> Print
                     </Button>
                     <a href={`/api/payroll/payslips/${id}/pdf`} target="_blank">
-                        <Button className="gap-2 min-h-[44px] bg-emerald-600 hover:bg-emerald-700 text-white">
+                        <Button className="gap-2 min-h-[44px] bg-blue-600 hover:bg-blue-700 text-white">
                             <Download className="h-4 w-4" /> Download PDF
                         </Button>
                     </a>
@@ -65,7 +65,7 @@ export default function PayslipDetailPage({ params }: { params: Promise<{ id: st
                                 {settings?.company_logo_url ? (
                                     <img src={settings.company_logo_url} alt="Logo" className="h-8 object-contain" />
                                 ) : (
-                                    <Building2 className="h-6 w-6 text-emerald-600" />
+                                    <Building2 className="h-6 w-6 text-blue-600" />
                                 )}
                                 <h1 className="text-2xl font-black" style={{ color: settings?.company_name_color || '#111827' }}>
                                     {settings?.company_name || 'Your Company'}
@@ -75,7 +75,7 @@ export default function PayslipDetailPage({ params }: { params: Promise<{ id: st
                         </div>
                         <div className="text-right">
                             <h2 className="text-xl font-bold text-gray-800 tracking-wider uppercase mb-1">PAYSLIP</h2>
-                            <span className="inline-block px-3 py-1 bg-emerald-50 text-emerald-700 font-bold text-xs rounded-full border border-emerald-200">
+                            <span className="inline-block px-3 py-1 bg-blue-50 text-blue-700 font-bold text-xs rounded-full border border-blue-200">
                                 {monthNames[payslip.month - 1].toUpperCase()} {payslip.year}
                             </span>
                         </div>
@@ -127,13 +127,13 @@ export default function PayslipDetailPage({ params }: { params: Promise<{ id: st
                         </div>
                     </div>
 
-                    <div className="p-4 bg-emerald-600 text-white rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-2 shadow-inner">
+                    <div className="p-4 bg-blue-600 text-white rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-2 shadow-inner">
                         <div>
-                            <p className="text-xs text-emerald-100 font-semibold uppercase tracking-wider">Net Take-Home Pay</p>
+                            <p className="text-xs text-blue-100 font-semibold uppercase tracking-wider">Net Take-Home Pay</p>
                             <h2 className="text-2xl font-black">₹{Number(payslip.net_salary).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</h2>
                         </div>
                         <div className="flex items-center gap-1.5 text-xs bg-white/20 px-3 py-1.5 rounded-full font-bold">
-                            <CheckCircle2 className="h-4 w-4 text-emerald-200" />
+                            <CheckCircle2 className="h-4 w-4 text-blue-200" />
                             <span>Salary Disbursed</span>
                         </div>
                     </div>

@@ -15,7 +15,7 @@ function SubmitButton() {
     return (
         <Button 
             type="submit" 
-            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white" 
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white" 
             disabled={pending}
         >
             {pending ? (
@@ -171,7 +171,7 @@ export default function LoginForm({ message }: { message?: string }) {
                                     errors.email 
                                         ? 'border-red-500 focus:ring-red-500' 
                                         : email && !errors.email
-                                        ? 'border-emerald-500 focus:ring-emerald-500'
+                                        ? 'border-blue-500 focus:ring-blue-500'
                                         : 'border-gray-300'
                                 }`}
                                 required
@@ -184,7 +184,7 @@ export default function LoginForm({ message }: { message?: string }) {
                                 </p>
                             )}
                             {touched.email && !errors.email && email && (
-                                <p className="text-xs font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1 mt-1">
+                                <p className="text-xs font-medium text-blue-600 dark:text-blue-400 flex items-center gap-1 mt-1">
                                     <CheckCircle className="w-3 h-3" />
                                     Email looks good
                                 </p>
@@ -198,7 +198,7 @@ export default function LoginForm({ message }: { message?: string }) {
                                 </label>
                                 <Link 
                                     href="/forgot-password" 
-                                    className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline transition-colors"
+                                    className="text-xs text-blue-600 dark:text-blue-400 hover:underline transition-colors"
                                 >
                                     Forgot password?
                                 </Link>
@@ -214,7 +214,7 @@ export default function LoginForm({ message }: { message?: string }) {
                                     errors.password 
                                         ? 'border-red-500 focus:ring-red-500' 
                                         : password && !errors.password
-                                        ? 'border-emerald-500 focus:ring-emerald-500'
+                                        ? 'border-blue-500 focus:ring-blue-500'
                                         : 'border-gray-300'
                                 }`}
                                 required
@@ -227,7 +227,7 @@ export default function LoginForm({ message }: { message?: string }) {
                                 </p>
                             )}
                             {touched.password && !errors.password && password && (
-                                <p className="text-xs font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1 mt-1">
+                                <p className="text-xs font-medium text-blue-600 dark:text-blue-400 flex items-center gap-1 mt-1">
                                     <CheckCircle className="w-3 h-3" />
                                     Password entered
                                 </p>
@@ -247,7 +247,7 @@ export default function LoginForm({ message }: { message?: string }) {
                         Don&apos;t have an account?{" "}
                         <Link 
                             href="/signup" 
-                            className="text-emerald-600 dark:text-emerald-400 hover:underline font-semibold transition-colors"
+                            className="text-blue-600 dark:text-blue-400 hover:underline font-semibold transition-colors"
                         >
                             Sign up
                         </Link>
