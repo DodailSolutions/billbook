@@ -16,9 +16,9 @@ import {
     getCashFlowStatement,
     getGeneralLedger,
     getChartOfAccounts,
-    getDefaultFYDates,
     syncInvoicesAndExpensesToLedger
 } from "@/lib/bookkeeping-actions"
+import { getDefaultFYDates } from "@/lib/bookkeeping-utils"
 import { getInvoiceSettings } from "@/app/(dashboard)/invoices/settings/actions"
 import { Card, CardContent } from "@/components/ui/Card"
 import { Button } from "@/components/ui/Button"

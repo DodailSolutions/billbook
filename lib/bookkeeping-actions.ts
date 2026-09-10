@@ -23,6 +23,7 @@ import {
     CreateJournalEntryInput, 
     CreateBankAccountInput 
 } from "./bookkeeping-types"
+import { getDefaultFYDates } from "./bookkeeping-utils"
 
 const DEFAULT_COA_SEED: Omit<CreateAccountInput, 'user_id'>[] = [
     // Assets
@@ -309,17 +310,6 @@ export async function createJournalEntry(input: CreateJournalEntryInput): Promis
 
     revalidatePath('/bookkeeping')
     return { success: true, data: entry }
-}
-
-export function getDefaultFYDates(): { fromDate: string; toDate: string } {
-    const now = new Date()
-    const currentYear = now.getFullYear()
-    const currentMonth = now.getMonth() // 0-indexed (April is 3)
-    const fyStartYear = currentMonth >= 3 ? currentYear : currentYear - 1
-    const fyEndYear = fyStartYear + 1
-    const fromDate = `${fyStartYear}-04-01`
-    const toDate = `${fyEndYear}-03-31`
-    return { fromDate, toDate }
 }
 
 export async function getTrialBalanceReport(filters?: DateFilterOptions): Promise<TrialBalanceReport> {
