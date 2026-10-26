@@ -55,7 +55,13 @@ export default function PayrollDashboardPage() {
                     </p>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                    <Link href="/payroll/employees?action=new">
+                        <Button className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white min-h-[44px]">
+                            <UserPlus className="h-4 w-4" />
+                            Add Employee
+                        </Button>
+                    </Link>
                     <Link href="/payroll/attendance">
                         <Button variant="outline" className="gap-2 min-h-[44px]">
                             <CalendarClock className="h-4 w-4" />
@@ -74,14 +80,14 @@ export default function PayrollDashboardPage() {
             {/* Metrics */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <Link href="/payroll/employees">
-                    <Card className="border-gray-100 shadow-2xs hover:border-blue-200 transition-all cursor-pointer h-full">
+                    <Card className="border-gray-100 shadow-2xs hover:border-blue-300 transition-all cursor-pointer h-full group">
                         <CardContent className="p-4 flex items-center justify-between">
                             <div>
                                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Employees</p>
                                 <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mt-1">{activeEmpCount}</h3>
-                                <p className="text-[11px] text-gray-400 mt-0.5">Active staff on payroll</p>
+                                <p className="text-[11px] text-blue-600 font-semibold mt-0.5 group-hover:underline">Manage & Add Staff →</p>
                             </div>
-                            <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl"><Users className="h-6 w-6" /></div>
+                            <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl group-hover:bg-blue-100 transition-colors"><Users className="h-6 w-6" /></div>
                         </CardContent>
                     </Card>
                 </Link>
@@ -122,6 +128,70 @@ export default function PayrollDashboardPage() {
                     </CardContent>
                 </Card>
             </div>
+
+            {/* Active Staff Summary & Quick Add */}
+            <Card className="border-gray-100 shadow-2xs">
+                <CardContent className="p-4 sm:p-6 space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 pb-3">
+                        <div>
+                            <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider flex items-center gap-2">
+                                <Users className="h-4 w-4 text-blue-600" />
+                                Employees on Payroll ({employees.length})
+                            </h3>
+                            <p className="text-xs text-gray-500 mt-0.5">Manage staff, roles, and salary structures for attendance & payslips.</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Link href="/payroll/employees">
+                                <Button variant="outline" size="sm" className="text-xs">
+                                    View Directory →
+                                </Button>
+                            </Link>
+                            <Link href="/payroll/employees?action=new">
+                                <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs gap-1.5">
+                                    <UserPlus className="h-3.5 w-3.5" />
+                                    + Add Employee
+                                </Button>
+                            </Link>
+                        </div>
+                    </div>
+
+                    {loading ? (
+                        <div className="flex justify-center py-6">
+                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600" />
+                        </div>
+                    ) : employees.length === 0 ? (
+                        <div className="text-center py-8 bg-slate-50 rounded-xl border border-dashed border-gray-200">
+                            <Users className="h-8 w-8 text-gray-300 mx-auto mb-2" />
+                            <p className="text-xs text-gray-600 font-medium">No employees registered yet.</p>
+                            <Link href="/payroll/employees?action=new" className="mt-2 inline-block">
+                                <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs gap-1.5">
+                                    <UserPlus className="h-3.5 w-3.5" />
+                                    Add Your First Employee
+                                </Button>
+                            </Link>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                            {employees.map(emp => (
+                                <Link 
+                                    key={emp.id} 
+                                    href={`/payroll/employees`}
+                                    className="p-3 bg-slate-50 hover:bg-blue-50/50 rounded-xl border border-gray-200 hover:border-blue-300 transition-all flex items-center justify-between text-xs group"
+                                >
+                                    <div className="truncate pr-2">
+                                        <p className="font-bold text-gray-900 group-hover:text-blue-600 truncate">{emp.name}</p>
+                                        <p className="text-[10px] text-gray-500 font-mono">{emp.employee_code} • {emp.designation || 'Staff'}</p>
+                                        <p className="text-[10px] font-semibold text-emerald-600 mt-0.5">
+                                            Basic: ₹{Number(emp.salary_structure?.basic_salary || 0).toLocaleString('en-IN')}/mo
+                                        </p>
+                                    </div>
+                                    <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-blue-600 transition-colors shrink-0" />
+                                </Link>
+                            ))}
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
 
             {/* Recent Payroll Runs */}
             <Card className="border-gray-100 shadow-2xs">

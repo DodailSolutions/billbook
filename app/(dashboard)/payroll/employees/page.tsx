@@ -64,6 +64,12 @@ export default function EmployeeDirectoryPage() {
 
     useEffect(() => {
         fetchEmp()
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search)
+            if (params.get('action') === 'new' || params.get('add') === 'true') {
+                openAddModal()
+            }
+        }
     }, [])
 
     const openAddModal = () => {

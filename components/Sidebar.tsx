@@ -128,6 +128,12 @@ export function Sidebar() {
                     color: "text-blue-600"
                 },
                 {
+                    label: 'Employees',
+                    icon: Users,
+                    href: '/payroll/employees',
+                    color: "text-slate-700"
+                },
+                {
                     label: 'Attendance Tracking',
                     icon: CalendarDays,
                     href: '/payroll/attendance',
