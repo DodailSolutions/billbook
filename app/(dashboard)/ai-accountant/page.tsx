@@ -80,13 +80,17 @@ export default async function AIAccountantPage() {
   return (
     <div className="h-[calc(100vh-5rem)] p-4 sm:p-8">
       <div className="max-w-6xl mx-auto h-full flex flex-col">
-        <div className="mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            AI Accountant Assistant
-          </h1>
-          <p className="text-gray-600">
-            Your personal AI accountant for {profile?.business_name || 'your business'}. Ask about bookkeeping, cash flow, or financial insights.
-          </p>
+        <div className="mb-4 sm:mb-6">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1">
+                Personal ERP AI Controller
+              </h1>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Data-grounded financial intelligence for <strong className="text-gray-900 dark:text-white">{profile?.business_name || profile?.owner_name || 'your business'}</strong>. Synthesizes ledgers, receivables, low-stock alerts, GST, and cash flow.
+              </p>
+            </div>
+          </div>
         </div>
         <AIAccountantChat 
           userId={user.id} 
