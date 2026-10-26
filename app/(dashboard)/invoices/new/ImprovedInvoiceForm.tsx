@@ -14,8 +14,6 @@ import {
 import { createInvoice } from '../actions'
 import { saveItemFromInvoice, deleteSavedItem as deleteSavedItemAction } from '../../items/actions'
 import type { Customer, InventoryItem as InventoryOption, SavedItem } from '@/lib/types'
-import jsPDF from 'jspdf'
-import html2canvas from 'html2canvas'
 
 interface InvoiceItem {
   id: string
@@ -41,7 +39,15 @@ interface ImprovedInvoiceFormProps {
   inventoryItems?: InventoryOption[]
 }
 
-export function ImprovedInvoiceForm({ customers: initialCustomers, savedItems = [], inventoryItems = [] }: ImprovedInvoiceFormProps) {
+export function ImprovedInvoiceForm({ 
+  customers: initialCustomers = [], 
+  savedItems: rawSavedItems = [], 
+  inventoryItems: rawInventoryItems = [] 
+}: ImprovedInvoiceFormProps) {
+  const safeInitialCustomers = initialCustomers || []
+  const savedItems = rawSavedItems || []
+  const inventoryItems = rawInventoryItems || []
+
   const router = useRouter()
   const [, startTransition] = useTransition()
   const [currentStep, setCurrentStep] = useState(1)
@@ -49,7 +55,7 @@ export function ImprovedInvoiceForm({ customers: initialCustomers, savedItems = 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [showAddCustomerModal, setShowAddCustomerModal] = useState(false)
-  const [customers, setCustomers] = useState<Customer[]>(initialCustomers)
+  const [customers, setCustomers] = useState<Customer[]>(safeInitialCustomers)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [createdInvoiceId, setCreatedInvoiceId] = useState<string | null>(null)
   const [isDownloading, setIsDownloading] = useState(false)
@@ -481,6 +487,12 @@ export function ImprovedInvoiceForm({ customers: initialCustomers, savedItems = 
         })
       )
       
+      // Dynamically load client-only PDF generation libraries
+      const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
+        import('html2canvas'),
+        import('jspdf')
+      ])
+
       // Convert to canvas
       const canvas = await html2canvas(container, {
         scale: 2,

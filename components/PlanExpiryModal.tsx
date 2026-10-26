@@ -14,21 +14,31 @@ interface PlanExpiryModalProps {
 export function PlanExpiryModal({ isExpired, daysUntilExpiry, planName }: PlanExpiryModalProps) {
     // Check if dismissed on initialization to avoid setState in effect
     const [isOpen, setIsOpen] = useState(() => {
-        const dismissedUntil = localStorage.getItem('planExpiryDismissed')
-        if (dismissedUntil) {
-            const dismissedDate = new Date(dismissedUntil)
-            if (dismissedDate > new Date()) {
-                return false
+        if (typeof window === 'undefined') return false
+        try {
+            const dismissedUntil = localStorage.getItem('planExpiryDismissed')
+            if (dismissedUntil) {
+                const dismissedDate = new Date(dismissedUntil)
+                if (dismissedDate > new Date()) {
+                    return false
+                }
             }
+        } catch {
+            return false
         }
         return isExpired || (daysUntilExpiry !== null && daysUntilExpiry <= 7)
     })
 
     const [dismissed, setDismissed] = useState(() => {
-        const dismissedUntil = localStorage.getItem('planExpiryDismissed')
-        if (dismissedUntil) {
-            const dismissedDate = new Date(dismissedUntil)
-            return dismissedDate > new Date()
+        if (typeof window === 'undefined') return false
+        try {
+            const dismissedUntil = localStorage.getItem('planExpiryDismissed')
+            if (dismissedUntil) {
+                const dismissedDate = new Date(dismissedUntil)
+                return dismissedDate > new Date()
+            }
+        } catch {
+            return false
         }
         return false
     })
@@ -41,7 +51,11 @@ export function PlanExpiryModal({ isExpired, daysUntilExpiry, planName }: PlanEx
         const hours = isExpired ? 1 : 24
         const dismissUntil = new Date()
         dismissUntil.setHours(dismissUntil.getHours() + hours)
-        localStorage.setItem('planExpiryDismissed', dismissUntil.toISOString())
+        try {
+            localStorage.setItem('planExpiryDismissed', dismissUntil.toISOString())
+        } catch {
+            // Ignore storage write errors (e.g. private browsing)
+        }
     }
 
     if (!isOpen || dismissed) return null

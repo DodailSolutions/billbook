@@ -61,7 +61,24 @@ export async function getUserPlanStatus(): Promise<PlanStatus | null> {
             }
         }
 
-        const plan = subscription.plan as SubscriptionPlan
+        // Extract plan safely handling both object, array, or null/missing relation
+        const rawPlan = Array.isArray(subscription.plan) ? subscription.plan[0] : subscription.plan
+
+        if (!rawPlan) {
+            // Subscription exists but plan details not found
+            return {
+                hasActivePlan: true,
+                isExpired: false,
+                planName: 'Professional',
+                planSlug: 'professional',
+                expiryDate: subscription.end_date || null,
+                daysUntilExpiry: null,
+                isLifetime: false,
+                subscription: subscription as UserSubscription
+            }
+        }
+
+        const plan = rawPlan as SubscriptionPlan
         const isLifetime = plan.billing_period === 'lifetime'
         const endDate = subscription.end_date ? new Date(subscription.end_date) : null
         const now = new Date()
@@ -77,8 +94,8 @@ export async function getUserPlanStatus(): Promise<PlanStatus | null> {
         return {
             hasActivePlan: !isExpired,
             isExpired,
-            planName: plan.name,
-            planSlug: plan.slug,
+            planName: plan.name || 'Free',
+            planSlug: plan.slug || 'free',
             expiryDate: subscription.end_date || null,
             daysUntilExpiry,
             isLifetime,

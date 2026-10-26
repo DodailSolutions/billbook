@@ -11,7 +11,10 @@ const FALLBACK_SMTP_PASSWORD = process.env.SMTP_PASSWORD
 const FALLBACK_FROM_EMAIL = process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER || 'billbookyapp@gmail.com'
 const FALLBACK_FROM_NAME = process.env.SMTP_FROM_NAME || 'BillBooky Support'
 
-const resendClient = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
+function getResendClient() {
+  const key = process.env.RESEND_API_KEY
+  return key ? new Resend(key) : null
+}
 
 // Get SMTP settings from database or fallback to environment variables
 async function getSMTPSettings() {
@@ -40,7 +43,8 @@ async function getSMTPSettings() {
   }
 
   // Fallback to environment variables
-  if (!resendClient && (!FALLBACK_SMTP_USER || !FALLBACK_SMTP_PASSWORD)) {
+  const resend = getResendClient()
+  if (!resend && (!FALLBACK_SMTP_USER || !FALLBACK_SMTP_PASSWORD)) {
     console.error('❌ SMTP credentials or RESEND_API_KEY are not configured')
     throw new Error(
       'SMTP settings not configured. Please configure SMTP settings in Admin > Email Configuration or set RESEND_API_KEY / SMTP credentials in .env.local.'
@@ -80,15 +84,24 @@ async function sendEmailSafely(emailParams: any) {
   try {
     const settings = await getSMTPSettings()
 
-    if (resendClient) {
+    const resend = getResendClient()
+    if (resend) {
       console.log('📧 Sending email via Resend API to:', emailParams.to)
-      const fromAddr = emailParams.from || `"${settings.from_name}" <${settings.from_email}>`
-      const res = await resendClient.emails.send({
+
+      // Resend does not allow sending from unverified public domains like @gmail.com.
+      // If RESEND_FROM_EMAIL is set, use it. Otherwise, if the settings email is @gmail.com or unverified,
+      // fallback to Resend's default onboarding sender so delivery does not fail.
+      let fromAddr = process.env.RESEND_FROM_EMAIL || emailParams.from || `"${settings.from_name}" <${settings.from_email}>`
+      if (fromAddr.includes('@gmail.com') && !process.env.RESEND_FROM_EMAIL) {
+        fromAddr = `${settings.from_name || 'BillBooky'} <onboarding@resend.dev>`
+      }
+
+      const res = await resend.emails.send({
         from: fromAddr,
         to: emailParams.to,
         subject: emailParams.subject,
         html: emailParams.html,
-        replyTo: emailParams.replyTo,
+        replyTo: emailParams.replyTo || settings.from_email,
       })
       if (res.error) {
         console.error('❌ Resend API Error:', res.error)
@@ -107,9 +120,15 @@ async function sendEmailSafely(emailParams: any) {
 
     console.log('✅ Email sent successfully:', info.messageId)
     return { success: true, data: { id: info.messageId } }
-  } catch (err) {
+  } catch (err: any) {
     console.error('❌ Error sending email:', err)
-    return { success: false, error: err }
+    let errorMessage = err instanceof Error ? err.message : String(err)
+    if (err?.code === 'EAUTH' || errorMessage.includes('BadCredentials') || errorMessage.includes('Username and Password not accepted')) {
+      errorMessage = 'Email service authentication failed. If you are using Gmail SMTP, Google requires a 16-character App Password (from Google Account > Security > 2-Step Verification > App Passwords) rather than your normal password. Alternatively, set RESEND_API_KEY in your Vercel Environment Variables.'
+    } else if (err?.code === 'ETIMEDOUT' || err?.code === 'ECONNREFUSED') {
+      errorMessage = 'Email connection timed out. Serverless cloud environments (like Vercel) often block outbound SMTP port 587/465. It is strongly recommended to set RESEND_API_KEY in Vercel Environment Variables for reliable email delivery.'
+    }
+    return { success: false, error: new Error(errorMessage) }
   }
 }
 

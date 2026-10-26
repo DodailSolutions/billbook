@@ -8,13 +8,28 @@ import { getInventoryItems } from "../../inventory/actions"
 import { ImprovedInvoiceForm } from "./ImprovedInvoiceForm"
 import { checkInvoiceLimit } from '@/lib/plan-utils'
 
+import type { Customer, InventoryItem, SavedItem } from "@/lib/types"
+
 export default async function NewInvoicePage() {
-    const [customers, savedItems, inventoryItems, limitStatus] = await Promise.all([
-        getCustomers(),
-        getSavedItems(),
-        getInventoryItems(),
-        checkInvoiceLimit()
-    ])
+    let customers: Customer[] = []
+    let savedItems: SavedItem[] = []
+    let inventoryItems: InventoryItem[] = []
+    let limitStatus = { canCreate: true, count: 0, limit: 50 }
+
+    try {
+        const [c, s, inv, lim] = await Promise.all([
+            getCustomers().catch(() => [] as Customer[]),
+            getSavedItems().catch(() => [] as SavedItem[]),
+            getInventoryItems().catch(() => [] as InventoryItem[]),
+            checkInvoiceLimit().catch(() => ({ canCreate: true, count: 0, limit: 50 }))
+        ])
+        customers = c || []
+        savedItems = s || []
+        inventoryItems = inv || []
+        limitStatus = lim || { canCreate: true, count: 0, limit: 50 }
+    } catch (err) {
+        console.error('Error loading data for NewInvoicePage:', err)
+    }
 
     // Check if user can create invoices
     if (!limitStatus.canCreate) {
