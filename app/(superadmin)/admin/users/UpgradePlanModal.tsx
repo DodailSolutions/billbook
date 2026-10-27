@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
-import { Crown, Loader2, X } from 'lucide-react'
+import { Crown, Loader2, X, AlertCircle, CheckCircle2 } from 'lucide-react'
 
 interface Plan {
   id: string
@@ -26,7 +26,7 @@ export function UpgradePlanModal({
   userId, 
   userEmail, 
   currentPlan,
-  plans, 
+  plans = [], 
   onClose, 
   onSuccess 
 }: UpgradePlanModalProps) {
@@ -37,7 +37,7 @@ export function UpgradePlanModal({
 
   const handleUpgrade = async () => {
     if (!selectedPlan) {
-      setError('Please select a plan')
+      setError('Please select a target plan to assign')
       return
     }
 
@@ -53,7 +53,7 @@ export function UpgradePlanModal({
         body: JSON.stringify({
           userId,
           planId: selectedPlan,
-          duration,
+          duration: Number(duration) || 30,
         }),
       })
 
@@ -66,7 +66,7 @@ export function UpgradePlanModal({
       onSuccess()
       onClose()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to upgrade plan')
+      setError(err instanceof Error ? err.message : 'Failed to upgrade user plan')
     } finally {
       setIsLoading(false)
     }
@@ -74,143 +74,180 @@ export function UpgradePlanModal({
 
   const selectedPlanData = plans.find(p => p.id === selectedPlan)
 
+  const calculateEndDate = () => {
+    try {
+      const d = new Date(Date.now() + (Number(duration) || 30) * 24 * 60 * 60 * 1000)
+      return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+    } catch {
+      return 'N/A'
+    }
+  }
+
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl max-w-xl w-full max-h-[92vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-800">
+        <div className="flex items-center justify-between p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
-              <Crown className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            <div className="p-2.5 bg-blue-50 dark:bg-blue-950/50 rounded-2xl text-blue-600 dark:text-blue-400">
+              <Crown className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                Upgrade User Plan
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+                Modify Subscription Plan
               </h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-xs text-slate-500 dark:text-slate-400 truncate max-w-[260px] sm:max-w-[360px]">
                 {userEmail}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+            aria-label="Close modal"
+            className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
           >
-            <X className="h-5 w-5 text-gray-500" />
+            <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-6 space-y-6">
-          {/* Current Plan */}
+        <div className="p-5 sm:p-6 space-y-5">
+          {/* Current Plan Badge */}
           {currentPlan && (
-            <div className="p-4 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-              <p className="text-sm text-blue-900 dark:text-blue-300">
-                Current Plan: <span className="font-semibold">{currentPlan}</span>
-              </p>
+            <div className="p-3.5 bg-blue-50/60 dark:bg-blue-950/30 border border-blue-200/70 dark:border-blue-900/50 rounded-2xl flex items-center justify-between">
+              <span className="text-xs text-blue-700 dark:text-blue-300 font-medium">Current Active Plan:</span>
+              <span className="text-xs font-bold text-blue-800 dark:text-blue-200 bg-white dark:bg-blue-900/50 px-2.5 py-1 rounded-lg border border-blue-200/80 dark:border-blue-800/80">
+                {currentPlan}
+              </span>
             </div>
           )}
 
           {/* Select Plan */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-              Select New Plan
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2.5">
+              Select Target Plan
             </label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {plans.map((plan) => (
-                <button
-                  key={plan.id}
-                  onClick={() => setSelectedPlan(plan.id)}
-                  className={`p-4 border-2 rounded-xl text-left transition-all ${
-                    selectedPlan === plan.id
-                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-950/20'
-                      : 'border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-700'
-                  }`}
-                >
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
-                    {plan.name}
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    ₹{plan.price}/{plan.billing_period === 'lifetime' ? 'one-time' : plan.billing_period}
-                  </p>
-                </button>
-              ))}
-            </div>
+            {plans.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                {plans.map((plan) => {
+                  const isSelected = selectedPlan === plan.id
+                  return (
+                    <button
+                      key={plan.id}
+                      type="button"
+                      onClick={() => setSelectedPlan(plan.id)}
+                      className={`p-3.5 rounded-2xl text-left border-2 transition-all relative ${
+                        isSelected
+                          ? 'border-blue-600 bg-blue-50/60 dark:bg-blue-950/40 shadow-xs'
+                          : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-slate-50/40 dark:bg-slate-800/30'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <h3 className="font-bold text-sm text-slate-900 dark:text-white">
+                          {plan.name}
+                        </h3>
+                        {isSelected && (
+                          <CheckCircle2 className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                        )}
+                      </div>
+                      <p className="text-xs font-semibold text-slate-600 dark:text-slate-300">
+                        ₹{plan.price}{' '}
+                        <span className="text-[11px] text-slate-400 font-normal">
+                          / {plan.billing_period === 'lifetime' ? 'lifetime' : plan.billing_period}
+                        </span>
+                      </p>
+                    </button>
+                  )
+                })}
+              </div>
+            ) : (
+              <div className="p-4 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 text-center text-xs text-slate-500">
+                No active plans currently configured.
+              </div>
+            )}
           </div>
 
-          {/* Duration */}
+          {/* Duration in Days */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-              Duration (Days)
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2.5">
+              Validity Duration (Days)
             </label>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-4 gap-2 mb-2">
               {[30, 90, 180, 365].map((days) => (
                 <button
                   key={days}
+                  type="button"
                   onClick={() => setDuration(days)}
-                  className={`py-2 px-3 border-2 rounded-lg text-sm font-medium transition-all ${
+                  className={`py-2 px-3 border rounded-xl text-xs font-bold transition-all ${
                     duration === days
-                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-950/20 text-blue-700 dark:text-blue-300'
-                      : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-blue-300 dark:hover:border-blue-700'
+                      ? 'border-blue-600 bg-blue-600 text-white shadow-xs'
+                      : 'border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
                   }`}
                 >
-                  {days}d
+                  {days} Days
                 </button>
               ))}
             </div>
             <Input
               type="number"
               value={duration}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDuration(parseInt(e.target.value) || 30)}
-              className="mt-2"
-              placeholder="Custom days"
+              onChange={(e) => setDuration(parseInt(e.target.value) || 30)}
+              className="text-xs"
+              placeholder="Or enter custom number of days"
               min="1"
             />
           </div>
 
-          {/* Summary */}
+          {/* Upgrade Summary */}
           {selectedPlanData && (
-            <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg space-y-2">
-              <h4 className="font-semibold text-gray-900 dark:text-white">Summary</h4>
-              <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                <p>Plan: <span className="font-medium text-gray-900 dark:text-white">{selectedPlanData.name}</span></p>
-                <p>Duration: <span className="font-medium text-gray-900 dark:text-white">{duration} days</span></p>
-                <p>End Date: <span className="font-medium text-gray-900 dark:text-white">
-                  {new Date(Date.now() + duration * 24 * 60 * 60 * 1000).toLocaleDateString()}
-                </span></p>
+            <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 space-y-1.5 text-xs">
+              <div className="flex justify-between text-slate-600 dark:text-slate-400">
+                <span>Selected Plan:</span>
+                <span className="font-semibold text-slate-900 dark:text-white">{selectedPlanData.name}</span>
+              </div>
+              <div className="flex justify-between text-slate-600 dark:text-slate-400">
+                <span>Validity:</span>
+                <span className="font-semibold text-slate-900 dark:text-white">{duration} days</span>
+              </div>
+              <div className="flex justify-between text-slate-600 dark:text-slate-400">
+                <span>Calculated End Date:</span>
+                <span className="font-semibold text-slate-900 dark:text-white">{calculateEndDate()}</span>
               </div>
             </div>
           )}
 
-          {/* Error */}
+          {/* Error Message */}
           {error && (
-            <div className="p-3 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-lg">
-              <p className="text-sm text-red-900 dark:text-red-300">{error}</p>
+            <div className="p-3 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900 rounded-xl flex items-center gap-2 text-rose-700 dark:text-rose-400 text-xs">
+              <AlertCircle className="h-4 w-4 shrink-0" />
+              <span>{error}</span>
             </div>
           )}
 
           {/* Actions */}
-          <div className="flex gap-3">
+          <div className="flex gap-3 pt-2">
             <Button
+              type="button"
               onClick={onClose}
-              variant="secondary"
-              className="flex-1"
+              variant="outline"
+              className="flex-1 text-xs"
               disabled={isLoading}
             >
               Cancel
             </Button>
             <Button
+              type="button"
               onClick={handleUpgrade}
-              className="flex-1 bg-blue-600 hover:bg-blue-700"
+              className="flex-1 bg-blue-600 hover:bg-blue-700 text-xs font-semibold text-white shadow-xs"
               disabled={isLoading || !selectedPlan}
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Upgrading...
+                  <Loader2 className="h-3.5 w-3.5 mr-2 animate-spin" />
+                  Applying Upgrade...
                 </>
               ) : (
-                'Upgrade Plan'
+                'Confirm & Apply Plan'
               )}
             </Button>
           </div>
