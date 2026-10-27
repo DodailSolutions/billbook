@@ -56,6 +56,47 @@ export async function getCustomer(id: string): Promise<Customer | null> {
     return data
 }
 
+export async function createCustomerAction(formData: FormData): Promise<{ success: boolean; error?: string; customerId?: string }> {
+    try {
+        const supabase = await createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) {
+            return { success: false, error: 'User is not authenticated' }
+        }
+
+        const name = (formData.get('name') as string)?.trim()
+        if (!name) {
+            return { success: false, error: 'Customer name is required' }
+        }
+
+        const customerData = {
+            user_id: user.id,
+            name,
+            email: (formData.get('email') as string)?.trim() || null,
+            phone: (formData.get('phone') as string)?.trim() || null,
+            address: (formData.get('address') as string)?.trim() || null,
+            gstin: (formData.get('gstin') as string)?.trim().toUpperCase() || null,
+        }
+
+        const { data, error } = await supabase
+            .from('customers')
+            .insert([customerData])
+            .select('id')
+            .single()
+
+        if (error) {
+            console.error('Error creating customer:', error)
+            return { success: false, error: error.message || 'Failed to create customer' }
+        }
+
+        revalidatePath('/customers')
+        return { success: true, customerId: data?.id }
+    } catch (err) {
+        console.error('Unexpected error creating customer:', err)
+        return { success: false, error: err instanceof Error ? err.message : 'An unexpected error occurred' }
+    }
+}
+
 export async function createCustomer(formData: FormData) {
     const supabase = await createClient()
 

@@ -3,8 +3,6 @@
 import { useState } from "react"
 import { Loader2, FileDown } from "lucide-react"
 import { Button } from "@/components/ui/Button"
-import jsPDF from 'jspdf'
-import html2canvas from 'html2canvas'
 
 interface DownloadPOPDFButtonProps {
     poId: string
@@ -17,6 +15,11 @@ export function DownloadPOPDFButton({ poId, poNumber }: DownloadPOPDFButtonProps
     const handleDownload = async () => {
         setIsDownloading(true)
         try {
+            const [{ default: jsPDF }, { default: html2canvas }] = await Promise.all([
+                import('jspdf'),
+                import('html2canvas')
+            ])
+
             // Fetch the PO HTML
             const response = await fetch(`/api/purchase-orders/${poId}/pdf?mode=html`)
             

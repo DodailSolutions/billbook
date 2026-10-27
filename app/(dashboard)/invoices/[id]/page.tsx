@@ -59,9 +59,9 @@ export default async function InvoiceDetailPage({
                     <ShareInvoiceButton
                         invoiceId={id}
                         invoiceNumber={invoice.invoice_number}
-                        customerName={invoice.customer.name}
-                        customerPhone={invoice.customer.phone}
-                        customerEmail={invoice.customer.email}
+                        customerName={invoice.customer?.name || 'Customer'}
+                        customerPhone={invoice.customer?.phone || ''}
+                        customerEmail={invoice.customer?.email || ''}
                         total={invoice.total}
                     />
                     <Link href={`/invoices/${id}/edit`}>
@@ -124,11 +124,11 @@ export default async function InvoiceDetailPage({
                             <User2 className="h-3.5 w-3.5" />Bill To
                         </p>
                         <div className="space-y-0.5">
-                            <p className="font-bold text-gray-900 dark:text-white">{invoice.customer.name}</p>
-                            {invoice.customer.email && <p className="text-sm text-gray-600 dark:text-gray-400">{invoice.customer.email}</p>}
-                            {invoice.customer.phone && <p className="text-sm text-gray-600 dark:text-gray-400">{invoice.customer.phone}</p>}
-                            {invoice.customer.address && <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{invoice.customer.address}</p>}
-                            {invoice.customer.gstin && (
+                            <p className="font-bold text-gray-900 dark:text-white">{invoice.customer?.name || 'Direct Customer'}</p>
+                            {invoice.customer?.email && <p className="text-sm text-gray-600 dark:text-gray-400">{invoice.customer.email}</p>}
+                            {invoice.customer?.phone && <p className="text-sm text-gray-600 dark:text-gray-400">{invoice.customer.phone}</p>}
+                            {invoice.customer?.address && <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{invoice.customer.address}</p>}
+                            {invoice.customer?.gstin && (
                                 <p className="text-xs text-gray-500 font-mono mt-1 bg-gray-100 dark:bg-gray-800 rounded px-2 py-0.5 inline-block">
                                     GSTIN: {invoice.customer.gstin}
                                 </p>

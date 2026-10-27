@@ -3,8 +3,6 @@
 import { useState } from "react"
 import { Loader2, FileDown } from "lucide-react"
 import { Button } from "@/components/ui/Button"
-import jsPDF from 'jspdf'
-import html2canvas from 'html2canvas'
 
 interface DownloadPDFButtonProps {
     invoiceId: string
@@ -16,6 +14,11 @@ export function DownloadPDFButton({ invoiceId }: DownloadPDFButtonProps) {
     const handleDownload = async () => {
         setIsDownloading(true)
         try {
+            const [{ default: jsPDF }, { default: html2canvas }] = await Promise.all([
+                import('jspdf'),
+                import('html2canvas')
+            ])
+
             // Fetch the invoice HTML
             const response = await fetch(`/api/invoices/${invoiceId}/pdf?mode=html`)
             

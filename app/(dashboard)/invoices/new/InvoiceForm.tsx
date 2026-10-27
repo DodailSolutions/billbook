@@ -41,7 +41,7 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
     const [notes, setNotes] = useState(invoice?.notes || '')
     const [simplifiedView, setSimplifiedView] = useState(true)
     const [items, setItems] = useState<InvoiceItem[]>(
-        invoice?.invoice_items.map(item => ({
+        (invoice?.invoice_items || []).map(item => ({
             inventory_item_id: item.inventory_item_id,
             inventory_name: inventoryItems.find((inventoryItem) => inventoryItem.id === item.inventory_item_id)?.name,
             available_stock: inventoryItems.find((inventoryItem) => inventoryItem.id === item.inventory_item_id)?.current_stock,

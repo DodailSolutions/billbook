@@ -9,8 +9,6 @@ import { Button } from "@/components/ui/Button"
 import { deleteInvoice, updateInvoiceStatus } from "./actions"
 import type { InvoiceWithDetails } from "@/lib/types"
 import { cn, formatDate } from "@/lib/utils"
-import jsPDF from 'jspdf'
-import html2canvas from 'html2canvas'
 
 interface InvoicesListProps {
     invoices: InvoiceWithDetails[]
@@ -156,6 +154,11 @@ export function InvoicesList({ invoices }: InvoicesListProps) {
         setDownloadingId(invoiceId)
         
         try {
+            const [{ default: jsPDF }, { default: html2canvas }] = await Promise.all([
+                import('jspdf'),
+                import('html2canvas')
+            ])
+
             // Fetch the invoice HTML
             const response = await fetch(`/api/invoices/${invoiceId}/pdf?mode=html`)
             

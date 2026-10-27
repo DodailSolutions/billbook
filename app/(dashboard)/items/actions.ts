@@ -53,6 +53,44 @@ export async function getSavedItem(id: string): Promise<SavedItem | null> {
     return data
 }
 
+export async function createSavedItemAction(formData: FormData): Promise<{ success: boolean; error?: string }> {
+    try {
+        const supabase = await createClient()
+        const { data: { user }, error: authError } = await supabase.auth.getUser()
+        if (authError || !user) return { success: false, error: 'User is not authenticated' }
+
+        const name = (formData.get('name') as string)?.trim()
+        const description = (formData.get('description') as string)?.trim()
+        if (!name || !description) {
+            return { success: false, error: 'Item name and description are required' }
+        }
+
+        const itemData = {
+            user_id: user.id,
+            name,
+            description,
+            item_details: (formData.get('item_details') as string)?.trim() || null,
+            unit_price: parseFloat(formData.get('unit_price') as string) || 0,
+            default_quantity: parseFloat(formData.get('default_quantity') as string) || 1,
+            hsn_sac_code: (formData.get('hsn_sac_code') as string)?.trim() || null,
+            hsn_sac_type: (formData.get('hsn_sac_type') as string) || null,
+            gst_rate: formData.get('gst_rate') ? parseFloat(formData.get('gst_rate') as string) : null,
+        }
+
+        const { error } = await supabase.from('saved_items').insert([itemData])
+        if (error) {
+            console.error('Error creating saved item:', error)
+            return { success: false, error: error.message || 'Failed to save item' }
+        }
+
+        revalidatePath('/items')
+        return { success: true }
+    } catch (err) {
+        console.error('Unexpected error creating saved item:', err)
+        return { success: false, error: err instanceof Error ? err.message : 'An unexpected error occurred' }
+    }
+}
+
 export async function createSavedItem(formData: FormData) {
     const supabase = await createClient()
 

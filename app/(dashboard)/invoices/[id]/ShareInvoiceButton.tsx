@@ -3,8 +3,6 @@
 import { useState } from 'react'
 import { Mail, Check, MessageCircle, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
-import jsPDF from 'jspdf'
-import html2canvas from 'html2canvas'
 
 interface ShareInvoiceButtonProps {
     invoiceId: string
@@ -29,6 +27,11 @@ export function ShareInvoiceButton({
 
     const generatePDFBlob = async (): Promise<Blob> => {
         try {
+            const [{ default: jsPDF }, { default: html2canvas }] = await Promise.all([
+                import('jspdf'),
+                import('html2canvas')
+            ])
+
             // Fetch the invoice HTML
             const response = await fetch(`/api/invoices/${invoiceId}/pdf?mode=html`)
             
