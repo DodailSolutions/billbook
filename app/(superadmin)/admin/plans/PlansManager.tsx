@@ -275,7 +275,7 @@ export default function PlansManager({ initialPlans }: PlansManagerProps) {
     }
 
     const handleSeedPlans = async () => {
-        if (!confirm('This will seed any missing standard plans for India (INR), UAE (AED), and US (USD). Proceed?')) return
+        if (!confirm('This will synchronize all plans with official landing rates (Starter ₹299, Professional ₹599, Enterprise ₹999, Lifetime ₹9,999) and add all UAE and US regional plans. Proceed?')) return
         setIsSeeding(true)
         try {
             const res = await seedStandardRegionalPlans()
@@ -284,10 +284,10 @@ export default function PlansManager({ initialPlans }: PlansManagerProps) {
                 // Refresh full list from server
                 window.location.reload()
             } else {
-                alert(res.error || 'Failed to seed plans')
+                alert(res.error || 'Failed to sync plans')
             }
         } catch (err) {
-            console.error('Error seeding plans:', err)
+            console.error('Error syncing plans:', err)
         } finally {
             setIsSeeding(false)
         }
@@ -347,10 +347,10 @@ export default function PlansManager({ initialPlans }: PlansManagerProps) {
                             onClick={handleSeedPlans}
                             disabled={isSeeding}
                             className="text-xs flex items-center gap-1.5 border-dashed"
-                            title="Auto-seed missing standard regional plans"
+                            title="Auto-sync and update plans to official rates"
                         >
                             <RefreshCw className={`h-3.5 w-3.5 text-blue-600 ${isSeeding ? 'animate-spin' : ''}`} />
-                            <span>{isSeeding ? 'Seeding...' : 'Sync Regional Plans'}</span>
+                            <span>{isSeeding ? 'Syncing...' : 'Sync Official Rates'}</span>
                         </Button>
                         <Button
                             size="sm"

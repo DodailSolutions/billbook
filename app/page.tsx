@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { InteractiveFeaturePreview } from './_components/InteractiveFeaturePreview'
 import Footer from '@/components/Footer'
+import { createClient } from '@/lib/supabase/server'
 
 // Lazy load below-the-fold components for performance
 const FAQSection = dynamic(() => import('./_components/FAQSection').then(mod => ({ default: mod.FAQSection })), {
@@ -35,7 +36,30 @@ const ALL_FEATURES = [
     { icon: Lock, title: 'Bank Grade Security', desc: '256-bit encryption, automated daily backups, and complete data privacy', color: 'black' },
 ]
 
-export default function Home() {
+export default async function Home() {
+    let starterPrice = 299
+    let proPrice = 599
+    let freePrice = 0
+
+    try {
+        const supabase = await createClient()
+        const { data: plans } = await supabase
+            .from('subscription_plans')
+            .select('slug, price')
+            .eq('is_active', true)
+        
+        if (plans && Array.isArray(plans)) {
+            const starter = plans.find(p => p.slug === 'starter')
+            const pro = plans.find(p => p.slug === 'professional')
+            const free = plans.find(p => p.slug === 'free')
+            if (starter && starter.price) starterPrice = Number(starter.price)
+            if (pro && pro.price) proPrice = Number(pro.price)
+            if (free && free.price !== undefined) freePrice = Number(free.price)
+        }
+    } catch {
+        // Fallback to official default rates
+    }
+
     return (
         <div className="min-h-screen bg-white text-slate-950 selection:bg-blue-600 selection:text-white font-sans antialiased">
             {/* Apple-style Sticky Navigation */}
@@ -248,7 +272,7 @@ export default function Home() {
                             <div className="space-y-4">
                                 <span className="text-sm font-bold text-slate-600 uppercase tracking-wider block">Free Plan</span>
                                 <div>
-                                    <span className="text-4xl font-black text-slate-950">₹0</span>
+                                    <span className="text-4xl font-black text-slate-950">₹{freePrice}</span>
                                     <span className="text-slate-400 text-xs font-semibold"> / forever</span>
                                 </div>
                                 <p className="text-xs text-slate-500 font-medium">Ideal for freelancers and new startups.</p>
@@ -274,7 +298,7 @@ export default function Home() {
                             <div className="space-y-4">
                                 <span className="text-sm font-bold text-blue-700 uppercase tracking-wider block">Pro Starter</span>
                                 <div>
-                                    <span className="text-4xl font-black text-slate-950">₹299</span>
+                                    <span className="text-4xl font-black text-slate-950">₹{starterPrice}</span>
                                     <span className="text-slate-500 text-xs font-semibold"> / month</span>
                                 </div>
                                 <p className="text-xs text-slate-500 font-medium">Everything growing SMBs need.</p>
@@ -298,7 +322,7 @@ export default function Home() {
                             <div className="space-y-4">
                                 <span className="text-sm font-bold text-slate-900 uppercase tracking-wider block">Enterprise Suite</span>
                                 <div>
-                                    <span className="text-4xl font-black text-slate-950">₹599</span>
+                                    <span className="text-4xl font-black text-slate-950">₹{proPrice}</span>
                                     <span className="text-slate-500 text-xs font-semibold"> / month</span>
                                 </div>
                                 <p className="text-xs text-slate-500 font-medium">Complete suite with AI & Payroll.</p>

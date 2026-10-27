@@ -24,9 +24,9 @@ export interface PlanInput {
     sort_order?: number
 }
 
-// Standard plans across regions
+// Standard official plans across all regions
 const STANDARD_REGIONAL_PLANS: PlanInput[] = [
-    // 🇮🇳 INDIA (INR)
+    // 🇮🇳 INDIA (INR ₹)
     {
         name: 'Free',
         slug: 'free',
@@ -56,7 +56,7 @@ const STANDARD_REGIONAL_PLANS: PlanInput[] = [
     {
         name: 'Starter Yearly',
         slug: 'starter-yearly',
-        description: 'Save with annual billing for Indian small businesses',
+        description: 'Save with annual billing for Indian small businesses (₹249/mo)',
         price: 2988,
         currency: 'INR',
         billing_period: 'yearly',
@@ -82,7 +82,7 @@ const STANDARD_REGIONAL_PLANS: PlanInput[] = [
     {
         name: 'Professional Yearly',
         slug: 'professional-yearly',
-        description: 'Best value annual plan for growing businesses',
+        description: 'Best value annual plan for growing businesses (₹499/mo)',
         price: 5988,
         currency: 'INR',
         billing_period: 'yearly',
@@ -93,9 +93,22 @@ const STANDARD_REGIONAL_PLANS: PlanInput[] = [
         sort_order: 5
     },
     {
-        name: 'Lifetime Founder',
-        slug: 'lifetime',
-        description: 'One-time payment for lifetime unlimited invoicing',
+        name: 'Enterprise',
+        slug: 'enterprise',
+        description: 'Complete suite with AI assistant, payroll engine & CA marketplace',
+        price: 999,
+        currency: 'INR',
+        billing_period: 'monthly',
+        features: ['Everything in Professional', 'Full Payroll & Payslip Engine', 'AI Accountant Assistant', 'Unlimited team members', 'Certified CA Marketplace Access'],
+        limits: { invoices_per_month: 999999, customers: 999999 },
+        is_active: true,
+        is_popular: false,
+        sort_order: 6
+    },
+    {
+        name: 'Lifetime Professional',
+        slug: 'lifetime-professional',
+        description: 'Pay once, use forever - All professional features included',
         price: 9999,
         currency: 'INR',
         billing_period: 'lifetime',
@@ -103,7 +116,7 @@ const STANDARD_REGIONAL_PLANS: PlanInput[] = [
         limits: { invoices_per_month: 999999, customers: 999999 },
         is_active: true,
         is_popular: false,
-        sort_order: 6
+        sort_order: 7
     },
 
     // 🇦🇪 UAE (AED)
@@ -173,7 +186,7 @@ const STANDARD_REGIONAL_PLANS: PlanInput[] = [
         sort_order: 14
     },
 
-    // 🇺🇸 US & INTERNATIONAL (USD)
+    // 🇺🇸 US & INTERNATIONAL (USD $)
     {
         name: 'Starter US',
         slug: 'starter-us',
@@ -267,7 +280,36 @@ export async function getAllPlans(currency?: string): Promise<SubscriptionPlan[]
             return []
         }
 
-        return (data || []) as SubscriptionPlan[]
+        const plans = (data || []) as SubscriptionPlan[]
+
+        // Auto-heal legacy rates mismatch (e.g. ₹499 -> ₹299, ₹999 -> ₹599, ₹2999 -> ₹999)
+        // so that Super Admin view always matches the official pricing
+        let needsRevalidate = false
+        for (const p of plans) {
+            if (p.slug === 'starter' && Number(p.price) === 499) {
+                await supabase.from('subscription_plans').update({ price: 299 }).eq('id', p.id)
+                p.price = 299
+                needsRevalidate = true
+            }
+            if (p.slug === 'professional' && Number(p.price) === 999) {
+                await supabase.from('subscription_plans').update({ price: 599 }).eq('id', p.id)
+                p.price = 599
+                needsRevalidate = true
+            }
+            if (p.slug === 'enterprise' && Number(p.price) === 2999) {
+                await supabase.from('subscription_plans').update({ price: 999 }).eq('id', p.id)
+                p.price = 999
+                needsRevalidate = true
+            }
+        }
+
+        if (needsRevalidate) {
+            revalidatePath('/admin/plans')
+            revalidatePath('/')
+            revalidatePath('/pricing')
+        }
+
+        return plans
     } catch (error) {
         console.error('Fatal error in getAllPlans:', error)
         return []
@@ -314,6 +356,8 @@ export async function createPlan(data: PlanInput) {
         })
 
         revalidatePath('/admin/plans')
+        revalidatePath('/')
+        revalidatePath('/pricing')
         return { success: true, plan: newPlan }
     } catch (error) {
         console.error('Error creating plan:', error)
@@ -356,6 +400,8 @@ export async function updatePlan(id: string, data: Partial<PlanInput>) {
         await createAuditLog('subscription_plan_updated', 'plan', id, updatePayload)
 
         revalidatePath('/admin/plans')
+        revalidatePath('/')
+        revalidatePath('/pricing')
         return { success: true }
     } catch (error) {
         console.error('Error updating plan:', error)
@@ -379,6 +425,8 @@ export async function togglePlanStatus(id: string, is_active: boolean) {
 
         await createAuditLog('subscription_plan_status_toggled', 'plan', id, { is_active })
         revalidatePath('/admin/plans')
+        revalidatePath('/')
+        revalidatePath('/pricing')
         return { success: true }
     } catch (error) {
         console.error('Error toggling plan status:', error)
@@ -402,6 +450,8 @@ export async function togglePlanPopular(id: string, is_popular: boolean) {
 
         await createAuditLog('subscription_plan_popular_toggled', 'plan', id, { is_popular })
         revalidatePath('/admin/plans')
+        revalidatePath('/')
+        revalidatePath('/pricing')
         return { success: true }
     } catch (error) {
         console.error('Error toggling plan popular status:', error)
@@ -456,17 +506,36 @@ export async function seedStandardRegionalPlans() {
 
         const supabase = await createClient()
 
-        // Fetch existing slugs
-        const { data: existingPlans } = await supabase
-            .from('subscription_plans')
-            .select('slug')
-
-        const existingSlugs = new Set((existingPlans || []).map(p => p.slug))
-
-        let addedCount = 0
+        let updatedCount = 0
+        let insertedCount = 0
 
         for (const plan of STANDARD_REGIONAL_PLANS) {
-            if (!existingSlugs.has(plan.slug)) {
+            const { data: existing } = await supabase
+                .from('subscription_plans')
+                .select('id, price, name')
+                .eq('slug', plan.slug)
+                .single()
+
+            if (existing) {
+                // Update to standard official rates and features
+                await supabase
+                    .from('subscription_plans')
+                    .update({
+                        name: plan.name,
+                        price: plan.price,
+                        currency: plan.currency,
+                        description: plan.description,
+                        billing_period: plan.billing_period,
+                        features: plan.features,
+                        limits: plan.limits,
+                        is_active: plan.is_active,
+                        is_popular: plan.is_popular,
+                        sort_order: plan.sort_order,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', existing.id)
+                updatedCount++
+            } else {
                 await supabase
                     .from('subscription_plans')
                     .insert({
@@ -484,16 +553,23 @@ export async function seedStandardRegionalPlans() {
                         created_at: new Date().toISOString(),
                         updated_at: new Date().toISOString()
                     })
-                addedCount++
+                insertedCount++
             }
         }
 
+        // Also update 'lifetime-professional' if present
+        await supabase
+            .from('subscription_plans')
+            .update({ price: 9999, updated_at: new Date().toISOString() })
+            .eq('slug', 'lifetime-professional')
+
         revalidatePath('/admin/plans')
+        revalidatePath('/')
+        revalidatePath('/pricing')
+
         return { 
             success: true, 
-            message: addedCount > 0 
-                ? `Successfully seeded ${addedCount} missing regional plan(s) for India, UAE, and US!`
-                : 'All standard regional plans already exist in the database.' 
+            message: `Synchronized ${updatedCount} plan(s) with official rates (Starter ₹299, Professional ₹599, Enterprise ₹999) and added ${insertedCount} new regional plan(s)!` 
         }
     } catch (error) {
         console.error('Error seeding regional plans:', error)
