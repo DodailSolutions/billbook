@@ -15,19 +15,19 @@ export default async function SuperAdminLayout({
     }
 
     return (
-        <div className="h-full relative">
+        <div className="h-full relative flex">
             {/* Mobile Sidebar */}
             <MobileAdminSidebar />
             
             {/* Desktop Sidebar */}
-            <div className="hidden h-full md:flex md:w-72 md:flex-col md:fixed md:inset-y-0 z-80 bg-gray-900">
+            <div className="hidden md:block h-screen sticky top-0 z-80">
                 <AdminSidebar />
             </div>
             
             {/* Main Content */}
-            <main className="md:pl-72 min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-                {/* Add top padding on mobile for fixed header */}
-                <div className="pt-20 pb-24 md:pt-0 md:pb-0">
+            <main className="flex-1 min-h-screen bg-linear-to-br from-slate-50 via-white to-slate-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+                {/* Mobile top padding for fixed header */}
+                <div className="p-4 md:p-8 pt-20 md:pt-8 pb-24 md:pb-8">
                     {children}
                 </div>
             </main>
