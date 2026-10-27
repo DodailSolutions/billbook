@@ -27,12 +27,8 @@ import {
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
-import { 
-    type RegionalCMSData, 
-    type SubdomainConfig, 
-    saveRegionalCMS, 
-    saveSubdomainConfig 
-} from './actions'
+import type { RegionalCMSData, SubdomainConfig } from './types'
+import { saveRegionalCMS, saveSubdomainConfig } from './actions'
 
 interface CMSManagerProps {
     initialContent: Record<string, RegionalCMSData>
