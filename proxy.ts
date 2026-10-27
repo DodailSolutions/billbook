@@ -18,7 +18,62 @@ export async function proxy(request: NextRequest) {
         return await updateSession(request)
     }
 
-    // Get country from Vercel's geo-location headers
+    // 1. Subdomain-based Routing (e.g. ae.billbooky.dodail.com, us.billbooky.dodail.com, app.billbooky.dodail.com)
+    const host = request.headers.get('host') || ''
+    const hostParts = host.split('.')
+    let subdomain = ''
+    if (hostParts.length >= 3) {
+        subdomain = hostParts[0].toLowerCase()
+    }
+
+    // Subdomain: UAE (ae.*)
+    if (subdomain === 'ae') {
+        if (pathname === '/') {
+            const url = request.nextUrl.clone()
+            url.pathname = '/ae'
+            const response = NextResponse.rewrite(url)
+            response.cookies.set('region-preference', 'ae', {
+                maxAge: 60 * 60 * 24 * 30,
+                path: '/',
+                sameSite: 'lax'
+            })
+            return response
+        }
+        if (pathname === '/pricing' || pathname === '/features') {
+            const url = request.nextUrl.clone()
+            url.pathname = `/ae${pathname}`
+            return NextResponse.rewrite(url)
+        }
+    }
+
+    // Subdomain: US & Global (us.*)
+    if (subdomain === 'us') {
+        if (pathname === '/') {
+            const url = request.nextUrl.clone()
+            url.pathname = '/us'
+            const response = NextResponse.rewrite(url)
+            response.cookies.set('region-preference', 'us', {
+                maxAge: 60 * 60 * 24 * 30,
+                path: '/',
+                sameSite: 'lax'
+            })
+            return response
+        }
+        if (pathname === '/pricing' || pathname === '/features') {
+            const url = request.nextUrl.clone()
+            url.pathname = `/us${pathname}`
+            return NextResponse.rewrite(url)
+        }
+    }
+
+    // Subdomain: App Portal (app.*)
+    if (subdomain === 'app' && pathname === '/') {
+        const url = request.nextUrl.clone()
+        url.pathname = '/dashboard'
+        return NextResponse.redirect(url, 307)
+    }
+
+    // 2. Country detection from Vercel's geo-location headers
     const country = request.headers.get('x-vercel-ip-country')
 
     // Region mapping - automatically redirect based on country

@@ -20,7 +20,8 @@ import {
     ArrowUpRight,
     Sparkles,
     Activity,
-    Layers
+    Layers,
+    Globe
 } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
@@ -402,6 +403,13 @@ export default async function SuperAdminDashboard() {
                             </h4>
                         </div>
                         <div className="grid grid-cols-1 gap-2.5">
+                            <HubActionCard
+                                title="Content Management (CMS)"
+                                description="Manage announcements, regional hero copy, and subdomains for India, UAE, and US."
+                                icon={Globe}
+                                href="/admin/cms"
+                                color="indigo"
+                            />
                             <HubActionCard
                                 title="Support Desk"
                                 description="Respond to user tickets, assign priority, and troubleshoot issues."

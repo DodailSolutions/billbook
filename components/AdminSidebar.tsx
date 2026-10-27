@@ -21,7 +21,8 @@ import {
     ChevronLeft,
     ChevronRight,
     Sparkles,
-    DollarSign
+    DollarSign,
+    Globe
 } from "lucide-react"
 import { SignOutButton } from "./SignOutButton"
 import { ThemeToggle } from "./ThemeToggle"
@@ -95,6 +96,11 @@ const adminSections: AdminNavSection[] = [
     {
         title: "Platform Operations",
         items: [
+            {
+                label: 'Content (CMS)',
+                icon: Globe,
+                href: '/admin/cms',
+            },
             {
                 label: 'Support Tickets',
                 icon: Ticket,
