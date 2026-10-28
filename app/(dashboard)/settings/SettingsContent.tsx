@@ -1,17 +1,18 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
     User, Lock, Mail, Phone, Save, Key, Shield, Bell,
     CheckCircle2, AlertCircle, Camera, Globe, Clock,
     Crown, Zap, Eye, EyeOff, Building2, FileText, Check,
-    Sparkles, ArrowRight, RotateCcw, Copy, CheckCheck, Loader2
+    Sparkles, ArrowRight, RotateCcw, Copy, CheckCheck, Loader2,
+    Trash2, UploadCloud
 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
-import { updateProfile, changePassword, updateEmail, type UserProfile, type UpdateProfileInput } from './actions'
+import { updateProfile, updateAvatar, changePassword, updateEmail, type UserProfile, type UpdateProfileInput } from './actions'
 import { getPlanStatus } from '@/app/(dashboard)/plan-actions'
 import { SUPPORTED_LANGUAGES } from '@/lib/i18n/languages'
 import type { PlanStatus } from '@/lib/plan-utils'
@@ -52,10 +53,87 @@ export default function SettingsContent({ initialProfile, planStatus: initialPla
     const [planStatus, setPlanStatus] = useState<PlanStatus | null>(initialPlanStatus ?? null)
     const [copiedEmail, setCopiedEmail] = useState(false)
 
+    // Avatar state & upload ref
+    const [avatarUrl, setAvatarUrl] = useState(initialProfile?.avatar_url || '')
+    const [isUploadingAvatar, setIsUploadingAvatar] = useState(false)
+    const avatarInputRef = useRef<HTMLInputElement>(null)
+
     // Refresh plan status client-side for accuracy
     useEffect(() => {
         getPlanStatus().then(setPlanStatus).catch(() => {})
     }, [])
+
+    const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (!file) return
+
+        if (!file.type.startsWith('image/')) {
+            showMessage('error', 'Please select a valid image file (PNG, JPG, WEBP)')
+            return
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+            showMessage('error', 'Image size must be under 5MB')
+            return
+        }
+
+        try {
+            setIsUploadingAvatar(true)
+
+            // Read and compress image using HTML5 Canvas to keep payload optimized and crisp
+            const reader = new FileReader()
+            reader.onload = async (event) => {
+                const img = new window.Image()
+                img.onload = async () => {
+                    const canvas = document.createElement('canvas')
+                    const size = 300 // High-DPI 300x300 square crop
+                    canvas.width = size
+                    canvas.height = size
+                    const ctx = canvas.getContext('2d')
+
+                    if (ctx) {
+                        const minDim = Math.min(img.width, img.height)
+                        const startX = (img.width - minDim) / 2
+                        const startY = (img.height - minDim) / 2
+                        ctx.drawImage(img, startX, startY, minDim, minDim, 0, 0, size, size)
+                        const optimizedBase64 = canvas.toDataURL('image/jpeg', 0.88)
+
+                        setAvatarUrl(optimizedBase64)
+                        try {
+                            const res = await updateAvatar(optimizedBase64)
+                            showMessage('success', res.message)
+                            router.refresh()
+                        } catch (err: unknown) {
+                            showMessage('error', err instanceof Error ? err.message : 'Failed to update profile picture')
+                        } finally {
+                            setIsUploadingAvatar(false)
+                        }
+                    }
+                }
+                img.src = event.target?.result as string
+            }
+            reader.readAsDataURL(file)
+        } catch (err) {
+            console.error('Avatar upload error:', err)
+            showMessage('error', 'Failed to process selected image')
+            setIsUploadingAvatar(false)
+        }
+    }
+
+    const handleRemoveAvatar = async () => {
+        if (!confirm('Are you sure you want to remove your profile picture?')) return
+        try {
+            setIsUploadingAvatar(true)
+            await updateAvatar(null)
+            setAvatarUrl('')
+            showMessage('success', 'Profile picture removed')
+            router.refresh()
+        } catch (err: unknown) {
+            showMessage('error', err instanceof Error ? err.message : 'Failed to remove profile picture')
+        } finally {
+            setIsUploadingAvatar(false)
+        }
+    }
 
     // Personal Profile form state
     const [fullName, setFullName] = useState(initialProfile?.full_name || initialProfile?.owner_name || '')
@@ -319,14 +397,77 @@ export default function SettingsContent({ initialProfile, planStatus: initialPla
 
                         {/* Avatar & User Details */}
                         <div className="px-5 pb-5 -mt-10 flex flex-col items-center text-center">
-                            <div className="relative mb-3">
-                                <div className="w-20 h-20 rounded-full bg-linear-to-tr from-blue-600 via-indigo-600 to-purple-600 flex items-center justify-center text-white text-2xl font-black ring-4 ring-white dark:ring-slate-900 shadow-md">
-                                    {(fullName || initialProfile?.business_name || initialProfile?.email || 'U')[0].toUpperCase()}
-                                </div>
-                                <div className="absolute bottom-0 right-0 p-1.5 bg-white dark:bg-slate-800 rounded-full shadow-xs border border-slate-200 dark:border-slate-700">
-                                    <Camera className="h-3.5 w-3.5 text-slate-600 dark:text-slate-300" />
-                                </div>
+                            {/* Hidden File Input for Avatar Upload */}
+                            <input
+                                type="file"
+                                ref={avatarInputRef}
+                                onChange={handleAvatarChange}
+                                accept="image/png,image/jpeg,image/webp,image/gif"
+                                className="hidden"
+                            />
+
+                            <div className="relative mb-3 group">
+                                {/* Interactive Avatar Circle */}
+                                <button
+                                    type="button"
+                                    onClick={() => avatarInputRef.current?.click()}
+                                    disabled={isUploadingAvatar}
+                                    className="relative w-20 h-20 rounded-full overflow-hidden ring-4 ring-white dark:ring-slate-900 shadow-md focus:outline-none focus:ring-4 focus:ring-blue-500 transition-all active:scale-95 group cursor-pointer block"
+                                    title="Click to upload profile photo"
+                                >
+                                    {avatarUrl ? (
+                                        <img
+                                            src={avatarUrl}
+                                            alt="Profile photo"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full bg-linear-to-tr from-blue-600 via-indigo-600 to-purple-600 flex items-center justify-center text-white text-2xl font-black">
+                                            {(fullName || initialProfile?.business_name || initialProfile?.email || 'U')[0].toUpperCase()}
+                                        </div>
+                                    )}
+
+                                    {/* Hover overlay with Camera */}
+                                    <div className="absolute inset-0 bg-black/45 flex flex-col items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-2xs">
+                                        <Camera className="h-5 w-5 mb-0.5" />
+                                        <span className="text-[9px] font-bold uppercase tracking-wider">Change</span>
+                                    </div>
+
+                                    {/* Uploading Spinner Overlay */}
+                                    {isUploadingAvatar && (
+                                        <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white">
+                                            <Loader2 className="h-6 w-6 animate-spin text-blue-400" />
+                                        </div>
+                                    )}
+                                </button>
+
+                                {/* Camera Trigger Button */}
+                                <button
+                                    type="button"
+                                    onClick={() => avatarInputRef.current?.click()}
+                                    disabled={isUploadingAvatar}
+                                    className="absolute bottom-0 right-0 p-1.5 bg-white dark:bg-slate-800 rounded-full shadow-md border border-slate-200 dark:border-slate-700 hover:bg-blue-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-blue-600 transition-all hover:scale-110 cursor-pointer"
+                                    title="Upload new profile picture"
+                                >
+                                    {isUploadingAvatar ? (
+                                        <Loader2 className="h-3.5 w-3.5 animate-spin text-blue-600" />
+                                    ) : (
+                                        <Camera className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+                                    )}
+                                </button>
                             </div>
+
+                            {/* Remove photo option if custom avatar is set */}
+                            {avatarUrl && (
+                                <button
+                                    type="button"
+                                    onClick={handleRemoveAvatar}
+                                    disabled={isUploadingAvatar}
+                                    className="text-[11px] text-slate-400 hover:text-rose-600 underline font-medium transition-colors mb-2 -mt-1 cursor-pointer"
+                                >
+                                    Remove photo
+                                </button>
+                            )}
 
                             <h3 className="text-lg font-bold text-slate-900 dark:text-white leading-tight">
                                 {fullName || initialProfile?.business_name || 'Business Owner'}

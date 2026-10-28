@@ -17,6 +17,7 @@ export interface UserProfile {
     gstin?: string
     role?: string
     status?: string
+    avatar_url?: string
     created_at: string
 }
 
@@ -29,6 +30,7 @@ export interface UpdateProfileInput {
     business_phone?: string
     business_email?: string
     gstin?: string
+    avatar_url?: string | null
 }
 
 export async function getUserProfile(): Promise<UserProfile | null> {
@@ -61,6 +63,7 @@ export async function getUserProfile(): Promise<UserProfile | null> {
             gstin: dbProfile?.gstin || '',
             role: dbProfile?.role || 'user',
             status: dbProfile?.status || 'active',
+            avatar_url: user.user_metadata?.avatar_url || (dbProfile as any)?.avatar_url || '',
             created_at: dbProfile?.created_at || user.created_at || ''
         }
     } catch (error) {
@@ -79,13 +82,19 @@ export async function updateProfile(data: UpdateProfileInput) {
         }
 
         // 1. Update Auth user metadata
-        await supabase.auth.updateUser({
-            data: {
-                full_name: data.full_name,
-                phone: data.phone || data.business_phone,
-                business_name: data.business_name
-            }
-        })
+        const metadataUpdate: Record<string, any> = {}
+        if (data.full_name !== undefined) metadataUpdate.full_name = data.full_name
+        if (data.phone !== undefined || data.business_phone !== undefined) {
+            metadataUpdate.phone = data.phone || data.business_phone
+        }
+        if (data.business_name !== undefined) metadataUpdate.business_name = data.business_name
+        if (data.avatar_url !== undefined) metadataUpdate.avatar_url = data.avatar_url
+
+        if (Object.keys(metadataUpdate).length > 0) {
+            await supabase.auth.updateUser({
+                data: metadataUpdate
+            })
+        }
 
         // 2. Update user_profiles table in Supabase
         const profilePayload: Record<string, any> = {
@@ -103,12 +112,12 @@ export async function updateProfile(data: UpdateProfileInput) {
         if (data.business_email !== undefined) profilePayload.business_email = data.business_email
         if (data.gstin !== undefined) profilePayload.gstin = data.gstin.toUpperCase().trim()
 
-        const { error: profileError } = await supabase
-            .from('user_profiles')
-            .update(profilePayload)
-            .eq('id', user.id)
-
-        if (profileError) {
+        try {
+            await supabase
+                .from('user_profiles')
+                .update(profilePayload)
+                .eq('id', user.id)
+        } catch (profileError) {
             console.warn('Could not update user_profiles table (non-blocking):', profileError)
         }
 
@@ -119,6 +128,47 @@ export async function updateProfile(data: UpdateProfileInput) {
     } catch (error) {
         console.error('Error updating profile:', error)
         throw error
+    }
+}
+
+export async function updateAvatar(avatarUrl: string | null) {
+    try {
+        const supabase = await createClient()
+        const { data: { user }, error: authError } = await supabase.auth.getUser()
+        if (authError || !user) throw new Error('Not authenticated')
+
+        // Save to Supabase auth metadata
+        const { error: authErrorUpdate } = await supabase.auth.updateUser({
+            data: { avatar_url: avatarUrl }
+        })
+
+        if (authErrorUpdate) {
+            console.error('Error updating user avatar in auth:', authErrorUpdate)
+            throw authErrorUpdate
+        }
+
+        // Also attempt updating user_profiles table (silently catch if column absent)
+        try {
+            await supabase
+                .from('user_profiles')
+                .update({ 
+                    avatar_url: avatarUrl, 
+                    updated_at: new Date().toISOString() 
+                })
+                .eq('id', user.id)
+        } catch (e) {
+            // column might not exist yet, auth metadata is the primary source of truth
+        }
+
+        revalidatePath('/settings')
+        revalidatePath('/dashboard')
+        return { 
+            success: true, 
+            message: avatarUrl ? 'Profile photo updated successfully!' : 'Profile photo removed' 
+        }
+    } catch (error: unknown) {
+        console.error('Error updating avatar:', error)
+        throw new Error(error instanceof Error ? error.message : 'Failed to update profile photo')
     }
 }
 
