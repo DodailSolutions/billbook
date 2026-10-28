@@ -63,7 +63,7 @@ export async function getUserProfile(): Promise<UserProfile | null> {
             gstin: dbProfile?.gstin || '',
             role: dbProfile?.role || 'user',
             status: dbProfile?.status || 'active',
-            avatar_url: user.user_metadata?.avatar_url || (dbProfile as any)?.avatar_url || '',
+            avatar_url: (dbProfile as any)?.avatar_url || '',
             created_at: dbProfile?.created_at || user.created_at || ''
         }
     } catch (error) {
@@ -81,19 +81,22 @@ export async function updateProfile(data: UpdateProfileInput) {
             throw new Error('Not authenticated')
         }
 
-        // 1. Update Auth user metadata
-        const metadataUpdate: Record<string, any> = {}
+        // 1. Update Auth user metadata (Keep metadata strictly compact to avoid HTTP 494)
+        const metadataUpdate: Record<string, any> = {
+            avatar_url: null // Ensure no base64 avatar data lingers in auth token cookies
+        }
         if (data.full_name !== undefined) metadataUpdate.full_name = data.full_name
         if (data.phone !== undefined || data.business_phone !== undefined) {
             metadataUpdate.phone = data.phone || data.business_phone
         }
         if (data.business_name !== undefined) metadataUpdate.business_name = data.business_name
-        if (data.avatar_url !== undefined) metadataUpdate.avatar_url = data.avatar_url
 
-        if (Object.keys(metadataUpdate).length > 0) {
+        try {
             await supabase.auth.updateUser({
                 data: metadataUpdate
             })
+        } catch (authErr) {
+            console.warn('Could not update user metadata in auth:', authErr)
         }
 
         // 2. Update user_profiles table in Supabase
@@ -111,6 +114,7 @@ export async function updateProfile(data: UpdateProfileInput) {
         }
         if (data.business_email !== undefined) profilePayload.business_email = data.business_email
         if (data.gstin !== undefined) profilePayload.gstin = data.gstin.toUpperCase().trim()
+        if (data.avatar_url !== undefined) profilePayload.avatar_url = data.avatar_url
 
         try {
             await supabase
@@ -137,27 +141,31 @@ export async function updateAvatar(avatarUrl: string | null) {
         const { data: { user }, error: authError } = await supabase.auth.getUser()
         if (authError || !user) throw new Error('Not authenticated')
 
-        // Save to Supabase auth metadata
-        const { error: authErrorUpdate } = await supabase.auth.updateUser({
-            data: { avatar_url: avatarUrl }
-        })
-
-        if (authErrorUpdate) {
-            console.error('Error updating user avatar in auth:', authErrorUpdate)
-            throw authErrorUpdate
+        // CRITICAL: Ensure raw_user_meta_data never stores base64 images.
+        // Doing so bloats the session JWT cookie to >25KB, triggering HTTP 494 REQUEST_HEADER_TOO_LARGE.
+        try {
+            await supabase.auth.updateUser({
+                data: { avatar_url: null }
+            })
+        } catch (authCleanupErr) {
+            console.warn('Could not clear avatar_url from auth metadata:', authCleanupErr)
         }
 
-        // Also attempt updating user_profiles table (silently catch if column absent)
-        try {
-            await supabase
-                .from('user_profiles')
-                .update({ 
-                    avatar_url: avatarUrl, 
-                    updated_at: new Date().toISOString() 
-                })
-                .eq('id', user.id)
-        } catch (e) {
-            // column might not exist yet, auth metadata is the primary source of truth
+        // Save profile picture exclusively in the user_profiles Postgres table
+        const { error: profileError } = await supabase
+            .from('user_profiles')
+            .update({ 
+                avatar_url: avatarUrl, 
+                updated_at: new Date().toISOString() 
+            })
+            .eq('id', user.id)
+
+        if (profileError) {
+            console.error('Error updating avatar in user_profiles:', profileError)
+            if (profileError.code === '42703') { // Column does not exist
+                throw new Error("Please run the SQL migration 'ALTER TABLE user_profiles ADD COLUMN IF NOT EXISTS avatar_url TEXT;' in Supabase SQL editor.")
+            }
+            throw new Error(profileError.message || 'Failed to update avatar in database')
         }
 
         revalidatePath('/settings')
