@@ -5,7 +5,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { LayoutDashboard, FileText, Users, Bell, Settings, User, Menu, X, Bot, UserCog, Package, Receipt, Sparkles, BookOpen, MoreHorizontal, ShoppingBag, DollarSign, Building2, CalendarDays, CalendarOff, Briefcase, UserPlus } from "lucide-react"
+import { LayoutDashboard, FileText, Users, Bell, Settings, User, Menu, X, Bot, UserCog, Package, Receipt, Sparkles, BookOpen, MoreHorizontal, ShoppingBag, DollarSign, Building2, CalendarDays, CalendarOff, Briefcase, UserPlus, Mail } from "lucide-react"
 import { SignOutButton } from "./SignOutButton"
 import { PlanBanner } from "./PlanBanner"
 import { getMyCAProfile } from "@/lib/ca-profile-actions"
@@ -200,6 +200,12 @@ export function MobileSidebar() {
                     icon: Settings,
                     href: '/invoices/settings',
                     color: "text-slate-500"
+                },
+                {
+                    label: 'Email & Templates',
+                    icon: Mail,
+                    href: '/settings/email',
+                    color: "text-blue-600"
                 },
                 {
                     label: 'Account Settings',

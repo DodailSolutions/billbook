@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import {
     User, Lock, Mail, Phone, Save, Key, Shield, Bell,
     CheckCircle, AlertCircle, Camera, Globe, Clock,
@@ -149,9 +150,18 @@ export default function SettingsContent({ initialProfile, planStatus: initialPla
     return (
         <div className="space-y-6">
             {/* Page Header */}
-            <div>
-                <h1 className="text-2xl font-bold text-gray-900">Account Settings</h1>
-                <p className="text-sm text-gray-500 mt-0.5">Manage your profile, security, and notification preferences</p>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-900">Account Settings</h1>
+                    <p className="text-sm text-gray-500 mt-0.5">Manage your profile, security, and notification preferences</p>
+                </div>
+                <Link
+                    href="/settings/email"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-xl text-sm font-semibold border border-blue-200 transition-colors shrink-0"
+                >
+                    <Mail className="h-4 w-4" />
+                    Email &amp; Templates &rarr;
+                </Link>
             </div>
 
             {/* Toast Message */}

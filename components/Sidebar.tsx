@@ -5,7 +5,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { LayoutDashboard, FileText, Users, RefreshCw, Bell, Settings, User, Bot, UserCog, FileBarChart, HelpCircle, Briefcase, UserPlus, ChevronLeft, ChevronRight, Package, Receipt, Sparkles, BookOpen, ShoppingBag, DollarSign, Building2, CalendarDays, CalendarOff } from "lucide-react"
+import { LayoutDashboard, FileText, Users, RefreshCw, Bell, Settings, User, Bot, UserCog, FileBarChart, HelpCircle, Briefcase, UserPlus, ChevronLeft, ChevronRight, Package, Receipt, Sparkles, BookOpen, ShoppingBag, DollarSign, Building2, CalendarDays, CalendarOff, Mail } from "lucide-react"
 import { SignOutButton } from "./SignOutButton"
 import { PlanBanner } from "./PlanBanner"
 import { getMyCAProfile } from "@/lib/ca-profile-actions"
@@ -186,6 +186,13 @@ export function Sidebar() {
                     icon: Settings,
                     href: '/invoices/settings',
                     color: "text-slate-500"
+                },
+                {
+                    label: 'Email & Templates',
+                    icon: Mail,
+                    href: '/settings/email',
+                    color: "text-blue-600",
+                    badge: 'NEW'
                 },
                 {
                     label: 'Account Settings',

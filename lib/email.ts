@@ -80,7 +80,7 @@ async function getEmailTransporter() {
 }
 
 // Helper function to safely send emails with error handling
-async function sendEmailSafely(emailParams: any) {
+export async function sendEmailSafely(emailParams: any) {
   try {
     const settings = await getSMTPSettings()
 
