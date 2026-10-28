@@ -27,7 +27,7 @@ export default async function DashboardLayout({
     }
 
     return (
-        <div className="h-full relative flex">
+        <div className="min-h-screen relative flex w-full bg-slate-50 dark:bg-slate-950">
             <PlanExpiryChecker />
             
             {/* Mobile Sidebar */}
