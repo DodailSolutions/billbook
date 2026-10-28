@@ -106,17 +106,30 @@ const STANDARD_REGIONAL_PLANS: PlanInput[] = [
         sort_order: 6
     },
     {
-        name: 'Lifetime Professional',
+        name: 'Founder Lifetime Plan',
         slug: 'lifetime-professional',
-        description: 'Pay once, use forever - All professional features included',
+        description: 'Founder circle lifetime access - All professional features included forever',
         price: 9999,
         currency: 'INR',
         billing_period: 'lifetime',
-        features: ['Unlimited invoices forever', 'All current & future features', 'No monthly or annual fees', 'VIP priority support'],
+        features: ['Unlimited invoices forever', 'Priority WhatsApp support', 'Early access to AI features', 'Direct founder access', 'Feature voting rights', 'Custom branding'],
+        limits: { invoices_per_month: 999999, customers: 999999 },
+        is_active: true,
+        is_popular: true,
+        sort_order: 7
+    },
+    {
+        name: 'Founder Yearly Plan',
+        slug: 'founder-yearly',
+        description: 'Founder circle yearly access with locked-in founder rates',
+        price: 2999,
+        currency: 'INR',
+        billing_period: 'yearly',
+        features: ['Unlimited invoices for 12 months', 'GST-ready billing & e-Way bill reports', 'Automated payment reminders & WhatsApp', 'Customer management & payment tracking', 'Fast email invoice delivery', 'Business analytics & reports'],
         limits: { invoices_per_month: 999999, customers: 999999 },
         is_active: true,
         is_popular: false,
-        sort_order: 7
+        sort_order: 8
     },
 
     // 🇦🇪 UAE (AED)
@@ -300,6 +313,44 @@ export async function getAllPlans(currency?: string): Promise<SubscriptionPlan[]
                 await supabase.from('subscription_plans').update({ price: 999 }).eq('id', p.id)
                 p.price = 999
                 needsRevalidate = true
+            }
+        }
+
+        // Ensure founder-yearly plan exists for admin management
+        const hasFounderYearly = plans.some(p => p.slug === 'founder-yearly')
+        if (!hasFounderYearly && (!currency || currency === 'all' || currency === 'INR')) {
+            try {
+                const { data: inserted } = await supabase
+                    .from('subscription_plans')
+                    .insert({
+                        name: 'Founder Yearly Plan',
+                        slug: 'founder-yearly',
+                        description: 'Founder circle yearly access with locked-in founder rates',
+                        price: 2999,
+                        currency: 'INR',
+                        billing_period: 'yearly',
+                        features: [
+                            'Unlimited invoices for 12 months',
+                            'GST-ready billing & e-Way bill reports',
+                            'Automated payment reminders & WhatsApp',
+                            'Customer management & payment tracking',
+                            'Fast email invoice delivery',
+                            'Business analytics & reports'
+                        ],
+                        limits: { invoices_per_month: 999999, customers: 999999 },
+                        is_active: true,
+                        is_popular: false,
+                        sort_order: 8
+                    })
+                    .select()
+                    .single()
+
+                if (inserted) {
+                    plans.push(inserted as SubscriptionPlan)
+                    needsRevalidate = true
+                }
+            } catch (err) {
+                console.warn('Could not auto-insert founder-yearly plan:', err)
             }
         }
 
@@ -556,12 +607,6 @@ export async function seedStandardRegionalPlans() {
                 insertedCount++
             }
         }
-
-        // Also update 'lifetime-professional' if present
-        await supabase
-            .from('subscription_plans')
-            .update({ price: 9999, updated_at: new Date().toISOString() })
-            .eq('slug', 'lifetime-professional')
 
         revalidatePath('/admin/plans')
         revalidatePath('/')

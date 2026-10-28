@@ -62,6 +62,10 @@ export default async function PricingPage() {
     console.warn('Could not fetch DB plans:', err)
   }
 
+  // Resolve dynamic enterprise plan
+  const enterprisePlan = dbPlans.find(p => p.slug === 'enterprise')
+  const enterprisePrice = enterprisePlan ? Number(enterprisePlan.price) : 999
+
   return (
     <>
       <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
@@ -123,7 +127,7 @@ export default async function PricingPage() {
       </section>
 
       {/* Founder Circle - Limited Early Access */}
-      <FounderCircle isAuthenticated={isAuthenticated} />
+      <FounderCircle isAuthenticated={isAuthenticated} plans={dbPlans} />
 
       {/* Pricing Cards */}
       <section className="px-4 sm:px-6 pb-16 sm:pb-24 max-w-7xl mx-auto">
@@ -138,7 +142,7 @@ export default async function PricingPage() {
                 FOR LARGE TEAMS &amp; ENTERPRISE
               </div>
               <h4 className="text-2xl sm:text-3xl font-bold mb-2 bg-linear-to-r from-white to-blue-200 bg-clip-text text-transparent">Enterprise Plan</h4>
-              <p className="text-blue-100 mb-2 text-lg font-semibold">₹999<span className="text-sm text-gray-300">/month</span> • Up to 10 team members</p>
+              <p className="text-blue-100 mb-2 text-lg font-semibold">₹{enterprisePrice.toLocaleString('en-IN')}<span className="text-sm text-gray-300">/month</span> • Up to 10 team members</p>
               <p className="text-sm sm:text-base text-gray-300">
                 Complete suite with AI Accountant Assistant, full Payroll &amp; Payslip engine, and Certified CA Marketplace access.
               </p>
@@ -149,7 +153,7 @@ export default async function PricingPage() {
               <Link href="/pricing?checkout=enterprise" className="w-full sm:w-auto">
                 <Button className="w-full sm:w-auto bg-white text-gray-900 hover:bg-blue-50 font-bold px-6 py-5 text-sm sm:text-base shadow-lg hover:shadow-xl transition-all hover:scale-105 whitespace-nowrap flex items-center justify-center gap-2">
                   <ShoppingCart className="h-4 w-4" />
-                  {isAuthenticated ? "Upgrade Now • ₹999" : "Buy Enterprise • ₹999"}
+                  {isAuthenticated ? `Upgrade Now • ₹${enterprisePrice.toLocaleString('en-IN')}` : `Buy Enterprise • ₹${enterprisePrice.toLocaleString('en-IN')}`}
                 </Button>
               </Link>
               <Link href={isAuthenticated ? "/dashboard?trial=enterprise" : "/signup?plan=enterprise&trial=true"} className="w-full sm:w-auto">

@@ -79,6 +79,40 @@ export function CheckoutHandler() {
     const [error, setError] = useState<string | null>(null)
     const [userInfo, setUserInfo] = useState({ name: '', email: '', contact: '' })
     const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
+    const [dynamicPlan, setDynamicPlan] = useState<{ name: string; amount: number; currency: string } | null>(null)
+
+    useEffect(() => {
+        const fetchPlanFromDb = async () => {
+            if (!checkoutPlan) return
+            try {
+                const supabase = createClient()
+                const { data } = await supabase
+                    .from('subscription_plans')
+                    .select('name, price, currency, slug')
+                    .or(`slug.eq.${checkoutPlan},slug.eq.lifetime-professional,slug.eq.founder-yearly`)
+                    .eq('is_active', true)
+
+                if (data && data.length > 0) {
+                    const matched = data.find(p => p.slug === checkoutPlan) ||
+                        (checkoutPlan.includes('lifetime') ? data.find(p => p.slug === 'lifetime-professional' || p.slug === 'founder-lifetime') : null) ||
+                        (checkoutPlan.includes('founder') ? data.find(p => p.slug === 'founder-yearly') : null) ||
+                        data[0]
+
+                    if (matched) {
+                        setDynamicPlan({
+                            name: matched.name,
+                            amount: Number(matched.price),
+                            currency: matched.currency
+                        })
+                    }
+                }
+            } catch (err) {
+                console.warn('Could not fetch DB plan for checkout:', err)
+            }
+        }
+
+        fetchPlanFromDb()
+    }, [checkoutPlan])
 
     useEffect(() => {
         const fetchUserInfo = async () => {
@@ -130,10 +164,10 @@ export function CheckoutHandler() {
     const handleCheckout = async () => {
         if (!checkoutPlan) return
 
-        const planDetails = PLAN_DETAILS[checkoutPlan]
-        if (!planDetails) {
-            setError('Invalid plan selected')
-            return
+        const planDetails = dynamicPlan || PLAN_DETAILS[checkoutPlan] || {
+            name: checkoutPlan.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+            amount: 2999,
+            currency: 'INR'
         }
 
         try {
@@ -147,7 +181,10 @@ export function CheckoutHandler() {
                 body: JSON.stringify({
                     amount: planDetails.amount,
                     currency: planDetails.currency,
-                    notes: { plan: checkoutPlan }
+                    notes: { 
+                        plan: checkoutPlan,
+                        plan_name: planDetails.name
+                    }
                 })
             })
 
@@ -224,12 +261,15 @@ export function CheckoutHandler() {
 
     if (!checkoutPlan) return null
 
-    const planDetails = PLAN_DETAILS[checkoutPlan]
-    if (!planDetails) return null
+    const planDetails = dynamicPlan || PLAN_DETAILS[checkoutPlan] || {
+        name: checkoutPlan.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+        amount: 2999,
+        currency: 'INR'
+    }
 
-    // For lifetime plans, allow payment without authentication
+    // For lifetime and founder plans, allow payment without authentication
     // For other plans, prompt authentication or signup first
-    const isLifetime = checkoutPlan.includes('lifetime')
+    const isLifetime = checkoutPlan.includes('lifetime') || checkoutPlan.includes('founder')
     if (isAuthenticated === false && !isLifetime) {
         return (
             <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">

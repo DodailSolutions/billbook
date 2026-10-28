@@ -21,13 +21,37 @@ export async function POST(request: NextRequest) {
             notes?.plan === 'lifetime-professional' || 
             notes?.plan === 'founder-lifetime' || 
             notes?.plan === 'founder-yearly' ||
-            (typeof notes?.plan === 'string' && notes.plan.includes('lifetime'))
+            notes?.plan === 'founder' ||
+            (typeof notes?.plan === 'string' && (notes.plan.includes('lifetime') || notes.plan.includes('founder')))
         
         if (!isLifetimePlan && (authError || !user)) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        if (!amount || amount <= 0) {
+        // Dynamically verify amount from database subscription_plans
+        let orderAmount = amount
+        let orderCurrency = finalCurrency
+        if (notes?.plan) {
+            try {
+                const { data: dbPlan } = await supabase
+                    .from('subscription_plans')
+                    .select('price, currency, slug')
+                    .or(`slug.eq.${notes.plan},slug.eq.lifetime-professional,slug.eq.founder-yearly`)
+                    .eq('is_active', true)
+                    .maybeSingle()
+
+                if (dbPlan && dbPlan.price) {
+                    orderAmount = Number(dbPlan.price)
+                    if (supportedCurrencies.includes(dbPlan.currency)) {
+                        orderCurrency = dbPlan.currency
+                    }
+                }
+            } catch (err) {
+                console.warn('Could not verify plan price in DB:', err)
+            }
+        }
+
+        if (!orderAmount || orderAmount <= 0) {
             return NextResponse.json({ error: 'Invalid amount' }, { status: 400 })
         }
 
@@ -44,12 +68,12 @@ export async function POST(request: NextRequest) {
         }
 
         // Create Razorpay order
-        console.log('Creating Razorpay order with amount:', amount * 100, 'paise')
+        console.log('Creating Razorpay order with amount:', orderAmount * 100, 'paise')
         
         const razorpay = getRazorpayInstance()
         const orderOptions = {
-            amount: amount * 100, // Razorpay expects amount in paise/fils
-            currency: finalCurrency,
+            amount: Math.round(orderAmount * 100), // Razorpay expects amount in paise/fils
+            currency: orderCurrency,
             receipt: `subscription_${Date.now()}`,
             notes: {
                 user_id: user?.id || 'guest',

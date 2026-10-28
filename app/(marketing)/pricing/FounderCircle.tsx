@@ -6,24 +6,83 @@ import { useRouter } from 'next/navigation'
 import { Check, ShoppingCart, Zap, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { activatePlanTrial } from './actions'
+import type { SubscriptionPlan } from '@/lib/types-admin'
 
 interface FounderCircleProps {
   isAuthenticated?: boolean
+  plans?: SubscriptionPlan[]
 }
 
-export default function FounderCircle({ isAuthenticated = false }: FounderCircleProps) {
+export default function FounderCircle({ isAuthenticated = false, plans = [] }: FounderCircleProps) {
   const router = useRouter()
   const [isActivatingYearlyTrial, setIsActivatingYearlyTrial] = useState(false)
 
+  // 1. Resolve Founder Lifetime Plan from DB plans
+  const lifetimePlan = plans.find(p => 
+    p.currency === 'INR' && (
+      p.slug === 'lifetime-professional' || 
+      p.slug === 'founder-lifetime' || 
+      p.slug === 'lifetime' || 
+      (p.billing_period === 'lifetime' && p.slug !== 'free')
+    )
+  )
+
+  // 2. Resolve Founder Yearly Plan from DB plans
+  const founderYearlyPlan = plans.find(p => 
+    p.currency === 'INR' && (
+      p.slug === 'founder-yearly' || 
+      p.slug === 'founder' || 
+      (p.billing_period === 'yearly' && (p.name.toLowerCase().includes('founder') || p.slug.includes('founder')))
+    )
+  )
+
+  // Dynamic values for Lifetime Plan
+  const lifetimeName = lifetimePlan?.name || 'Founder Lifetime Plan'
+  const lifetimeDesc = lifetimePlan?.description || 'Pay once, own it forever with all future updates'
+  const lifetimePrice = lifetimePlan ? Number(lifetimePlan.price) : 9999
+  const lifetimeSlug = lifetimePlan?.slug || 'lifetime-professional'
+  const isLifetimeActive = lifetimePlan ? lifetimePlan.is_active : true
+  const lifetimeFeatures = (lifetimePlan?.features && lifetimePlan.features.length > 0)
+    ? lifetimePlan.features
+    : [
+        'Unlimited invoices forever',
+        'Priority WhatsApp & phone support',
+        'Early access to all AI features',
+        'Direct founder access & advisory',
+        'Feature voting & roadmap influence',
+        'Full custom branding & watermark removal'
+      ]
+
+  // Dynamic values for Founder Yearly Plan
+  const yearlyName = founderYearlyPlan?.name || 'Founder Yearly Plan'
+  const yearlyDesc = founderYearlyPlan?.description || 'Locked-in founder pricing for 1 full year'
+  const yearlyPrice = founderYearlyPlan ? Number(founderYearlyPlan.price) : 2999
+  const yearlySlug = founderYearlyPlan?.slug || 'founder-yearly'
+  const isYearlyActive = founderYearlyPlan ? founderYearlyPlan.is_active : true
+  const yearlyFeatures = (founderYearlyPlan?.features && founderYearlyPlan.features.length > 0)
+    ? founderYearlyPlan.features
+    : [
+        'Unlimited invoices for 12 months',
+        'GST-ready billing & e-Way bill reports',
+        'Automated payment reminders & WhatsApp',
+        'Customer management & payment tracking',
+        'Fast email invoice delivery',
+        'Business analytics & reports'
+      ]
+
+  // Calculated reference comparison prices
+  const lifetimeOriginalPrice = Math.max(49000, lifetimePrice * 3)
+  const yearlyOriginalPrice = Math.max(9999, yearlyPrice * 3)
+
   const handleYearlyTrial = async () => {
     if (!isAuthenticated) {
-      router.push('/signup?plan=founder-yearly&trial=true')
+      router.push(`/signup?plan=${yearlySlug}&trial=true`)
       return
     }
 
     try {
       setIsActivatingYearlyTrial(true)
-      const res = await activatePlanTrial('founder-yearly')
+      const res = await activatePlanTrial(yearlySlug)
       if (res.redirectUrl) {
         router.push(res.redirectUrl)
       } else if (!res.success && res.error) {
@@ -38,7 +97,7 @@ export default function FounderCircle({ isAuthenticated = false }: FounderCircle
   }
 
   const scrollToApplication = () => {
-    window.location.href = '/signup?plan=founder'
+    window.location.href = `/signup?plan=${lifetimeSlug}`
   }
 
   return (
@@ -79,31 +138,30 @@ export default function FounderCircle({ isAuthenticated = false }: FounderCircle
             <div>
               <div className="text-center mb-6 pt-2">
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1.5">
-                  Founder Lifetime Plan
+                  {lifetimeName}
                 </h3>
-                <p className="text-xs text-gray-500 mb-3">Pay once, own it forever with all future updates</p>
+                <p className="text-xs text-gray-500 mb-3">{lifetimeDesc}</p>
                 <div className="mb-1">
-                  <span className="text-gray-400 line-through text-base font-semibold">₹49,000</span>
+                  <span className="text-gray-400 line-through text-base font-semibold">₹{lifetimeOriginalPrice.toLocaleString('en-IN')}</span>
                 </div>
                 <div className="flex items-baseline justify-center gap-1.5 mb-3">
-                  <span className="text-4xl sm:text-5xl font-black text-indigo-600 dark:text-indigo-400">₹9,999</span>
+                  <span className="text-4xl sm:text-5xl font-black text-indigo-600 dark:text-indigo-400">₹{lifetimePrice.toLocaleString('en-IN')}</span>
                   <span className="text-xs text-gray-500 font-medium">one-time</span>
                 </div>
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-300 rounded-full text-xs font-semibold border border-red-200 dark:border-red-800">
-                  <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-                  Only 5 Spots Left
-                </div>
+                {isLifetimeActive ? (
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-300 rounded-full text-xs font-semibold border border-red-200 dark:border-red-800">
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                    Only 5 Spots Left
+                  </div>
+                ) : (
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 rounded-full text-xs font-semibold">
+                    Currently Closed
+                  </div>
+                )}
               </div>
 
               <ul className="space-y-3 mb-8">
-                {[
-                  'Unlimited invoices forever',
-                  'Priority WhatsApp & phone support',
-                  'Early access to all AI features',
-                  'Direct founder access & advisory',
-                  'Feature voting & roadmap influence',
-                  'Full custom branding & watermark removal'
-                ].map((feature, index) => (
+                {lifetimeFeatures.map((feature, index) => (
                   <li key={index} className="flex items-start gap-2.5 text-sm text-gray-700 dark:text-gray-300">
                     <Check className="h-4 w-4 text-indigo-600 dark:text-indigo-400 shrink-0 mt-0.5" />
                     <span>{feature}</span>
@@ -114,12 +172,18 @@ export default function FounderCircle({ isAuthenticated = false }: FounderCircle
 
             {/* Lifetime Actions */}
             <div className="space-y-2.5 pt-4 border-t border-slate-100 dark:border-slate-800">
-              <Link href="/pricing?checkout=lifetime" className="block">
-                <button className="w-full h-12 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-sm sm:text-base transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2">
-                  <ShoppingCart className="h-4 w-4" />
-                  Buy Lifetime Access • ₹9,999
+              {isLifetimeActive ? (
+                <Link href={`/pricing?checkout=${lifetimeSlug}`} className="block">
+                  <button className="w-full h-12 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-sm sm:text-base transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+                    <ShoppingCart className="h-4 w-4" />
+                    Buy Lifetime Access • ₹{lifetimePrice.toLocaleString('en-IN')}
+                  </button>
+                </Link>
+              ) : (
+                <button disabled className="w-full h-12 bg-gray-300 dark:bg-gray-800 text-gray-500 font-bold rounded-xl text-sm sm:text-base cursor-not-allowed">
+                  Sold Out
                 </button>
-              </Link>
+              )}
               <p className="text-[11px] text-center text-slate-500 dark:text-slate-400">
                 ✨ One-time payment • No monthly fees ever • 14-day refund guarantee
               </p>
@@ -131,30 +195,29 @@ export default function FounderCircle({ isAuthenticated = false }: FounderCircle
             <div>
               <div className="text-center mb-6 pt-2">
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1.5">
-                  Founder Yearly Plan
+                  {yearlyName}
                 </h3>
-                <p className="text-xs text-gray-500 mb-3">Locked-in founder pricing for 1 full year</p>
+                <p className="text-xs text-gray-500 mb-3">{yearlyDesc}</p>
                 <div className="mb-1">
-                  <span className="text-gray-400 line-through text-base font-semibold">₹9,999</span>
+                  <span className="text-gray-400 line-through text-base font-semibold">₹{yearlyOriginalPrice.toLocaleString('en-IN')}</span>
                 </div>
                 <div className="flex items-baseline justify-center gap-1.5 mb-3">
-                  <span className="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white">₹2,999</span>
+                  <span className="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white">₹{yearlyPrice.toLocaleString('en-IN')}</span>
                   <span className="text-sm text-gray-500 font-semibold">/year</span>
                 </div>
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 rounded-full text-xs font-semibold border border-amber-200 dark:border-amber-800">
-                  Only 15 Spots Left
-                </div>
+                {isYearlyActive ? (
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 rounded-full text-xs font-semibold border border-amber-200 dark:border-amber-800">
+                    Only 15 Spots Left
+                  </div>
+                ) : (
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 rounded-full text-xs font-semibold">
+                    Currently Closed
+                  </div>
+                )}
               </div>
 
               <ul className="space-y-3 mb-8">
-                {[
-                  'Unlimited invoices for 12 months',
-                  'GST-ready billing & e-Way bill reports',
-                  'Automated payment reminders & WhatsApp',
-                  'Customer management & payment tracking',
-                  'Fast email invoice delivery',
-                  'Business analytics & reports'
-                ].map((feature, index) => (
+                {yearlyFeatures.map((feature, index) => (
                   <li key={index} className="flex items-start gap-2.5 text-sm text-gray-700 dark:text-gray-300">
                     <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
                     <span>{feature}</span>
@@ -165,30 +228,38 @@ export default function FounderCircle({ isAuthenticated = false }: FounderCircle
 
             {/* Yearly Actions: Try + Buy */}
             <div className="space-y-2.5 pt-4 border-t border-slate-100 dark:border-slate-800">
-              <Link href="/pricing?checkout=founder-yearly" className="block">
-                <button className="w-full h-12 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 dark:text-slate-900 text-white font-bold rounded-xl text-sm sm:text-base transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2">
-                  <ShoppingCart className="h-4 w-4" />
-                  Buy Yearly Access • ₹2,999
-                </button>
-              </Link>
+              {isYearlyActive ? (
+                <>
+                  <Link href={`/pricing?checkout=${yearlySlug}`} className="block">
+                    <button className="w-full h-12 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 dark:text-slate-900 text-white font-bold rounded-xl text-sm sm:text-base transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+                      <ShoppingCart className="h-4 w-4" />
+                      Buy Yearly Access • ₹{yearlyPrice.toLocaleString('en-IN')}
+                    </button>
+                  </Link>
 
-              <button
-                onClick={handleYearlyTrial}
-                disabled={isActivatingYearlyTrial}
-                className="w-full h-10 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-semibold rounded-xl text-xs sm:text-sm transition-all duration-200 flex items-center justify-center gap-1.5"
-              >
-                {isActivatingYearlyTrial ? (
-                  <>
-                    <Loader2 className="h-3.5 w-3.5 animate-spin text-indigo-600" />
-                    <span>Starting Trial...</span>
-                  </>
-                ) : (
-                  <>
-                    <Zap className="h-3.5 w-3.5 text-indigo-600 fill-indigo-600" />
-                    <span>Try 14 Days Free</span>
-                  </>
-                )}
-              </button>
+                  <button
+                    onClick={handleYearlyTrial}
+                    disabled={isActivatingYearlyTrial}
+                    className="w-full h-10 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-semibold rounded-xl text-xs sm:text-sm transition-all duration-200 flex items-center justify-center gap-1.5"
+                  >
+                    {isActivatingYearlyTrial ? (
+                      <>
+                        <Loader2 className="h-3.5 w-3.5 animate-spin text-indigo-600" />
+                        <span>Starting Trial...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Zap className="h-3.5 w-3.5 text-indigo-600 fill-indigo-600" />
+                        <span>Try 14 Days Free</span>
+                      </>
+                    )}
+                  </button>
+                </>
+              ) : (
+                <button disabled className="w-full h-12 bg-gray-300 dark:bg-gray-800 text-gray-500 font-bold rounded-xl text-sm sm:text-base cursor-not-allowed">
+                  Sold Out
+                </button>
+              )}
 
               <p className="text-[11px] text-center text-slate-500 dark:text-slate-400">
                 Cancel anytime during trial • Instant activation upon purchase
