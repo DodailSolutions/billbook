@@ -15,9 +15,13 @@ export async function POST(request: NextRequest) {
         const supportedCurrencies = ['INR', 'AED', 'USD', 'EUR', 'GBP']
         const finalCurrency = supportedCurrencies.includes(currency) ? currency : 'INR'
         
-        // Check authentication - allow unauthenticated requests for lifetime plan
+        // Check authentication - allow unauthenticated requests for lifetime & founder deals
         const { data: { user }, error: authError } = await supabase.auth.getUser()
-        const isLifetimePlan = notes?.plan === 'lifetime'
+        const isLifetimePlan = notes?.plan === 'lifetime' || 
+            notes?.plan === 'lifetime-professional' || 
+            notes?.plan === 'founder-lifetime' || 
+            notes?.plan === 'founder-yearly' ||
+            (typeof notes?.plan === 'string' && notes.plan.includes('lifetime'))
         
         if (!isLifetimePlan && (authError || !user)) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

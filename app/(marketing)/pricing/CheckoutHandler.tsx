@@ -35,7 +35,12 @@ const PLAN_DETAILS: Record<string, { name: string; amount: number; currency: str
     professional: { name: 'Professional Plan', amount: 599, currency: 'INR' },
     'professional-yearly': { name: 'Professional Plan (Yearly)', amount: 5988, currency: 'INR' },
     enterprise: { name: 'Enterprise Plan', amount: 999, currency: 'INR' },
-    lifetime: { name: 'Lifetime Professional', amount: 9999, currency: 'INR' },
+    'enterprise-yearly': { name: 'Enterprise Plan (Yearly)', amount: 9990, currency: 'INR' },
+    lifetime: { name: 'Founder Lifetime Plan', amount: 9999, currency: 'INR' },
+    'lifetime-professional': { name: 'Lifetime Professional Plan', amount: 9999, currency: 'INR' },
+    'founder-lifetime': { name: 'Founder Lifetime Plan', amount: 9999, currency: 'INR' },
+    'founder-yearly': { name: 'Founder Yearly Plan', amount: 2999, currency: 'INR' },
+    founder: { name: 'Founder Yearly Plan', amount: 2999, currency: 'INR' },
     
     // UAE plans (AED)
     'starter-ae': { name: 'Starter Plan', amount: 49, currency: 'AED' },
@@ -222,9 +227,10 @@ export function CheckoutHandler() {
     const planDetails = PLAN_DETAILS[checkoutPlan]
     if (!planDetails) return null
 
-    // For lifetime plan, allow payment without authentication
-    // For other plans, require authentication first
-    if (isAuthenticated === false && checkoutPlan !== 'lifetime') {
+    // For lifetime plans, allow payment without authentication
+    // For other plans, prompt authentication or signup first
+    const isLifetime = checkoutPlan.includes('lifetime')
+    if (isAuthenticated === false && !isLifetime) {
         return (
             <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
                 <Card className="max-w-md w-full">
@@ -326,7 +332,7 @@ export function CheckoutHandler() {
                         </div>
                         <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
                             <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                            <span>{checkoutPlan === 'lifetime' ? 'One-time payment, lifetime access' : '14-day free trial included'}</span>
+                            <span>{isLifetime ? 'One-time payment, lifetime access' : '14-day free trial included'}</span>
                         </div>
                         <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
                             <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
