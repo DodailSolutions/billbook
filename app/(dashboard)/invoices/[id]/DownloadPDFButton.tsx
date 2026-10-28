@@ -13,6 +13,7 @@ export function DownloadPDFButton({ invoiceId }: DownloadPDFButtonProps) {
 
     const handleDownload = async () => {
         setIsDownloading(true)
+        let iframe: HTMLIFrameElement | null = null
         try {
             const [{ default: jsPDF }, { default: html2canvas }] = await Promise.all([
                 import('jspdf'),
@@ -33,11 +34,16 @@ export function DownloadPDFButton({ invoiceId }: DownloadPDFButtonProps) {
             const invoiceNumber = invoiceNumberMatch ? invoiceNumberMatch[1] : invoiceId
             
             // Create an isolated iframe to render the HTML without global CSS
-            const iframe = document.createElement('iframe')
-            iframe.style.position = 'absolute'
-            iframe.style.left = '-9999px'
+            // Positioned with slight opacity in viewport so html2canvas renders layout accurately
+            iframe = document.createElement('iframe')
+            iframe.style.position = 'fixed'
+            iframe.style.top = '0'
+            iframe.style.left = '0'
             iframe.style.width = '800px'
             iframe.style.height = '1200px'
+            iframe.style.opacity = '0.01'
+            iframe.style.pointerEvents = 'none'
+            iframe.style.zIndex = '-9999'
             iframe.style.border = 'none'
             document.body.appendChild(iframe)
             
@@ -48,7 +54,7 @@ export function DownloadPDFButton({ invoiceId }: DownloadPDFButtonProps) {
             }
             
             iframeDoc.open()
-            iframeDoc.write(`
+            iframeDoc.write(html.includes('<!DOCTYPE') ? html : `
                 <!DOCTYPE html>
                 <html>
                 <head>
@@ -65,33 +71,36 @@ export function DownloadPDFButton({ invoiceId }: DownloadPDFButtonProps) {
             
             const container = iframeDoc.body
             
-            // Wait for images to load
+            // Wait for images to load with max 2s timeout
             const images = container.getElementsByTagName('img')
-            await Promise.all(
-                Array.from(images).map(img => {
-                    if (img.complete) return Promise.resolve()
-                    return new Promise(resolve => {
-                        img.onload = resolve
-                        img.onerror = resolve
+            await Promise.race([
+                Promise.all(
+                    Array.from(images).map(img => {
+                        if (img.complete) return Promise.resolve()
+                        return new Promise(resolve => {
+                            img.onload = resolve
+                            img.onerror = resolve
+                        })
                     })
-                })
-            )
+                ),
+                new Promise(resolve => setTimeout(resolve, 2000))
+            ])
             
             // Convert to canvas
             const canvas = await html2canvas(container, {
                 scale: 2,
                 useCORS: true,
+                allowTaint: true,
                 logging: false,
                 backgroundColor: '#ffffff',
                 windowWidth: 800,
                 ignoreElements: (element) => {
-                    // Ignore elements with problematic color formats
                     const style = window.getComputedStyle(element)
                     const bg = style.backgroundColor
                     const color = style.color
                     if (bg?.includes('lab') || bg?.includes('lch') || bg?.includes('oklch') ||
                         color?.includes('lab') || color?.includes('lch') || color?.includes('oklch')) {
-                        return false // Don't ignore, but we've neutralized these
+                        return false
                     }
                     return false
                 },
@@ -107,11 +116,10 @@ export function DownloadPDFButton({ invoiceId }: DownloadPDFButtonProps) {
             const maxHeight = pdfHeight - 20 // 10mm margin top and bottom
             
             let imgWidth = maxWidth
-            let imgHeight = (canvas.height * imgWidth) / canvas.width
+            let imgHeight = (canvas.height * imgWidth) / (canvas.width || 1)
             
             // If content fits on one page, scale it to fit nicely
             if (imgHeight <= maxHeight) {
-                // Content fits! Center it on the page
                 const topMargin = (pdfHeight - imgHeight) / 2
                 pdf.addImage(
                     canvas.toDataURL('image/png'),
@@ -122,11 +130,9 @@ export function DownloadPDFButton({ invoiceId }: DownloadPDFButtonProps) {
                     imgHeight
                 )
             } else {
-                // Content is too long, use multi-page approach
                 let heightLeft = imgHeight
-                let position = 10 // 10mm top margin
+                let position = 10
                 
-                // Add first page
                 pdf.addImage(
                     canvas.toDataURL('image/png'),
                     'PNG',
@@ -138,7 +144,6 @@ export function DownloadPDFButton({ invoiceId }: DownloadPDFButtonProps) {
                 
                 heightLeft -= pdfHeight
                 
-                // Add additional pages
                 while (heightLeft > 0) {
                     position = heightLeft - imgHeight + 10
                     pdf.addPage()
@@ -156,14 +161,14 @@ export function DownloadPDFButton({ invoiceId }: DownloadPDFButtonProps) {
             
             // Download the PDF
             pdf.save(`Invoice-${invoiceNumber}.pdf`)
-            
-            // Cleanup
-            document.body.removeChild(iframe)
-            
         } catch (error) {
-            console.error('Error generating PDF:', error)
-            alert(error instanceof Error ? error.message : 'Failed to generate PDF. Please try again.')
+            console.warn('Client-side jsPDF download failed, opening native print/PDF viewer:', error)
+            // Fallback: open print dialog
+            window.open(`/api/invoices/${invoiceId}/pdf?mode=download`, '_blank')
         } finally {
+            if (iframe && iframe.parentNode) {
+                iframe.parentNode.removeChild(iframe)
+            }
             setIsDownloading(false)
         }
     }

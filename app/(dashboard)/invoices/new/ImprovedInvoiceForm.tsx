@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -9,7 +10,7 @@ import {
   ArrowLeft, Plus, Trash2, Send, 
   User, Receipt, FileText, 
   AlertCircle, CheckCircle2, ChevronDown, ChevronUp,
-  Sparkles, Shield, Clock, X, UserPlus, Download, CheckCircle, Mail, Loader2
+  Sparkles, Shield, Clock, X, UserPlus, Download, CheckCircle, Mail, Loader2, ExternalLink
 } from 'lucide-react'
 import { createInvoice } from '../actions'
 import { saveItemFromInvoice, deleteSavedItem as deleteSavedItemAction } from '../../items/actions'
@@ -423,17 +424,18 @@ export function ImprovedInvoiceForm({
     }
   }
 
-  // Download PDF handler - Direct download without print dialog
+  // Download PDF handler - Direct download with robust print fallback
   const handleDownloadPDF = async () => {
     if (!createdInvoiceId) return
     
     setIsDownloading(true)
+    let iframe: HTMLIFrameElement | null = null
     try {
       // Fetch the invoice HTML
       const response = await fetch(`/api/invoices/${createdInvoiceId}/pdf?mode=html`)
       
       if (!response.ok) {
-        throw new Error('Failed to fetch invoice')
+        throw new Error('Failed to fetch invoice preview')
       }
       
       const html = await response.text()
@@ -443,22 +445,26 @@ export function ImprovedInvoiceForm({
       const invoiceNumber = invoiceNumberMatch ? invoiceNumberMatch[1] : createdInvoiceId
       
       // Create an isolated iframe to render the HTML without global CSS
-      const iframe = document.createElement('iframe')
-      iframe.style.position = 'absolute'
-      iframe.style.left = '-9999px'
+      // Positioned with slight opacity in viewport so html2canvas renders layout accurately
+      iframe = document.createElement('iframe')
+      iframe.style.position = 'fixed'
+      iframe.style.top = '0'
+      iframe.style.left = '0'
       iframe.style.width = '800px'
       iframe.style.height = '1200px'
+      iframe.style.opacity = '0.01'
+      iframe.style.pointerEvents = 'none'
+      iframe.style.zIndex = '-9999'
       iframe.style.border = 'none'
       document.body.appendChild(iframe)
       
-      // Write clean HTML to iframe without any global styles
       const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document
       if (!iframeDoc) {
         throw new Error('Failed to access iframe document')
       }
       
       iframeDoc.open()
-      iframeDoc.write(`
+      iframeDoc.write(html.includes('<!DOCTYPE') ? html : `
         <!DOCTYPE html>
         <html>
         <head>
@@ -475,17 +481,20 @@ export function ImprovedInvoiceForm({
       
       const container = iframeDoc.body
       
-      // Wait for images to load
+      // Wait for images to load with max 2s timeout
       const images = container.getElementsByTagName('img')
-      await Promise.all(
-        Array.from(images).map(img => {
-          if (img.complete) return Promise.resolve()
-          return new Promise(resolve => {
-            img.onload = resolve
-            img.onerror = resolve
+      await Promise.race([
+        Promise.all(
+          Array.from(images).map(img => {
+            if (img.complete) return Promise.resolve()
+            return new Promise(resolve => {
+              img.onload = resolve
+              img.onerror = resolve
+            })
           })
-        })
-      )
+        ),
+        new Promise(resolve => setTimeout(resolve, 2000))
+      ])
       
       // Dynamically load client-only PDF generation libraries
       const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
@@ -497,6 +506,7 @@ export function ImprovedInvoiceForm({
       const canvas = await html2canvas(container, {
         scale: 2,
         useCORS: true,
+        allowTaint: true,
         logging: false,
         backgroundColor: '#ffffff',
         windowWidth: 800,
@@ -508,15 +518,13 @@ export function ImprovedInvoiceForm({
       const pdfHeight = pdf.internal.pageSize.getHeight()
       
       // Calculate with margins
-      const maxWidth = pdfWidth - 20 // 10mm margin on each side
-      const maxHeight = pdfHeight - 20 // 10mm margin top and bottom
+      const maxWidth = pdfWidth - 20
+      const maxHeight = pdfHeight - 20
       
       const imgWidth = maxWidth
-      const imgHeight = (canvas.height * imgWidth) / canvas.width
+      const imgHeight = (canvas.height * imgWidth) / (canvas.width || 1)
       
-      // If content fits on one page, scale it to fit nicely
       if (imgHeight <= maxHeight) {
-        // Content fits! Center it on the page
         const topMargin = (pdfHeight - imgHeight) / 2
         pdf.addImage(
           canvas.toDataURL('image/png'),
@@ -527,11 +535,9 @@ export function ImprovedInvoiceForm({
           imgHeight
         )
       } else {
-        // Content is too long, use multi-page approach
         let heightLeft = imgHeight
-        let position = 10 // 10mm top margin
+        let position = 10
         
-        // Add first page
         pdf.addImage(
           canvas.toDataURL('image/png'),
           'PNG',
@@ -543,7 +549,6 @@ export function ImprovedInvoiceForm({
         
         heightLeft -= pdfHeight
         
-        // Add additional pages
         while (heightLeft > 0) {
           position = heightLeft - imgHeight + 10
           pdf.addPage()
@@ -561,14 +566,14 @@ export function ImprovedInvoiceForm({
       
       // Download the PDF
       pdf.save(`Invoice-${invoiceNumber}.pdf`)
-      
-      // Cleanup
-      document.body.removeChild(iframe)
-      setIsDownloading(false)
-      
     } catch (error) {
-      console.error('Error generating PDF:', error)
-      alert('Failed to download PDF. Please try viewing the invoice from the invoices list.')
+      console.warn('Client-side jsPDF failed, falling back to native print/PDF viewer:', error)
+      // Seamless fallback: open browser print/PDF view
+      window.open(`/api/invoices/${createdInvoiceId}/pdf?mode=download`, '_blank')
+    } finally {
+      if (iframe && iframe.parentNode) {
+        iframe.parentNode.removeChild(iframe)
+      }
       setIsDownloading(false)
     }
   }
@@ -1554,6 +1559,18 @@ export function ImprovedInvoiceForm({
                     </Button>
                   ) : null
                 })()}
+
+                {createdInvoiceId && (
+                  <Link href={`/invoices/${createdInvoiceId}`} className="block w-full">
+                    <Button
+                      variant="outline"
+                      className="w-full gap-2 border-blue-600 text-blue-600 hover:bg-blue-50"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      View This Invoice
+                    </Button>
+                  </Link>
+                )}
 
                 <Button
                   onClick={handleViewInvoices}

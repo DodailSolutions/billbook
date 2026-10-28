@@ -153,6 +153,7 @@ export function InvoicesList({ invoices }: InvoicesListProps) {
         event.preventDefault()
         setDownloadingId(invoiceId)
         
+        let iframe: HTMLIFrameElement | null = null
         try {
             const [{ default: jsPDF }, { default: html2canvas }] = await Promise.all([
                 import('jspdf'),
@@ -173,11 +174,15 @@ export function InvoicesList({ invoices }: InvoicesListProps) {
             const invoiceNumber = invoiceNumberMatch ? invoiceNumberMatch[1] : invoiceId
             
             // Create iframe to render HTML
-            const iframe = document.createElement('iframe')
-            iframe.style.position = 'absolute'
-            iframe.style.left = '-9999px'
+            iframe = document.createElement('iframe')
+            iframe.style.position = 'fixed'
+            iframe.style.top = '0'
+            iframe.style.left = '0'
             iframe.style.width = '800px'
             iframe.style.height = '1200px'
+            iframe.style.opacity = '0.01'
+            iframe.style.pointerEvents = 'none'
+            iframe.style.zIndex = '-9999'
             iframe.style.border = 'none'
             document.body.appendChild(iframe)
             
@@ -185,7 +190,7 @@ export function InvoicesList({ invoices }: InvoicesListProps) {
             if (!iframeDoc) throw new Error('Failed to access iframe')
             
             iframeDoc.open()
-            iframeDoc.write(`
+            iframeDoc.write(html.includes('<!DOCTYPE') ? html : `
                 <!DOCTYPE html>
                 <html>
                 <head>
@@ -202,22 +207,26 @@ export function InvoicesList({ invoices }: InvoicesListProps) {
             
             const container = iframeDoc.body
             
-            // Wait for images
+            // Wait for images with 2s timeout
             const images = container.getElementsByTagName('img')
-            await Promise.all(
-                Array.from(images).map(img => {
-                    if (img.complete) return Promise.resolve()
-                    return new Promise(resolve => {
-                        img.onload = resolve
-                        img.onerror = resolve
+            await Promise.race([
+                Promise.all(
+                    Array.from(images).map(img => {
+                        if (img.complete) return Promise.resolve()
+                        return new Promise(resolve => {
+                            img.onload = resolve
+                            img.onerror = resolve
+                        })
                     })
-                })
-            )
+                ),
+                new Promise(resolve => setTimeout(resolve, 2000))
+            ])
             
             // Convert to canvas
             const canvas = await html2canvas(container, {
                 scale: 2,
                 useCORS: true,
+                allowTaint: true,
                 logging: false,
                 backgroundColor: '#ffffff',
                 windowWidth: 800,
@@ -231,7 +240,7 @@ export function InvoicesList({ invoices }: InvoicesListProps) {
             const maxHeight = pdfHeight - 20
             
             let imgWidth = maxWidth
-            let imgHeight = (canvas.height * imgWidth) / canvas.width
+            let imgHeight = (canvas.height * imgWidth) / (canvas.width || 1)
             
             if (imgHeight <= maxHeight) {
                 const topMargin = (pdfHeight - imgHeight) / 2
@@ -252,13 +261,14 @@ export function InvoicesList({ invoices }: InvoicesListProps) {
             
             // Download PDF
             pdf.save(`Invoice-${invoiceNumber}.pdf`)
-            
-            // Cleanup
-            document.body.removeChild(iframe)
         } catch (error) {
-            console.error('Error downloading PDF:', error)
-            alert('Failed to download PDF. Please try again.')
+            console.warn('Client-side jsPDF download failed, opening native print/PDF viewer:', error)
+            // Seamless automatic fallback
+            window.open(`/api/invoices/${invoiceId}/pdf?mode=download`, '_blank')
         } finally {
+            if (iframe && iframe.parentNode) {
+                iframe.parentNode.removeChild(iframe)
+            }
             setDownloadingId(null)
         }
     }

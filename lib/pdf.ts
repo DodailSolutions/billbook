@@ -41,6 +41,21 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
     const showSignature = settings?.show_signature ?? true
     const companyStampUrl = settings?.company_stamp_url || ''
     const showStamp = settings?.show_stamp ?? true
+
+    // Safe fallbacks for customer and items
+    const customer = invoice.customer || {
+        name: 'Valued Customer',
+        email: '',
+        phone: '',
+        address: '',
+        gstin: ''
+    }
+    const customerName = customer.name || 'Valued Customer'
+    const customerEmail = customer.email || ''
+    const customerPhone = customer.phone || ''
+    const customerAddress = customer.address || ''
+    const customerGstin = customer.gstin || ''
+    const invoiceItems = Array.isArray(invoice.invoice_items) ? invoice.invoice_items : []
     
     // Generate HTML for PDF
     const html = `
@@ -262,7 +277,7 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
                     ${companyAddress ? `<div>${companyAddress}</div>` : ''}
                     ${companyEmail ? `<div>Email: ${companyEmail}</div>` : ''}
                     ${companyPhone ? `<div>Phone: ${companyPhone}</div>` : ''}
-                    ${showGstin && companyGstin ? `<div>GSTIN: <span class="${invoice.customer.gstin ? 'gstin-highlight' : ''}">${companyGstin}</span></div>` : ''}
+                    ${showGstin && companyGstin ? `<div>GSTIN: <span class="${customerGstin ? 'gstin-highlight' : ''}">${companyGstin}</span></div>` : ''}
                 </div>
                 ` : ''}
             </div>
@@ -286,11 +301,11 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
                 <div class="customer-section">
                     <div class="section-title">Bill To:</div>
                     <div class="customer-details">
-                        <div class="customer-name">${invoice.customer.name}</div>
-                        ${invoice.customer.email ? `<div>${invoice.customer.email}</div>` : ''}
-                        ${invoice.customer.phone ? `<div>${invoice.customer.phone}</div>` : ''}
-                        ${invoice.customer.address ? `<div>${invoice.customer.address}</div>` : ''}
-                        ${invoice.customer.gstin ? `<div>GSTIN: <span class="${companyGstin ? 'gstin-highlight' : ''}">${invoice.customer.gstin}</span></div>` : ''}
+                        <div class="customer-name">${customerName}</div>
+                        ${customerEmail ? `<div>${customerEmail}</div>` : ''}
+                        ${customerPhone ? `<div>${customerPhone}</div>` : ''}
+                        ${customerAddress ? `<div>${customerAddress}</div>` : ''}
+                        ${customerGstin ? `<div>GSTIN: <span class="${companyGstin ? 'gstin-highlight' : ''}">${customerGstin}</span></div>` : ''}
                     </div>
                 </div>
             </div>
@@ -304,18 +319,18 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
                     <th class="text-right">Qty</th>
                     <th class="text-right">Price</th>
                     <th class="text-right">Amount</th>
-                    ${invoice.invoice_items.some(item => item.gst_rate) ? '<th class="text-right">GST Rate</th><th class="text-right">GST Amount</th>' : ''}
+                    ${invoiceItems.some(item => item.gst_rate) ? '<th class="text-right">GST Rate</th><th class="text-right">GST Amount</th>' : ''}
                 </tr>
             </thead>
             <tbody>
-                ${invoice.invoice_items.map(item => `
+                ${invoiceItems.map(item => `
                 <tr>
                     <td>${item.description}${item.item_details ? `<div style="font-size:${Math.max(9, invoiceFontSize - 2)}px; color:#6b7280; margin-top:4px; white-space:pre-line;">${item.item_details}</div>` : ''}</td>
                     <td style="font-family:monospace">${item.hsn_sac_code ? `${item.hsn_sac_type ? `<span style="font-size:${Math.max(8, invoiceFontSize - 3)}px; color:#9ca3af;">${item.hsn_sac_type} </span>` : ''}${item.hsn_sac_code}` : '<span style="color:#d1d5db">—</span>'}</td>
                     <td class="text-right">${item.quantity}</td>
                     <td class="text-right">₹${item.unit_price.toFixed(2)}</td>
                     <td class="text-right">₹${item.amount.toFixed(2)}</td>
-                    ${invoice.invoice_items.some(i => i.gst_rate) ? `<td class="text-right">${item.gst_rate || invoice.gst_percentage}%</td><td class="text-right">₹${(item.item_tax_amount || 0).toFixed(2)}</td>` : ''}
+                    ${invoiceItems.some(i => i.gst_rate) ? `<td class="text-right">${item.gst_rate || invoice.gst_percentage}%</td><td class="text-right">₹${(item.item_tax_amount || 0).toFixed(2)}</td>` : ''}
                 </tr>
                 `).join('')}
             </tbody>
