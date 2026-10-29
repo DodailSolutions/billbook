@@ -9,6 +9,7 @@ import {
     Bot, Layers, ChevronRight, ShieldCheck, Award
 } from 'lucide-react'
 import { InteractiveFeaturePreview } from './_components/InteractiveFeaturePreview'
+import { HomePricingSection } from './_components/HomePricingSection'
 import Footer from '@/components/Footer'
 import { createClient } from '@/lib/supabase/server'
 
@@ -37,12 +38,18 @@ const ALL_FEATURES = [
 ]
 
 export default async function Home() {
-    let starterPrice = 299
-    let proPrice = 599
+    let starterPrice = 2999
+    let proPrice = 4999
     let freePrice = 0
+    let starterSlug = 'starter'
+    let enterpriseSlug = 'enterprise'
+    let isAuthenticated = false
 
     try {
         const supabase = await createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        isAuthenticated = !!user
+
         const { data: plans } = await supabase
             .from('subscription_plans')
             .select('slug, price')
@@ -50,10 +57,16 @@ export default async function Home() {
         
         if (plans && Array.isArray(plans)) {
             const starter = plans.find(p => p.slug === 'starter')
-            const pro = plans.find(p => p.slug === 'professional')
+            const enterprise = plans.find(p => p.slug === 'enterprise') || plans.find(p => p.slug === 'professional')
             const free = plans.find(p => p.slug === 'free')
-            if (starter && starter.price) starterPrice = Number(starter.price)
-            if (pro && pro.price) proPrice = Number(pro.price)
+            if (starter && starter.price) {
+                starterPrice = Number(starter.price)
+                starterSlug = starter.slug
+            }
+            if (enterprise && enterprise.price) {
+                proPrice = Number(enterprise.price)
+                enterpriseSlug = enterprise.slug
+            }
             if (free && free.price !== undefined) freePrice = Number(free.price)
         }
     } catch {
@@ -251,98 +264,15 @@ export default async function Home() {
                 </div>
             </section>
 
-            {/* Apple Style Pricing Section */}
-            <section id="pricing" className="py-20 sm:py-28 bg-white border-t border-slate-200/60">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-                    <div className="text-center max-w-3xl mx-auto space-y-4">
-                        <span className="inline-block px-4 py-1.5 rounded-full bg-blue-50 text-blue-800 text-xs font-bold uppercase tracking-wider border border-blue-200">
-                            Transparent Pricing
-                        </span>
-                        <h2 className="text-3xl sm:text-5xl font-black text-slate-950 -tracking-tight">
-                            Simple, predictable plans
-                        </h2>
-                        <p className="text-slate-500 text-sm sm:text-base font-medium">
-                            Start 100% free with no credit card required. Upgrade as your company grows.
-                        </p>
-                    </div>
-
-                    <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                        {/* Free Plan */}
-                        <div className="bg-white p-8 rounded-[28px] border border-slate-200/80 space-y-6 flex flex-col justify-between hover:shadow-xl transition-all shadow-xs">
-                            <div className="space-y-4">
-                                <span className="text-sm font-bold text-slate-600 uppercase tracking-wider block">Free Plan</span>
-                                <div>
-                                    <span className="text-4xl font-black text-slate-950">₹{freePrice}</span>
-                                    <span className="text-slate-400 text-xs font-semibold"> / forever</span>
-                                </div>
-                                <p className="text-xs text-slate-500 font-medium">Ideal for freelancers and new startups.</p>
-                                <ul className="space-y-3 pt-4 border-t border-slate-100 text-xs text-slate-700 font-semibold">
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-blue-600 shrink-0" /> 50 Invoices / Month</li>
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-blue-600 shrink-0" /> GST Tax Compliance</li>
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-blue-600 shrink-0" /> Customer & Items Directory</li>
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-blue-600 shrink-0" /> Basic Financial Reports</li>
-                                </ul>
-                            </div>
-                            <Link href="/signup">
-                                <Button className="w-full bg-black hover:bg-slate-900 text-white font-bold min-h-[44px] rounded-full">
-                                    Get Started Free
-                                </Button>
-                            </Link>
-                        </div>
-
-                        {/* Pro Starter Plan */}
-                        <div className="bg-white p-8 rounded-[28px] border-2 border-blue-600 space-y-6 flex flex-col justify-between shadow-2xl relative">
-                            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-[10px] font-black px-4 py-1 rounded-full uppercase tracking-wider shadow-md">
-                                MOST POPULAR
-                            </div>
-                            <div className="space-y-4">
-                                <span className="text-sm font-bold text-blue-700 uppercase tracking-wider block">Pro Starter</span>
-                                <div>
-                                    <span className="text-4xl font-black text-slate-950">₹{starterPrice}</span>
-                                    <span className="text-slate-500 text-xs font-semibold"> / month</span>
-                                </div>
-                                <p className="text-xs text-slate-500 font-medium">Everything growing SMBs need.</p>
-                                <ul className="space-y-3 pt-4 border-t border-slate-100 text-xs text-slate-700 font-semibold">
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-blue-600 shrink-0" /> <strong>Unlimited</strong> Invoices & Quotes</li>
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-blue-600 shrink-0" /> Full CRM & Deal Pipeline</li>
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-blue-600 shrink-0" /> Bookkeeping & General Ledger</li>
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-blue-600 shrink-0" /> Vendor Purchase Orders</li>
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-blue-600 shrink-0" /> WhatsApp Direct Sharing</li>
-                                </ul>
-                            </div>
-                            <Link href="/signup">
-                                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold min-h-[44px] rounded-full shadow-lg shadow-blue-600/25">
-                                    Start 14-Day Free Trial
-                                </Button>
-                            </Link>
-                        </div>
-
-                        {/* Enterprise Plan */}
-                        <div className="bg-white p-8 rounded-[28px] border border-slate-200/80 space-y-6 flex flex-col justify-between hover:shadow-xl transition-all shadow-xs">
-                            <div className="space-y-4">
-                                <span className="text-sm font-bold text-slate-900 uppercase tracking-wider block">Enterprise Suite</span>
-                                <div>
-                                    <span className="text-4xl font-black text-slate-950">₹{proPrice}</span>
-                                    <span className="text-slate-500 text-xs font-semibold"> / month</span>
-                                </div>
-                                <p className="text-xs text-slate-500 font-medium">Complete suite with AI & Payroll.</p>
-                                <ul className="space-y-3 pt-4 border-t border-slate-100 text-xs text-slate-700 font-semibold">
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-black shrink-0" /> Everything in Pro Starter</li>
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-black shrink-0" /> Full Payroll & Payslip Engine</li>
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-black shrink-0" /> AI Accountant Assistant</li>
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-black shrink-0" /> Multi-User Team Roles</li>
-                                    <li className="flex items-center gap-2.5"><Check className="h-4 w-4 text-black shrink-0" /> Certified CA Marketplace Access</li>
-                                </ul>
-                            </div>
-                            <Link href="/signup">
-                                <Button className="w-full bg-black hover:bg-slate-900 text-white font-bold min-h-[44px] rounded-full">
-                                    Get Enterprise Plan
-                                </Button>
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            {/* Apple Style Pricing Section with Pay or Try */}
+            <HomePricingSection
+                starterPrice={starterPrice}
+                proPrice={proPrice}
+                freePrice={freePrice}
+                starterSlug={starterSlug}
+                enterpriseSlug={enterpriseSlug}
+                isAuthenticated={isAuthenticated}
+            />
 
             {/* Testimonials */}
             <section className="py-20 bg-slate-50/50 border-t border-slate-200/60">
