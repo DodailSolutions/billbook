@@ -1,7 +1,15 @@
 import { SignupPageContent } from "./SignupPageContent"
 
 export default async function SignupPage(props: { 
-    searchParams: Promise<{ message?: string; error?: string; error_description?: string; plan?: string; redirect?: string; payment?: string }> 
+    searchParams: Promise<{ 
+        message?: string; 
+        error?: string; 
+        error_description?: string; 
+        plan?: string; 
+        redirect?: string; 
+        payment?: string;
+        trial?: string;
+    }> 
 }) {
     const searchParams = await props.searchParams
     const rawError = searchParams.error_description || searchParams.error || searchParams.message

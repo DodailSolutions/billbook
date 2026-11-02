@@ -13,27 +13,38 @@ export async function getAllUsers(): Promise<UserWithDetails[]> {
             return []
         }
 
-        const supabase = await createClient()
+        // Use service role admin client if available to see all users regardless of RLS
+        let dataClient = await createClient()
+        let adminClient: any = null
+        try {
+            if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+                adminClient = await createAdminClient()
+                dataClient = adminClient
+            }
+        } catch (e) {
+            console.warn('[getAllUsers] Admin client unavailable, using standard client:', e)
+        }
 
         // 1. Fetch user profiles safely
-        const { data: profiles, error: profilesError } = await supabase
+        const { data: profiles, error: profilesError } = await dataClient
             .from('user_profiles')
             .select('*')
             .order('created_at', { ascending: false })
 
         if (profilesError) {
             console.error('[getAllUsers] Error fetching user_profiles:', profilesError)
-            return []
         }
 
-        if (!profiles || profiles.length === 0) {
-            return []
-        }
+        const profileList = profiles || []
+        const profileMap = new Map<string, any>()
+        profileList.forEach((p: any) => {
+            if (p.id) profileMap.set(p.id, p)
+        })
 
         // 2. Fetch user subscriptions separately to avoid PostgREST nested join failures
         const subscriptionsByUser: Record<string, UserSubscription> = {}
         try {
-            const { data: subs, error: subsError } = await supabase
+            const { data: subs, error: subsError } = await dataClient
                 .from('user_subscriptions')
                 .select(`
                     id,
@@ -42,6 +53,7 @@ export async function getAllUsers(): Promise<UserWithDetails[]> {
                     plan_id,
                     start_date,
                     end_date,
+                    trial_ends_at,
                     amount_paid,
                     currency,
                     created_at,
@@ -61,8 +73,9 @@ export async function getAllUsers(): Promise<UserWithDetails[]> {
                         ? sub.subscription_plans[0]
                         : sub.subscription_plans
 
-                    // Prioritize active subscription if multiple exist
-                    if (!subscriptionsByUser[sub.user_id] || sub.status === 'active') {
+                    // Prioritize trial or active subscription
+                    const existing = subscriptionsByUser[sub.user_id]
+                    if (!existing || sub.status === 'active' || (sub.status === 'trial' && existing.status !== 'active')) {
                         subscriptionsByUser[sub.user_id] = {
                             id: sub.id,
                             user_id: sub.user_id,
@@ -70,6 +83,7 @@ export async function getAllUsers(): Promise<UserWithDetails[]> {
                             status: sub.status,
                             start_date: sub.start_date,
                             end_date: sub.end_date,
+                            trial_ends_at: sub.trial_ends_at,
                             auto_renew: !!sub.auto_renew,
                             currency: sub.currency || 'INR',
                             amount_paid: sub.amount_paid,
@@ -84,44 +98,93 @@ export async function getAllUsers(): Promise<UserWithDetails[]> {
             console.warn('[getAllUsers] Non-fatal: could not fetch user_subscriptions:', subErr)
         }
 
-        // 3. Try to fetch auth user emails via Admin Client (service role)
-        const authEmailMap: Record<string, string> = {}
+        // 3. Fetch all auth.users directly via admin client if available (includes unconfirmed / newly created signups)
+        const allAuthUsers: any[] = []
         try {
-            if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
-                const adminClient = await createAdminClient()
-                if (adminClient?.auth?.admin?.listUsers) {
-                    const { data: authData, error: authError } = await adminClient.auth.admin.listUsers({
-                        perPage: 1000
-                    })
-                    if (!authError && authData?.users) {
-                        authData.users.forEach(u => {
-                            if (u.id && u.email) {
-                                authEmailMap[u.id] = u.email
-                            }
-                        })
-                    }
+            if (adminClient?.auth?.admin?.listUsers) {
+                const { data: authData, error: authError } = await adminClient.auth.admin.listUsers({
+                    perPage: 1000
+                })
+                if (!authError && authData?.users) {
+                    allAuthUsers.push(...authData.users)
                 }
             }
         } catch (authErr) {
-            console.warn('[getAllUsers] Non-fatal: could not fetch auth.users (falling back to profile emails):', authErr)
+            console.warn('[getAllUsers] Non-fatal: could not fetch auth.users:', authErr)
         }
 
-        // 4. Merge data safely with defensive fallbacks
-        const usersWithDetails: UserWithDetails[] = profiles.map(profile => {
-            const email = authEmailMap[profile.id] || profile.business_email || profile.email || 'Email not available'
-            const subscription = subscriptionsByUser[profile.id]
+        // 4. Merge data safely: ensure every user in auth.users or user_profiles appears in admin
+        const mergedUsers: UserWithDetails[] = []
+        const handledUserIds = new Set<string>()
 
-            return {
-                ...profile,
-                email,
-                role: profile.role || 'user',
+        // Process auth.users first
+        allAuthUsers.forEach(authUser => {
+            handledUserIds.add(authUser.id)
+            const profile = profileMap.get(authUser.id) || {}
+            const meta = authUser.user_metadata || {}
+            const subscription = subscriptionsByUser[authUser.id]
+
+            // If subscription not in user_subscriptions table yet, synthesize from metadata if present
+            let resolvedSub = subscription
+            if (!resolvedSub && (meta.selected_plan || meta.is_trial)) {
+                resolvedSub = {
+                    id: `trial-${authUser.id}`,
+                    user_id: authUser.id,
+                    plan_id: meta.selected_plan || 'trial',
+                    status: meta.is_trial ? 'trial' : 'active',
+                    start_date: authUser.created_at,
+                    end_date: new Date(new Date(authUser.created_at).getTime() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+                    currency: 'INR',
+                    amount_paid: 0,
+                    created_at: authUser.created_at,
+                    updated_at: authUser.created_at,
+                    plan: {
+                        id: meta.selected_plan || 'trial',
+                        name: meta.selected_plan ? meta.selected_plan.charAt(0).toUpperCase() + meta.selected_plan.slice(1) : 'Trial',
+                        price: 0,
+                        slug: meta.selected_plan || 'trial',
+                        billing_period: 'monthly'
+                    }
+                }
+            }
+
+            mergedUsers.push({
+                id: authUser.id,
+                email: authUser.email || profile.business_email || profile.email || 'Email not available',
+                role: profile.role || (authUser.app_metadata?.role as any) || 'user',
                 status: profile.status || 'active',
-                created_at: profile.created_at || new Date().toISOString(),
-                subscription
+                business_name: profile.business_name || meta.business_name || meta.owner_name || authUser.email?.split('@')[0],
+                owner_name: profile.owner_name || meta.owner_name || meta.full_name,
+                business_type: profile.business_type || meta.business_type,
+                business_phone: profile.business_phone || meta.business_phone,
+                business_address: profile.business_address || meta.business_address,
+                gstin: profile.gstin || meta.gstin,
+                created_at: profile.created_at || authUser.created_at || new Date().toISOString(),
+                updated_at: profile.updated_at || authUser.updated_at || new Date().toISOString(),
+                subscription: resolvedSub
+            })
+        })
+
+        // Process any remaining profiles not in auth.users list
+        profileList.forEach((profile: any) => {
+            if (!handledUserIds.has(profile.id)) {
+                handledUserIds.add(profile.id)
+                const subscription = subscriptionsByUser[profile.id]
+                mergedUsers.push({
+                    ...profile,
+                    email: profile.business_email || profile.email || 'Email not available',
+                    role: profile.role || 'user',
+                    status: profile.status || 'active',
+                    created_at: profile.created_at || new Date().toISOString(),
+                    subscription
+                })
             }
         })
 
-        return usersWithDetails
+        // Sort by newest first
+        mergedUsers.sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
+
+        return mergedUsers
     } catch (error) {
         console.error('[getAllUsers] Fatal error prevented:', error)
         return []

@@ -1,4 +1,4 @@
-import { Users, Shield, UserCheck, UserX, Crown, ArrowLeft, Plus, Sparkles, Building2 } from 'lucide-react'
+import { Users, Shield, UserCheck, UserX, Crown, ArrowLeft, Plus, Sparkles, Building2, Zap } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import Link from 'next/link'
@@ -18,7 +18,7 @@ function StatCard({
     value: number
     description: string
     icon: any
-    color: 'blue' | 'emerald' | 'rose' | 'purple'
+    color: 'blue' | 'emerald' | 'rose' | 'purple' | 'amber'
     badge?: string
 }) {
     const colorMap = {
@@ -37,6 +37,10 @@ function StatCard({
         purple: {
             bg: 'bg-purple-50 text-purple-600 dark:bg-purple-950/50 dark:text-purple-400',
             text: 'text-purple-600 dark:text-purple-400'
+        },
+        amber: {
+            bg: 'bg-amber-50 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400',
+            text: 'text-amber-600 dark:text-amber-400'
         }
     }
 
@@ -120,6 +124,7 @@ export default async function UsersManagementPage() {
     const stats = {
         total: users?.length || 0,
         active: users?.filter(u => u?.status === 'active')?.length || 0,
+        trial: users?.filter(u => u?.subscription?.status === 'trial')?.length || 0,
         suspended: users?.filter(u => u?.status === 'suspended')?.length || 0,
         admins: users?.filter(u => u?.role === 'super_admin' || u?.role === 'admin')?.length || 0
     }
@@ -182,13 +187,20 @@ export default async function UsersManagementPage() {
             )}
 
             {/* Metric KPI Cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
                 <StatCard
                     title="Total Registered"
                     value={stats.total}
-                    description="All user profiles"
+                    description="All accounts"
                     icon={Users}
                     color="blue"
+                />
+                <StatCard
+                    title="Trial Users"
+                    value={stats.trial}
+                    description="14-day trials"
+                    icon={Zap}
+                    color="amber"
                 />
                 <StatCard
                     title="Active Accounts"
@@ -198,7 +210,7 @@ export default async function UsersManagementPage() {
                     color="emerald"
                 />
                 <StatCard
-                    title="Suspended / Inactive"
+                    title="Suspended"
                     value={stats.suspended}
                     description="Restricted access"
                     icon={UserX}
@@ -207,7 +219,7 @@ export default async function UsersManagementPage() {
                 <StatCard
                     title="Staff & Admins"
                     value={stats.admins}
-                    description="Admin & Super Admin"
+                    description="Super Admin"
                     icon={Shield}
                     color="purple"
                     badge="Privileged"

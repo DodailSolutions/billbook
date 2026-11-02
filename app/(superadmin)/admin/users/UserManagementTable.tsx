@@ -64,7 +64,7 @@ export default function UserManagementTable({
     const [userList, setUserList] = useState<UserWithDetails[]>(rawUsers)
     const [searchQuery, setSearchQuery] = useState('')
     const [roleFilter, setRoleFilter] = useState<'all' | 'user' | 'admin' | 'super_admin'>('all')
-    const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'suspended' | 'inactive'>('all')
+    const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'trial' | 'suspended' | 'inactive'>('all')
     const [planFilter, setPlanFilter] = useState<string>('all')
     const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'name'>('newest')
     
@@ -252,8 +252,13 @@ export default function UserManagementTable({
             }
 
             // Status filter
-            if (statusFilter !== 'all' && user.status !== statusFilter) {
-                return false
+            if (statusFilter !== 'all') {
+                const isTrial = user.subscription?.status === 'trial'
+                if (statusFilter === 'trial') {
+                    if (!isTrial) return false
+                } else if (user.status !== statusFilter) {
+                    return false
+                }
             }
 
             // Plan filter
@@ -368,6 +373,7 @@ export default function UserManagementTable({
                         >
                             <option value="all">All Statuses</option>
                             <option value="active">Active</option>
+                            <option value="trial">Free Trial</option>
                             <option value="suspended">Suspended</option>
                             <option value="inactive">Inactive</option>
                         </select>
@@ -504,9 +510,16 @@ export default function UserManagementTable({
 
                                         {/* Subscription Plan */}
                                         <td className="py-3.5 px-4 whitespace-nowrap">
-                                            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 border border-blue-200/80 dark:border-blue-900/40 text-xs font-semibold">
-                                                <Crown className="h-3 w-3 text-blue-600 dark:text-blue-400" />
-                                                <span>{planName}</span>
+                                            <div className="flex items-center gap-1.5 flex-wrap">
+                                                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 border border-blue-200/80 dark:border-blue-900/40 text-xs font-semibold">
+                                                    <Crown className="h-3 w-3 text-blue-600 dark:text-blue-400" />
+                                                    <span>{planName}</span>
+                                                </div>
+                                                {user.subscription?.status === 'trial' && (
+                                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-300/80">
+                                                        Trial
+                                                    </span>
+                                                )}
                                             </div>
                                         </td>
 

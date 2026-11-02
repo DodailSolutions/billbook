@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { sendWelcomeEmail } from '@/lib/email'
 
 export async function login(formData: FormData) {
@@ -93,6 +93,7 @@ export async function signup(formData: FormData) {
         const gstin = formData.get('gstin') as string
         const selectedPlan = formData.get('selectedPlan') as string
         const redirectAfter = formData.get('redirectAfter') as string
+        const isTrial = formData.get('isTrial') === 'true' || (selectedPlan && selectedPlan !== 'free' && redirectAfter !== 'checkout')
 
         // Log for debugging
         console.log('Signup attempt for:', email, 'with plan:', selectedPlan, 'redirect:', redirectAfter)
@@ -115,6 +116,7 @@ export async function signup(formData: FormData) {
                     business_email: businessEmail || email,
                     gstin: gstin,
                     selected_plan: selectedPlan || 'free',
+                    is_trial: isTrial,
                 },
                 emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://billbooky.dodail.com'}/auth/callback`
             }
@@ -131,14 +133,23 @@ export async function signup(formData: FormData) {
             return redirect('/login?message=' + encodeURIComponent('User already exists. Please login.'))
         }
 
-        // If user is created, store business profile in user_profiles table
+        // If user is created, store business profile & trial subscription (using admin client to bypass RLS)
         if (data?.user) {
             console.log('User created successfully:', data.user.id)
             
             try {
-                const { error: profileError } = await supabase
+                let dbClient = supabase
+                try {
+                    if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+                        dbClient = await createAdminClient()
+                    }
+                } catch (adminClientErr) {
+                    console.warn('Could not init adminClient for signup, falling back to user client:', adminClientErr)
+                }
+
+                const { error: profileError } = await dbClient
                     .from('user_profiles')
-                    .insert({
+                    .upsert({
                         id: data.user.id,
                         role: 'user',
                         business_name: businessName || undefined,
@@ -148,14 +159,41 @@ export async function signup(formData: FormData) {
                         business_phone: businessPhone || undefined,
                         business_email: businessEmail || email || undefined,
                         gstin: gstin || undefined,
-                        status: 'active'
-                    })
+                        status: 'active',
+                        plan_name: selectedPlan || 'free'
+                    }, { onConflict: 'id' })
 
                 if (profileError) {
                     console.error('Profile creation error:', profileError)
-                    // Continue anyway - user can complete profile later
                 } else {
                     console.log('Profile created successfully')
+                }
+
+                // If this is a trial or free signup, create subscription record immediately
+                if (selectedPlan && selectedPlan !== 'free' && isTrial) {
+                    try {
+                        const { data: planData } = await dbClient
+                            .from('subscription_plans')
+                            .select('id')
+                            .eq('slug', selectedPlan)
+                            .maybeSingle()
+
+                        if (planData?.id) {
+                            const now = new Date()
+                            const trialEnd = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000)
+                            await dbClient.from('user_subscriptions').upsert({
+                                user_id: data.user.id,
+                                plan_id: planData.id,
+                                status: 'trial',
+                                start_date: now.toISOString(),
+                                end_date: trialEnd.toISOString(),
+                                trial_ends_at: trialEnd.toISOString(),
+                                payment_method: 'free_trial'
+                            }, { onConflict: 'user_id' })
+                        }
+                    } catch (subErr) {
+                        console.warn('Could not auto-create trial subscription on signup:', subErr)
+                    }
                 }
 
                 // Send welcome email (non-blocking - don't fail signup if email fails)

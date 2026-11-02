@@ -39,13 +39,14 @@ interface SignupFormProps {
     message?: string
     redirectAfter?: string
     paymentData?: string | null
+    isTrial?: boolean
 }
 
 interface FieldErrors {
     [key: string]: string | undefined
 }
 
-export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }: SignupFormProps) {
+export function SignupForm({ selectedPlan, message, redirectAfter, paymentData, isTrial = false }: SignupFormProps) {
     const router = useRouter()
     const [isMounted, setIsMounted] = useState(false)
     const [currentStep, setCurrentStep] = useState(1)
@@ -65,7 +66,8 @@ export function SignupForm({ selectedPlan, message, redirectAfter, paymentData }
         businessEmail: '',
         gstin: '',
         selectedPlan: selectedPlan,
-        redirectAfter: redirectAfter || ''
+        redirectAfter: redirectAfter || '',
+        isTrial: isTrial ? 'true' : 'false'
     })
 
     // Prevent hydration mismatch
