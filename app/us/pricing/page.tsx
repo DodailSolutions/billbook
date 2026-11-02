@@ -5,6 +5,8 @@ import { CheckCircle, Zap, Shield, DollarSign, Sparkles } from 'lucide-react'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { createClient } from '@/lib/supabase/server'
 import { USPricingToggleSection } from './USPricingToggleSection'
+import { RegionSwitcher } from '@/components/RegionSwitcher'
+import { PublicHeaderAuth } from '@/components/PublicHeaderAuth'
 
 export const metadata = {
   title: 'Pricing - BillBooky International | Plans Starting at $49/year',
@@ -112,25 +114,9 @@ export default async function USPricingPage() {
             <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">BillBooky International</h1>
           </Link>
           <div className="flex items-center gap-2 md:gap-3">
+            <RegionSwitcher />
             <ThemeToggle />
-            {isAuthenticated ? (
-              <Link href="/dashboard">
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                  Dashboard
-                </Button>
-              </Link>
-            ) : (
-              <>
-                <Link href="/login">
-                  <Button variant="secondary">Sign In</Button>
-                </Link>
-                <Link href="/signup">
-                  <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                    Get Started
-                  </Button>
-                </Link>
-              </>
-            )}
+            <PublicHeaderAuth initialAuthenticated={isAuthenticated} />
           </div>
         </div>
       </nav>

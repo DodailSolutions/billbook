@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, BadgeIndianRupee, Sparkles, Phone, LayoutDashboard, FileText, LogIn } from 'lucide-react'
+import { Home, BadgeIndianRupee, DollarSign, Globe, Sparkles, Phone, LayoutDashboard, FileText, LogIn } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 
@@ -20,6 +20,8 @@ const visiblePublicPaths = [
   '/refund',
   '/for-cas',
   '/ca-marketplace',
+  '/us',
+  '/ae',
 ]
 
 export function PublicMobileNav() {
@@ -55,17 +57,23 @@ export function PublicMobileNav() {
     return null
   }
 
+  const isAE = pathname.startsWith('/ae')
+  const isUS = pathname.startsWith('/us')
+  const homeHref = isAE ? '/ae' : isUS ? '/us' : '/'
+  const pricingHref = isAE ? '/ae/pricing' : isUS ? '/us/pricing' : '/pricing'
+  const pricingIcon = isAE ? Globe : isUS ? DollarSign : BadgeIndianRupee
+
   const navRoutes = isAuthenticated
     ? [
-        { label: 'Home', href: '/', icon: Home },
+        { label: 'Home', href: homeHref, icon: Home },
         { label: 'Invoices', href: '/invoices', icon: FileText },
-        { label: 'Pricing', href: '/pricing', icon: BadgeIndianRupee },
+        { label: 'Pricing', href: pricingHref, icon: pricingIcon },
         { label: 'Contact', href: '/contact', icon: Phone },
         { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, isPrimary: true },
       ]
     : [
-        { label: 'Home', href: '/', icon: Home },
-        { label: 'Pricing', href: '/pricing', icon: BadgeIndianRupee },
+        { label: 'Home', href: homeHref, icon: Home },
+        { label: 'Pricing', href: pricingHref, icon: pricingIcon },
         { label: 'Features', href: '/features', icon: Sparkles },
         { label: 'Contact', href: '/contact', icon: Phone },
         { label: 'Sign In', href: '/login', icon: LogIn, isPrimary: true },
@@ -80,8 +88,8 @@ export function PublicMobileNav() {
       >
         <div className="grid grid-cols-5 gap-1 px-2 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom,0px))]">
           {navRoutes.map((route) => {
-            const active = route.href === '/'
-              ? pathname === '/'
+            const active = route.href === homeHref
+              ? pathname === homeHref
               : pathname === route.href || pathname.startsWith(`${route.href}/`)
 
             return (

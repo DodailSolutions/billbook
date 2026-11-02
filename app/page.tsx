@@ -13,6 +13,7 @@ import { HomePricingSection } from './_components/HomePricingSection'
 import Footer from '@/components/Footer'
 import { createClient } from '@/lib/supabase/server'
 import { PublicHeaderAuth } from '@/components/PublicHeaderAuth'
+import { RegionSwitcher } from '@/components/RegionSwitcher'
 
 export const dynamic = 'force-dynamic'
 
@@ -113,7 +114,10 @@ export default async function Home() {
                             <Link href="/contact" className="hover:text-black transition-colors">Contact</Link>
                         </div>
 
-                        <PublicHeaderAuth initialAuthenticated={isAuthenticated} />
+                        <div className="flex items-center gap-2 sm:gap-3">
+                            <RegionSwitcher />
+                            <PublicHeaderAuth initialAuthenticated={isAuthenticated} />
+                        </div>
                     </div>
                 </div>
             </nav>

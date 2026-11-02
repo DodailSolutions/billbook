@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
+import { RegionSwitcher } from './RegionSwitcher'
 
 export default function Footer() {
   return (
@@ -58,12 +59,12 @@ export default function Footer() {
         </div>
         
         {/* Bottom Bar matching screenshot */}
-        <div className="pt-8 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-600 font-medium">
+        <div className="pt-8 border-t border-slate-200/80 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-600 font-medium">
           <div className="flex items-center gap-2">
             <span className="font-extrabold text-slate-950 text-base">Bill<span className="text-blue-600">Booky</span></span>
             <span className="text-slate-500">© 2026 BillBooky Inc. All rights reserved.</span>
           </div>
-          <p className="text-slate-500 font-medium">Made in India 🇮🇳</p>
+          <RegionSwitcher variant="footer" />
         </div>
       </div>
     </footer>
