@@ -7,6 +7,7 @@ import { Mail, MessageSquare, Phone, CheckCircle, XCircle } from 'lucide-react'
 import { submitContactForm } from './actions'
 import { useState, useTransition } from 'react'
 import Footer from '@/components/Footer'
+import { PublicHeaderAuth } from '@/components/PublicHeaderAuth'
 
 export default function ContactPage() {
   const [isPending, startTransition] = useTransition()
@@ -44,18 +45,7 @@ export default function ContactPage() {
             </div>
             <h1 className="text-2xl font-bold text-gray-900">BillBooky</h1>
           </Link>
-          <div className="flex items-center gap-3">
-            <Link href="/login">
-              <Button variant="secondary" className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50">
-                Sign In
-              </Button>
-            </Link>
-            <Link href="/signup">
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                Get Started
-              </Button>
-            </Link>
-          </div>
+          <PublicHeaderAuth />
         </div>
       </nav>
 

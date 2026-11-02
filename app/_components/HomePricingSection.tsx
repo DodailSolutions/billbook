@@ -110,14 +110,23 @@ export function HomePricingSection({
                         </div>
 
                         <div className="space-y-2 pt-8">
-                            <Link href="/signup?plan=free" className="block">
-                                <Button className="w-full bg-black hover:bg-slate-900 text-white font-bold min-h-[46px] rounded-full transition-transform duration-200 hover:scale-[1.01]">
-                                    Get Started Free
-                                </Button>
-                            </Link>
+                            {isAuthenticated ? (
+                                <Link href="/dashboard" className="block">
+                                    <Button className="w-full bg-slate-900 hover:bg-black text-white font-bold min-h-[46px] rounded-full transition-transform duration-200 hover:scale-[1.01] flex items-center justify-center gap-2">
+                                        <Check className="h-4 w-4 text-emerald-400" />
+                                        <span>Current Plan • Open Dashboard</span>
+                                    </Button>
+                                </Link>
+                            ) : (
+                                <Link href="/signup?plan=free" className="block">
+                                    <Button className="w-full bg-black hover:bg-slate-900 text-white font-bold min-h-[46px] rounded-full transition-transform duration-200 hover:scale-[1.01]">
+                                        Get Started Free
+                                    </Button>
+                                </Link>
+                            )}
                             <div className="h-[44px] flex items-center justify-center">
                                 <span className="text-[11px] text-slate-400 font-medium">
-                                    Always 100% free • No card required
+                                    {isAuthenticated ? 'Active forever • Unlimited access' : 'Always 100% free • No card required'}
                                 </span>
                             </div>
                         </div>

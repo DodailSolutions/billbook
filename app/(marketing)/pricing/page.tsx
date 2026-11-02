@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/Button'
 import { Zap, ShoppingCart } from 'lucide-react'
 import Footer from '@/components/Footer'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { PublicHeaderAuth } from '@/components/PublicHeaderAuth'
 import { createClient } from '@/lib/supabase/server'
 import { CheckoutHandler } from './CheckoutHandler'
 import { PricingToggleSection } from './PricingToggleSection'
@@ -88,26 +89,7 @@ export default async function PricingPage() {
           </Link>
           <div className="flex items-center gap-2 md:gap-3">
             <ThemeToggle />
-            {isAuthenticated ? (
-              <Link href="/dashboard">
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white text-sm md:text-base">
-                  Dashboard
-                </Button>
-              </Link>
-            ) : (
-              <>
-                <Link href="/login" className="hidden sm:inline-block">
-                  <Button variant="secondary" className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">
-                    Sign In
-                  </Button>
-                </Link>
-                <Link href="/signup">
-                  <Button className="bg-blue-600 hover:bg-blue-700 text-white text-sm md:text-base">
-                    Get Started
-                  </Button>
-                </Link>
-              </>
-            )}
+            <PublicHeaderAuth initialAuthenticated={isAuthenticated} />
           </div>
         </div>
       </nav>

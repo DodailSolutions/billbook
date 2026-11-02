@@ -1,24 +1,27 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import dynamic from 'next/dynamic'
+import dynamicImport from 'next/dynamic'
 import { Button } from '@/components/ui/Button'
 import { 
     FileText, Users, IndianRupee, Zap, CheckCircle, Shield, TrendingUp, 
     RefreshCw, Clock, Building2, ArrowRight, Star, Check, BarChart3, 
     Smartphone, Globe, Lock, Sparkles, BookOpen, ShoppingBag, DollarSign, 
-    Bot, Layers, ChevronRight, ShieldCheck, Award
+    Bot, Layers, ChevronRight, ShieldCheck, Award, LayoutDashboard, PlusCircle
 } from 'lucide-react'
 import { InteractiveFeaturePreview } from './_components/InteractiveFeaturePreview'
 import { HomePricingSection } from './_components/HomePricingSection'
 import Footer from '@/components/Footer'
 import { createClient } from '@/lib/supabase/server'
+import { PublicHeaderAuth } from '@/components/PublicHeaderAuth'
+
+export const dynamic = 'force-dynamic'
 
 // Lazy load below-the-fold components for performance
-const FAQSection = dynamic(() => import('./_components/FAQSection').then(mod => ({ default: mod.FAQSection })), {
+const FAQSection = dynamicImport(() => import('./_components/FAQSection').then(mod => ({ default: mod.FAQSection })), {
     loading: () => <div className="py-20 text-center text-slate-400 font-medium">Loading FAQ...</div>,
 })
 
-const TestimonialCarousel = dynamic(() => import('./_components/TestimonialCarousel').then(mod => ({ default: mod.TestimonialCarousel })), {
+const TestimonialCarousel = dynamicImport(() => import('./_components/TestimonialCarousel').then(mod => ({ default: mod.TestimonialCarousel })), {
     loading: () => <div className="py-20 text-center text-slate-400 font-medium">Loading testimonials...</div>,
 })
 
@@ -101,7 +104,7 @@ export default async function Home() {
                             </span>
                         </Link>
                         
-                        <div className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
+                        <div className="hidden lg:flex items-center gap-6 xl:gap-8 text-sm font-semibold text-slate-600">
                             <Link href="#features" className="hover:text-black transition-colors">Features</Link>
                             <Link href="#showcase" className="hover:text-black transition-colors">Live Preview</Link>
                             <Link href="#pricing" className="hover:text-black transition-colors">Pricing</Link>
@@ -110,18 +113,7 @@ export default async function Home() {
                             <Link href="/contact" className="hover:text-black transition-colors">Contact</Link>
                         </div>
 
-                        <div className="flex items-center gap-3">
-                            <Link href="/login" className="hidden sm:block">
-                                <Button variant="ghost" className="text-slate-700 hover:text-black hover:bg-slate-100 font-bold min-h-[44px] rounded-full px-5">
-                                    Sign In
-                                </Button>
-                            </Link>
-                            <Link href="/signup">
-                                <Button className="bg-black hover:bg-slate-900 text-white font-bold shadow-md shadow-black/10 min-h-[44px] px-6 rounded-full transition-all duration-300 hover:scale-105">
-                                    Get Started Free
-                                </Button>
-                            </Link>
-                        </div>
+                        <PublicHeaderAuth initialAuthenticated={isAuthenticated} />
                     </div>
                 </div>
             </nav>
@@ -137,7 +129,7 @@ export default async function Home() {
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-200/80 shadow-xs">
                             <span className="h-2 w-2 rounded-full bg-blue-600 animate-ping" />
                             <span className="text-xs sm:text-sm font-bold text-blue-800 tracking-wide uppercase">
-                                All-In-One Business Operating System
+                                {isAuthenticated ? 'Welcome Back • Workspace Active' : 'All-In-One Business Operating System'}
                             </span>
                         </div>
 
@@ -154,18 +146,38 @@ export default async function Home() {
                         </p>
 
                         {/* Apple Action Buttons */}
-                        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
-                            <Link href="/signup" className="w-full sm:w-auto">
-                                <Button size="lg" className="w-full sm:w-auto bg-black hover:bg-slate-900 text-white font-extrabold px-8 py-4 rounded-full shadow-lg shadow-black/10 hover:shadow-2xl hover:-translate-y-0.5 transition-all duration-300 text-base min-h-[52px] gap-2">
-                                    Start Free Account
-                                    <ArrowRight className="h-5 w-5" />
-                                </Button>
-                            </Link>
-                            <Link href="#showcase" className="w-full sm:w-auto">
-                                <Button size="lg" className="w-full sm:w-auto bg-slate-100/90 hover:bg-slate-200 text-slate-900 font-bold px-8 py-4 rounded-full border border-slate-200/80 hover:-translate-y-0.5 transition-all duration-300 text-base min-h-[52px]">
-                                    Explore Features
-                                </Button>
-                            </Link>
+                        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-2 w-full sm:w-auto">
+                            {isAuthenticated ? (
+                                <>
+                                    <Link href="/dashboard" className="w-full sm:w-auto">
+                                        <Button size="lg" className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-extrabold px-8 py-4 rounded-full shadow-lg shadow-blue-600/25 hover:shadow-2xl hover:-translate-y-0.5 transition-all duration-300 text-base min-h-[52px] gap-2.5">
+                                            <LayoutDashboard className="h-5 w-5" />
+                                            Go to Dashboard
+                                            <ArrowRight className="h-5 w-5" />
+                                        </Button>
+                                    </Link>
+                                    <Link href="/invoices/new" className="w-full sm:w-auto">
+                                        <Button size="lg" className="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 text-slate-900 font-bold px-8 py-4 rounded-full border border-slate-200 hover:-translate-y-0.5 transition-all duration-300 text-base min-h-[52px] gap-2">
+                                            <PlusCircle className="h-5 w-5 text-blue-600" />
+                                            Create New Invoice
+                                        </Button>
+                                    </Link>
+                                </>
+                            ) : (
+                                <>
+                                    <Link href="/signup" className="w-full sm:w-auto">
+                                        <Button size="lg" className="w-full sm:w-auto bg-black hover:bg-slate-900 text-white font-extrabold px-8 py-4 rounded-full shadow-lg shadow-black/10 hover:shadow-2xl hover:-translate-y-0.5 transition-all duration-300 text-base min-h-[52px] gap-2">
+                                            Start Free Account
+                                            <ArrowRight className="h-5 w-5" />
+                                        </Button>
+                                    </Link>
+                                    <Link href="#features" className="w-full sm:w-auto">
+                                        <Button size="lg" className="w-full sm:w-auto bg-slate-100/90 hover:bg-slate-200 text-slate-900 font-bold px-8 py-4 rounded-full border border-slate-200/80 hover:-translate-y-0.5 transition-all duration-300 text-base min-h-[52px]">
+                                            Explore Features
+                                        </Button>
+                                    </Link>
+                                </>
+                            )}
                         </div>
 
                         {/* Ratings & Social Proof */}
@@ -306,12 +318,25 @@ export default async function Home() {
                     <p className="text-slate-300 text-sm sm:text-base max-w-xl mx-auto font-medium">
                         Join 500+ Indian startups and SMBs managing invoicing, CRM, bookkeeping, and payroll on BillBooky.
                     </p>
-                    <Link href="/signup" className="inline-block">
-                        <Button size="lg" className="bg-blue-600 text-white hover:bg-blue-700 font-black px-8 py-4 rounded-full shadow-xl text-base min-h-[52px] gap-2 hover:scale-105 transition-all duration-300">
-                            Create Free Account Now
-                            <ArrowRight className="h-5 w-5" />
-                        </Button>
-                    </Link>
+                    {isAuthenticated ? (
+                        <div className="space-y-4">
+                            <Link href="/dashboard" className="inline-block">
+                                <Button size="lg" className="bg-blue-600 text-white hover:bg-blue-700 font-black px-8 py-4 rounded-full shadow-xl text-base min-h-[52px] gap-2.5 hover:scale-105 transition-all duration-300">
+                                    <LayoutDashboard className="h-5 w-5" />
+                                    Open Your Dashboard
+                                    <ArrowRight className="h-5 w-5" />
+                                </Button>
+                            </Link>
+                            <p className="text-xs text-slate-400 font-medium">Direct instant access to your active invoices, CRM deals, and team bookkeeping.</p>
+                        </div>
+                    ) : (
+                        <Link href="/signup" className="inline-block">
+                            <Button size="lg" className="bg-blue-600 text-white hover:bg-blue-700 font-black px-8 py-4 rounded-full shadow-xl text-base min-h-[52px] gap-2 hover:scale-105 transition-all duration-300">
+                                Create Free Account Now
+                                <ArrowRight className="h-5 w-5" />
+                            </Button>
+                        </Link>
+                    )}
                 </div>
             </section>
 
