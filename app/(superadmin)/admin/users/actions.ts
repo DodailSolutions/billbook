@@ -125,7 +125,7 @@ export async function getAllUsers(): Promise<UserWithDetails[]> {
             const subscription = subscriptionsByUser[authUser.id]
 
             // If subscription not in user_subscriptions table yet, synthesize from metadata if present
-            let resolvedSub = subscription
+            let resolvedSub: any = subscription
             if (!resolvedSub && (meta.selected_plan || meta.is_trial)) {
                 resolvedSub = {
                     id: `trial-${authUser.id}`,
@@ -136,14 +136,24 @@ export async function getAllUsers(): Promise<UserWithDetails[]> {
                     end_date: new Date(new Date(authUser.created_at).getTime() + 14 * 24 * 60 * 60 * 1000).toISOString(),
                     currency: 'INR',
                     amount_paid: 0,
+                    auto_renew: false,
                     created_at: authUser.created_at,
                     updated_at: authUser.created_at,
                     plan: {
                         id: meta.selected_plan || 'trial',
                         name: meta.selected_plan ? meta.selected_plan.charAt(0).toUpperCase() + meta.selected_plan.slice(1) : 'Trial',
-                        price: 0,
                         slug: meta.selected_plan || 'trial',
-                        billing_period: 'monthly'
+                        description: 'Trial Plan',
+                        price: 0,
+                        currency: 'INR',
+                        billing_period: 'monthly' as const,
+                        features: [],
+                        limits: {},
+                        is_active: true,
+                        is_popular: false,
+                        sort_order: 99,
+                        created_at: authUser.created_at,
+                        updated_at: authUser.created_at,
                     }
                 }
             }
