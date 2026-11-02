@@ -24,8 +24,17 @@ interface UpgradePlanModalProps {
 }
 
 
-function getPlanCurrency(currency?: string) {
-  const c = (currency || '').toUpperCase()
+function getPlanCurrency(currency?: string, planName?: string, planSlug?: string) {
+  const name = (planName || '').toUpperCase()
+  const slug = (planSlug || '').toUpperCase()
+  const c = (currency || '').trim().toUpperCase()
+
+  if (name.includes('UAE') || name.includes('AED') || slug.includes('-AE') || slug.includes('UAE')) {
+    return { symbol: 'AED ', label: 'AED' }
+  }
+  if (name.includes('USD') || slug.includes('-US') || slug.includes('USD')) {
+    return { symbol: '$', label: 'USD' }
+  }
   if (c === 'AED') return { symbol: 'AED ', label: 'AED' }
   if (c === 'USD') return { symbol: '$', label: 'USD' }
   if (c === 'EUR') return { symbol: '€', label: 'EUR' }
@@ -49,7 +58,8 @@ export function UpgradePlanModal({
 
   const visiblePlans = plans.filter(p => {
     if (regionTab === 'ALL') return true
-    return (p.currency || 'INR').toUpperCase() === regionTab
+    const curr = getPlanCurrency(p.currency, p.name, p.slug)
+    return curr.label === regionTab
   })
 
   const handleUpgrade = async () => {
@@ -145,9 +155,9 @@ export function UpgradePlanModal({
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Select Target Plan
               </label>
-              {Array.from(new Set(plans.map(p => (p.currency || 'INR').toUpperCase()))).length > 1 && (
+              {Array.from(new Set(plans.map(p => getPlanCurrency(p.currency, p.name, p.slug).label))).length > 1 && (
                 <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg text-[10px] font-bold">
-                  {['ALL', 'INR', 'AED', 'USD'].filter(c => c === 'ALL' || plans.some(p => (p.currency || 'INR').toUpperCase() === c)).map((c) => (
+                  {['ALL', 'INR', 'AED', 'USD'].filter(c => c === 'ALL' || plans.some(p => getPlanCurrency(p.currency, p.name, p.slug).label === c)).map((c) => (
                     <button
                       key={c}
                       type="button"
@@ -168,7 +178,7 @@ export function UpgradePlanModal({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 {visiblePlans.map((plan) => {
                   const isSelected = selectedPlan === plan.id
-                  const curr = getPlanCurrency(plan.currency)
+                  const curr = getPlanCurrency(plan.currency, plan.name, plan.slug)
                   return (
                     <button
                       key={plan.id}
@@ -189,7 +199,7 @@ export function UpgradePlanModal({
                         )}
                       </div>
                       <p className="text-xs font-semibold text-slate-600 dark:text-slate-300">
-                        {curr.symbol}{Number(plan.price).toLocaleString('en-IN')}{' '}
+                        {curr.symbol}{Number(plan.price).toLocaleString(curr.label === 'INR' ? 'en-IN' : 'en-US')}{' '}
                         <span className="text-[11px] text-slate-400 font-normal">
                           / {plan.billing_period === 'lifetime' ? 'lifetime' : plan.billing_period}
                         </span>
