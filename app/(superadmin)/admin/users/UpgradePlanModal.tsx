@@ -10,6 +10,7 @@ interface Plan {
   name: string
   slug: string
   price: number
+  currency?: string
   billing_period: string
 }
 
@@ -20,6 +21,16 @@ interface UpgradePlanModalProps {
   plans: Plan[]
   onClose: () => void
   onSuccess: () => void
+}
+
+
+function getPlanCurrency(currency?: string) {
+  const c = (currency || '').toUpperCase()
+  if (c === 'AED') return { symbol: 'AED ', label: 'AED' }
+  if (c === 'USD') return { symbol: '$', label: 'USD' }
+  if (c === 'EUR') return { symbol: '€', label: 'EUR' }
+  if (c === 'GBP') return { symbol: '£', label: 'GBP' }
+  return { symbol: '₹', label: 'INR' }
 }
 
 export function UpgradePlanModal({ 
@@ -34,6 +45,12 @@ export function UpgradePlanModal({
   const [duration, setDuration] = useState<number>(30)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string>('')
+  const [regionTab, setRegionTab] = useState<string>('ALL')
+
+  const visiblePlans = plans.filter(p => {
+    if (regionTab === 'ALL') return true
+    return (p.currency || 'INR').toUpperCase() === regionTab
+  })
 
   const handleUpgrade = async () => {
     if (!selectedPlan) {
@@ -124,13 +141,34 @@ export function UpgradePlanModal({
 
           {/* Select Plan */}
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2.5">
-              Select Target Plan
-            </label>
-            {plans.length > 0 ? (
+            <div className="flex items-center justify-between mb-2.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Select Target Plan
+              </label>
+              {Array.from(new Set(plans.map(p => (p.currency || 'INR').toUpperCase()))).length > 1 && (
+                <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg text-[10px] font-bold">
+                  {['ALL', 'INR', 'AED', 'USD'].filter(c => c === 'ALL' || plans.some(p => (p.currency || 'INR').toUpperCase() === c)).map((c) => (
+                    <button
+                      key={c}
+                      type="button"
+                      onClick={() => setRegionTab(c)}
+                      className={`px-2 py-0.5 rounded-md transition-colors ${
+                        regionTab === c 
+                          ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-xs' 
+                          : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                      }`}
+                    >
+                      {c === 'ALL' ? 'All' : c === 'INR' ? '🇮🇳 INR' : c === 'AED' ? '🇦🇪 AED' : '$ USD'}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            {visiblePlans.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                {plans.map((plan) => {
+                {visiblePlans.map((plan) => {
                   const isSelected = selectedPlan === plan.id
+                  const curr = getPlanCurrency(plan.currency)
                   return (
                     <button
                       key={plan.id}
@@ -151,7 +189,7 @@ export function UpgradePlanModal({
                         )}
                       </div>
                       <p className="text-xs font-semibold text-slate-600 dark:text-slate-300">
-                        ₹{plan.price}{' '}
+                        {curr.symbol}{Number(plan.price).toLocaleString('en-IN')}{' '}
                         <span className="text-[11px] text-slate-400 font-normal">
                           / {plan.billing_period === 'lifetime' ? 'lifetime' : plan.billing_period}
                         </span>

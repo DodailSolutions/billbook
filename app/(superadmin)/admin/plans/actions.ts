@@ -44,7 +44,7 @@ const STANDARD_REGIONAL_PLANS: PlanInput[] = [
         name: 'Starter',
         slug: 'starter',
         description: 'Best for freelancers and small businesses in India',
-        price: 299,
+        price: 2999,
         currency: 'INR',
         billing_period: 'monthly',
         features: ['Unlimited invoices', 'Automated payment reminders', 'WhatsApp sharing', 'GST reports & e-Way bill', 'Standard support'],
@@ -56,11 +56,11 @@ const STANDARD_REGIONAL_PLANS: PlanInput[] = [
     {
         name: 'Starter Yearly',
         slug: 'starter-yearly',
-        description: 'Save with annual billing for Indian small businesses (₹249/mo)',
-        price: 2988,
+        description: 'Save with annual billing for Indian small businesses (save ₹6,000/year)',
+        price: 29990,
         currency: 'INR',
         billing_period: 'yearly',
-        features: ['Everything in Starter', 'Save ₹600/year', 'Priority email support', 'Custom invoice templates'],
+        features: ['Everything in Starter', 'Save ₹6,000/year', 'Priority email support', 'Custom invoice templates'],
         limits: { invoices_per_month: 999999, customers: 999999 },
         is_active: true,
         is_popular: false,
@@ -70,7 +70,7 @@ const STANDARD_REGIONAL_PLANS: PlanInput[] = [
         name: 'Professional',
         slug: 'professional',
         description: 'For growing businesses requiring multi-user access & analytics',
-        price: 599,
+        price: 4999,
         currency: 'INR',
         billing_period: 'monthly',
         features: ['Everything in Starter', 'Multi-user roles (up to 5)', 'Recurring invoices', 'Inventory tracking', 'Dedicated CA export'],
@@ -82,11 +82,11 @@ const STANDARD_REGIONAL_PLANS: PlanInput[] = [
     {
         name: 'Professional Yearly',
         slug: 'professional-yearly',
-        description: 'Best value annual plan for growing businesses (₹499/mo)',
-        price: 5988,
+        description: 'Best value annual plan for growing businesses (save ₹10,000/year)',
+        price: 49990,
         currency: 'INR',
         billing_period: 'yearly',
-        features: ['Everything in Professional', 'Save ₹1,200/year', 'Advanced audit logs', 'Priority phone & chat support'],
+        features: ['Everything in Professional', 'Save ₹10,000/year', 'Advanced audit logs', 'Priority phone & chat support'],
         limits: { invoices_per_month: 999999, customers: 999999 },
         is_active: true,
         is_popular: false,
@@ -96,7 +96,7 @@ const STANDARD_REGIONAL_PLANS: PlanInput[] = [
         name: 'Enterprise',
         slug: 'enterprise',
         description: 'Complete suite with AI assistant, payroll engine & CA marketplace',
-        price: 999,
+        price: 10999,
         currency: 'INR',
         billing_period: 'monthly',
         features: ['Everything in Professional', 'Full Payroll & Payslip Engine', 'AI Accountant Assistant', 'Unlimited team members', 'Certified CA Marketplace Access'],
@@ -295,23 +295,23 @@ export async function getAllPlans(currency?: string): Promise<SubscriptionPlan[]
 
         const plans = (data || []) as SubscriptionPlan[]
 
-        // Auto-heal legacy rates mismatch (e.g. ₹499 -> ₹299, ₹999 -> ₹599, ₹2999 -> ₹999)
+        // Auto-heal legacy rates mismatch to official prices (Starter ₹2999, Professional ₹4999, Enterprise ₹10999)
         // so that Super Admin view always matches the official pricing
         let needsRevalidate = false
         for (const p of plans) {
-            if (p.slug === 'starter' && Number(p.price) === 499) {
-                await supabase.from('subscription_plans').update({ price: 299 }).eq('id', p.id)
-                p.price = 299
+            if (p.slug === 'starter' && (Number(p.price) === 299 || Number(p.price) === 499)) {
+                await supabase.from('subscription_plans').update({ price: 2999 }).eq('id', p.id)
+                p.price = 2999
                 needsRevalidate = true
             }
-            if (p.slug === 'professional' && Number(p.price) === 999) {
-                await supabase.from('subscription_plans').update({ price: 599 }).eq('id', p.id)
-                p.price = 599
+            if (p.slug === 'professional' && (Number(p.price) === 599 || Number(p.price) === 999)) {
+                await supabase.from('subscription_plans').update({ price: 4999 }).eq('id', p.id)
+                p.price = 4999
                 needsRevalidate = true
             }
-            if (p.slug === 'enterprise' && Number(p.price) === 2999) {
-                await supabase.from('subscription_plans').update({ price: 999 }).eq('id', p.id)
-                p.price = 999
+            if (p.slug === 'enterprise' && (Number(p.price) === 999 || Number(p.price) === 2999)) {
+                await supabase.from('subscription_plans').update({ price: 10999 }).eq('id', p.id)
+                p.price = 10999
                 needsRevalidate = true
             }
         }
@@ -614,7 +614,7 @@ export async function seedStandardRegionalPlans() {
 
         return { 
             success: true, 
-            message: `Synchronized ${updatedCount} plan(s) with official rates (Starter ₹299, Professional ₹599, Enterprise ₹999) and added ${insertedCount} new regional plan(s)!` 
+            message: `Synchronized ${updatedCount} plan(s) with official rates (Starter ₹2,999, Professional ₹4,999, Enterprise ₹10,999) and added ${insertedCount} new regional plan(s)!` 
         }
     } catch (error) {
         console.error('Error seeding regional plans:', error)

@@ -40,8 +40,10 @@ const ALL_FEATURES = [
 export default async function Home() {
     let starterPrice = 2999
     let proPrice = 4999
+    let enterprisePrice = 10999
     let freePrice = 0
     let starterSlug = 'starter'
+    let proSlug = 'professional'
     let enterpriseSlug = 'enterprise'
     let isAuthenticated = false
 
@@ -57,14 +59,19 @@ export default async function Home() {
         
         if (plans && Array.isArray(plans)) {
             const starter = plans.find(p => p.slug === 'starter')
-            const enterprise = plans.find(p => p.slug === 'enterprise') || plans.find(p => p.slug === 'professional')
+            const pro = plans.find(p => p.slug === 'professional')
+            const enterprise = plans.find(p => p.slug === 'enterprise')
             const free = plans.find(p => p.slug === 'free')
             if (starter && starter.price) {
                 starterPrice = Number(starter.price)
                 starterSlug = starter.slug
             }
+            if (pro && pro.price) {
+                proPrice = Number(pro.price)
+                proSlug = pro.slug
+            }
             if (enterprise && enterprise.price) {
-                proPrice = Number(enterprise.price)
+                enterprisePrice = Number(enterprise.price)
                 enterpriseSlug = enterprise.slug
             }
             if (free && free.price !== undefined) freePrice = Number(free.price)
@@ -268,8 +275,10 @@ export default async function Home() {
             <HomePricingSection
                 starterPrice={starterPrice}
                 proPrice={proPrice}
+                enterprisePrice={enterprisePrice}
                 freePrice={freePrice}
                 starterSlug={starterSlug}
+                proSlug={proSlug}
                 enterpriseSlug={enterpriseSlug}
                 isAuthenticated={isAuthenticated}
             />

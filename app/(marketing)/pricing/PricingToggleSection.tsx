@@ -22,13 +22,13 @@ export function PricingToggleSection({ isAuthenticated, currentPlan, plans = [] 
   const proYearlyPlan = plans.find((p) => p.slug === 'professional-yearly')
 
   // Dynamic or official fallback rates
-  const starterMonthlyPrice = starterPlan?.price ?? 299
-  const starterYearlyPrice = starterYearlyPlan?.price ?? 2988
+  const starterMonthlyPrice = starterPlan?.price ?? 2999
+  const starterYearlyPrice = starterYearlyPlan?.price ?? 29990
   const starterYearlyPerMonth = Math.round(starterYearlyPrice / 12)
   const starterSavings = starterMonthlyPrice * 12 - starterYearlyPrice
 
-  const proMonthlyPrice = proPlan?.price ?? 599
-  const proYearlyPrice = proYearlyPlan?.price ?? 5988
+  const proMonthlyPrice = proPlan?.price ?? 4999
+  const proYearlyPrice = proYearlyPlan?.price ?? 49990
   const proYearlyPerMonth = Math.round(proYearlyPrice / 12)
   const proSavings = proMonthlyPrice * 12 - proYearlyPrice
 

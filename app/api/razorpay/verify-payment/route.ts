@@ -52,12 +52,15 @@ export async function POST(request: NextRequest) {
         // Handle plan mapping and pricing
         const planMapping: Record<string, { type: string; amount: number; currency: string; region: string; months: number }> = {
             // India plans
-            'starter': { type: 'starter', amount: 299, currency: 'INR', region: 'IN', months: 1 },
-            'starter-yearly': { type: 'starter', amount: 2988, currency: 'INR', region: 'IN', months: 12 },
-            'professional': { type: 'professional', amount: 599, currency: 'INR', region: 'IN', months: 1 },
-            'professional-yearly': { type: 'professional', amount: 5988, currency: 'INR', region: 'IN', months: 12 },
-            'enterprise': { type: 'enterprise', amount: 999, currency: 'INR', region: 'IN', months: 1 },
+            'starter': { type: 'starter', amount: 2999, currency: 'INR', region: 'IN', months: 1 },
+            'starter-yearly': { type: 'starter', amount: 29990, currency: 'INR', region: 'IN', months: 12 },
+            'professional': { type: 'professional', amount: 4999, currency: 'INR', region: 'IN', months: 1 },
+            'professional-yearly': { type: 'professional', amount: 49990, currency: 'INR', region: 'IN', months: 12 },
+            'enterprise': { type: 'enterprise', amount: 10999, currency: 'INR', region: 'IN', months: 1 },
+            'enterprise-yearly': { type: 'enterprise', amount: 109990, currency: 'INR', region: 'IN', months: 12 },
             'lifetime': { type: 'professional', amount: 9999, currency: 'INR', region: 'IN', months: 1200 },
+            'lifetime-professional': { type: 'professional', amount: 9999, currency: 'INR', region: 'IN', months: 1200 },
+            'founder-yearly': { type: 'starter', amount: 2999, currency: 'INR', region: 'IN', months: 12 },
             
             // UAE plans
             'starter-ae': { type: 'starter', amount: 49, currency: 'AED', region: 'AE', months: 1 },

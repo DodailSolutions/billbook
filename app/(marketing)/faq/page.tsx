@@ -47,7 +47,7 @@ const FAQS = [
       },
       {
         q: 'What happens when I reach 50 invoices on the free plan?',
-        a: 'You\'ll need to upgrade to a paid plan (starting at ₹299/month) to continue creating invoices. All your existing data will be preserved.'
+        a: 'You\'ll need to upgrade to a paid plan (starting at ₹2,999/month) to continue creating invoices. All your existing data will be preserved.'
       },
       {
         q: 'Do you offer refunds?',
@@ -72,7 +72,7 @@ const FAQS = [
       },
       {
         q: 'Can multiple team members use the same account?',
-        a: 'Yes, on the Professional plan (₹599/month) you can add up to 2 team members, and on the Enterprise plan (₹999/month) you can add up to 10 team members.'
+        a: 'Yes, on the Professional plan (₹4,999/month) you can add up to 5 team members, and on the Enterprise plan (₹10,999/month) you can add up to 10 team members.'
       },
       {
         q: 'What is the AI Accountant feature?',

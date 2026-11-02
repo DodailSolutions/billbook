@@ -30,12 +30,12 @@ interface RazorpayOptions {
 
 const PLAN_DETAILS: Record<string, { name: string; amount: number; currency: string }> = {
     // India plans (INR)
-    starter: { name: 'Starter Plan', amount: 299, currency: 'INR' },
-    'starter-yearly': { name: 'Starter Plan (Yearly)', amount: 2988, currency: 'INR' },
-    professional: { name: 'Professional Plan', amount: 599, currency: 'INR' },
-    'professional-yearly': { name: 'Professional Plan (Yearly)', amount: 5988, currency: 'INR' },
-    enterprise: { name: 'Enterprise Plan', amount: 999, currency: 'INR' },
-    'enterprise-yearly': { name: 'Enterprise Plan (Yearly)', amount: 9990, currency: 'INR' },
+    starter: { name: 'Starter Plan', amount: 2999, currency: 'INR' },
+    'starter-yearly': { name: 'Starter Plan (Yearly)', amount: 29990, currency: 'INR' },
+    professional: { name: 'Professional Plan', amount: 4999, currency: 'INR' },
+    'professional-yearly': { name: 'Professional Plan (Yearly)', amount: 49990, currency: 'INR' },
+    enterprise: { name: 'Enterprise Plan', amount: 10999, currency: 'INR' },
+    'enterprise-yearly': { name: 'Enterprise Plan (Yearly)', amount: 109990, currency: 'INR' },
     lifetime: { name: 'Founder Lifetime Plan', amount: 9999, currency: 'INR' },
     'lifetime-professional': { name: 'Lifetime Professional Plan', amount: 9999, currency: 'INR' },
     'founder-lifetime': { name: 'Founder Lifetime Plan', amount: 9999, currency: 'INR' },

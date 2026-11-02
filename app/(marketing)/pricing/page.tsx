@@ -14,7 +14,7 @@ import type { SubscriptionPlan } from '@/lib/types-admin'
 
 export const metadata: Metadata = {
   title: 'Pricing - Affordable Plans Starting Free | BillBooky Invoice Generator',
-  description: '100% Free plan with 50 invoices. Upgrade to Starter (₹299/mo), Professional (₹599/mo), or Lifetime (₹9,999) for unlimited invoicing. Try free for 14 days. GST-compliant billing software for Indian businesses.',
+  description: '100% Free plan with 50 invoices. Upgrade to Starter (₹2,999/mo), Professional (₹4,999/mo), or Enterprise (₹10,999/mo) for unlimited invoicing. Try free for 14 days. GST-compliant billing software for Indian businesses.',
   keywords: [
     'invoice generator pricing',
     'free invoice software',
@@ -64,7 +64,7 @@ export default async function PricingPage() {
 
   // Resolve dynamic enterprise plan
   const enterprisePlan = dbPlans.find(p => p.slug === 'enterprise')
-  const enterprisePrice = enterprisePlan ? Number(enterprisePlan.price) : 999
+  const enterprisePrice = enterprisePlan ? Number(enterprisePlan.price) : 10999
 
   return (
     <>

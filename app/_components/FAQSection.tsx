@@ -27,7 +27,7 @@ const faqs = [
   },
   {
     question: 'What happens when I reach 50 invoices?',
-    answer: 'You can upgrade to a paid plan starting at ₹299/month to continue creating invoices. All your existing data will be preserved.'
+    answer: 'You can upgrade to a paid plan starting at ₹2,999/month to continue creating invoices. All your existing data will be preserved.'
   },
   {
     question: 'Is my data secure?',

@@ -146,7 +146,7 @@ export async function GET() {
 
     const { data: plans, error } = await supabase
       .from('subscription_plans')
-      .select('id, name, slug, price, billing_period')
+      .select('id, name, slug, price, currency, billing_period')
       .eq('is_active', true)
       .order('sort_order')
 

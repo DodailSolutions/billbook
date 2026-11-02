@@ -38,6 +38,7 @@ interface Plan {
     name: string
     slug: string
     price: number
+    currency?: string
     billing_period: string
 }
 

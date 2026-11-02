@@ -10,8 +10,10 @@ import { activatePlanTrial } from '@/app/(marketing)/pricing/actions'
 interface HomePricingSectionProps {
     starterPrice: number
     proPrice: number
+    enterprisePrice?: number
     freePrice: number
     starterSlug?: string
+    proSlug?: string
     enterpriseSlug?: string
     isAuthenticated?: boolean
 }
@@ -19,8 +21,10 @@ interface HomePricingSectionProps {
 export function HomePricingSection({
     starterPrice,
     proPrice,
+    enterprisePrice = 10999,
     freePrice,
     starterSlug = 'starter',
+    proSlug = 'professional',
     enterpriseSlug = 'enterprise',
     isAuthenticated = false
 }: HomePricingSectionProps) {
@@ -193,12 +197,12 @@ export function HomePricingSection({
                         </div>
                     </div>
 
-                    {/* Enterprise Suite Plan */}
+                    {/* Professional Suite Plan */}
                     <div className="bg-white p-8 rounded-[28px] border border-slate-200/80 flex flex-col justify-between hover:shadow-xl transition-all shadow-xs">
                         <div className="space-y-4">
                             <div className="flex items-center justify-between">
                                 <span className="text-sm font-bold text-slate-900 uppercase tracking-wider block">
-                                    Enterprise Suite
+                                    Professional Suite
                                 </span>
                                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
                                     Buy or Try
@@ -231,21 +235,21 @@ export function HomePricingSection({
                         {/* BOTH Buy & Try Action Buttons Always Visible */}
                         <div className="space-y-2.5 pt-8">
                             {/* 1. BUY BUTTON */}
-                            <Link href={`/pricing?checkout=${enterpriseSlug}`} className="block">
+                            <Link href={`/pricing?checkout=${proSlug}`} className="block">
                                 <Button className="w-full bg-slate-950 hover:bg-slate-900 text-white font-bold min-h-[46px] rounded-full shadow-md flex items-center justify-center gap-2 text-sm sm:text-base transition-transform duration-200 hover:scale-[1.01]">
                                     <ShoppingCart className="h-4 w-4" />
-                                    <span>Buy Enterprise • ₹{proPrice.toLocaleString('en-IN')}/mo</span>
+                                    <span>Buy Now • ₹{proPrice.toLocaleString('en-IN')}/mo</span>
                                 </Button>
                             </Link>
 
                             {/* 2. TRY BUTTON */}
                             <Button
-                                onClick={() => handleTrial(enterpriseSlug)}
-                                disabled={activatingSlug === enterpriseSlug}
+                                onClick={() => handleTrial(proSlug)}
+                                disabled={activatingSlug === proSlug}
                                 variant="outline"
                                 className="w-full border-2 border-slate-900 text-slate-900 hover:bg-slate-100 font-bold min-h-[44px] rounded-full flex items-center justify-center gap-2 text-sm transition-transform duration-200 hover:scale-[1.01]"
                             >
-                                {activatingSlug === enterpriseSlug ? (
+                                {activatingSlug === proSlug ? (
                                     <>
                                         <Loader2 className="h-4 w-4 animate-spin text-slate-900" />
                                         <span>Activating Trial...</span>
@@ -259,8 +263,41 @@ export function HomePricingSection({
                             </Button>
 
                             <p className="text-[11px] text-center text-slate-400 font-medium pt-1">
-                                Full enterprise access • Cancel anytime
+                                Full professional access • Cancel anytime
                             </p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Enterprise Plan Banner */}
+                <div className="max-w-6xl mx-auto bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 rounded-[28px] p-6 sm:p-8 text-white shadow-xl border border-blue-800/30">
+                    <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                        <div className="text-center md:text-left space-y-1">
+                            <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-500/20 border border-blue-500/30 rounded-full text-blue-300 text-xs font-semibold">
+                                <span className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></span>
+                                FOR LARGE TEAMS &amp; ENTERPRISE
+                            </div>
+                            <h4 className="text-2xl font-bold bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">Enterprise Plan</h4>
+                            <p className="text-blue-200 text-sm font-semibold">
+                                ₹{enterprisePrice.toLocaleString('en-IN')}<span className="text-xs text-gray-300">/month</span> • Up to 10 team members &amp; dedicated CA
+                            </p>
+                        </div>
+                        <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+                            <Link href={`/pricing?checkout=${enterpriseSlug}`} className="w-full sm:w-auto">
+                                <Button className="w-full sm:w-auto bg-white hover:bg-blue-50 text-slate-950 font-bold px-6 py-4 rounded-full flex items-center justify-center gap-2 text-sm shadow-md">
+                                    <ShoppingCart className="h-4 w-4" />
+                                    <span>Buy Enterprise • ₹{enterprisePrice.toLocaleString('en-IN')}/mo</span>
+                                </Button>
+                            </Link>
+                            <Button
+                                onClick={() => handleTrial(enterpriseSlug)}
+                                disabled={activatingSlug === enterpriseSlug}
+                                variant="outline"
+                                className="w-full sm:w-auto border-blue-400/50 hover:bg-white/10 text-white font-semibold px-5 py-4 rounded-full flex items-center justify-center gap-1.5 text-sm"
+                            >
+                                <Zap className="h-4 w-4 text-blue-400 fill-blue-400" />
+                                <span>Try 14 Days Free</span>
+                            </Button>
                         </div>
                     </div>
                 </div>

@@ -142,7 +142,7 @@ export default function PlansManager({ initialPlans }: PlansManagerProps) {
             name: '',
             slug: '',
             description: '',
-            price: 299,
+            price: 2999,
             currency: defaultCurrency,
             billing_period: 'monthly',
             features: [],
@@ -275,7 +275,7 @@ export default function PlansManager({ initialPlans }: PlansManagerProps) {
     }
 
     const handleSeedPlans = async () => {
-        if (!confirm('This will synchronize all plans with official landing rates (Starter ₹299, Professional ₹599, Enterprise ₹999, Lifetime ₹9,999) and add all UAE and US regional plans. Proceed?')) return
+        if (!confirm('This will synchronize all plans with official landing rates (Starter ₹2,999, Professional ₹4,999, Enterprise ₹10,999, Lifetime ₹9,999) and add all UAE and US regional plans. Proceed?')) return
         setIsSeeding(true)
         try {
             const res = await seedStandardRegionalPlans()

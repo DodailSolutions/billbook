@@ -90,7 +90,7 @@ export const DEFAULT_REGIONAL_CONTENT: Record<string, RegionalCMSData> = {
             {
                 id: 'faq-in-3',
                 question: 'What happens after the 50 free invoices?',
-                answer: 'You can upgrade anytime to Starter at ₹299/month, or claim our Lifetime Founder Deal for ₹9,999 with zero recurring fees forever.',
+                answer: 'You can upgrade anytime to Starter at ₹2,999/month, or claim our Lifetime Founder Deal for ₹9,999 with zero recurring fees forever.',
                 category: 'Pricing',
                 is_active: true
             }
