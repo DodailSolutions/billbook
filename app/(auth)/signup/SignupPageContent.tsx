@@ -1,1 +1,54 @@
-'use client'\n\nimport { useEffect, useState } from 'react'\nimport Link from "next/link"\nimport { SignupForm } from "./SignupForm"\nimport { ArrowLeft } from "lucide-react"\n\ninterface SignupPageContentProps {\n    searchParams: { message?: string; plan?: string; redirect?: string; payment?: string; trial?: string }\n}\n\nexport function SignupPageContent({ searchParams }: SignupPageContentProps) {\n    const [mounted, setMounted] = useState(false)\n\n    useEffect(() => {\n        setMounted(true)\n    }, [])\n\n    if (!mounted) {\n        return null\n    }\n\n    const selectedPlan = searchParams.plan || 'free'\n    const redirectAfter = searchParams.redirect\n    const paymentData = searchParams.payment\n    const isTrial = searchParams.trial === 'true' || (selectedPlan !== 'free' && !paymentData && !redirectAfter)\n\n    return (\n        <div className="w-full space-y-6" suppressHydrationWarning>\n            <Link \n                href="/" \n                className="inline-flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-black transition-colors"\n            >\n                <ArrowLeft className="h-4 w-4" />\n                Back to Home\n            </Link>\n\n            <SignupForm \n                selectedPlan={selectedPlan} \n                message={searchParams.message} \n                redirectAfter={redirectAfter} \n                paymentData={paymentData} \n                isTrial={isTrial}\n            />\n\n            <div className="pt-2 text-center text-xs text-slate-600 font-medium">\n                Already have an account?{' '}\n                <Link href="/login" className="text-blue-700 font-bold hover:underline">\n                    Sign in to your account\n                </Link>\n            </div>\n        </div>\n    )\n}\n
+'use client'
+
+import { useEffect, useState } from 'react'
+import Link from "next/link"
+import { SignupForm } from "./SignupForm"
+import { ArrowLeft } from "lucide-react"
+
+interface SignupPageContentProps {
+    searchParams: { message?: string; plan?: string; redirect?: string; payment?: string; trial?: string }
+}
+
+export function SignupPageContent({ searchParams }: SignupPageContentProps) {
+    const [mounted, setMounted] = useState(false)
+
+    useEffect(() => {
+        setMounted(true)
+    }, [])
+
+    if (!mounted) {
+        return null
+    }
+
+    const selectedPlan = searchParams.plan || 'free'
+    const redirectAfter = searchParams.redirect
+    const paymentData = searchParams.payment
+    const isTrial = searchParams.trial === 'true' || (selectedPlan !== 'free' && !paymentData && !redirectAfter)
+
+    return (
+        <div className="w-full space-y-6" suppressHydrationWarning>
+            <Link 
+                href="/" 
+                className="inline-flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-black transition-colors"
+            >
+                <ArrowLeft className="h-4 w-4" />
+                Back to Home
+            </Link>
+
+            <SignupForm 
+                selectedPlan={selectedPlan} 
+                message={searchParams.message} 
+                redirectAfter={redirectAfter} 
+                paymentData={paymentData} 
+                isTrial={isTrial}
+            />
+
+            <div className="pt-2 text-center text-xs text-slate-600 font-medium">
+                Already have an account?{' '}
+                <Link href="/login" className="text-blue-700 font-bold hover:underline">
+                    Sign in to your account
+                </Link>
+            </div>
+        </div>
+    )
+}
