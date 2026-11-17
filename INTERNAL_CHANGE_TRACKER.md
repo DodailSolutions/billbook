@@ -125,3 +125,22 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 | Date | Component / Route | Change Description | Status |
 | :--- | :--- | :--- | :--- |
 | 2026-11-17 | `app/(dashboard)/invoices/actions.ts` | 3-tier fail-safe invoice & item inserts, collision-free numbers, error reporting | ✅ Completed |
+
+---
+
+## [Release v1.2.3] - 2026-11-17
+
+### 10. Clean-up: Removed Hardcoded BillBooky Logo & URL from Invoice Footers
+- **User Feedback**: The BillBooky footer badge and URL are not needed on customer invoices.
+- **Resolution**:
+  - Completely removed the hardcoded BillBooky branding watermark badge, logo icon, and website link from:
+    - `lib/pdf.ts` (invoice and purchase order PDF export templates)
+    - `app/(dashboard)/invoices/settings/InvoicePreview.tsx` (settings preview)
+    - `app/(dashboard)/invoices/new/InvoicePreviewPanel.tsx` (real-time invoice creation preview)
+  - Invoices now only show the merchant's configured custom footer text (`footer_text`), ensuring a clean, unbranded output.
+
+---
+
+| Date | Component / Route | Change Description | Status |
+| :--- | :--- | :--- | :--- |
+| 2026-11-17 | `lib/pdf.ts` & Previews | Removed hardcoded BillBooky watermark, logo badge, and URL | ✅ Completed |

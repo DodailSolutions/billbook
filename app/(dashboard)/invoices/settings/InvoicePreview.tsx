@@ -313,19 +313,6 @@ export default function InvoicePreview({ settings }: InvoicePreviewProps) {
                         {footer_text}
                     </div>
                 )}
-
-                {/* Permanent BillBooky Watermark & Marketing Footer */}
-                <div className="mt-6 pt-3 border-t border-dashed border-slate-200 flex items-center justify-between text-[11px] text-slate-500">
-                    <div className="flex items-center gap-2">
-                        <div className="inline-flex items-center justify-center w-5 h-5 bg-blue-600 text-white rounded font-bold text-xs">
-                            B
-                        </div>
-                        <span className="font-semibold text-slate-800">BillBooky</span>
-                        <span className="text-slate-300">|</span>
-                        <span>Created with <strong className="text-blue-600">BillBooky</strong> — Free GST Invoicing</span>
-                    </div>
-                    <span className="text-[10px] text-slate-400">www.billbooky.com</span>
-                </div>
             </div>
         </div>
     )
