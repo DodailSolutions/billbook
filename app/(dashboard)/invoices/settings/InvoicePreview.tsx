@@ -313,6 +313,13 @@ export default function InvoicePreview({ settings }: InvoicePreviewProps) {
                         {footer_text}
                     </div>
                 )}
+
+                {/* Hardcoded BillBooky Branding Footer */}
+                <div className="text-center text-xs text-gray-400 mt-6 pt-3 border-t border-gray-100 flex items-center justify-center gap-1.5 font-medium">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/logo-icon.svg" alt="BillBooky" className="h-3.5 w-3.5 object-contain inline-block" />
+                    <span>Created with BillBooky</span>
+                </div>
             </div>
         </div>
     )

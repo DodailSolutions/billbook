@@ -144,3 +144,41 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 | Date | Component / Route | Change Description | Status |
 | :--- | :--- | :--- | :--- |
 | 2026-11-17 | `lib/pdf.ts` & Previews | Removed hardcoded BillBooky watermark, logo badge, and URL | ✅ Completed |
+
+---
+
+## [Release v1.2.4] - 2026-11-17
+
+### 11. Enhancement: Standardized Invoice Footer Branding (Logo & Text Only)
+- **Requirement**: Add hardcoded invoice footer branding strictly at the bottom of invoices using the uniform BillBooky logo (`/logo-icon.svg`) and clean text "Created with BillBooky" without any URLs or external web links.
+- **Resolution**:
+  - Embedded uniform `/logo-icon.svg` and text strictly at the bottom of:
+    - `lib/pdf.ts` (`generateInvoicePDF` and `generatePurchaseOrderPDF`)
+    - `app/(dashboard)/invoices/settings/InvoicePreview.tsx`
+    - `app/(dashboard)/invoices/new/InvoicePreviewPanel.tsx`
+  - Positioned cleanly below custom terms and footer text, avoiding duplicate headers or watermarks.
+
+### 12. Feature: Smart CRM Intelligence & Pipeline Automation
+- **Requirement**: Elevate CRM capabilities with smarter lead scoring, revenue forecasting, and rapid follow-up actions.
+- **Resolution**:
+  - **AI Deal Health & Scoring**:
+    - Automatic lead categorization: 🔥 Hot Deal (>=70% probability or negotiation stage), ⚡ Active/Warm, ❄️ Cold.
+    - Stale Deal Detection: Identifies active deals with no activity for >7 days (⚠️ Needs Action).
+  - **Weighted Revenue Forecasting**:
+    - Automatically calculates projected revenue based on stage probability multipliers in `lib/crm-actions.ts` & `CRMStats`.
+  - **Instant Follow-up Action Triggers**:
+    - Direct 1-click WhatsApp message trigger with pre-filled greeting (`https://wa.me/...`).
+    - Direct 1-click Email client trigger (`mailto:...`).
+    - Direct 1-click "Invoice" shortcut to convert CRM deals directly into invoices.
+  - **Smart Filtering & Search**:
+    - Added real-time search across deal titles, company names, contact names, and phone numbers.
+    - Quick priority filter toggles: All Deals, Hot Deals 🔥, and Stale Follow-ups ⚠️.
+  - **AI Sales Copilot & Forecasting Banner**:
+    - Real-time intelligence summary banner in `app/(dashboard)/crm/page.tsx` displaying weighted forecast and deal priorities.
+
+---
+
+| Date | Component / Route | Change Description | Status |
+| :--- | :--- | :--- | :--- |
+| 2026-11-17 | `lib/pdf.ts` & Previews | Standardized BillBooky logo & "Created with BillBooky" footer (no URLs) | ✅ Completed |
+| 2026-11-17 | `app/(dashboard)/crm` | Smart CRM: AI deal scoring, weighted revenue forecast, instant WhatsApp/Email/Invoice actions | ✅ Completed |

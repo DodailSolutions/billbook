@@ -8,7 +8,7 @@ import { LeadModal } from "./LeadModal"
 import { ActivityTimeline } from "./ActivityTimeline"
 import { Button } from "@/components/ui/Button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card"
-import { Plus, Sparkles, TrendingUp, DollarSign, Award, Target, LayoutGrid, List, Clock, BarChart2 } from "lucide-react"
+import { Plus, Sparkles, TrendingUp, DollarSign, Award, Target, LayoutGrid, List, Clock, BarChart2, Flame, AlertTriangle, Zap } from "lucide-react"
 
 export default function CRMPage() {
     const [leads, setLeads] = useState<CRMLead[]>([])
@@ -136,6 +136,35 @@ export default function CRMPage() {
                             </div>
                         </CardContent>
                     </Card>
+                </div>
+            )}
+
+            {/* Smart Pipeline Intelligence Banner */}
+            {stats && (
+                <div className="bg-linear-to-r from-indigo-50 via-purple-50 to-pink-50 border border-indigo-100/80 rounded-2xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    <div className="flex items-start gap-3">
+                        <div className="p-2.5 bg-indigo-600 text-white rounded-xl shadow-xs shrink-0">
+                            <Sparkles className="h-5 w-5" />
+                        </div>
+                        <div>
+                            <div className="flex items-center gap-2">
+                                <h4 className="text-sm font-bold text-gray-900">AI Sales Copilot & Forecasting</h4>
+                                <span className="text-[10px] font-bold bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">Automated</span>
+                            </div>
+                            <p className="text-xs text-gray-600 mt-0.5">
+                                Weighted pipeline projection is <span className="font-bold text-indigo-700">₹{(stats.weightedForecast || 0).toLocaleString('en-IN')}</span> across {stats.totalLeads} active opportunities.
+                                {stats.hotDealsCount ? ` 🔥 ${stats.hotDealsCount} hot deals ready to close.` : ''}
+                                {stats.staleDealsCount ? ` ⚠️ ${stats.staleDealsCount} deals haven't been touched in over 7 days.` : ''}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 shrink-0 self-end md:self-center">
+                        <div className="bg-white/80 backdrop-blur-xs px-3 py-1.5 rounded-xl border border-indigo-100 text-right">
+                            <span className="text-[10px] text-gray-500 block uppercase font-semibold">Weighted Forecast</span>
+                            <span className="text-sm font-bold text-indigo-600">₹{(stats.weightedForecast || 0).toLocaleString('en-IN')}</span>
+                        </div>
+                    </div>
                 </div>
             )}
 

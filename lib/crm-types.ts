@@ -46,6 +46,9 @@ export interface CRMStats {
     pipelineValue: number
     wonDealsValue: number
     winRate: number
+    weightedForecast?: number
+    hotDealsCount?: number
+    staleDealsCount?: number
     stageCounts: Record<LeadStage, number>
     stageValues: Record<LeadStage, number>
 }

@@ -458,6 +458,13 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
             ${footerText}
         </div>
         ` : ''}
+
+        <div style="margin-top: 24px; padding-top: 12px; border-top: 1px solid #f3f4f6; text-align: center; page-break-inside: avoid;">
+            <div style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 11px; font-weight: 500; color: #9ca3af;">
+                <img src="/logo-icon.svg" alt="BillBooky" style="width: 14px; height: 14px; vertical-align: middle; display: inline-block;" />
+                <span>Created with BillBooky</span>
+            </div>
+        </div>
     </div>
 </body>
 </html>
@@ -920,6 +927,13 @@ export async function generatePurchaseOrderPDF(po: PurchaseOrder): Promise<strin
             ${footerText}
         </div>
         ` : ''}
+
+        <div style="margin-top: 24px; padding-top: 12px; border-top: 1px solid #f3f4f6; text-align: center; page-break-inside: avoid;">
+            <div style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 11px; font-weight: 500; color: #9ca3af;">
+                <img src="/logo-icon.svg" alt="BillBooky" style="width: 14px; height: 14px; vertical-align: middle; display: inline-block;" />
+                <span>Created with BillBooky</span>
+            </div>
+        </div>
     </div>
 </body>
 </html>

@@ -251,14 +251,31 @@ export async function getCRMStats(): Promise<CRMStats> {
 
     let pipelineValue = 0
     let wonDealsValue = 0
+    let weightedForecast = 0
+    let hotDealsCount = 0
+    let staleDealsCount = 0
+
+    const now = Date.now()
+    const sevenDaysMs = 7 * 24 * 60 * 60 * 1000
 
     for (const lead of leads) {
         const val = Number(lead.value || 0)
+        const prob = Number(lead.probability || 0)
         stageCounts[lead.stage] = (stageCounts[lead.stage] || 0) + 1
         stageValues[lead.stage] = (stageValues[lead.stage] || 0) + val
 
         if (lead.stage !== 'lost') {
             pipelineValue += val
+            weightedForecast += Math.round((val * prob) / 100)
+
+            if (prob >= 70 || lead.stage === 'negotiation' || (val >= 50000 && prob >= 50)) {
+                hotDealsCount += 1
+            }
+
+            const updatedTime = new Date(lead.updated_at || lead.created_at).getTime()
+            if (lead.stage !== 'won' && (now - updatedTime > sevenDaysMs)) {
+                staleDealsCount += 1
+            }
         }
         if (lead.stage === 'won') {
             wonDealsValue += val
@@ -273,6 +290,9 @@ export async function getCRMStats(): Promise<CRMStats> {
         pipelineValue,
         wonDealsValue,
         winRate,
+        weightedForecast,
+        hotDealsCount,
+        staleDealsCount,
         stageCounts,
         stageValues
     }
