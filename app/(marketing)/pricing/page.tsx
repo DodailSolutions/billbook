@@ -139,7 +139,7 @@ export default async function PricingPage() {
                 </Button>
               </Link>
               <Link href={isAuthenticated ? "/dashboard?trial=enterprise" : "/signup?plan=enterprise&trial=true"} className="w-full sm:w-auto">
-                <Button variant="outline" className="w-full sm:w-auto border-blue-400/50 hover:bg-white/10 text-white font-semibold px-5 py-5 text-sm whitespace-nowrap flex items-center justify-center gap-1.5">
+                <Button variant="outline" className="w-full sm:w-auto border-2 border-blue-400/80 bg-transparent hover:bg-blue-900/40 text-white font-bold px-6 py-5 text-sm sm:text-base rounded-xl whitespace-nowrap flex items-center justify-center gap-2 shadow-sm transition-colors">
                   <Zap className="h-4 w-4 text-blue-400 fill-blue-400" />
                   Try 14 Days Free
                 </Button>

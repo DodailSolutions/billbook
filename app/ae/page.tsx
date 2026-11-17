@@ -403,7 +403,7 @@ export default async function UAELandingPage() {
                 </Button>
               </Link>
               <Link href="/ae/pricing" className="w-full sm:w-auto">
-                <Button size="lg" variant="outline" className="w-full sm:w-auto border-white/40 text-white hover:bg-white/10 font-bold px-8 py-4 rounded-full text-base min-h-[52px]">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto border-2 border-white/60 bg-transparent text-white hover:bg-white/10 font-bold px-8 py-4 rounded-full text-base min-h-[52px]">
                   View All AED Plans
                 </Button>
               </Link>

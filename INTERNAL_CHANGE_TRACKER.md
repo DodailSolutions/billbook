@@ -303,3 +303,30 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 | 2026-11-17 | `app/api/webhooks/paypal/route.ts` | PayPal global capture webhook listener | ✅ Completed |
 | 2026-11-17 | `app/layout.tsx` | FAQPage JSON-LD schema & SEO targeting vs Zoho Invoice | ✅ Completed |
 
+---
+
+## [Release v1.2.8] - 2026-11-17
+
+### 21. Fix: Razorpay Webhook Event Variable Definition
+- **Issue**: Vercel production build failed with `Type error: 'event' is possibly 'undefined'` in `app/api/webhooks/razorpay/route.ts:60:48`.
+- **Root Cause**: Webhook payload parsing (`const event = JSON.parse(body)`) was misplaced before event logging.
+- **Resolution**: Ensured `event` is strictly parsed from body prior to event logging and dispatching to handlers.
+
+### 22. Fix: Invisible Text on Outline Buttons across Dark Banners & Sections
+- **Issue**: Button text was completely invisible (white on white) on the Enterprise Plan banner on the homepage and `/pricing` page, as well as on `/us` and `/ae` CTA buttons.
+- **Root Cause**: `components/ui/Button.tsx`'s `variant="outline"` defaults to `bg-white text-gray-900`. When used in a dark container alongside `text-white`, `text-white` overrode the font color while `bg-white` persisted, producing white text on a white button.
+- **Resolution**:
+  - Replaced ambiguous outline styling with explicit `border-2 border-blue-400/80 bg-transparent hover:bg-blue-900/40 text-white` in `app/_components/HomePricingSection.tsx` and `app/(marketing)/pricing/page.tsx`.
+  - Added explicit `bg-transparent` and high-contrast borders in `app/us/page.tsx` and `app/ae/page.tsx`.
+  - Restored clear visibility and contrast across all screen modes.
+
+---
+
+| Date | Component / Route | Change Description | Status |
+| :--- | :--- | :--- | :--- |
+| 2026-11-17 | `app/api/webhooks/razorpay/route.ts` | Fix `event` variable definition for TypeScript build | ✅ Completed |
+| 2026-11-17 | `app/_components/HomePricingSection.tsx` | Fix Enterprise Plan "Try 14 Days Free" text contrast | ✅ Completed |
+| 2026-11-17 | `app/(marketing)/pricing/page.tsx` | Fix Enterprise Plan trial button visibility | ✅ Completed |
+| 2026-11-17 | `app/us/page.tsx` & `app/ae/page.tsx` | Fix outline button text contrast on hero banners | ✅ Completed |
+
+

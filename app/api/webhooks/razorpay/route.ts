@@ -57,6 +57,7 @@ export async function POST(request: NextRequest) {
             console.warn('Razorpay webhook received without configured secret - processing event payload')
         }
 
+        const event = JSON.parse(body)
         console.log('Razorpay webhook event:', event.event)
 
         // Handle different webhook events
