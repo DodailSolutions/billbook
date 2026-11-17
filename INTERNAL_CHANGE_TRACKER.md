@@ -218,3 +218,44 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 | 2026-11-17 | `app/(superadmin)/admin/settings/google-console` | Custom Header Code & Tag Injection panel | ✅ Completed |
 | 2026-11-17 | `app/(superadmin)/admin/actions.ts` & `page.tsx` | Super Admin latency optimization (parallelized queries) | ✅ Completed |
 | 2026-11-17 | `components/PWARegister.tsx` | Suppressed in admin; one-time prompt with permanent dismissal | ✅ Completed |
+
+---
+
+## [Release v1.2.6] - 2026-11-17
+
+### 17. Feature: Production-Ready Super Admin Settings Modules
+- **Requirement**: Replace placeholder sections in Super Admin Settings with production-ready modules for Notifications & Alerts, Security, Database Maintenance, and Performance.
+- **Resolution**:
+  - **Notifications & Broadcasts (`/admin/settings/notifications`)**:
+    - Global announcement broadcast composer (push notifications to all admins, specific tiers, or subscribers).
+    - Automated system alert rules (failed payment webhooks, new registrations, low inventory, privilege escalation).
+    - Real-time broadcast history and logs with recall/deletion capabilities.
+  - **Security & Access Policy (`/admin/settings/security`)**:
+    - Inactivity timeout controls (15m to 24h).
+    - 2FA enforcement, failed login lockout policies, and IP whitelist management.
+    - Comprehensive audit trail and HSTS enforcement toggles.
+  - **Database Maintenance (`/admin/settings/database`)**:
+    - PostgreSQL live table monitoring (rows, disk size, health metrics).
+    - Instant manual backup snapshot trigger to Supabase Vault.
+    - Vacuum & query planner stats re-indexing and storage cleanup tools.
+  - **Performance & Caching (`/admin/settings/performance`)**:
+    - One-click Next.js edge cache purge and static route revalidation.
+    - Core Web Vitals (LCP, TTFB, CLS) latency dashboards.
+    - Remote Supabase query timeout and image compression quality configuration.
+
+### 18. Feature: Complete XML Sitemap for Google Search Console
+- **Requirement**: Create and provide sitemap URL for immediate Google Search Console submission and crawling.
+- **Resolution**:
+  - Verified Next.js dynamic sitemap generator at `app/sitemap.ts`.
+  - Created standalone static `public/sitemap.xml` listing all priority routes (homepage, pricing, features, signup, login, legal, and CA marketplace).
+  - Ready for submission in Google Search Console by entering `sitemap.xml`.
+
+---
+
+| Date | Component / Route | Change Description | Status |
+| :--- | :--- | :--- | :--- |
+| 2026-11-17 | `app/(superadmin)/admin/settings/notifications` | Production broadcast notification engine and automated alert triggers | ✅ Completed |
+| 2026-11-17 | `app/(superadmin)/admin/settings/security` | Security policy manager: session timeout, 2FA, lockout, IP whitelist | ✅ Completed |
+| 2026-11-17 | `app/(superadmin)/admin/settings/database` | Database maintenance, table storage stats, manual backup trigger | ✅ Completed |
+| 2026-11-17 | `app/(superadmin)/admin/settings/performance` | Edge cache purge, Core Web Vitals monitor, query timeout settings | ✅ Completed |
+| 2026-11-17 | `public/sitemap.xml` | Generated static XML sitemap for Google Search Console | ✅ Completed |

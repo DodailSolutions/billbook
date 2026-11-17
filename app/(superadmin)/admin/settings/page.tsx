@@ -22,40 +22,36 @@ export default function SettingsPage() {
             bgColor: 'bg-blue-50 dark:bg-blue-900/20'
         },
         {
-            title: 'Notifications',
-            description: 'Manage system notifications and alerts',
+            title: 'Notifications & Broadcasts',
+            description: 'Push real-time announcements, alerts, and automate operational warnings for all business admins',
             icon: Bell,
-            href: '#',
-            color: 'text-yellow-600',
-            bgColor: 'bg-yellow-50 dark:bg-yellow-900/20',
-            comingSoon: true
+            href: '/admin/settings/notifications',
+            color: 'text-amber-600',
+            bgColor: 'bg-amber-50 dark:bg-amber-900/20'
         },
         {
-            title: 'Security',
-            description: 'Configure security settings and access controls',
+            title: 'Security & Access',
+            description: 'Configure session timeout, 2FA policy, IP whitelist, and audit trails',
             icon: Shield,
-            href: '#',
+            href: '/admin/settings/security',
             color: 'text-red-600',
-            bgColor: 'bg-red-50 dark:bg-red-900/20',
-            comingSoon: true
+            bgColor: 'bg-red-50 dark:bg-red-900/20'
         },
         {
-            title: 'Database',
-            description: 'Database maintenance and backups',
+            title: 'Database & Maintenance',
+            description: 'PostgreSQL storage health, table stats, manual backup snapshots, and index maintenance',
             icon: Database,
-            href: '#',
-            color: 'text-green-600',
-            bgColor: 'bg-green-50 dark:bg-green-900/20',
-            comingSoon: true
+            href: '/admin/settings/database',
+            color: 'text-emerald-600',
+            bgColor: 'bg-emerald-50 dark:bg-emerald-900/20'
         },
         {
-            title: 'Performance',
-            description: 'Optimize system performance and caching',
+            title: 'Performance & Edge Cache',
+            description: 'Purge edge cache, tune image compression, and adjust query latency thresholds',
             icon: Zap,
-            href: '#',
+            href: '/admin/settings/performance',
             color: 'text-purple-600',
-            bgColor: 'bg-purple-50 dark:bg-purple-900/20',
-            comingSoon: true
+            bgColor: 'bg-purple-50 dark:bg-purple-900/20'
         }
     ]
 
