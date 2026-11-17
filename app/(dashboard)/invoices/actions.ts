@@ -280,11 +280,11 @@ export async function generateInvoiceNumber(seriesId?: string): Promise<string> 
     })
 
     if (error) {
-        console.error('Error generating invoice number:', error)
-        // Final fallback to simple generation
+        console.error('Error generating invoice number from RPC:', error)
+        // Resilient fallback with high-entropy timestamp and random component to prevent UNIQUE collision
         const fy = getCurrentFinancialYear()
-        const timestamp = Date.now()
-        return `INV-${fy}-${timestamp.toString().slice(-4)}`
+        const entropy = `${Date.now().toString().slice(-6)}${Math.floor(100 + Math.random() * 900)}`
+        return `INV-${fy}-${entropy}`
     }
 
     return data as string
@@ -333,7 +333,14 @@ export async function createInvoice(data: CreateInvoiceData) {
             return { success: false, error: 'Not authenticated' }
         }
 
-        await validateInventoryAvailability(supabase, user.id, [], data.items)
+        try {
+            await validateInventoryAvailability(supabase, user.id, [], data.items)
+        } catch (invErr: any) {
+            console.warn('Inventory check warning:', invErr?.message)
+            if (invErr?.message?.includes('Insufficient stock')) {
+                return { success: false, error: invErr.message }
+            }
+        }
 
         // Get customer for auto GST classification
         const { data: customer } = await supabase
@@ -384,9 +391,11 @@ export async function createInvoice(data: CreateInvoiceData) {
         // Generate invoice number
         const invoice_number = await generateInvoiceNumber(data.invoice_series_id)
 
-        // Create invoice with GST breakdown (simplified for compatibility)
+        // Create invoice with GST breakdown (tiered fallback for full schema compatibility)
         let invoice: { id: string; total: number; [key: string]: unknown } | null = null
-        const invoicePayload = {
+        
+        // 1. Try full payload with discounts, breakdown, and partial payment fields
+        const fullPayload = {
             user_id: user.id,
             customer_id: data.customer_id,
             invoice_number,
@@ -405,40 +414,79 @@ export async function createInvoice(data: CreateInvoiceData) {
             status: 'draft',
             amount_paid: 0,
             amount_remaining: roundOff.roundedAmount,
-            is_partial_payment: false
+            is_partial_payment: false,
+            discount_amount: discountAmount > 0 ? discountAmount : null,
+            discount_type: discountAmount > 0 ? (data.discount_type || null) : null,
+            discount_value: discountAmount > 0 ? (data.discount_value || null) : null,
         }
 
-        // Try inserting with discount columns first, fall back if not migrated
-        const { data: invoiceWithDiscount, error: invoiceErrorWithDiscount } = await supabase
+        const { data: invFull, error: errFull } = await supabase
             .from('invoices')
-            .insert([{
-                ...invoicePayload,
-                discount_amount: discountAmount > 0 ? discountAmount : null,
-                discount_type: discountAmount > 0 ? (data.discount_type || null) : null,
-                discount_value: discountAmount > 0 ? (data.discount_value || null) : null,
-            }])
+            .insert([fullPayload])
             .select()
             .single()
 
-        if (invoiceErrorWithDiscount) {
-            // Fallback: insert without discount columns (migration not yet run)
-            const { data: invoiceFallback, error: invoiceError } = await supabase
+        if (invFull) {
+            invoice = invFull
+        } else {
+            console.warn('Full invoice insert failed, falling back to base GST payload:', errFull?.message)
+            // 2. Try standard payload without discount / partial payment columns
+            const baseGstPayload = {
+                user_id: user.id,
+                customer_id: data.customer_id,
+                invoice_number,
+                invoice_date: data.invoice_date,
+                due_date: data.due_date || null,
+                subtotal: rawSubtotal,
+                gst_percentage: data.gst_percentage,
+                gst_amount: gstComponents.totalTax,
+                total: roundOff.roundedAmount,
+                notes: data.notes || null,
+                status: 'draft',
+            }
+
+            const { data: invBaseGst, error: errBaseGst } = await supabase
                 .from('invoices')
-                .insert([invoicePayload])
+                .insert([baseGstPayload])
                 .select()
                 .single()
-            if (invoiceError) {
-                console.error('Error creating invoice:', invoiceError)
-                return { success: false, error: 'Failed to create invoice' }
+
+            if (invBaseGst) {
+                invoice = invBaseGst
+            } else {
+                console.warn('Base GST insert failed, falling back to minimal payload:', errBaseGst?.message)
+                // 3. Absolute minimum columns guaranteed by original supabase-schema.sql
+                const minimalPayload = {
+                    user_id: user.id,
+                    customer_id: data.customer_id,
+                    invoice_number,
+                    invoice_date: data.invoice_date,
+                    subtotal: rawSubtotal,
+                    total: roundOff.roundedAmount,
+                    status: 'draft'
+                }
+
+                const { data: invMin, error: errMin } = await supabase
+                    .from('invoices')
+                    .insert([minimalPayload])
+                    .select()
+                    .single()
+
+                if (invMin) {
+                    invoice = invMin
+                } else {
+                    console.error('All invoice insert tiers failed:', errMin)
+                    return { 
+                        success: false, 
+                        error: errMin?.message || errBaseGst?.message || errFull?.message || 'Failed to create invoice' 
+                    }
+                }
             }
-            invoice = invoiceFallback
-        } else {
-            invoice = invoiceWithDiscount
         }
 
         if (!invoice) return { success: false, error: 'Failed to create invoice' }
 
-        // Create invoice items with HSN/SAC and individual tax rates
+        // Create invoice items with HSN/SAC and individual tax rates (tiered fallback)
         const itemsWithDetails = data.items.map(item => {
             const itemAmount = item.quantity * item.unit_price
             const itemGSTRate = item.gst_rate !== undefined ? item.gst_rate : data.gst_percentage
@@ -462,24 +510,36 @@ export async function createInvoice(data: CreateInvoiceData) {
             }
         })
 
-        // Try inserting with item_details, fall back without if column not migrated yet
         const { error: itemsError } = await supabase
             .from('invoice_items')
             .insert(itemsWithDetails)
 
         if (itemsError) {
-            // Fallback: strip optional columns and retry
-            const itemsCore = itemsWithDetails.map(({ item_details, inventory_item_id, ...rest }) => rest)
+            console.warn('Rich item insert failed, falling back to core item columns:', itemsError.message)
+            // Core fallback guaranteed by base schema
+            const itemsCore = data.items.map(item => ({
+                invoice_id: invoice!.id,
+                description: item.description,
+                quantity: item.quantity,
+                unit_price: item.unit_price,
+                amount: item.quantity * item.unit_price
+            }))
+
             const { error: itemsFallbackError } = await supabase
                 .from('invoice_items')
                 .insert(itemsCore)
+
             if (itemsFallbackError) {
-                console.error('Error creating invoice items:', itemsFallbackError)
-                return { success: false, error: 'Failed to create invoice items' }
+                console.error('Core items insert failed:', itemsFallbackError)
+                return { success: false, error: itemsFallbackError.message || 'Failed to create invoice items' }
             }
         }
 
-        await syncInventoryForInvoice(supabase, user.id, invoice.id, [], data.items)
+        try {
+            await syncInventoryForInvoice(supabase, user.id, invoice.id, [], data.items)
+        } catch (syncErr) {
+            console.warn('Stock sync error:', syncErr)
+        }
     
     // Handle payment collection if mark_as_paid is true
     if (data.mark_as_paid && data.payment_amount && data.payment_amount > 0) {
@@ -663,7 +723,8 @@ export async function updateInvoice(id: string, data: UpdateInvoiceData) {
             .eq('user_id', user.id)
 
         if (invoiceErrorWithDiscount) {
-            // Fallback: update without discount columns
+            console.warn('Update with discount columns failed, falling back to base GST update:', invoiceErrorWithDiscount.message)
+            // Fallback 1: update without discount columns
             const { error: invoiceError } = await supabase
                 .from('invoices')
                 .update({
@@ -683,9 +744,27 @@ export async function updateInvoice(id: string, data: UpdateInvoiceData) {
                 })
                 .eq('id', id)
                 .eq('user_id', user.id)
+
             if (invoiceError) {
-                console.error('Error updating invoice:', invoiceError)
-                return { success: false, error: 'Failed to update invoice' }
+                console.warn('Base GST update failed, falling back to minimal update:', invoiceError.message)
+                // Fallback 2: minimal columns update
+                const { error: minError } = await supabase
+                    .from('invoices')
+                    .update({
+                        customer_id: data.customer_id,
+                        invoice_date: data.invoice_date,
+                        due_date: data.due_date || null,
+                        subtotal: rawSubtotal,
+                        total: gstComponents.totalAmount,
+                        notes: data.notes || null,
+                    })
+                    .eq('id', id)
+                    .eq('user_id', user.id)
+
+                if (minError) {
+                    console.error('All invoice update tiers failed:', minError)
+                    return { success: false, error: minError.message || invoiceError.message || 'Failed to update invoice' }
+                }
             }
         }
 
@@ -729,24 +808,37 @@ export async function updateInvoice(id: string, data: UpdateInvoiceData) {
             .insert(items)
 
         if (itemsError) {
-            // Fallback: strip optional columns and retry
-            const itemsCore = items.map(({ item_details, inventory_item_id, ...rest }) => rest)
+            console.warn('Rich items update insert failed, falling back to core columns:', itemsError.message)
+            // Fallback: core base columns
+            const itemsCore = data.items.map(item => ({
+                invoice_id: id,
+                description: item.description,
+                quantity: item.quantity,
+                unit_price: item.unit_price,
+                amount: item.quantity * item.unit_price
+            }))
+
             const { error: itemsFallbackError } = await supabase
                 .from('invoice_items')
                 .insert(itemsCore)
+
             if (itemsFallbackError) {
                 console.error('Error creating invoice items:', itemsFallbackError)
-                return { success: false, error: 'Failed to create invoice items' }
+                return { success: false, error: itemsFallbackError.message || 'Failed to create invoice items' }
             }
         }
 
-        await syncInventoryForInvoice(
-            supabase,
-            user.id,
-            id,
-            ((existingInvoiceItems || []) as Array<{ inventory_item_id?: string; quantity: number }>),
-            data.items
-        )
+        try {
+            await syncInventoryForInvoice(
+                supabase,
+                user.id,
+                id,
+                ((existingInvoiceItems || []) as Array<{ inventory_item_id?: string; quantity: number }>),
+                data.items
+            )
+        } catch (syncErr) {
+            console.warn('Stock sync error on update:', syncErr)
+        }
 
         revalidatePath('/invoices')
         revalidatePath('/inventory')

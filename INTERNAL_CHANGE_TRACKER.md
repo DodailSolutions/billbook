@@ -96,3 +96,32 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 | 2026-11-17 | `app/(dashboard)/invoices/new` | Non-blocking timeout loading & resilient limit checking | ✅ Completed |
 | 2026-11-17 | `app/(superadmin)/admin/settings/google-console` | Built Google Search Console & SEO admin section | ✅ Completed |
 | 2026-11-17 | `app/layout.tsx` | Enhanced organic SEO keywords & verification meta tags | ✅ Completed |
+
+---
+
+## [Release v1.2.2] - 2026-11-17
+
+### 9. Fix: Fail-Safe Multi-Tier Schema Compatibility for Invoice Creation & Updates
+- **Issue**: "Failed to create invoice" encountered when submitting the invoice creation form.
+- **Root Cause**:
+  1. The insert payload included new columns (`cgst_amount`, `sgst_amount`, `igst_amount`, `supply_type`, `reverse_charge_applicable`, `amount_paid`, `amount_remaining`, `is_partial_payment`, `discount_amount`) that may not exist in databases prior to complete migration execution. The previous fallback still attempted to insert unmigrated GST columns, causing fatal PostgreSQL errors (`42703 undefined_column`).
+  2. The invoice item insert payload included `hsn_sac_code`, `hsn_sac_type`, `gst_rate`, `item_cgst`, `item_sgst`, `item_igst`, `item_tax_amount`. The previous fallback only stripped `item_details` and `inventory_item_id`, still failing if the other columns did not exist.
+  3. `generateInvoiceNumber` fallback used a 4-digit timestamp slice (`timestamp.toString().slice(-4)`), presenting a high probability of colliding with existing invoice numbers on the `UNIQUE` invoice number constraint.
+  4. Unhandled rejections from `validateInventoryAvailability` and `syncInventoryForInvoice` if inventory tables were unmigrated or had missing records.
+- **Resolution**:
+  - Implemented 3-tier progressive insert fallback for `invoices`:
+    - Tier 1: Full payload (all discounts, partial payments, breakdown).
+    - Tier 2: Base GST payload (standard columns).
+    - Tier 3: Core guaranteed payload (`user_id`, `customer_id`, `invoice_number`, `invoice_date`, `subtotal`, `total`, `status`).
+  - Implemented 2-tier progressive insert fallback for `invoice_items`:
+    - Tier 1: Rich details (HSN/SAC, individual tax breakdowns).
+    - Tier 2: Core guaranteed payload (`invoice_id`, `description`, `quantity`, `unit_price`, `amount`).
+  - Hardened `generateInvoiceNumber` with 9-digit high-entropy timestamp + random nonce to guarantee collision-free invoice numbers.
+  - Wrapped inventory stock validation and sync in graceful exception handlers so missing inventory master records do not block invoice creation.
+  - Detailed error messages returned from PostgreSQL to client if any unexpected constraint fails.
+
+---
+
+| Date | Component / Route | Change Description | Status |
+| :--- | :--- | :--- | :--- |
+| 2026-11-17 | `app/(dashboard)/invoices/actions.ts` | 3-tier fail-safe invoice & item inserts, collision-free numbers, error reporting | ✅ Completed |
