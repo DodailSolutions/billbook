@@ -122,7 +122,6 @@ export default function GoogleSearchConsolePage() {
       setIsSaving(false)
     }
   }
-  }
 
   const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text)

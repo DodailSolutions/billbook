@@ -84,10 +84,6 @@ export function PWARegister() {
       setShowInstallPrompt(true)
     }
 
-      setInstallPromptEvent(event as BeforeInstallPromptEvent)
-      setShowInstallPrompt(true)
-    }
-
     const handleAppInstalled = () => {
       try {
         localStorage.setItem('pwa_installed', 'true')
