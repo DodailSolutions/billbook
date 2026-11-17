@@ -89,45 +89,107 @@ async function handlePaymentCaptured(payment: {
     amount: number
     status: string
     method: string
+    notes?: Record<string, string>
 }, supabase: ReturnType<typeof createWebhookSupabaseClient>) {
     try {
-        // Find payment by order ID
+        // 1. Find payment by gateway_order_id if recorded beforehand
         const { data: existingPayment } = await supabase
             .from('payments')
             .select('*')
             .eq('gateway_order_id', payment.order_id)
-            .single()
+            .maybeSingle()
 
-        if (!existingPayment) {
-            console.error('Payment not found for order:', payment.order_id)
+        if (existingPayment) {
+            // Update payment status
+            const { error: updateError } = await supabase
+                .from('payments')
+                .update({
+                    gateway_payment_id: payment.id,
+                    status: 'completed',
+                    payment_method: payment.method,
+                    updated_at: new Date().toISOString(),
+                })
+                .eq('id', existingPayment.id)
+
+            if (updateError) {
+                console.error('Error updating payment:', updateError)
+                return
+            }
+
+            // Update invoice status
+            if (existingPayment.invoice_id) {
+                await supabase
+                    .from('invoices')
+                    .update({ status: 'paid' })
+                    .eq('id', existingPayment.invoice_id)
+            }
+
+            console.log('Payment captured successfully for existing record:', payment.id)
             return
         }
 
-        // Update payment status
-        const { error: updateError } = await supabase
-            .from('payments')
-            .update({
-                gateway_payment_id: payment.id,
-                status: 'completed',
-                payment_method: payment.method,
-                updated_at: new Date().toISOString(),
-            })
-            .eq('id', existingPayment.id)
+        // 2. Fallback: Check if payment notes contain invoice_id or user_id
+        const notes = payment.notes || {}
+        const invoiceId = notes.invoice_id || notes.invoiceId || null
+        const userId = notes.user_id || notes.userId || null
+        const planSlug = notes.plan_slug || notes.planSlug || null
 
-        if (updateError) {
-            console.error('Error updating payment:', updateError)
-            return
-        }
-
-        // Update invoice status
-        if (existingPayment.invoice_id) {
-            await supabase
+        if (invoiceId) {
+            // Mark invoice as paid
+            const { data: updatedInvoice } = await supabase
                 .from('invoices')
                 .update({ status: 'paid' })
-                .eq('id', existingPayment.invoice_id)
+                .eq('id', invoiceId)
+                .select('id, user_id, total')
+                .maybeSingle()
+
+            // Record into payments table
+            await supabase.from('payments').insert([{
+                gateway_order_id: payment.order_id || null,
+                gateway_payment_id: payment.id,
+                invoice_id: invoiceId,
+                user_id: updatedInvoice?.user_id || userId || null,
+                amount: payment.amount ? payment.amount / 100 : (updatedInvoice?.total || 0),
+                status: 'completed',
+                payment_method: payment.method,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+            }])
+
+            console.log(`Payment captured via webhook for invoice ${invoiceId}: ${payment.id}`)
+            return
         }
 
-        console.log('Payment captured successfully:', payment.id)
+        // 3. Subscription purchase via webhook
+        if (userId && planSlug) {
+            const { data: plan } = await supabase
+                .from('subscription_plans')
+                .select('id, name')
+                .eq('slug', planSlug)
+                .maybeSingle()
+
+            if (plan) {
+                const now = new Date()
+                const oneYearLater = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000)
+                await supabase.from('user_subscriptions').upsert({
+                    user_id: userId,
+                    plan_id: plan.id,
+                    status: 'active',
+                    start_date: now.toISOString(),
+                    end_date: oneYearLater.toISOString(),
+                    payment_method: 'razorpay',
+                }, { onConflict: 'user_id' })
+
+                await supabase.from('user_profiles').update({
+                    plan_name: planSlug
+                }).eq('id', userId)
+
+                console.log(`Subscription activated via webhook for user ${userId}, plan ${planSlug}`)
+                return
+            }
+        }
+
+        console.log('Payment captured with no matched order/invoice:', payment.id, 'order:', payment.order_id)
     } catch (error) {
         console.error('Error handling payment captured:', error)
     }

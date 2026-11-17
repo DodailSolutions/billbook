@@ -42,7 +42,8 @@ export function PWARegister() {
     }
 
     const handleBeforeInstallPrompt = (event: Event) => {
-      event.preventDefault()
+      // Avoid calling event.preventDefault() unconditionally to prevent Chrome console warning:
+      // "Banner not shown: beforeinstallpromptevent.preventDefault() called"
       setInstallPromptEvent(event as BeforeInstallPromptEvent)
       setShowInstallPrompt(true)
     }

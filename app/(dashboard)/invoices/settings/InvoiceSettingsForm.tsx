@@ -9,6 +9,48 @@ import { Card } from '@/components/ui/Card'
 import { Input } from '@/components/ui/Input'
 import { saveInvoiceSettings, type InvoiceSettings } from './actions'
 
+// Client-side image compression to prevent HTTP 413 (Payload Too Large) and connection resets
+function compressImage(file: File, maxDim = 240, quality = 0.65): Promise<string> {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = (e) => {
+            const img = new window.Image()
+            img.onload = () => {
+                let width = img.width
+                let height = img.height
+                if (width > height) {
+                    if (width > maxDim) {
+                        height = Math.round((height * maxDim) / width)
+                        width = maxDim
+                    }
+                } else {
+                    if (height > maxDim) {
+                        width = Math.round((width * maxDim) / height)
+                        height = maxDim
+                    }
+                }
+                const canvas = document.createElement('canvas')
+                canvas.width = Math.max(width, 1)
+                canvas.height = Math.max(height, 1)
+                const ctx = canvas.getContext('2d')
+                if (!ctx) {
+                    resolve(e.target?.result as string)
+                    return
+                }
+                ctx.drawImage(img, 0, 0, width, height)
+                // Highly compressed JPEG or PNG to guarantee size < 25KB
+                const mimeType = file.type === 'image/png' ? 'image/png' : 'image/jpeg'
+                const compressed = canvas.toDataURL(mimeType, quality)
+                resolve(compressed)
+            }
+            img.onerror = () => reject(new Error('Failed to load image for compression'))
+            img.src = e.target?.result as string
+        }
+        reader.onerror = reject
+        reader.readAsDataURL(file)
+    })
+}
+
 interface InvoiceSettingsFormProps {
     initialSettings: InvoiceSettings | null
     onPreviewUpdate?: (settings: any) => void
@@ -56,58 +98,51 @@ export default function InvoiceSettingsForm({ initialSettings, onPreviewUpdate }
     const [stampPreview, setStampPreview] = useState(initialSettings?.company_stamp_url || '')
     const [showStamp, setShowStamp] = useState(initialSettings?.show_stamp ?? true)
 
-    const handleSignatureUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleSignatureUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
         if (!file) return
         if (!file.type.startsWith('image/')) { alert('Please upload an image file'); return }
-        if (file.size > 2 * 1024 * 1024) { alert('Image size should be less than 2MB'); return }
-        const reader = new FileReader()
-        reader.onloadend = () => {
-            const base64 = reader.result as string
-            setSignatureUrl(base64)
-            setSignaturePreview(base64)
+        try {
+            const compressed = await compressImage(file, 240, 0.65)
+            setSignatureUrl(compressed)
+            setSignaturePreview(compressed)
+        } catch (err: any) {
+            console.error('Signature compression error:', err)
+            alert('Failed to process signature image.')
         }
-        reader.readAsDataURL(file)
     }
 
-    const handleStampUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleStampUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
         if (!file) return
         if (!file.type.startsWith('image/')) { alert('Please upload an image file'); return }
-        if (file.size > 2 * 1024 * 1024) { alert('Image size should be less than 2MB'); return }
-        const reader = new FileReader()
-        reader.onloadend = () => {
-            const base64 = reader.result as string
-            setStampUrl(base64)
-            setStampPreview(base64)
+        try {
+            const compressed = await compressImage(file, 240, 0.65)
+            setStampUrl(compressed)
+            setStampPreview(compressed)
+        } catch (err: any) {
+            console.error('Stamp compression error:', err)
+            alert('Failed to process stamp image.')
         }
-        reader.readAsDataURL(file)
     }
 
     const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
         if (!file) return
 
-        // Validate file type
         if (!file.type.startsWith('image/')) {
             alert('Please upload an image file')
             return
         }
 
-        // Validate file size (max 2MB)
-        if (file.size > 2 * 1024 * 1024) {
-            alert('Image size should be less than 2MB')
-            return
+        try {
+            const compressed = await compressImage(file, 240, 0.7)
+            setLogoUrl(compressed)
+            setLogoPreview(compressed)
+        } catch (err: any) {
+            console.error('Logo compression error:', err)
+            alert('Failed to process logo image.')
         }
-
-        // Convert to base64
-        const reader = new FileReader()
-        reader.onloadend = () => {
-            const base64String = reader.result as string
-            setLogoUrl(base64String)
-            setLogoPreview(base64String)
-        }
-        reader.readAsDataURL(file)
     }
 
     const handleRemoveLogo = () => {
@@ -119,26 +154,19 @@ export default function InvoiceSettingsForm({ initialSettings, onPreviewUpdate }
         const file = e.target.files?.[0]
         if (!file) return
 
-        // Validate file type
         if (!file.type.startsWith('image/')) {
             alert('Please upload an image file')
             return
         }
 
-        // Validate file size (max 2MB)
-        if (file.size > 2 * 1024 * 1024) {
-            alert('Image size should be less than 2MB')
-            return
+        try {
+            const compressed = await compressImage(file, 240, 0.75)
+            setQrCodeUrl(compressed)
+            setQrCodePreview(compressed)
+        } catch (err: any) {
+            console.error('QR code compression error:', err)
+            alert('Failed to process QR code image.')
         }
-
-        // Convert to base64
-        const reader = new FileReader()
-        reader.onloadend = () => {
-            const base64String = reader.result as string
-            setQrCodeUrl(base64String)
-            setQrCodePreview(base64String)
-        }
-        reader.readAsDataURL(file)
     }
 
     const handleRemoveQrCode = () => {
@@ -195,11 +223,11 @@ export default function InvoiceSettingsForm({ initialSettings, onPreviewUpdate }
         setIsLoading(true)
 
         try {
-            // Normalize empty strings to undefined and validate base64 strings
-            const normalizedLogoUrl = logoUrl && logoUrl.trim() && logoUrl.startsWith('data:image') ? logoUrl : undefined
-            const normalizedQrCodeUrl = qrCodeUrl && qrCodeUrl.trim() && qrCodeUrl.startsWith('data:image') ? qrCodeUrl : undefined
-            const normalizedSignatureUrl = signatureUrl && signatureUrl.trim() && signatureUrl.startsWith('data:image') ? signatureUrl : undefined
-            const normalizedStampUrl = stampUrl && stampUrl.trim() && stampUrl.startsWith('data:image') ? stampUrl : undefined
+            // Normalize empty strings to undefined and preserve both data URLs and uploaded URLs
+            const normalizedLogoUrl = logoUrl && logoUrl.trim() ? logoUrl.trim() : undefined
+            const normalizedQrCodeUrl = qrCodeUrl && qrCodeUrl.trim() ? qrCodeUrl.trim() : undefined
+            const normalizedSignatureUrl = signatureUrl && signatureUrl.trim() ? signatureUrl.trim() : undefined
+            const normalizedStampUrl = stampUrl && stampUrl.trim() ? stampUrl.trim() : undefined
 
             await saveInvoiceSettings({
                 company_name: companyName || undefined,
