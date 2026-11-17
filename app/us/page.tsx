@@ -11,6 +11,7 @@ import { ThemeToggle } from '@/components/ThemeToggle'
 import { createClient } from '@/lib/supabase/server'
 import { RegionSwitcher } from '@/components/RegionSwitcher'
 import { PublicHeaderAuth } from '@/components/PublicHeaderAuth'
+import { getRegionalCMS } from '../(superadmin)/admin/cms/actions'
 
 export const dynamic = 'force-dynamic'
 
@@ -123,19 +124,47 @@ const GLOBAL_COUNTRIES = [
 ]
 
 export default async function USInternationalLandingPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  const isAuthenticated = !!user
+  let cms: any = null
+  let isAuthenticated = false
+
+  try {
+    const [supabase, cmsData] = await Promise.all([
+      createClient(),
+      getRegionalCMS('US').catch(() => null)
+    ])
+    cms = cmsData
+    const { data: { user } } = await supabase.auth.getUser()
+    isAuthenticated = !!user
+  } catch {
+    // Graceful fallback
+  }
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased selection:bg-blue-600 selection:text-white">
       {/* Top Banner */}
-      <div className="bg-slate-900 text-white text-xs py-2 px-4 text-center font-medium border-b border-slate-800">
-        <span>🌍 <strong>Global Launch:</strong> BillBooky International is now live across USA, Canada, UK, Australia & 50+ countries. </span>
-        <Link href="/us/pricing" className="underline font-bold text-blue-400 hover:text-blue-300 ml-1">
-          Get Started from $9/mo →
-        </Link>
-      </div>
+      {cms?.announcement?.enabled ? (
+        <div className={`text-white text-xs py-2 px-4 text-center font-medium border-b border-slate-800 ${
+          cms.announcement.theme === 'blue' ? 'bg-blue-600' :
+          cms.announcement.theme === 'emerald' ? 'bg-emerald-600' :
+          cms.announcement.theme === 'amber' ? 'bg-amber-600' :
+          cms.announcement.theme === 'rose' ? 'bg-rose-600' :
+          'bg-purple-600'
+        }`}>
+          <span>{cms.announcement.message}</span>
+          {cms.announcement.linkText && (
+            <Link href={cms.announcement.linkUrl || '/us/pricing'} className="underline font-bold text-white ml-2 hover:opacity-90">
+              {cms.announcement.linkText} →
+            </Link>
+          )}
+        </div>
+      ) : (
+        <div className="bg-slate-900 text-white text-xs py-2 px-4 text-center font-medium border-b border-slate-800">
+          <span>🌍 <strong>Global Launch:</strong> BillBooky International is now live across USA, Canada, UK, Australia & 50+ countries. </span>
+          <Link href="/us/pricing" className="underline font-bold text-blue-400 hover:text-blue-300 ml-1">
+            Get Started from $9/mo →
+          </Link>
+        </div>
+      )}
 
       {/* Navigation Header */}
       <nav className="sticky top-0 z-50 bg-white/90 dark:bg-slate-950/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors">
@@ -187,19 +216,23 @@ export default async function USInternationalLandingPage() {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 text-xs font-bold mb-6 shadow-2xs">
             <span className="h-2 w-2 rounded-full bg-blue-600 animate-pulse" />
-            <span>🇺🇸 US & INTERNATIONAL BUSINESS OPERATING SYSTEM</span>
+            <span>{cms?.hero?.badge || '🇺🇸 US & INTERNATIONAL BUSINESS OPERATING SYSTEM'}</span>
           </div>
 
           {/* Main Title */}
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black text-slate-950 dark:text-white tracking-tight leading-[1.08] max-w-5xl mx-auto mb-6">
-            Accounting, Invoicing, CRM & Payroll.{' '}
-            <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-sky-500 bg-clip-text text-transparent">
-              Built for Global Growth.
-            </span>
+            {cms?.hero?.headline || (
+              <>
+                Accounting, Invoicing, CRM & Payroll.{' '}
+                <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-sky-500 bg-clip-text text-transparent">
+                  Built for Global Growth.
+                </span>
+              </>
+            )}
           </h1>
 
           <p className="text-base sm:text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto leading-relaxed font-medium mb-10">
-            Create sales tax-compliant invoices across 50 US states, track deals in visual CRM pipelines, manage GAAP-ready double-entry books, issue vendor POs, and run staff payroll — all in one modern workspace.
+            {cms?.hero?.subheadline || 'Create sales tax-compliant invoices across 50 US states, track deals in visual CRM pipelines, manage GAAP-ready double-entry books, issue vendor POs, and run staff payroll — all in one modern workspace.'}
           </p>
 
           {/* Action Buttons */}
@@ -214,15 +247,15 @@ export default async function USInternationalLandingPage() {
               </Link>
             ) : (
               <>
-                <Link href="/signup?plan=starter-us&trial=true" className="w-full sm:w-auto">
+                <Link href={cms?.hero?.primaryButtonUrl || '/signup?plan=starter-us&trial=true'} className="w-full sm:w-auto">
                   <Button size="lg" className="w-full sm:w-auto bg-slate-950 hover:bg-slate-900 text-white dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100 font-extrabold px-8 py-4 rounded-full shadow-lg shadow-black/10 hover:shadow-2xl hover:-translate-y-0.5 transition-all duration-300 text-base min-h-[52px] gap-2">
-                    Start 14-Day Free Trial
+                    {cms?.hero?.primaryButtonText || 'Start 14-Day Free Trial'}
                     <ArrowRight className="h-5 w-5" />
                   </Button>
                 </Link>
-                <Link href="/us/pricing" className="w-full sm:w-auto">
+                <Link href={cms?.hero?.secondaryButtonUrl || '/us/pricing'} className="w-full sm:w-auto">
                   <Button size="lg" className="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-bold px-8 py-4 rounded-full border border-slate-200 dark:border-slate-700 hover:-translate-y-0.5 transition-all duration-300 text-base min-h-[52px]">
-                    View USD Plans
+                    {cms?.hero?.secondaryButtonText || 'View USD Plans'}
                   </Button>
                 </Link>
               </>
@@ -231,22 +264,17 @@ export default async function USInternationalLandingPage() {
 
           {/* Quick Metrics Bar */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-4xl mx-auto pt-6 border-t border-slate-200/80 dark:border-slate-800/80">
-            <div className="p-4 rounded-2xl bg-white/60 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 shadow-2xs">
-              <div className="text-2xl sm:text-3xl font-black text-blue-600 dark:text-blue-400">$9/mo</div>
-              <div className="text-xs text-slate-500 font-semibold mt-0.5">Starter Plan or $49/yr</div>
-            </div>
-            <div className="p-4 rounded-2xl bg-white/60 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 shadow-2xs">
-              <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">50 States</div>
-              <div className="text-xs text-slate-500 font-semibold mt-0.5">US Sales Tax Ready</div>
-            </div>
-            <div className="p-4 rounded-2xl bg-white/60 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 shadow-2xs">
-              <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">10+ Currencies</div>
-              <div className="text-xs text-slate-500 font-semibold mt-0.5">USD, EUR, GBP, CAD, AUD</div>
-            </div>
-            <div className="p-4 rounded-2xl bg-white/60 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 shadow-2xs">
-              <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400">14 Days</div>
-              <div className="text-xs text-slate-500 font-semibold mt-0.5">Free Trial • No Card Req.</div>
-            </div>
+            {(cms?.metrics || [
+              { value: '$9/mo', label: 'Starter Plan or $49/yr' },
+              { value: '50 States', label: 'US Sales Tax Ready' },
+              { value: '10+ Currencies', label: 'USD, EUR, GBP, CAD, AUD' },
+              { value: '14 Days', label: 'Free Trial • No Card Req.' }
+            ]).map((m: any, idx: number) => (
+              <div key={idx} className="p-4 rounded-2xl bg-white/60 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 shadow-2xs">
+                <div className="text-2xl sm:text-3xl font-black text-blue-600 dark:text-blue-400">{m.value}</div>
+                <div className="text-xs text-slate-500 font-semibold mt-0.5">{m.label}</div>
+              </div>
+            ))}
           </div>
 
         </div>

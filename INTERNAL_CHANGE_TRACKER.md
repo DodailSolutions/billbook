@@ -329,4 +329,41 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 | 2026-11-17 | `app/(marketing)/pricing/page.tsx` | Fix Enterprise Plan trial button visibility | ✅ Completed |
 | 2026-11-17 | `app/us/page.tsx` & `app/ae/page.tsx` | Fix outline button text contrast on hero banners | ✅ Completed |
 
+---
+
+## [Release v1.2.9] - 2026-11-18
+
+### 23. Feature: Elementor Pro-Style Visual Page & Blog Builder in Super Admin CMS (`/admin/cms`)
+- **Requirement**: The user requested a visual builder inspired by Elementor Pro (WordPress) allowing full page and blog post editing across all screen devices (Desktop, Tablet, Mobile) with strict error boundaries and stability.
+- **Resolution**:
+  - Implemented responsive device viewport switcher (🖥️ Desktop 100%, 📟 Tablet 768px, 📱 Mobile 375px) with live canvas container in `app/(superadmin)/admin/cms/CMSManager.tsx`.
+  - Added reorderable section hierarchy with Move Up, Move Down, and Visibility toggles.
+  - Implemented dedicated **Blog Articles Engine** with dynamic markdown editor, slug generation, category tags, author metadata, read time estimation, and live preview.
+  - Connected database persistence to `system_settings` (`cms_blog_posts` and `cms_region_*`).
+
+### 24. Feature: Regional Landing Page CMS Binding & 12-Core Feature Parity
+- **Requirement**: Connect India (`/`), UAE (`/ae`), and US & Global (`/us`) landing pages to the CMS so Super Admin can individually edit each page without altering current UI layouts or introducing errors.
+- **Resolution**:
+  - Connected `getRegionalCMS('IN')` to `app/page.tsx`, `getRegionalCMS('AE')` to `app/ae/page.tsx`, and `getRegionalCMS('US')` to `app/us/page.tsx`.
+  - Bound announcements, hero badges, headlines, subheadlines, CTAs, and 4-metric counter bars to CMS data with defensive fallback to hardcoded designs.
+  - Preserved country-specific tax modules (India GST/e-Way, UAE FTA 5% VAT / 9% Corporate Tax, US 50-state Sales Tax & IRS 1099) and accounting professional networks (CA vs FTA Agent vs CPA).
+
+### 25. Feature: Public Blog Directory & Article Reader (`/blog` and `/blog/[slug]`)
+- **Requirement**: Public-facing blog engine to publish articles, tax guides, and tutorials.
+- **Resolution**:
+  - Created `app/blog/page.tsx` with responsive grid, category filter chips, read-time badges, and author info.
+  - Created `app/blog/[slug]/page.tsx` with safe, dependency-free native markdown rendering, dynamic metadata for SEO, author bylines, and in-article trial conversion banners.
+
+---
+
+| Date | Component / Route | Change Description | Status |
+| :--- | :--- | :--- | :--- |
+| 2026-11-18 | `app/(superadmin)/admin/cms` | Elementor Pro-style responsive builder & blog post manager | ✅ Completed |
+| 2026-11-18 | `app/us/page.tsx` | Bound US/Global landing page hero & metrics to CMS | ✅ Completed |
+| 2026-11-18 | `app/ae/page.tsx` | Bound UAE landing page hero & metrics to CMS | ✅ Completed |
+| 2026-11-18 | `app/page.tsx` | Bound India landing page hero & metrics to CMS | ✅ Completed |
+| 2026-11-18 | `app/blog/page.tsx` | Public knowledge hub and blog directory | ✅ Completed |
+| 2026-11-18 | `app/blog/[slug]/page.tsx` | Dynamic blog article reader with SEO metadata | ✅ Completed |
+| 2026-11-18 | Root Tracker | Logged Release v1.2.9 in `INTERNAL_CHANGE_TRACKER.md` | ✅ Completed |
+
 
