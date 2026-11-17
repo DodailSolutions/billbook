@@ -392,5 +392,6 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 | 2026-11-18 | `app/(marketing)/pricing/CheckoutHandler.tsx` | Added multi-currency guest direct checkout & regional basePath | ✅ Completed |
 | 2026-11-18 | `app/api/razorpay/create-order` | Enabled guest direct purchase for public subscription plans | ✅ Completed |
 | 2026-11-18 | `app/ae/page.tsx` & `app/us/page.tsx` | Dynamic plan price sync with `subscription_plans` table | ✅ Completed |
+| 2026-11-18 | `app/ae/pricing/page.tsx` | Removed redundant closing tags to resolve JSX parse error | ✅ Completed |
 
 

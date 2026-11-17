@@ -291,9 +291,6 @@ export default async function UAEPricingPage() {
               </Link>
             </div>
           </div>
-              </Link>
-            </div>
-          </div>
 
           {/* Lifetime Terms */}
           <div className="mt-12 bg-amber-50 dark:bg-amber-900/20 rounded-xl p-6 max-w-4xl mx-auto">
