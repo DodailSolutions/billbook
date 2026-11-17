@@ -259,3 +259,46 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 | 2026-11-17 | `app/(superadmin)/admin/settings/database` | Database maintenance, table storage stats, manual backup trigger | ✅ Completed |
 | 2026-11-17 | `app/(superadmin)/admin/settings/performance` | Edge cache purge, Core Web Vitals monitor, query timeout settings | ✅ Completed |
 | 2026-11-17 | `public/sitemap.xml` | Generated static XML sitemap for Google Search Console | ✅ Completed |
+
+---
+
+## [Release v1.2.7] - 2026-11-17
+
+### 19. Feature: Multi-Gateway Payment & Webhook Configuration (Razorpay, Cashfree, Stripe, PayPal)
+- **Requirement**: Allow Super Admins to configure payment gateways and webhooks for domestic (India) and international (US & Global) checkout reconciliation.
+- **Resolution**:
+  - **Razorpay (India)**:
+    - Key ID, Key Secret, Webhook Secret, Live/Test mode toggle.
+    - Webhook URL: `https://billbooky.dodail.com/api/webhooks/razorpay`
+    - Subscribed events: `payment.captured`, `order.paid`, `subscription.charged`, `refund.processed`.
+  - **Cashfree (India)**:
+    - App ID, Secret Key, Webhook Secret, Production/Sandbox mode toggle.
+    - Webhook URL: `https://billbooky.dodail.com/api/webhooks/cashfree`
+    - Webhook route: `app/api/webhooks/cashfree/route.ts` with HMAC SHA256 signature verification.
+  - **Stripe (US & Global)**:
+    - Publishable Key, Secret Key, Webhook Signing Secret, Live/Test mode toggle.
+    - Webhook URL: `https://billbooky.dodail.com/api/webhooks/stripe`
+    - Webhook route: `app/api/webhooks/stripe/route.ts` with `checkout.session.completed` reconciliation.
+  - **PayPal (US & Global)**:
+    - Client ID, Secret Key, Webhook ID, Live/Sandbox mode toggle.
+    - Webhook URL: `https://billbooky.dodail.com/api/webhooks/paypal`
+    - Webhook route: `app/api/webhooks/paypal/route.ts` with `PAYMENT.CAPTURE.COMPLETED` capture.
+  - **Navigation**:
+    - Linked directly in Super Admin Settings (`/admin/settings`).
+
+### 20. SEO: Google Search Ranking Signals vs Zoho Invoice & Competitors
+- **Requirement**: Rank above Zoho Invoice, Vyapar, and Tally in Google Search for invoice queries.
+- **Resolution**:
+  - Added targeted competitive keywords: `Zoho Invoice alternative`, `Zoho Invoice free alternative`, `best free invoice generator in India`, `Zoho Invoice vs BillBooky`.
+  - Injected structured `FAQPage` Schema into `app/layout.tsx` targeting "Why is BillBooky the best free alternative to Zoho Invoice in India?", enabling expandable SERP rich cards.
+
+---
+
+| Date | Component / Route | Change Description | Status |
+| :--- | :--- | :--- | :--- |
+| 2026-11-17 | `app/(superadmin)/admin/settings/payments` | Multi-gateway manager for Razorpay, Cashfree, Stripe, and PayPal | ✅ Completed |
+| 2026-11-17 | `app/api/webhooks/cashfree/route.ts` | Cashfree auto-reconciling webhook endpoint | ✅ Completed |
+| 2026-11-17 | `app/api/webhooks/stripe/route.ts` | Stripe global payment webhook listener | ✅ Completed |
+| 2026-11-17 | `app/api/webhooks/paypal/route.ts` | PayPal global capture webhook listener | ✅ Completed |
+| 2026-11-17 | `app/layout.tsx` | FAQPage JSON-LD schema & SEO targeting vs Zoho Invoice | ✅ Completed |
+

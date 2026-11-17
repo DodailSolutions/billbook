@@ -23,10 +23,10 @@ export const metadata: Metadata = {
   applicationName: 'BillBooky',
   metadataBase: new URL('https://billbooky.dodail.com'),
   title: {
-    default: 'BillBooky - Free GST Invoice Generator for Indian Businesses | Made in India',
+    default: 'BillBooky - #1 Free GST Invoice Generator & Billing Software | Top Zoho Invoice Alternative India',
     template: '%s | BillBooky - Invoice Generator India'
   },
-  description: 'Free GST-compliant invoice generator for Indian businesses. Create professional invoices, manage customers, track payments. Made in India for Indian MSMEs, freelancers, and enterprises. Start free today!',
+  description: 'Free GST-compliant invoice generator for Indian businesses. #1 Zoho Invoice & Vyapar alternative with instant WhatsApp sharing, GST e-invoicing, payments, and smart CRM. 100% free for Indian MSMEs.',
   keywords: [
     'free invoice generator',
     'invoice generator India',
@@ -48,6 +48,8 @@ export const metadata: Metadata = {
     'invoice management system',
     'customer billing software',
     'payment tracking India',
+    'Zoho Invoice alternative',
+    'Zoho Invoice free alternative',
     'Zoho Books alternative',
     'Vyapar alternative',
     'Tally alternative',
@@ -55,7 +57,9 @@ export const metadata: Metadata = {
     'free GST billing software India',
     'e-invoicing software for MSME',
     'online invoice maker with GST',
-    'BillBooky billing app'
+    'BillBooky billing app',
+    'best free invoice generator in India',
+    'Zoho Invoice vs BillBooky'
   ],
   authors: [{ name: 'BillBooky Team' }],
   creator: 'BillBooky',
@@ -218,6 +222,42 @@ export default function RootLayout({
                 'query-input': 'required name=search_term_string',
               },
             }),
+          }}
+        />
+        {/* Structured Data - FAQPage Schema for Rich Search Results vs Zoho Invoice */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'FAQPage',
+              mainEntity: [
+                {
+                  '@type': 'Question',
+                  name: 'Why is BillBooky the best free alternative to Zoho Invoice and Vyapar in India?',
+                  acceptedAnswer: {
+                    '@type': 'Answer',
+                    text: 'BillBooky is 100% free with unlimited GST invoice creation, built-in WhatsApp sharing, automated payment reminders, and multi-gateway support (Razorpay, Cashfree, Stripe, PayPal) without restrictive invoice caps or forced subscription upgrades.'
+                  }
+                },
+                {
+                  '@type': 'Question',
+                  name: 'Is BillBooky fully GST compliant with HSN/SAC codes and e-invoicing?',
+                  acceptedAnswer: {
+                    '@type': 'Answer',
+                    text: 'Yes! BillBooky generates 100% GST-compliant tax invoices with automatic CGST, SGST, IGST calculations, HSN/SAC lookups, and reverse charge mechanisms compliant with Indian tax laws.'
+                  }
+                },
+                {
+                  '@type': 'Question',
+                  name: 'Can I accept online payments with BillBooky invoices?',
+                  acceptedAnswer: {
+                    '@type': 'Answer',
+                    text: 'Yes, BillBooky connects directly to Razorpay, Cashfree, Stripe, and PayPal so customers can pay via UPI, Credit/Debit cards, Netbanking, or international cards with instant webhook reconciliation.'
+                  }
+                }
+              ]
+            })
           }}
         />
       </body>

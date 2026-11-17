@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Settings, Mail, Bell, Shield, Database, Zap, Globe } from 'lucide-react'
+import { Settings, Mail, Bell, Shield, Database, Zap, Globe, CreditCard } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import type { LucideIcon } from 'lucide-react'
@@ -16,6 +16,14 @@ interface SettingsSection {
 
 export default function SettingsPage() {
     const settingsSections: SettingsSection[] = [
+        {
+            title: 'Payment Gateways & Webhooks',
+            description: 'Configure Razorpay, Cashfree, Stripe, and PayPal API keys with instant auto-reconciling webhook endpoints',
+            icon: CreditCard,
+            href: '/admin/settings/payments',
+            color: 'text-blue-600',
+            bgColor: 'bg-blue-50 dark:bg-blue-900/20'
+        },
         {
             title: 'Google Search Console & SEO',
             description: 'Connect Google Search Console, site verification, sitemaps, and organic keyword tracking',
