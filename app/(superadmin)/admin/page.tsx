@@ -132,8 +132,10 @@ function HubActionCard({
 }
 
 export default async function SuperAdminDashboard() {
-    const stats = await getDashboardStats()
-    const recentActivity = await getRecentActivity()
+    const [stats, recentActivity] = await Promise.all([
+        getDashboardStats(),
+        getRecentActivity()
+    ])
 
     if (!stats) {
         return (

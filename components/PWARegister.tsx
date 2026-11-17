@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { Download, RefreshCw, Smartphone, X } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 
@@ -14,6 +15,9 @@ type NavigatorWithStandalone = Navigator & {
 }
 
 export function PWARegister() {
+  const pathname = usePathname()
+  const isAdmin = pathname?.startsWith('/admin')
+
   const [installPromptEvent, setInstallPromptEvent] = useState<BeforeInstallPromptEvent | null>(null)
   const [showInstallPrompt, setShowInstallPrompt] = useState(false)
   const [showIosHint, setShowIosHint] = useState(false)
@@ -35,7 +39,8 @@ export function PWARegister() {
   }, [])
 
   useEffect(() => {
-    if (process.env.NODE_ENV !== 'production') {
+    // Never show PWA prompts in Super Admin routes or development
+    if (process.env.NODE_ENV !== 'production' || isAdmin) {
       return
     }
 
@@ -49,27 +54,35 @@ export function PWARegister() {
       return
     }
 
-    const dismissedUntil = localStorage.getItem('pwa_prompt_dismissed_until')
-    const isDismissed = dismissedUntil && Date.now() < parseInt(dismissedUntil, 10)
+    // If user has dismissed the prompt once, permanently never show again
+    const isPermanentlyDismissed = localStorage.getItem('pwa_prompt_dismissed_permanently') === 'true'
+    if (isPermanentlyDismissed) {
+      return
+    }
 
     const userAgent = window.navigator.userAgent.toLowerCase()
     const isIos = /iphone|ipad|ipod/.test(userAgent)
     const isSafari = /safari/.test(userAgent) && !/crios|fxios|edgios/.test(userAgent)
 
-    if (!isStandalone && !isDismissed && isIos && isSafari) {
+    if (!isStandalone && isIos && isSafari) {
       setShowIosHint(true)
     }
 
     const handleBeforeInstallPrompt = (event: Event) => {
-      // If already installed or currently running standalone or user dismissed recently, do not show
+      // If already installed, running standalone, in admin, or user dismissed, do not show
       if (
+        isAdmin ||
         window.matchMedia('(display-mode: standalone)').matches ||
         (window.navigator as NavigatorWithStandalone).standalone === true ||
         localStorage.getItem('pwa_installed') === 'true' ||
-        (dismissedUntil && Date.now() < parseInt(dismissedUntil, 10))
+        localStorage.getItem('pwa_prompt_dismissed_permanently') === 'true'
       ) {
         return
       }
+
+      setInstallPromptEvent(event as BeforeInstallPromptEvent)
+      setShowInstallPrompt(true)
+    }
 
       setInstallPromptEvent(event as BeforeInstallPromptEvent)
       setShowInstallPrompt(true)
@@ -160,14 +173,14 @@ export function PWARegister() {
   const dismissInstallPrompt = () => {
     setShowInstallPrompt(false)
     try {
-      localStorage.setItem('pwa_prompt_dismissed_until', (Date.now() + 14 * 24 * 60 * 60 * 1000).toString())
+      localStorage.setItem('pwa_prompt_dismissed_permanently', 'true')
     } catch {}
   }
 
   const dismissIosHint = () => {
     setShowIosHint(false)
     try {
-      localStorage.setItem('pwa_prompt_dismissed_until', (Date.now() + 14 * 24 * 60 * 60 * 1000).toString())
+      localStorage.setItem('pwa_prompt_dismissed_permanently', 'true')
     } catch {}
   }
 
@@ -200,7 +213,7 @@ export function PWARegister() {
     waitingWorker.postMessage({ type: 'SKIP_WAITING' })
   }
 
-  if (!showInstallPrompt && !showIosHint && !showUpdatePrompt) {
+  if (isAdmin || (!showInstallPrompt && !showIosHint && !showUpdatePrompt)) {
     return null
   }
 

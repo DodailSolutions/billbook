@@ -13,51 +13,44 @@ export async function getDashboardStats(): Promise<DashboardStats | null> {
 
         const supabase = await createClient()
 
-        // Get total payments
-        const { data: payments } = await supabase
-            .from('payments')
-            .select('amount, status')
+        // Fetch all stats concurrently in parallel for maximum performance
+        const [
+            paymentsRes,
+            refundsRes,
+            usersRes,
+            subsRes,
+            ticketsRes
+        ] = await Promise.all([
+            supabase.from('payments').select('amount, status'),
+            supabase.from('refunds').select('amount, status'),
+            supabase.from('user_profiles').select('*', { count: 'exact', head: true }),
+            supabase.from('user_subscriptions').select('*', { count: 'exact', head: true }).eq('status', 'active'),
+            supabase.from('support_tickets').select('*', { count: 'exact', head: true }).in('status', ['open', 'in_progress'])
+        ])
+
+        const payments = paymentsRes.data || []
+        const refunds = refundsRes.data || []
+        const total_users = usersRes.count || 0
+        const active_subscriptions = subsRes.count || 0
+        const open_tickets = ticketsRes.count || 0
 
         const total_payments = payments
-            ?.filter(p => p.status === 'completed')
-            .reduce((sum, p) => sum + (p.amount || 0), 0) || 0
+            .filter(p => p.status === 'completed')
+            .reduce((sum, p) => sum + (p.amount || 0), 0)
 
-        const total_sales = payments?.reduce((sum, p) => sum + (p.amount || 0), 0) || 0
+        const total_sales = payments.reduce((sum, p) => sum + (p.amount || 0), 0)
 
-        // Get unpaid/pending amount
         const unpaid_amount = payments
-            ?.filter(p => p.status === 'pending' || p.status === 'failed')
-            .reduce((sum, p) => sum + (p.amount || 0), 0) || 0
-
-        // Get refund amount
-        const { data: refunds } = await supabase
-            .from('refunds')
-            .select('amount, status')
+            .filter(p => p.status === 'pending' || p.status === 'failed')
+            .reduce((sum, p) => sum + (p.amount || 0), 0)
 
         const refund_amount = refunds
-            ?.filter(r => r.status === 'completed')
-            .reduce((sum, r) => sum + (r.amount || 0), 0) || 0
+            .filter(r => r.status === 'completed')
+            .reduce((sum, r) => sum + (r.amount || 0), 0)
 
         const pending_refunds = refunds
-            ?.filter(r => r.status === 'pending' || r.status === 'approved')
-            .length || 0
-
-        // Get user counts
-        const { count: total_users } = await supabase
-            .from('user_profiles')
-            .select('*', { count: 'exact', head: true })
-
-        // Get active subscriptions
-        const { count: active_subscriptions } = await supabase
-            .from('user_subscriptions')
-            .select('*', { count: 'exact', head: true })
-            .eq('status', 'active')
-
-        // Get open tickets
-        const { count: open_tickets } = await supabase
-            .from('support_tickets')
-            .select('*', { count: 'exact', head: true })
-            .in('status', ['open', 'in_progress'])
+            .filter(r => r.status === 'pending' || r.status === 'approved')
+            .length
 
         return {
             total_sales,

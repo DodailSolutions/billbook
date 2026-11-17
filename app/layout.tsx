@@ -61,7 +61,7 @@ export const metadata: Metadata = {
   creator: 'BillBooky',
   publisher: 'BillBooky',
   verification: {
-    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || 'google-site-verification-billbooky',
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || '-8t9f7kYXCnXv0O-BgLx_Jb5-3bIRO8R2gfR2nMYLTw',
   },
   formatDetection: {
     email: false,
@@ -120,7 +120,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
-      <head />
+      <head>
+        <meta name="google-site-verification" content="-8t9f7kYXCnXv0O-BgLx_Jb5-3bIRO8R2gfR2nMYLTw" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning

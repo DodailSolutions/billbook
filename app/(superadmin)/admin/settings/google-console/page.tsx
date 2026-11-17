@@ -15,7 +15,8 @@ import {
   AlertCircle,
   HelpCircle,
   Save,
-  BarChart3
+  BarChart3,
+  Code2
 } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
@@ -24,7 +25,8 @@ import { createClient } from '@/lib/supabase/client'
 
 export default function GoogleSearchConsolePage() {
   const supabase = createClient()
-  const [siteVerificationToken, setSiteVerificationToken] = useState('')
+  const [siteVerificationToken, setSiteVerificationToken] = useState('-8t9f7kYXCnXv0O-BgLx_Jb5-3bIRO8R2gfR2nMYLTw')
+  const [customHeaderScripts, setCustomHeaderScripts] = useState('<meta name="google-site-verification" content="-8t9f7kYXCnXv0O-BgLx_Jb5-3bIRO8R2gfR2nMYLTw" />')
   const [gaMeasurementId, setGaMeasurementId] = useState('')
   const [gtmId, setGtmId] = useState('')
   const [targetKeywords, setTargetKeywords] = useState('free gst invoice generator, billing software india, tally alternative, zoho books alternative, vyapar alternative, msme invoice maker, e-invoicing india')
@@ -42,14 +44,13 @@ export default function GoogleSearchConsolePage() {
 
   const loadSettings = async () => {
     try {
-      const { data } = await supabase
-        .from('system_settings')
-        .select('*')
-        .eq('key', 'google_search_console')
-        .single()
+      const [gscRes, scriptsRes] = await Promise.all([
+        supabase.from('system_settings').select('*').eq('key', 'google_search_console').single(),
+        supabase.from('system_settings').select('*').eq('key', 'custom_header_scripts').single()
+      ])
 
-      if (data?.value) {
-        const val = data.value as {
+      if (gscRes.data?.value) {
+        const val = gscRes.data.value as {
           siteVerificationToken?: string
           gaMeasurementId?: string
           gtmId?: string
@@ -59,28 +60,27 @@ export default function GoogleSearchConsolePage() {
         if (val.gaMeasurementId) setGaMeasurementId(val.gaMeasurementId)
         if (val.gtmId) setGtmId(val.gtmId)
         if (val.targetKeywords) setTargetKeywords(val.targetKeywords)
+      }
+
+      if (scriptsRes.data?.value?.scripts) {
+        setCustomHeaderScripts(scriptsRes.data.value.scripts)
       } else {
-        // Fallback to localStorage
-        const cached = localStorage.getItem('billbooky_gsc_settings')
-        if (cached) {
-          const parsed = JSON.parse(cached)
-          setSiteVerificationToken(parsed.siteVerificationToken || '')
-          setGaMeasurementId(parsed.gaMeasurementId || '')
-          setGtmId(parsed.gtmId || '')
-          if (parsed.targetKeywords) setTargetKeywords(parsed.targetKeywords)
-        }
+        const cachedScripts = localStorage.getItem('billbooky_custom_header_scripts')
+        if (cachedScripts) setCustomHeaderScripts(cachedScripts)
       }
     } catch {
       const cached = localStorage.getItem('billbooky_gsc_settings')
       if (cached) {
         try {
           const parsed = JSON.parse(cached)
-          setSiteVerificationToken(parsed.siteVerificationToken || '')
-          setGaMeasurementId(parsed.gaMeasurementId || '')
-          setGtmId(parsed.gtmId || '')
+          if (parsed.siteVerificationToken) setSiteVerificationToken(parsed.siteVerificationToken)
+          if (parsed.gaMeasurementId) setGaMeasurementId(parsed.gaMeasurementId)
+          if (parsed.gtmId) setGtmId(parsed.gtmId)
           if (parsed.targetKeywords) setTargetKeywords(parsed.targetKeywords)
         } catch {}
       }
+      const cachedScripts = localStorage.getItem('billbooky_custom_header_scripts')
+      if (cachedScripts) setCustomHeaderScripts(cachedScripts)
     }
   }
 
@@ -97,13 +97,21 @@ export default function GoogleSearchConsolePage() {
 
     try {
       localStorage.setItem('billbooky_gsc_settings', JSON.stringify(payload))
-      await supabase
-        .from('system_settings')
-        .upsert({
+      localStorage.setItem('billbooky_custom_header_scripts', customHeaderScripts.trim())
+
+      await Promise.all([
+        supabase.from('system_settings').upsert({
           key: 'google_search_console',
           value: payload,
           description: 'Google Search Console and SEO verification configurations'
+        }),
+        supabase.from('system_settings').upsert({
+          key: 'custom_header_scripts',
+          value: { scripts: customHeaderScripts.trim(), updated_at: new Date().toISOString() },
+          description: 'Raw custom head tags and analytics scripts injected into website header'
         })
+      ])
+
       setSaveSuccess(true)
       setTimeout(() => setSaveSuccess(false), 3000)
     } catch (e) {
@@ -113,6 +121,7 @@ export default function GoogleSearchConsolePage() {
     } finally {
       setIsSaving(false)
     }
+  }
   }
 
   const copyToClipboard = (text: string, id: string) => {
@@ -244,6 +253,42 @@ export default function GoogleSearchConsolePage() {
                   <Button onClick={handleSave} disabled={isSaving} className="gap-2 bg-blue-600 hover:bg-blue-700">
                     <Save className="h-4 w-4" />
                     {isSaving ? 'Saving...' : 'Save Configuration'}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Custom Header Code & Tag Injection */}
+            <Card className="border-indigo-100 shadow-sm bg-gradient-to-br from-white to-indigo-50/20">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg flex items-center gap-2 text-indigo-900 dark:text-indigo-300">
+                    <Code2 className="h-5 w-5 text-indigo-600" />
+                    Custom Header Code &amp; Scripts Injection
+                  </CardTitle>
+                  <span className="text-[10px] font-bold bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">Global &lt;head&gt;</span>
+                </div>
+                <CardDescription>
+                  Paste any raw verification meta tags, Google Tag Manager scripts, analytics snippets, or third-party tracking pixels to deploy them dynamically to the website header.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="space-y-1.5">
+                  <textarea
+                    rows={6}
+                    value={customHeaderScripts}
+                    onChange={(e) => setCustomHeaderScripts(e.target.value)}
+                    className="w-full rounded-xl border border-indigo-200 bg-slate-900 p-3 font-mono text-xs text-emerald-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-inner"
+                    placeholder={`<meta name="google-site-verification" content="-8t9f7kYXCnXv0O-BgLx_Jb5-3bIRO8R2gfR2nMYLTw" />\n<script async src="https://www.googletagmanager.com/gtag/js?id=..."></script>`}
+                  />
+                  <p className="text-xs text-slate-500">
+                    Injected dynamically across all pages inside the HTML <code>&lt;head&gt;</code> without requiring a manual redeploy.
+                  </p>
+                </div>
+                <div className="flex justify-end pt-2">
+                  <Button onClick={handleSave} disabled={isSaving} className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white">
+                    <Save className="h-4 w-4" />
+                    {isSaving ? 'Saving...' : 'Deploy Header Scripts'}
                   </Button>
                 </div>
               </CardContent>
