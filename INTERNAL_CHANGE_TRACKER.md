@@ -365,5 +365,6 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 | 2026-11-18 | `app/blog/page.tsx` | Public knowledge hub and blog directory | ✅ Completed |
 | 2026-11-18 | `app/blog/[slug]/page.tsx` | Dynamic blog article reader with SEO metadata | ✅ Completed |
 | 2026-11-18 | Root Tracker | Logged Release v1.2.9 in `INTERNAL_CHANGE_TRACKER.md` | ✅ Completed |
+| 2026-11-18 | `app/(superadmin)/admin/cms/CMSManager.tsx` | Added missing `Link` import for blog article preview | ✅ Completed |
 
 
