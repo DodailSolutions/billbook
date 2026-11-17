@@ -5,21 +5,39 @@ import { BillingToggle } from '@/components/ui/BillingToggle'
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
 import { CheckCircle } from 'lucide-react'
+import type { SubscriptionPlan } from '@/lib/types-admin'
 
-export function UAEPricingToggleSection() {
+interface UAEPricingToggleSectionProps {
+  plans?: SubscriptionPlan[]
+}
+
+export function UAEPricingToggleSection({ plans = [] }: UAEPricingToggleSectionProps) {
   const [isYearly, setIsYearly] = useState(false)
 
-  const plans = [
+  // Dynamic plan lookups from database with official fallbacks
+  const starterM = plans.find(p => p.slug === 'starter-ae')?.price ?? 49
+  const starterY = plans.find(p => p.slug === 'starter-ae-yearly')?.price ?? 490
+
+  const growthM = plans.find(p => p.slug === 'growth-ae')?.price ?? 99
+  const growthY = plans.find(p => p.slug === 'growth-ae-yearly')?.price ?? 990
+
+  const proM = plans.find(p => p.slug === 'pro-ae')?.price ?? 199
+  const proY = plans.find(p => p.slug === 'pro-ae-yearly')?.price ?? 1990
+
+  const entM = plans.find(p => p.slug === 'enterprise-ae')?.price ?? 299
+  const entY = plans.find(p => p.slug === 'enterprise-ae-yearly')?.price ?? 2990
+
+  const dynamicPlans = [
     {
       name: 'Starter',
       slug: 'starter-ae',
-      monthlyPrice: 49,
-      yearlyPrice: 490,
-      description: 'Perfect for freelancers',
+      monthlyPrice: Number(starterM),
+      yearlyPrice: Number(starterY),
+      description: 'Perfect for freelancers & solo consultants',
       features: [
         '1 user',
         'Unlimited invoices',
-        'VAT-compliant invoicing',
+        'FTA 5% VAT-compliant invoicing',
         'Client management',
         'Email support'
       ],
@@ -28,28 +46,28 @@ export function UAEPricingToggleSection() {
     {
       name: 'Growth',
       slug: 'growth-ae',
-      monthlyPrice: 99,
-      yearlyPrice: 990,
-      description: 'For small businesses',
+      monthlyPrice: Number(growthM),
+      yearlyPrice: Number(growthY),
+      description: 'For small trading and service businesses',
       features: [
         'Up to 3 users',
         'Everything in Starter',
         'Recurring invoices',
         'Payment reminders',
-        'Arabic invoices'
+        'Arabic & English bilingual invoices'
       ],
       popular: true
     },
     {
       name: 'Pro',
       slug: 'pro-ae',
-      monthlyPrice: 199,
-      yearlyPrice: 1990,
-      description: 'For growing companies',
+      monthlyPrice: Number(proM),
+      yearlyPrice: Number(proY),
+      description: 'For growing companies & agencies',
       features: [
         'Up to 5 users',
         'Everything in Growth',
-        'Advanced VAT reports',
+        'Advanced VAT return reports',
         'API access',
         'Priority support'
       ],
@@ -58,13 +76,13 @@ export function UAEPricingToggleSection() {
     {
       name: 'Enterprise',
       slug: 'enterprise-ae',
-      monthlyPrice: 299,
-      yearlyPrice: 2990,
-      description: 'For large teams',
+      monthlyPrice: Number(entM),
+      yearlyPrice: Number(entY),
+      description: 'For large teams & Free Zone enterprises',
       features: [
         'Up to 10 users',
         'Everything in Pro',
-        'AI Accountant',
+        'AI Accountant Copilot',
         'Custom integrations',
         'Dedicated support'
       ],
@@ -77,7 +95,7 @@ export function UAEPricingToggleSection() {
       <BillingToggle onToggle={setIsYearly} defaultYearly={false} />
       
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {plans.map((plan) => {
+        {dynamicPlans.map((plan) => {
           const price = isYearly ? plan.yearlyPrice : plan.monthlyPrice
           const savings = (plan.monthlyPrice * 12) - plan.yearlyPrice
           const planId = isYearly ? `${plan.slug}-yearly` : plan.slug
@@ -136,13 +154,13 @@ export function UAEPricingToggleSection() {
                   </li>
                 ))}
               </ul>
-              {`/pricing?checkout=${planId}`}
-              <Link href="/signup">
+
+              <Link href={`/ae/pricing?checkout=${planId}`}>
                 <Button 
                   className={`w-full ${
                     plan.popular 
-                      ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-                      : 'bg-gray-900 hover:bg-gray-800 text-white'
+                      ? 'bg-blue-600 hover:bg-blue-700 text-white font-bold' 
+                      : 'bg-gray-900 hover:bg-gray-800 text-white dark:bg-gray-700 font-bold'
                   }`}
                 >
                   Get Started

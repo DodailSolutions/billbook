@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
+import Script from 'next/script'
 import { Button } from '@/components/ui/Button'
 import { CheckCircle, X, Zap, Shield } from 'lucide-react'
 import { ThemeToggle } from '@/components/ThemeToggle'
@@ -7,11 +8,38 @@ import { createClient } from '@/lib/supabase/server'
 import { UAEPricingToggleSection } from './UAEPricingToggleSection'
 import { RegionSwitcher } from '@/components/RegionSwitcher'
 import { PublicHeaderAuth } from '@/components/PublicHeaderAuth'
+import { CheckoutHandler } from '@/app/(marketing)/pricing/CheckoutHandler'
+import type { SubscriptionPlan } from '@/lib/types-admin'
+
+export const dynamic = 'force-dynamic'
 
 export default async function UAEPricingPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   const isAuthenticated = !!user
+
+  // Fetch active UAE plans from database
+  let dbPlans: SubscriptionPlan[] = []
+  try {
+    const { data } = await supabase
+      .from('subscription_plans')
+      .select('*')
+      .eq('currency', 'AED')
+      .eq('is_active', true)
+      .order('sort_order', { ascending: true })
+
+    if (data && data.length > 0) {
+      dbPlans = data as SubscriptionPlan[]
+    }
+  } catch (error) {
+    console.error('Error fetching UAE plans from database:', error)
+  }
+
+  // Dynamic lifetime rates configured in Super Admin
+  const lifetimeStarter = dbPlans.find(p => p.slug === 'lifetime-ae' || p.slug === 'starter-ae-lifetime')?.price ?? 499
+  const lifetimeGrowth = dbPlans.find(p => p.slug === 'lifetime-growth-ae')?.price ?? 899
+  const lifetimePro = dbPlans.find(p => p.slug === 'lifetime-pro-ae')?.price ?? 1499
+  const lifetimeBusiness = dbPlans.find(p => p.slug === 'lifetime-enterprise-ae')?.price ?? 2499
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950">
@@ -65,7 +93,7 @@ export default async function UAEPricingPage() {
           </p>
         </div>
 
-        <UAEPricingToggleSection />
+        <UAEPricingToggleSection plans={dbPlans} />
       </section>
 
       {/* Lifetime Plans */}
@@ -89,7 +117,7 @@ export default async function UAEPricingPage() {
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border-2 border-gray-200 dark:border-gray-700 shadow-lg">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Starter Lifetime</h3>
               <div className="mb-4">
-                <span className="text-3xl font-bold text-gray-900 dark:text-white">AED 499</span>
+                <span className="text-3xl font-bold text-gray-900 dark:text-white">AED {lifetimeStarter}</span>
                 <p className="text-sm text-gray-600 dark:text-gray-400">one-time payment</p>
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">For freelancers</p>
@@ -121,8 +149,8 @@ export default async function UAEPricingPage() {
                 </li>
               </ul>
               
-              <Link href="/signup">
-                <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white text-sm">
+              <Link href="/ae/pricing?checkout=lifetime-ae">
+                <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white font-bold text-sm">
                   Get Lifetime Access
                 </Button>
               </Link>
@@ -138,7 +166,7 @@ export default async function UAEPricingPage() {
               
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Growth Lifetime</h3>
               <div className="mb-4">
-                <span className="text-3xl font-bold text-gray-900 dark:text-white">AED 899</span>
+                <span className="text-3xl font-bold text-gray-900 dark:text-white">AED {lifetimeGrowth}</span>
                 <p className="text-sm text-gray-600 dark:text-gray-400">one-time payment</p>
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">For small businesses</p>
@@ -170,8 +198,8 @@ export default async function UAEPricingPage() {
                 </li>
               </ul>
               
-              <Link href="/signup">
-                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm">
+              <Link href="/ae/pricing?checkout=lifetime-growth-ae">
+                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm">
                   Get Lifetime Access
                 </Button>
               </Link>
@@ -181,7 +209,7 @@ export default async function UAEPricingPage() {
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border-2 border-gray-200 dark:border-gray-700 shadow-lg">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Pro Lifetime</h3>
               <div className="mb-4">
-                <span className="text-3xl font-bold text-gray-900 dark:text-white">AED 1,499</span>
+                <span className="text-3xl font-bold text-gray-900 dark:text-white">AED {lifetimePro}</span>
                 <p className="text-sm text-gray-600 dark:text-gray-400">one-time payment</p>
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">For agencies</p>
@@ -213,8 +241,8 @@ export default async function UAEPricingPage() {
                 </li>
               </ul>
               
-              <Link href="/signup">
-                <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white text-sm">
+              <Link href="/ae/pricing?checkout=lifetime-pro-ae">
+                <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white font-bold text-sm">
                   Get Lifetime Access
                 </Button>
               </Link>
@@ -224,7 +252,7 @@ export default async function UAEPricingPage() {
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border-2 border-gray-200 dark:border-gray-700 shadow-lg">
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Business Lifetime</h3>
               <div className="mb-4">
-                <span className="text-3xl font-bold text-gray-900 dark:text-white">AED 2,499</span>
+                <span className="text-3xl font-bold text-gray-900 dark:text-white">AED {lifetimeBusiness}</span>
                 <p className="text-sm text-gray-600 dark:text-gray-400">one-time payment</p>
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">For enterprises</p>
@@ -256,10 +284,13 @@ export default async function UAEPricingPage() {
                 </li>
               </ul>
               
-              <Link href="/signup">
-                <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white text-sm">
+              <Link href="/ae/pricing?checkout=lifetime-enterprise-ae">
+                <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white font-bold text-sm">
                   Get Lifetime Access
                 </Button>
+              </Link>
+            </div>
+          </div>
               </Link>
             </div>
           </div>
@@ -372,6 +403,10 @@ export default async function UAEPricingPage() {
           </div>
         </div>
       </footer>
+
+      {/* Direct Payment Checkout Handler & Razorpay SDK */}
+      <CheckoutHandler basePath="/ae/pricing" />
+      <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
     </div>
   )
 }

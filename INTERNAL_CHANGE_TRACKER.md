@@ -367,4 +367,30 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 | 2026-11-18 | Root Tracker | Logged Release v1.2.9 in `INTERNAL_CHANGE_TRACKER.md` | ✅ Completed |
 | 2026-11-18 | `app/(superadmin)/admin/cms/CMSManager.tsx` | Added missing `Link` import for blog article preview | ✅ Completed |
 
+---
+
+## [Release v1.3.0] - 2026-11-18
+
+### 27. Feature: Direct Buy & Checkout for UAE & US Regional Pricing
+- **Issue**: Visitors on `/ae/pricing` and `/us/pricing` could not buy plans directly:
+  - UAE pricing buttons were routed to `/signup` instead of checkout, with stray URL text `{`/pricing?checkout=${planId}`}` rendered above the button.
+  - US pricing buttons redirected to India's `/pricing` page instead of staying on `/us/pricing`.
+  - Regional pricing pages did not dynamically synchronize with the `subscription_plans` table updated in the Super Admin panel (`/admin/plans`).
+- **Resolution**:
+  - Mounted `<CheckoutHandler basePath="/ae/pricing" />` and `<Script src="https://checkout.razorpay.com/v1/checkout.js" />` on `app/ae/pricing/page.tsx`.
+  - Mounted `<CheckoutHandler basePath="/us/pricing" />` and `<Script src="https://checkout.razorpay.com/v1/checkout.js" />` on `app/us/pricing/page.tsx`.
+  - Upgraded `CheckoutHandler.tsx` with a guest direct purchase flow (Email & Name entry with instant Razorpay checkout in AED or USD) so unauthenticated international users can buy without friction.
+  - Connected `UAEPricingToggleSection` and `USPricingToggleSection` to dynamic `subscription_plans` fetched from the database, eliminating hardcoded rates.
+  - Dynamic pricing data bound to `app/ae/page.tsx` comparison tables and `app/us/page.tsx` metrics bar.
+
+---
+
+| Date | Component / Route | Change Description | Status |
+| :--- | :--- | :--- | :--- |
+| 2026-11-18 | `app/ae/pricing` | Added direct Razorpay AED checkout & dynamic DB plan sync | ✅ Completed |
+| 2026-11-18 | `app/us/pricing` | Added direct Razorpay USD checkout & dynamic DB plan sync | ✅ Completed |
+| 2026-11-18 | `app/(marketing)/pricing/CheckoutHandler.tsx` | Added multi-currency guest direct checkout & regional basePath | ✅ Completed |
+| 2026-11-18 | `app/api/razorpay/create-order` | Enabled guest direct purchase for public subscription plans | ✅ Completed |
+| 2026-11-18 | `app/ae/page.tsx` & `app/us/page.tsx` | Dynamic plan price sync with `subscription_plans` table | ✅ Completed |
+
 

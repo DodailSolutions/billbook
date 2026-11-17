@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
         const supportedCurrencies = ['INR', 'AED', 'USD', 'EUR', 'GBP']
         const finalCurrency = supportedCurrencies.includes(currency) ? currency : 'INR'
         
-        // Check authentication - allow unauthenticated requests for lifetime & founder deals
+        // Check authentication - allow unauthenticated requests for lifetime & founder deals, or direct checkout
         const { data: { user }, error: authError } = await supabase.auth.getUser()
         const isLifetimePlan = notes?.plan === 'lifetime' || 
             notes?.plan === 'lifetime-professional' || 
@@ -24,7 +24,9 @@ export async function POST(request: NextRequest) {
             notes?.plan === 'founder' ||
             (typeof notes?.plan === 'string' && (notes.plan.includes('lifetime') || notes.plan.includes('founder')))
         
-        if (!isLifetimePlan && (authError || !user)) {
+        const isDirectCheckout = isLifetimePlan || notes?.direct_checkout === 'true' || !!notes?.guest_email
+
+        if (!isDirectCheckout && (authError || !user)) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 

@@ -5,18 +5,36 @@ import { BillingToggle } from '@/components/ui/BillingToggle'
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
 import { CheckCircle, Sparkles } from 'lucide-react'
+import type { SubscriptionPlan } from '@/lib/types-admin'
 
-export function USPricingToggleSection() {
+interface USPricingToggleSectionProps {
+  plans?: SubscriptionPlan[]
+}
+
+export function USPricingToggleSection({ plans = [] }: USPricingToggleSectionProps) {
   const [isYearly, setIsYearly] = useState(true) // Default to yearly
 
-  const plans = [
+  // Dynamic plan lookups from database with official fallbacks
+  const starterM = plans.find(p => p.slug === 'starter-us')?.price ?? 9
+  const starterY = plans.find(p => p.slug === 'starter-us-yearly')?.price ?? 49
+
+  const growthM = plans.find(p => p.slug === 'growth-us')?.price ?? 19
+  const growthY = plans.find(p => p.slug === 'growth-us-yearly')?.price ?? 99
+
+  const proM = plans.find(p => p.slug === 'pro-us')?.price ?? 29
+  const proY = plans.find(p => p.slug === 'pro-us-yearly')?.price ?? 179
+
+  const busM = plans.find(p => p.slug === 'business-us')?.price ?? 49
+  const busY = plans.find(p => p.slug === 'business-us-yearly')?.price ?? 299
+
+  const dynamicPlans = [
     {
       name: 'Starter',
       slug: 'starter-us',
-      monthlyPrice: 9,
-      yearlyPrice: 49,
+      monthlyPrice: Number(starterM),
+      yearlyPrice: Number(starterY),
       invoiceLimit: isYearly ? 200 : 20,
-      description: 'For freelancers',
+      description: 'For freelancers & solo operators',
       features: [
         '1 user',
         `${isYearly ? '200' : '20'} invoices / ${isYearly ? 'year' : 'month'}`,
@@ -31,17 +49,17 @@ export function USPricingToggleSection() {
     {
       name: 'Growth',
       slug: 'growth-us',
-      monthlyPrice: 19,
-      yearlyPrice: 99,
+      monthlyPrice: Number(growthM),
+      yearlyPrice: Number(growthY),
       invoiceLimit: isYearly ? 800 : 70,
-      description: 'For small businesses',
+      description: 'For small businesses & agencies',
       features: [
         'Up to 3 users',
         `${isYearly ? '800' : '70'} invoices / ${isYearly ? 'year' : 'month'}`,
         'Recurring invoices',
         'Payment reminders',
         'Client statements',
-        'Multi-state tax',
+        'Multi-state sales tax',
         'Priority email support'
       ],
       popular: true
@@ -49,10 +67,10 @@ export function USPricingToggleSection() {
     {
       name: 'Pro',
       slug: 'pro-us',
-      monthlyPrice: 29,
-      yearlyPrice: 179,
+      monthlyPrice: Number(proM),
+      yearlyPrice: Number(proY),
       invoiceLimit: isYearly ? 2000 : 170,
-      description: 'For agencies / consultants',
+      description: 'For agencies & consultants',
       features: [
         'Up to 5 users',
         `${isYearly ? '2,000' : '170'} invoices / ${isYearly ? 'year' : 'month'}`,
@@ -67,8 +85,8 @@ export function USPricingToggleSection() {
     {
       name: 'Business',
       slug: 'business-us',
-      monthlyPrice: 49,
-      yearlyPrice: 299,
+      monthlyPrice: Number(busM),
+      yearlyPrice: Number(busY),
       invoiceLimit: isYearly ? 6000 : 500,
       description: 'For accountants & teams',
       features: [
@@ -94,7 +112,7 @@ export function USPricingToggleSection() {
       </div>
       
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {plans.map((plan) => {
+        {dynamicPlans.map((plan) => {
           const price = isYearly ? plan.yearlyPrice : plan.monthlyPrice
           const monthlyEquivalent = isYearly ? (plan.yearlyPrice / 12).toFixed(2) : null
           const planId = isYearly ? `${plan.slug}-yearly` : plan.slug
@@ -145,12 +163,12 @@ export function USPricingToggleSection() {
                 ))}
               </ul>
               
-              <Link href={`/pricing?checkout=${planId}`}>
+              <Link href={`/us/pricing?checkout=${planId}`}>
                 <Button 
                   className={`w-full ${
                     plan.popular 
-                      ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-                      : 'bg-gray-900 hover:bg-gray-800 text-white dark:bg-gray-700 dark:hover:bg-gray-600'
+                      ? 'bg-blue-600 hover:bg-blue-700 text-white font-bold' 
+                      : 'bg-gray-900 hover:bg-gray-800 text-white dark:bg-gray-700 dark:hover:bg-gray-600 font-bold'
                   }`}
                 >
                   Get Started

@@ -99,6 +99,8 @@ const UAE_FEATURES = [
 export default async function UAELandingPage() {
   let cms: any = null
   let isAuthenticated = false
+  let starterPrice = 49
+  let lifetimePrice = 499
 
   try {
     const [supabase, cmsData] = await Promise.all([
@@ -108,6 +110,17 @@ export default async function UAELandingPage() {
     cms = cmsData
     const { data: { user } } = await supabase.auth.getUser()
     isAuthenticated = !!user
+
+    const { data: dbPlans } = await supabase
+      .from('subscription_plans')
+      .select('slug, price')
+      .eq('currency', 'AED')
+      .eq('is_active', true)
+
+    if (dbPlans && dbPlans.length > 0) {
+      starterPrice = Number(dbPlans.find((p: any) => p.slug === 'starter-ae')?.price ?? 49)
+      lifetimePrice = Number(dbPlans.find((p: any) => p.slug === 'lifetime-ae' || p.slug === 'starter-ae-lifetime')?.price ?? 499)
+    }
   } catch {
     // Graceful fallback
   }
@@ -318,13 +331,13 @@ export default async function UAELandingPage() {
               <tbody className="divide-y divide-slate-800/60 font-medium">
                 <tr>
                   <td className="py-4 px-4 text-slate-300 font-bold">Starting Monthly Price</td>
-                  <td className="py-4 px-4 font-extrabold text-emerald-400 bg-emerald-950/40 text-base">AED 49 / month</td>
+                  <td className="py-4 px-4 font-extrabold text-emerald-400 bg-emerald-950/40 text-base">AED {starterPrice} / month</td>
                   <td className="py-4 px-4 text-slate-400">AED 75 - AED 290 / mo</td>
                   <td className="py-4 px-4 text-slate-400">~$35 / mo (USD only)</td>
                 </tr>
                 <tr>
                   <td className="py-4 px-4 text-slate-300 font-bold">Lifetime Founder Deal</td>
-                  <td className="py-4 px-4 font-extrabold text-emerald-400 bg-emerald-950/40">✅ AED 499 Lifetime</td>
+                  <td className="py-4 px-4 font-extrabold text-emerald-400 bg-emerald-950/40">✅ AED {lifetimePrice} Lifetime</td>
                   <td className="py-4 px-4 text-rose-400">❌ Recurring monthly only</td>
                   <td className="py-4 px-4 text-rose-400">❌ Recurring monthly only</td>
                 </tr>

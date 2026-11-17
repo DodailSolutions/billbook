@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
+import Script from 'next/script'
 import { Button } from '@/components/ui/Button'
 import { CheckCircle, Zap, Shield, DollarSign, Sparkles } from 'lucide-react'
 import { ThemeToggle } from '@/components/ThemeToggle'
@@ -7,6 +8,10 @@ import { createClient } from '@/lib/supabase/server'
 import { USPricingToggleSection } from './USPricingToggleSection'
 import { RegionSwitcher } from '@/components/RegionSwitcher'
 import { PublicHeaderAuth } from '@/components/PublicHeaderAuth'
+import { CheckoutHandler } from '@/app/(marketing)/pricing/CheckoutHandler'
+import type { SubscriptionPlan } from '@/lib/types-admin'
+
+export const dynamic = 'force-dynamic'
 
 export const metadata = {
   title: 'Pricing - BillBooky International | Plans Starting at $49/year',
@@ -19,11 +24,33 @@ export default async function USPricingPage() {
   const { data: { user } } = await supabase.auth.getUser()
   const isAuthenticated = !!user
 
+  // Fetch active USD plans from database
+  let dbPlans: SubscriptionPlan[] = []
+  try {
+    const { data } = await supabase
+      .from('subscription_plans')
+      .select('*')
+      .eq('currency', 'USD')
+      .eq('is_active', true)
+      .order('sort_order', { ascending: true })
+
+    if (data && data.length > 0) {
+      dbPlans = data as SubscriptionPlan[]
+    }
+  } catch (err) {
+    console.error('Error loading USD plans:', err)
+  }
+
+  const starterLifetimePrice = dbPlans.find(p => p.slug === 'lifetime-starter-us')?.price ?? 149
+  const growthLifetimePrice = dbPlans.find(p => p.slug === 'lifetime-growth-us')?.price ?? 249
+  const proLifetimePrice = dbPlans.find(p => p.slug === 'lifetime-pro-us')?.price ?? 399
+  const businessLifetimePrice = dbPlans.find(p => p.slug === 'lifetime-business-us')?.price ?? 599
+
   const lifetimePlans = [
     {
       name: 'Starter',
       slug: 'lifetime-starter-us',
-      price: 149,
+      price: Number(starterLifetimePrice),
       description: 'Best for freelancers & solo founders',
       invoices: 250,
       features: [
@@ -39,7 +66,7 @@ export default async function USPricingPage() {
     {
       name: 'Growth',
       slug: 'lifetime-growth-us',
-      price: 249,
+      price: Number(growthLifetimePrice),
       popular: true,
       description: 'Best for small businesses',
       invoices: 1000,
@@ -56,7 +83,7 @@ export default async function USPricingPage() {
     {
       name: 'Pro',
       slug: 'lifetime-pro-us',
-      price: 399,
+      price: Number(proLifetimePrice),
       description: 'Best for agencies & consultants',
       invoices: 3000,
       features: [
@@ -72,7 +99,7 @@ export default async function USPricingPage() {
     {
       name: 'Business',
       slug: 'lifetime-business-us',
-      price: 599,
+      price: Number(businessLifetimePrice),
       description: 'Best for accounting firms',
       invoices: 10000,
       features: [
@@ -149,7 +176,7 @@ export default async function USPricingPage() {
           </p>
         </div>
 
-        <USPricingToggleSection />
+        <USPricingToggleSection plans={dbPlans} />
       </section>
 
       {/* Lifetime Plans */}
@@ -201,7 +228,7 @@ export default async function USPricingPage() {
                   ))}
                 </ul>
                 
-                <Link href={`/pricing?checkout=${plan.slug}`}>
+                <Link href={`/us/pricing?checkout=${plan.slug}`}>
                   <Button 
                     className={`w-full ${
                       plan.popular 
@@ -447,6 +474,10 @@ export default async function USPricingPage() {
           </div>
         </div>
       </footer>
+
+      {/* Direct Payment Checkout Handler & Razorpay SDK */}
+      <CheckoutHandler basePath="/us/pricing" />
+      <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
     </div>
   )
 }

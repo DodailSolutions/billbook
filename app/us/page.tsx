@@ -126,6 +126,8 @@ const GLOBAL_COUNTRIES = [
 export default async function USInternationalLandingPage() {
   let cms: any = null
   let isAuthenticated = false
+  let starterMonthly = 9
+  let starterYearly = 49
 
   try {
     const [supabase, cmsData] = await Promise.all([
@@ -135,6 +137,17 @@ export default async function USInternationalLandingPage() {
     cms = cmsData
     const { data: { user } } = await supabase.auth.getUser()
     isAuthenticated = !!user
+
+    const { data: dbPlans } = await supabase
+      .from('subscription_plans')
+      .select('slug, price')
+      .eq('currency', 'USD')
+      .eq('is_active', true)
+
+    if (dbPlans && dbPlans.length > 0) {
+      starterMonthly = Number(dbPlans.find((p: any) => p.slug === 'starter-us')?.price ?? 9)
+      starterYearly = Number(dbPlans.find((p: any) => p.slug === 'starter-us-yearly')?.price ?? 49)
+    }
   } catch {
     // Graceful fallback
   }
@@ -265,7 +278,7 @@ export default async function USInternationalLandingPage() {
           {/* Quick Metrics Bar */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-4xl mx-auto pt-6 border-t border-slate-200/80 dark:border-slate-800/80">
             {(cms?.metrics || [
-              { value: '$9/mo', label: 'Starter Plan or $49/yr' },
+              { value: `$${starterMonthly}/mo`, label: `Starter Plan or $${starterYearly}/yr` },
               { value: '50 States', label: 'US Sales Tax Ready' },
               { value: '10+ Currencies', label: 'USD, EUR, GBP, CAD, AUD' },
               { value: '14 Days', label: 'Free Trial • No Card Req.' }

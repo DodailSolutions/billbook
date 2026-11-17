@@ -71,7 +71,11 @@ const PLAN_DETAILS: Record<string, { name: string; amount: number; currency: str
     'lifetime-business-us': { name: 'Lifetime Business', amount: 599, currency: 'USD' }
 }
 
-export function CheckoutHandler() {
+interface CheckoutHandlerProps {
+    basePath?: string
+}
+
+export function CheckoutHandler({ basePath = '/pricing' }: CheckoutHandlerProps) {
     const searchParams = useSearchParams()
     const router = useRouter()
     const checkoutPlan = searchParams.get('checkout')
@@ -80,6 +84,8 @@ export function CheckoutHandler() {
     const [userInfo, setUserInfo] = useState({ name: '', email: '', contact: '' })
     const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
     const [dynamicPlan, setDynamicPlan] = useState<{ name: string; amount: number; currency: string } | null>(null)
+    const [directGuestEmail, setDirectGuestEmail] = useState('')
+    const [directGuestName, setDirectGuestName] = useState('')
 
     useEffect(() => {
         const fetchPlanFromDb = async () => {
@@ -121,7 +127,6 @@ export function CheckoutHandler() {
             
             if (user) {
                 setIsAuthenticated(true)
-                // Try to fetch user profile, but don't fail if it doesn't exist
                 try {
                     const { data: profile, error } = await supabase
                         .from('user_profiles')
@@ -136,7 +141,6 @@ export function CheckoutHandler() {
                             contact: profile.business_phone || ''
                         })
                     } else {
-                        // Fallback to auth user data only
                         setUserInfo({
                             name: user.email?.split('@')[0] || '',
                             email: user.email || '',
@@ -144,7 +148,6 @@ export function CheckoutHandler() {
                         })
                     }
                 } catch (err) {
-                    // If profile fetch fails, use auth user data
                     console.warn('Failed to fetch user profile:', err)
                     setUserInfo({
                         name: user.email?.split('@')[0] || '',
@@ -161,6 +164,7 @@ export function CheckoutHandler() {
             fetchUserInfo()
         }
     }, [checkoutPlan])
+
     const handleCheckout = async () => {
         if (!checkoutPlan) return
 
@@ -174,6 +178,9 @@ export function CheckoutHandler() {
             setLoading(true)
             setError(null)
 
+            const emailToUse = userInfo.email || directGuestEmail
+            const nameToUse = userInfo.name || directGuestName
+
             // Create Razorpay order
             const response = await fetch('/api/razorpay/create-order', {
                 method: 'POST',
@@ -183,7 +190,10 @@ export function CheckoutHandler() {
                     currency: planDetails.currency,
                     notes: { 
                         plan: checkoutPlan,
-                        plan_name: planDetails.name
+                        plan_name: planDetails.name,
+                        direct_checkout: 'true',
+                        guest_email: emailToUse,
+                        guest_name: nameToUse
                     }
                 })
             })
@@ -203,20 +213,19 @@ export function CheckoutHandler() {
                 description: planDetails.name,
                 order_id: order.id,
                 handler: async function (response: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) {
-                    // For lifetime plan without authentication, redirect to signup with payment details
-                    if (checkoutPlan === 'lifetime' && isAuthenticated === false) {
-                        // Store payment details in URL for signup verification
+                    if (isAuthenticated === false) {
                         const paymentData = btoa(JSON.stringify({
                             order_id: response.razorpay_order_id,
                             payment_id: response.razorpay_payment_id,
                             signature: response.razorpay_signature,
-                            plan: checkoutPlan
+                            plan: checkoutPlan,
+                            email: emailToUse,
+                            name: nameToUse
                         }))
-                        router.push(`/signup?payment=${paymentData}`)
+                        router.push(`/signup?payment=${paymentData}&plan=${checkoutPlan}`)
                         return
                     }
                     
-                    // For authenticated users, verify payment normally
                     const verifyResponse = await fetch('/api/razorpay/verify-payment', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -236,8 +245,8 @@ export function CheckoutHandler() {
                     }
                 },
                 prefill: {
-                    name: userInfo.name,
-                    email: userInfo.email,
+                    name: nameToUse,
+                    email: emailToUse,
                     contact: userInfo.contact,
                 },
                 theme: {
@@ -267,61 +276,99 @@ export function CheckoutHandler() {
         currency: 'INR'
     }
 
-    // For lifetime and founder plans, allow payment without authentication
-    // For other plans, prompt authentication or signup first
-    const isLifetime = checkoutPlan.includes('lifetime') || checkoutPlan.includes('founder')
-    if (isAuthenticated === false && !isLifetime) {
+    // Direct purchase modal for unauthenticated users
+    if (isAuthenticated === false) {
         return (
-            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                <Card className="max-w-md w-full">
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <Card className="max-w-md w-full shadow-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
                     <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
+                        <CardTitle className="flex items-center gap-2 text-xl font-bold text-slate-900 dark:text-white">
                             <CreditCard className="h-5 w-5 text-blue-600" />
-                            Complete Purchase - {planDetails.name}
+                            Direct Checkout - {planDetails.name}
                         </CardTitle>
-                        <CardDescription>
-                            Please login or create an account to continue with payment
+                        <CardDescription className="text-xs text-slate-500">
+                            Instant activation. Pay securely online with card or local payment methods.
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+                        <div className="bg-slate-50 dark:bg-slate-850 rounded-xl p-4 border border-slate-200 dark:border-slate-800">
                             <div className="flex justify-between items-baseline mb-2">
-                                <span className="text-gray-600 dark:text-gray-400">Selected Plan</span>
-                                <span className="font-semibold text-gray-900 dark:text-white">{planDetails.name}</span>
+                                <span className="text-sm text-slate-600 dark:text-slate-400">Selected Plan</span>
+                                <span className="font-bold text-slate-900 dark:text-white">{planDetails.name}</span>
                             </div>
                             <div className="flex justify-between items-baseline">
-                                <span className="text-gray-600 dark:text-gray-400">Amount</span>
-                                <span className="text-2xl font-bold text-blue-600">
-                                    {planDetails.currency === 'AED' ? 'AED' : planDetails.currency === 'USD' ? '$' : '₹'} {planDetails.amount.toLocaleString(planDetails.currency === 'AED' ? 'en-AE' : planDetails.currency === 'USD' ? 'en-US' : 'en-IN')}
+                                <span className="text-sm text-slate-600 dark:text-slate-400">Amount Due</span>
+                                <span className="text-2xl font-black text-blue-600 dark:text-blue-400">
+                                    {planDetails.currency === 'AED' ? 'AED ' : planDetails.currency === 'USD' ? '$' : '₹'}{planDetails.amount.toLocaleString(planDetails.currency === 'AED' ? 'en-AE' : planDetails.currency === 'USD' ? 'en-US' : 'en-IN')}
                                 </span>
                             </div>
                         </div>
 
-                        <div className="space-y-2">
-                            <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
-                                <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                                <span>Account will be created after payment</span>
+                        {error && (
+                            <div className="p-3 text-xs text-rose-600 bg-rose-50 dark:bg-rose-950/40 rounded-lg border border-rose-200 dark:border-rose-900">
+                                {error}
                             </div>
-                            <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
-                                <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                                <span>Instant activation with premium features</span>
+                        )}
+
+                        <div className="space-y-3">
+                            <div>
+                                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                    Your Email (for invoice receipt & login)
+                                </label>
+                                <input
+                                    type="email"
+                                    placeholder="you@company.com"
+                                    value={directGuestEmail}
+                                    onChange={(e) => setDirectGuestEmail(e.target.value)}
+                                    className="w-full text-sm px-3.5 py-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                    Business / Individual Name (Optional)
+                                </label>
+                                <input
+                                    type="text"
+                                    placeholder="Acme Corp"
+                                    value={directGuestName}
+                                    onChange={(e) => setDirectGuestName(e.target.value)}
+                                    className="w-full text-sm px-3.5 py-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
                             </div>
                         </div>
 
-                        <div className="flex gap-3">
+                        <div className="space-y-2 pt-2">
                             <Button
-                                variant="secondary"
-                                onClick={() => router.push('/pricing')}
-                                className="flex-1"
+                                onClick={handleCheckout}
+                                disabled={loading}
+                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 text-sm rounded-xl shadow-lg shadow-blue-600/20"
                             >
-                                Cancel
+                                {loading ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        Initiating Secure Payment...
+                                    </>
+                                ) : (
+                                    `Pay ${planDetails.currency === 'AED' ? 'AED ' : planDetails.currency === 'USD' ? '$' : '₹'}{planDetails.amount.toLocaleString(planDetails.currency === 'AED' ? 'en-AE' : planDetails.currency === 'USD' ? 'en-US' : 'en-IN')} Now`
+                                )}
                             </Button>
-                            <Button
-                                onClick={() => router.push(`/signup?plan=${checkoutPlan}&redirect=checkout`)}
-                                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
-                            >
-                                Continue →
-                            </Button>
+
+                            <div className="flex items-center justify-between pt-1">
+                                <button
+                                    type="button"
+                                    onClick={() => router.push(basePath)}
+                                    className="text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 font-medium"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => router.push(`/signup?plan=${checkoutPlan}&redirect=checkout`)}
+                                    className="text-xs text-blue-600 hover:underline font-semibold"
+                                >
+                                    Or create account first →
+                                </button>
+                            </div>
                         </div>
                     </CardContent>
                 </Card>
@@ -329,85 +376,63 @@ export function CheckoutHandler() {
         )
     }
 
-    // Loading state while checking authentication
     if (isAuthenticated === null) {
         return null
     }
 
-    // User is authenticated, show checkout modal
     return (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <Card className="max-w-md w-full">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <Card className="max-w-md w-full shadow-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
                 <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
+                    <CardTitle className="flex items-center gap-2 text-xl font-bold text-slate-900 dark:text-white">
                         <CreditCard className="h-5 w-5 text-blue-600" />
                         Upgrade to {planDetails.name}
                     </CardTitle>
-                    <CardDescription>
+                    <CardDescription className="text-xs text-slate-500">
                         Complete your purchase to unlock premium features
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+                    <div className="bg-slate-50 dark:bg-slate-850 rounded-xl p-4 border border-slate-200 dark:border-slate-800">
                         <div className="flex justify-between items-baseline mb-2">
-                            <span className="text-gray-600 dark:text-gray-400">Plan</span>
-                            <span className="font-semibold text-gray-900 dark:text-white">{planDetails.name}</span>
+                            <span className="text-sm text-slate-600 dark:text-slate-400">Plan</span>
+                            <span className="font-bold text-slate-900 dark:text-white">{planDetails.name}</span>
                         </div>
                         <div className="flex justify-between items-baseline">
-                            <span className="text-gray-600 dark:text-gray-400">Amount</span>
-                            <span className="text-2xl font-bold text-blue-600">
-                                {planDetails.currency === 'AED' ? 'AED' : planDetails.currency === 'USD' ? '$' : '₹'} {planDetails.amount.toLocaleString(planDetails.currency === 'AED' ? 'en-AE' : planDetails.currency === 'USD' ? 'en-US' : 'en-IN')}
+                            <span className="text-sm text-slate-600 dark:text-slate-400">Amount Due</span>
+                            <span className="text-2xl font-black text-blue-600 dark:text-blue-400">
+                                {planDetails.currency === 'AED' ? 'AED ' : planDetails.currency === 'USD' ? '$' : '₹'}{planDetails.amount.toLocaleString(planDetails.currency === 'AED' ? 'en-AE' : planDetails.currency === 'USD' ? 'en-US' : 'en-IN')}
                             </span>
                         </div>
                     </div>
 
-                    <div className="space-y-2">
-                        <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
-                            <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                            <span>Secure payment via Razorpay</span>
-                        </div>
-                        <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
-                            <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                            <span>Instant activation after payment</span>
-                        </div>
-                        <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
-                            <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                            <span>{isLifetime ? 'One-time payment, lifetime access' : '14-day free trial included'}</span>
-                        </div>
-                        <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
-                            <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                            <span>14-day money-back guarantee</span>
-                        </div>
-                    </div>
-
                     {error && (
-                        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 text-sm text-red-600 dark:text-red-400">
+                        <div className="p-3 text-xs text-rose-600 bg-rose-50 dark:bg-rose-950/40 rounded-lg border border-rose-200 dark:border-rose-900">
                             {error}
                         </div>
                     )}
 
-                    <div className="flex gap-3">
-                        <Button
-                            variant="secondary"
-                            onClick={() => router.push('/pricing')}
-                            disabled={loading}
-                            className="flex-1"
-                        >
-                            Cancel
-                        </Button>
+                    <div className="space-y-2">
                         <Button
                             onClick={handleCheckout}
                             disabled={loading}
-                            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 text-sm rounded-xl shadow-lg shadow-blue-600/20"
                         >
                             {loading ? (
                                 <>
-                                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                    Processing...
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Opening Payment Window...
                                 </>
                             ) : (
-                                'Proceed to Payment'
+                                `Pay ${planDetails.currency === 'AED' ? 'AED ' : planDetails.currency === 'USD' ? '$' : '₹'}{planDetails.amount.toLocaleString(planDetails.currency === 'AED' ? 'en-AE' : planDetails.currency === 'USD' ? 'en-US' : 'en-IN')} with Razorpay`
                             )}
+                        </Button>
+                        <Button
+                            variant="outline"
+                            onClick={() => router.push(basePath)}
+                            className="w-full text-xs text-slate-600 dark:text-slate-400"
+                        >
+                            Cancel
                         </Button>
                     </div>
                 </CardContent>
