@@ -17,11 +17,18 @@ export default async function NewInvoicePage() {
     let limitStatus = { canCreate: true, count: 0, limit: 50 }
 
     try {
+        const timeoutMs = 2500
+        const withTimeout = <T,>(p: Promise<T>, fallback: T): Promise<T> =>
+            Promise.race([
+                p,
+                new Promise<T>((resolve) => setTimeout(() => resolve(fallback), timeoutMs))
+            ])
+
         const [c, s, inv, lim] = await Promise.all([
-            getCustomers().catch(() => [] as Customer[]),
-            getSavedItems().catch(() => [] as SavedItem[]),
-            getInventoryItems().catch(() => [] as InventoryItem[]),
-            checkInvoiceLimit().catch(() => ({ canCreate: true, count: 0, limit: 50 }))
+            withTimeout(getCustomers().catch(() => [] as Customer[]), [] as Customer[]),
+            withTimeout(getSavedItems().catch(() => [] as SavedItem[]), [] as SavedItem[]),
+            withTimeout(getInventoryItems().catch(() => [] as InventoryItem[]), [] as InventoryItem[]),
+            withTimeout(checkInvoiceLimit().catch(() => ({ canCreate: true, count: 0, limit: 50 })), { canCreate: true, count: 0, limit: 50 })
         ])
         customers = c || []
         savedItems = s || []

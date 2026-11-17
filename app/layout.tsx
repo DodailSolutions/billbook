@@ -47,11 +47,22 @@ export const metadata: Metadata = {
     'GST compliant software',
     'invoice management system',
     'customer billing software',
-    'payment tracking India'
+    'payment tracking India',
+    'Zoho Books alternative',
+    'Vyapar alternative',
+    'Tally alternative',
+    'Tally Prime online alternative',
+    'free GST billing software India',
+    'e-invoicing software for MSME',
+    'online invoice maker with GST',
+    'BillBooky billing app'
   ],
   authors: [{ name: 'BillBooky Team' }],
   creator: 'BillBooky',
   publisher: 'BillBooky',
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || 'google-site-verification-billbooky',
+  },
   formatDetection: {
     email: false,
     address: false,

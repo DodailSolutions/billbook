@@ -1,10 +1,18 @@
 import Link from 'next/link'
-import { Settings, Mail, Bell, Shield, Database, Zap } from 'lucide-react'
+import { Settings, Mail, Bell, Shield, Database, Zap, Globe } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 
 export default function SettingsPage() {
     const settingsSections = [
+        {
+            title: 'Google Search Console & SEO',
+            description: 'Connect Google Search Console, site verification, sitemaps, and organic keyword tracking',
+            icon: Globe,
+            href: '/admin/settings/google-console',
+            color: 'text-emerald-600',
+            bgColor: 'bg-emerald-50 dark:bg-emerald-900/20'
+        },
         {
             title: 'Email Configuration',
             description: 'Configure SMTP settings for sending emails',

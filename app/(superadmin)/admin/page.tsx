@@ -425,6 +425,13 @@ export default async function SuperAdminDashboard() {
                                 color="rose"
                             />
                             <HubActionCard
+                                title="Google Search Console"
+                                description="Connect Google Search Console, verification codes, and sitemap indexing."
+                                icon={Globe}
+                                href="/admin/settings/google-console"
+                                color="emerald"
+                            />
+                            <HubActionCard
                                 title="System & SMTP Settings"
                                 description="Configure email delivery settings, credentials, and platform flags."
                                 icon={Settings}

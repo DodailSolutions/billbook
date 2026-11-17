@@ -401,6 +401,19 @@ export function InvoicePreviewPanel({
                         {settings.footer_text}
                     </div>
                 )}
+
+                {/* Permanent BillBooky Watermark & Marketing Footer */}
+                <div className="mt-4 pt-3 border-t border-dashed border-gray-200 flex items-center justify-between text-[11px] text-gray-500">
+                    <div className="flex items-center gap-1.5">
+                        <div className="inline-flex items-center justify-center w-4.5 h-4.5 bg-blue-600 text-white rounded font-bold text-[10px]">
+                            B
+                        </div>
+                        <span className="font-semibold text-gray-800">BillBooky</span>
+                        <span className="text-gray-300">|</span>
+                        <span>Created with <strong className="text-blue-600">BillBooky</strong></span>
+                    </div>
+                    <span className="text-[10px] text-gray-400">www.billbooky.com</span>
+                </div>
             </div>
         </div>
     )

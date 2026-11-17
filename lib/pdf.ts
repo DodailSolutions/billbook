@@ -458,6 +458,19 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
             ${footerText}
         </div>
         ` : ''}
+
+        <!-- Permanent BillBooky Watermark & Marketing Footer -->
+        <div style="margin-top: 26px; padding-top: 12px; border-top: 1px dashed #cbd5e1; display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: #64748b; page-break-inside: avoid;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; background: #2563eb; color: #ffffff; border-radius: 5px; font-weight: 800; font-size: 13px; font-family: -apple-system, sans-serif; line-height: 1;">B</div>
+                <span style="font-weight: 700; color: #0f172a; font-size: 12px; letter-spacing: -0.2px;">BillBooky</span>
+                <span style="color: #cbd5e1;">|</span>
+                <span style="color: #475569;">Created with <strong style="color: #2563eb;">BillBooky</strong> — Free GST Invoicing & Accounting</span>
+            </div>
+            <div style="font-size: 10px; color: #94a3b8; font-weight: 500;">
+                www.billbooky.com
+            </div>
+        </div>
     </div>
 </body>
 </html>
@@ -920,6 +933,19 @@ export async function generatePurchaseOrderPDF(po: PurchaseOrder): Promise<strin
             ${footerText}
         </div>
         ` : ''}
+
+        <!-- Permanent BillBooky Watermark & Marketing Footer -->
+        <div style="margin-top: 26px; padding-top: 12px; border-top: 1px dashed #cbd5e1; display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: #64748b; page-break-inside: avoid;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; background: #2563eb; color: #ffffff; border-radius: 5px; font-weight: 800; font-size: 13px; font-family: -apple-system, sans-serif; line-height: 1;">B</div>
+                <span style="font-weight: 700; color: #0f172a; font-size: 12px; letter-spacing: -0.2px;">BillBooky</span>
+                <span style="color: #cbd5e1;">|</span>
+                <span style="color: #475569;">Created with <strong style="color: #2563eb;">BillBooky</strong> — Free GST Invoicing & Accounting</span>
+            </div>
+            <div style="font-size: 10px; color: #94a3b8; font-weight: 500;">
+                www.billbooky.com
+            </div>
+        </div>
     </div>
 </body>
 </html>
