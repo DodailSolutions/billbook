@@ -14,6 +14,7 @@ import Footer from '@/components/Footer'
 import { createClient } from '@/lib/supabase/server'
 import { PublicHeaderAuth } from '@/components/PublicHeaderAuth'
 import { RegionSwitcher } from '@/components/RegionSwitcher'
+import { getRegionalCMS } from './(superadmin)/admin/cms/actions'
 
 export const dynamic = 'force-dynamic'
 
@@ -50,9 +51,14 @@ export default async function Home() {
     let proSlug = 'professional'
     let enterpriseSlug = 'enterprise'
     let isAuthenticated = false
+    let cms: any = null
 
     try {
-        const supabase = await createClient()
+        const [supabase, cmsData] = await Promise.all([
+            createClient(),
+            getRegionalCMS('IN').catch(() => null)
+        ])
+        cms = cmsData
         const { data: { user } } = await supabase.auth.getUser()
         isAuthenticated = !!user
 
@@ -86,6 +92,24 @@ export default async function Home() {
 
     return (
         <div className="min-h-screen bg-white text-slate-950 selection:bg-blue-600 selection:text-white font-sans antialiased">
+            {/* Dynamic Announcement Banner from CMS */}
+            {cms?.announcement?.enabled && (
+                <div className={`py-2 px-4 text-center text-xs font-semibold ${
+                    cms.announcement.theme === 'emerald' ? 'bg-emerald-600 text-white' :
+                    cms.announcement.theme === 'purple' ? 'bg-purple-600 text-white' :
+                    cms.announcement.theme === 'amber' ? 'bg-amber-600 text-white' :
+                    cms.announcement.theme === 'rose' ? 'bg-rose-600 text-white' :
+                    'bg-blue-600 text-white'
+                }`}>
+                    <span>{cms.announcement.message}</span>
+                    {cms.announcement.linkText && (
+                        <Link href={cms.announcement.linkUrl || '#'} className="underline ml-2 font-bold hover:opacity-90">
+                            {cms.announcement.linkText} →
+                        </Link>
+                    )}
+                </div>
+            )}
+
             {/* Apple-style Sticky Navigation */}
             <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 transition-all duration-300">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -133,20 +157,17 @@ export default async function Home() {
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-200/80 shadow-xs">
                             <span className="h-2 w-2 rounded-full bg-blue-600 animate-ping" />
                             <span className="text-xs sm:text-sm font-bold text-blue-800 tracking-wide uppercase">
-                                {isAuthenticated ? 'Welcome Back • Workspace Active' : 'All-In-One Business Operating System'}
+                                {isAuthenticated ? 'Welcome Back • Workspace Active' : (cms?.hero?.badge || '100% GST Compliant Invoice Generator & Operating System')}
                             </span>
                         </div>
 
                         {/* Main Title */}
                         <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black text-slate-950 -tracking-tight leading-[1.08]">
-                            Accounting, Invoicing, CRM & Payroll.{' '}
-                            <span className="bg-gradient-to-r from-slate-950 via-blue-600 to-blue-500 bg-clip-text text-transparent">
-                                Simple. Fast. Compliant.
-                            </span>
+                            {cms?.hero?.headline || 'Accounting, Invoicing, CRM & Payroll. Simple. Fast. Compliant.'}
                         </h1>
 
                         <p className="text-base sm:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed font-medium">
-                            Create GST invoices, track CRM sales pipelines, manage double-entry books, issue vendor POs, and run monthly staff payroll — all in one elegant workspace.
+                            {cms?.hero?.subheadline || 'Create GST invoices, track CRM sales pipelines, manage double-entry books, issue vendor POs, and run monthly staff payroll — all in one elegant workspace.'}
                         </p>
 
                         {/* Apple Action Buttons */}
@@ -169,15 +190,15 @@ export default async function Home() {
                                 </>
                             ) : (
                                 <>
-                                    <Link href="/signup" className="w-full sm:w-auto">
+                                    <Link href={cms?.hero?.primaryButtonUrl || '/signup'} className="w-full sm:w-auto">
                                         <Button size="lg" className="w-full sm:w-auto bg-black hover:bg-slate-900 text-white font-extrabold px-8 py-4 rounded-full shadow-lg shadow-black/10 hover:shadow-2xl hover:-translate-y-0.5 transition-all duration-300 text-base min-h-[52px] gap-2">
-                                            Start Free Account
+                                            {cms?.hero?.primaryButtonText || 'Start Free Account'}
                                             <ArrowRight className="h-5 w-5" />
                                         </Button>
                                     </Link>
-                                    <Link href="#features" className="w-full sm:w-auto">
+                                    <Link href={cms?.hero?.secondaryButtonUrl || '#features'} className="w-full sm:w-auto">
                                         <Button size="lg" className="w-full sm:w-auto bg-slate-100/90 hover:bg-slate-200 text-slate-900 font-bold px-8 py-4 rounded-full border border-slate-200/80 hover:-translate-y-0.5 transition-all duration-300 text-base min-h-[52px]">
-                                            Explore Features
+                                            {cms?.hero?.secondaryButtonText || 'Explore Features'}
                                         </Button>
                                     </Link>
                                 </>
@@ -209,22 +230,17 @@ export default async function Home() {
             <section className="py-10 bg-slate-50/60 border-y border-slate-200/60">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-                        <div className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs">
-                            <div className="text-3xl sm:text-4xl font-black text-slate-950 font-mono">500+</div>
-                            <div className="text-xs text-slate-500 mt-1 font-bold uppercase tracking-wider">Active Businesses</div>
-                        </div>
-                        <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs">
-                            <div className="text-3xl sm:text-4xl font-black text-blue-600 font-mono">₹10Cr+</div>
-                            <div className="text-xs text-slate-500 mt-1 font-bold uppercase tracking-wider">Invoices Processed</div>
-                        </div>
-                        <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs">
-                            <div className="text-3xl sm:text-4xl font-black text-black font-mono">100%</div>
-                            <div className="text-xs text-slate-500 mt-1 font-bold uppercase tracking-wider">GST Audit Ready</div>
-                        </div>
-                        <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs">
-                            <div className="text-3xl sm:text-4xl font-black text-blue-600 font-mono">6-in-1</div>
-                            <div className="text-xs text-slate-500 mt-1 font-bold uppercase tracking-wider">Enterprise Modules</div>
-                        </div>
+                        {(cms?.metrics || [
+                            { value: '500+', label: 'Active Businesses' },
+                            { value: '₹10Cr+', label: 'Invoices Processed' },
+                            { value: '100%', label: 'GST Audit Ready' },
+                            { value: '6-in-1', label: 'Enterprise Modules' }
+                        ]).map((m: any, idx: number) => (
+                            <div key={idx} className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs">
+                                <div className="text-3xl sm:text-4xl font-black text-slate-950 font-mono">{m.value}</div>
+                                <div className="text-xs text-slate-500 mt-1 font-bold uppercase tracking-wider">{m.label}</div>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </section>

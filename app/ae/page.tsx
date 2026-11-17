@@ -11,6 +11,7 @@ import { ThemeToggle } from '@/components/ThemeToggle'
 import { createClient } from '@/lib/supabase/server'
 import { RegionSwitcher } from '@/components/RegionSwitcher'
 import { PublicHeaderAuth } from '@/components/PublicHeaderAuth'
+import { getRegionalCMS } from '../(superadmin)/admin/cms/actions'
 
 export const dynamic = 'force-dynamic'
 
@@ -96,19 +97,47 @@ const UAE_FEATURES = [
 ]
 
 export default async function UAELandingPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  const isAuthenticated = !!user
+  let cms: any = null
+  let isAuthenticated = false
+
+  try {
+    const [supabase, cmsData] = await Promise.all([
+      createClient(),
+      getRegionalCMS('AE').catch(() => null)
+    ])
+    cms = cmsData
+    const { data: { user } } = await supabase.auth.getUser()
+    isAuthenticated = !!user
+  } catch {
+    // Graceful fallback
+  }
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased selection:bg-blue-600 selection:text-white" dir="ltr">
-      {/* Top Banner */}
-      <div className="bg-slate-900 text-white text-xs py-2 px-4 text-center font-medium border-b border-slate-800">
-        <span>🇦🇪 <strong>UAE Special:</strong> Full FTA 5% VAT & 9% Corporate Tax Suite. </span>
-        <Link href="/ae/pricing" className="underline font-bold text-blue-400 hover:text-blue-300 ml-1">
-          Plans from AED 49/month or Lifetime Deal →
-        </Link>
-      </div>
+      {/* Dynamic Top Banner */}
+      {cms?.announcement?.enabled ? (
+        <div className={`text-white text-xs py-2 px-4 text-center font-medium border-b border-slate-800 ${
+          cms.announcement.theme === 'blue' ? 'bg-blue-600' :
+          cms.announcement.theme === 'purple' ? 'bg-purple-600' :
+          cms.announcement.theme === 'amber' ? 'bg-amber-600' :
+          cms.announcement.theme === 'rose' ? 'bg-rose-600' :
+          'bg-emerald-600'
+        }`}>
+          <span>{cms.announcement.message}</span>
+          {cms.announcement.linkText && (
+            <Link href={cms.announcement.linkUrl || '/ae/pricing'} className="underline font-bold text-white ml-2 hover:opacity-90">
+              {cms.announcement.linkText} →
+            </Link>
+          )}
+        </div>
+      ) : (
+        <div className="bg-slate-900 text-white text-xs py-2 px-4 text-center font-medium border-b border-slate-800">
+          <span>🇦🇪 <strong>UAE Special:</strong> Full FTA 5% VAT & 9% Corporate Tax Suite. </span>
+          <Link href="/ae/pricing" className="underline font-bold text-blue-400 hover:text-blue-300 ml-1">
+            Plans from AED 49/month or Lifetime Deal →
+          </Link>
+        </div>
+      )}
 
       {/* Navigation Header */}
       <nav className="sticky top-0 z-50 bg-white/90 dark:bg-slate-950/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors">
@@ -160,15 +189,12 @@ export default async function UAELandingPage() {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 text-xs font-bold mb-6 shadow-2xs">
             <span className="h-2 w-2 rounded-full bg-emerald-600 animate-pulse" />
-            <span>🇦🇪 UAE FEDERAL TAX AUTHORITY & CORPORATE TAX COMPLIANT</span>
+            <span>{cms?.hero?.badge || '🇦🇪 UAE FEDERAL TAX AUTHORITY & CORPORATE TAX COMPLIANT'}</span>
           </div>
 
           {/* Main Title */}
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black text-slate-950 dark:text-white tracking-tight leading-[1.08] max-w-5xl mx-auto mb-4">
-            Bilingual VAT Invoicing, CRM & Accounting.{' '}
-            <span className="bg-gradient-to-r from-emerald-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              Built for UAE Businesses.
-            </span>
+            {cms?.hero?.headline || 'Bilingual VAT Invoicing, CRM & Accounting. Built for UAE Businesses.'}
           </h1>
 
           {/* Arabic Subtitle */}
@@ -177,7 +203,7 @@ export default async function UAELandingPage() {
           </p>
 
           <p className="text-sm sm:text-lg text-slate-600 dark:text-slate-400 max-w-3xl mx-auto leading-relaxed font-medium mb-10">
-            Generate bilingual English and Arabic tax invoices with TRN validation, 5% UAE VAT calculations, 9% Corporate Tax ledgers, multi-currency billing (AED, USD, EUR, GBP), and WhatsApp delivery.
+            {cms?.hero?.subheadline || 'Generate bilingual English and Arabic tax invoices with TRN validation, 5% UAE VAT calculations, 9% Corporate Tax ledgers, multi-currency billing (AED, USD, EUR, GBP), and WhatsApp delivery.'}
           </p>
 
           {/* Action Buttons */}
@@ -192,15 +218,15 @@ export default async function UAELandingPage() {
               </Link>
             ) : (
               <>
-                <Link href="/signup?plan=starter-ae&trial=true" className="w-full sm:w-auto">
+                <Link href={cms?.hero?.primaryButtonUrl || '/signup?plan=starter-ae&trial=true'} className="w-full sm:w-auto">
                   <Button size="lg" className="w-full sm:w-auto bg-slate-950 hover:bg-slate-900 text-white dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100 font-extrabold px-8 py-4 rounded-full shadow-lg shadow-black/10 hover:shadow-2xl hover:-translate-y-0.5 transition-all duration-300 text-base min-h-[52px] gap-2">
-                    Start 14-Day Free Trial
+                    {cms?.hero?.primaryButtonText || 'Start 14-Day Free Trial'}
                     <ArrowRight className="h-5 w-5" />
                   </Button>
                 </Link>
-                <Link href="/ae/pricing" className="w-full sm:w-auto">
+                <Link href={cms?.hero?.secondaryButtonUrl || '/ae/pricing'} className="w-full sm:w-auto">
                   <Button size="lg" className="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-bold px-8 py-4 rounded-full border border-slate-200 dark:border-slate-700 hover:-translate-y-0.5 transition-all duration-300 text-base min-h-[52px]">
-                    View AED Plans
+                    {cms?.hero?.secondaryButtonText || 'View AED Plans'}
                   </Button>
                 </Link>
               </>
@@ -209,22 +235,17 @@ export default async function UAELandingPage() {
 
           {/* Quick Metrics Bar */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-4xl mx-auto pt-6 border-t border-slate-200/80 dark:border-slate-800/80">
-            <div className="p-4 rounded-2xl bg-white/60 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 shadow-2xs">
-              <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400">AED 49</div>
-              <div className="text-xs text-slate-500 font-semibold mt-0.5">Starter Monthly or AED 490/yr</div>
-            </div>
-            <div className="p-4 rounded-2xl bg-white/60 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 shadow-2xs">
-              <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">5% VAT</div>
-              <div className="text-xs text-slate-500 font-semibold mt-0.5">FTA Compliant & TRN Checked</div>
-            </div>
-            <div className="p-4 rounded-2xl bg-white/60 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 shadow-2xs">
-              <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">Bilingual</div>
-              <div className="text-xs text-slate-500 font-semibold mt-0.5">English & Arabic Side-by-Side</div>
-            </div>
-            <div className="p-4 rounded-2xl bg-white/60 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 shadow-2xs">
-              <div className="text-2xl sm:text-3xl font-black text-blue-600 dark:text-blue-400">9% CT</div>
-              <div className="text-xs text-slate-500 font-semibold mt-0.5">Corporate Tax Threshold Track</div>
-            </div>
+            {(cms?.metrics || [
+              { value: '300+', label: 'UAE Companies' },
+              { value: 'AED 25M+', label: 'VAT Invoiced' },
+              { value: '100%', label: 'FTA Compliant' },
+              { value: '4.9/5', label: 'Client Rating' }
+            ]).map((m: any, idx: number) => (
+              <div key={idx} className="p-4 rounded-2xl bg-white/60 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 shadow-2xs">
+                <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400">{m.value}</div>
+                <div className="text-xs text-slate-500 font-semibold mt-0.5">{m.label}</div>
+              </div>
+            ))}
           </div>
 
         </div>

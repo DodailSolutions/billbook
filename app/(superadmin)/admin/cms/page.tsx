@@ -2,7 +2,7 @@ import { Globe, ArrowLeft, Shield, Sparkles, Server } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import Link from 'next/link'
-import { getAllRegionalCMS, getSubdomainConfig } from './actions'
+import { getAllRegionalCMS, getSubdomainConfig, getBlogPosts } from './actions'
 import CMSManager from './CMSManager'
 import { checkSuperAdminAccess } from '@/lib/admin-auth'
 
@@ -42,10 +42,11 @@ export default async function CMSPage() {
         )
     }
 
-    // 2. Fetch CMS Data & Subdomain config
-    const [content, subdomains] = await Promise.all([
+    // 2. Fetch CMS Data & Subdomain config & Blogs
+    const [content, subdomains, blogs] = await Promise.all([
         getAllRegionalCMS(),
-        getSubdomainConfig()
+        getSubdomainConfig(),
+        getBlogPosts()
     ])
 
     return (
@@ -92,6 +93,7 @@ export default async function CMSPage() {
             <CMSManager 
                 initialContent={content} 
                 initialSubdomains={subdomains} 
+                initialBlogs={blogs}
             />
         </div>
     )

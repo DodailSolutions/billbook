@@ -16,6 +16,17 @@ export interface RegionalCMSData {
         secondaryButtonText: string
         secondaryButtonUrl: string
     }
+    features?: Array<{
+        id: string
+        title: string
+        desc: string
+        badge?: string
+        color?: string
+    }>
+    metrics?: Array<{
+        value: string
+        label: string
+    }>
     contact: {
         supportEmail: string
         supportPhone: string
@@ -30,6 +41,20 @@ export interface RegionalCMSData {
         category?: string
         is_active: boolean
     }>
+}
+
+export interface BlogPost {
+    id: string
+    title: string
+    slug: string
+    excerpt: string
+    content: string
+    author: string
+    category: string
+    coverImage?: string
+    publishedAt: string
+    isPublished: boolean
+    readTime: string
 }
 
 export interface SubdomainConfig {
@@ -53,18 +78,24 @@ export const DEFAULT_REGIONAL_CONTENT: Record<string, RegionalCMSData> = {
             enabled: true,
             message: '🎉 GST 2.0 Ready! Unlimited invoicing with automated GSTR reports & e-Way bill.',
             linkText: 'Explore Features',
-            linkUrl: '/features',
+            linkUrl: '#features',
             theme: 'blue'
         },
         hero: {
-            badge: '🇮🇳 India’s Most Loved Billing & GST Invoicing Platform',
-            headline: 'Create Professional GST Invoices in Less Than 10 Seconds',
-            subheadline: 'Effortless invoicing, automated WhatsApp dispatch, payment links, and real-time GST reports designed specifically for Indian small businesses and freelancers.',
-            primaryButtonText: 'Start Invoicing for Free',
+            badge: '🇮🇳 100% GST Compliant Invoice Generator & Operating System',
+            headline: 'Accounting, Invoicing, CRM & Payroll. Simple. Fast. Compliant.',
+            subheadline: 'Create GST invoices, track CRM sales pipelines, manage double-entry books, issue vendor POs, and run monthly staff payroll — all in one elegant workspace.',
+            primaryButtonText: 'Start Free Account',
             primaryButtonUrl: '/signup',
-            secondaryButtonText: 'View Indian Pricing (₹)',
-            secondaryButtonUrl: '/pricing'
+            secondaryButtonText: 'Explore Features',
+            secondaryButtonUrl: '#features'
         },
+        metrics: [
+            { value: '500+', label: 'Active Businesses' },
+            { value: '₹10Cr+', label: 'Invoices Processed' },
+            { value: '99.9%', label: 'Platform Uptime' },
+            { value: '4.9/5', label: 'Customer Rating' }
+        ],
         contact: {
             supportEmail: 'support@dodail.com',
             supportPhone: '+91 98765 43210',
@@ -101,8 +132,8 @@ export const DEFAULT_REGIONAL_CONTENT: Record<string, RegionalCMSData> = {
         announcement: {
             enabled: true,
             message: '🇦🇪 FTA Approved: Bilingual Arabic & English Invoicing with 5% VAT & Corporate Tax ready.',
-            linkText: 'Learn More',
-            linkUrl: '/ae',
+            linkText: 'Explore UAE Features',
+            linkUrl: '/ae#features',
             theme: 'emerald'
         },
         hero: {
@@ -114,6 +145,12 @@ export const DEFAULT_REGIONAL_CONTENT: Record<string, RegionalCMSData> = {
             secondaryButtonText: 'Explore UAE Plans (AED)',
             secondaryButtonUrl: '/ae/pricing'
         },
+        metrics: [
+            { value: '300+', label: 'UAE Companies' },
+            { value: 'AED 25M+', label: 'VAT Invoiced' },
+            { value: '100%', label: 'FTA Compliant' },
+            { value: '4.9/5', label: 'Client Rating' }
+        ],
         contact: {
             supportEmail: 'support@dodail.com',
             supportPhone: '+971 4 123 4567',
@@ -163,6 +200,12 @@ export const DEFAULT_REGIONAL_CONTENT: Record<string, RegionalCMSData> = {
             secondaryButtonText: 'View USD Pricing ($)',
             secondaryButtonUrl: '/us/pricing'
         },
+        metrics: [
+            { value: '800+', label: 'Global Clients' },
+            { value: '$15M+', label: 'Processed in USD' },
+            { value: '50', label: 'US States Covered' },
+            { value: '4.9/5', label: 'User Rating' }
+        ],
         contact: {
             supportEmail: 'support@dodail.com',
             supportPhone: '+1 (555) 019-2834',
@@ -195,6 +238,45 @@ export const DEFAULT_REGIONAL_CONTENT: Record<string, RegionalCMSData> = {
         ]
     }
 }
+
+export const DEFAULT_BLOG_POSTS: BlogPost[] = [
+    {
+        id: 'post-1',
+        title: 'GST Invoicing in India: Complete Guide for MSMEs and Freelancers',
+        slug: 'gst-invoicing-guide-india',
+        excerpt: 'Everything Indian business owners need to know about CGST, SGST, IGST calculations, HSN codes, and e-invoicing compliance.',
+        content: `### GST Invoicing Essentials for Indian Businesses\n\nUnder the Goods and Services Tax (GST) regime, generating accurate and compliant tax invoices is critical for claiming Input Tax Credit (ITC) and avoiding penalties.\n\n#### Key Components of a GST Invoice:\n- **Supplier and Buyer Details**: Legal business name, address, and valid 15-digit GSTIN.\n- **Invoice Serial Number**: Unique consecutive numbering for each financial year.\n- **HSN/SAC Codes**: Harmonized System of Nomenclature codes corresponding to goods and services.\n- **Tax Breakup**: Distinct columns for CGST, SGST (intra-state) or IGST (inter-state).\n- **Payment QR Code**: Dynamic or static UPI QR code for immediate reconciliation.\n\nWith **BillBooky**, GST calculation is 100% automated based on your customer's location.`,
+        author: 'BillBooky Compliance Team',
+        category: 'Tax & Compliance',
+        publishedAt: '2026-11-15',
+        isPublished: true,
+        readTime: '4 min read'
+    },
+    {
+        id: 'post-2',
+        title: 'UAE FTA VAT & Corporate Tax: Bilingual E-Invoicing Best Practices',
+        slug: 'uae-fta-vat-corporate-tax-guide',
+        excerpt: 'How UAE businesses can issue Federal Tax Authority compliant bilingual tax invoices in Arabic and English with TRN verification.',
+        content: `### UAE VAT & Corporate Tax Rules for Businesses\n\nThe Federal Tax Authority (FTA) mandates specific standards for tax invoices issued by VAT-registered businesses in the United Arab Emirates.\n\n#### Requirements for FTA Compliance:\n1. **Bilingual Text**: Must display labels in Arabic and English side-by-side.\n2. **TRN (Tax Registration Number)**: Clearly displayed for both vendor and buyer.\n3. **5% Standard VAT Calculation**: Explicitly shown in Dirhams (AED).\n4. **9% Corporate Tax Record Keeping**: Financial ledgers and general journals maintained for at least 5 years.\n\nBillBooky's UAE edition produces instant bilingual PDF invoices formatted to FTA guidelines.`,
+        author: 'Middle East Tax Advisory',
+        category: 'International Tax',
+        publishedAt: '2026-11-16',
+        isPublished: true,
+        readTime: '5 min read'
+    },
+    {
+        id: 'post-3',
+        title: 'Double-Entry Bookkeeping vs Single-Entry: Why Growing Businesses Upgrade',
+        slug: 'double-entry-bookkeeping-benefits',
+        excerpt: 'Learn why automated double-entry general ledgers prevent fraud, simplify audits, and generate instant P&L and Balance Sheet reports.',
+        content: `### Why Double-Entry Accounting is the Gold Standard\n\nWhile single-entry bookkeeping tracks cash inflows and outflows, double-entry bookkeeping ensures every financial transaction has equal and opposite debits and credits.\n\n#### The Big Advantages:\n- **Audit Readiness**: Certified Accountants and auditors can verify every account balance effortlessly.\n- **Real-Time Financial Health**: Generate Trial Balances, P&L statements, and Balance Sheets on demand.\n- **Error Detection**: Mathematical imbalances immediately flag omitted or duplicate entries.\n\nBillBooky automates your Chart of Accounts and General Ledger silently in the background whenever you create an invoice, expense, or payroll entry.`,
+        author: 'Finance & Accounts Team',
+        category: 'Accounting',
+        publishedAt: '2026-11-17',
+        isPublished: true,
+        readTime: '3 min read'
+    }
+]
 
 export const DEFAULT_SUBDOMAINS: SubdomainConfig = {
     subdomains: [
