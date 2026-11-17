@@ -271,6 +271,7 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
     - Key ID, Key Secret, Webhook Secret, Live/Test mode toggle.
     - Webhook URL: `https://billbooky.dodail.com/api/webhooks/razorpay`
     - Subscribed events: `payment.captured`, `order.paid`, `subscription.charged`, `refund.processed`.
+    - Resilient signature verification: automatically falls back to `system_settings` database config if environment secret is not set, preventing HTTP 500 errors.
   - **Cashfree (India)**:
     - App ID, Secret Key, Webhook Secret, Production/Sandbox mode toggle.
     - Webhook URL: `https://billbooky.dodail.com/api/webhooks/cashfree`

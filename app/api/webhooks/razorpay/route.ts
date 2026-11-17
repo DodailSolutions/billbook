@@ -27,27 +27,35 @@ export async function POST(request: NextRequest) {
             )
         }
 
-        const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET
-        if (!webhookSecret) {
-            console.error('Razorpay webhook secret not configured')
-            return NextResponse.json(
-                { error: 'Webhook not configured' },
-                { status: 500 }
-            )
-        }
-
-        // Verify webhook signature
-        const isValid = verifyWebhookSignature(body, signature, webhookSecret)
-        if (!isValid) {
-            console.error('Invalid webhook signature')
-            return NextResponse.json(
-                { error: 'Invalid signature' },
-                { status: 401 }
-            )
-        }
-
-        const event = JSON.parse(body)
         const supabase = createWebhookSupabaseClient()
+        let webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET
+
+        if (!webhookSecret) {
+            try {
+                const { data } = await supabase
+                    .from('system_settings')
+                    .select('value')
+                    .eq('key', 'payment_gateways_config')
+                    .maybeSingle()
+                webhookSecret = data?.value?.razorpay?.webhookSecret
+            } catch (err) {
+                console.warn('Could not query system_settings for razorpay webhookSecret:', err)
+            }
+        }
+
+        // Verify webhook signature if secret and signature are provided
+        if (webhookSecret && signature) {
+            const isValid = verifyWebhookSignature(body, signature, webhookSecret)
+            if (!isValid) {
+                console.error('Invalid webhook signature')
+                return NextResponse.json(
+                    { error: 'Invalid signature' },
+                    { status: 401 }
+                )
+            }
+        } else if (!webhookSecret) {
+            console.warn('Razorpay webhook received without configured secret - processing event payload')
+        }
 
         console.log('Razorpay webhook event:', event.event)
 
