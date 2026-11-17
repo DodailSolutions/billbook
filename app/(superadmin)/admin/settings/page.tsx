@@ -2,9 +2,20 @@ import Link from 'next/link'
 import { Settings, Mail, Bell, Shield, Database, Zap, Globe } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
+import type { LucideIcon } from 'lucide-react'
+
+interface SettingsSection {
+    title: string
+    description: string
+    icon: LucideIcon
+    href: string
+    color: string
+    bgColor: string
+    comingSoon?: boolean
+}
 
 export default function SettingsPage() {
-    const settingsSections = [
+    const settingsSections: SettingsSection[] = [
         {
             title: 'Google Search Console & SEO',
             description: 'Connect Google Search Console, site verification, sitemaps, and organic keyword tracking',
