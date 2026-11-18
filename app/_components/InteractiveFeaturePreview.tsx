@@ -3,18 +3,20 @@
 import { useState } from 'react'
 import { 
     FileText, Sparkles, BookOpen, ShoppingBag, DollarSign, Bot, 
-    CheckCircle2, ArrowRight, Layers, ShieldCheck
+    CheckCircle2, ArrowRight, Layers, ShieldCheck, Download, Users, Lock
 } from 'lucide-react'
 
-type TabKey = 'invoicing' | 'crm' | 'bookkeeping' | 'po' | 'payroll' | 'ai'
+type TabKey = 'invoicing' | 'crm' | 'bookkeeping' | 'tally' | 'ca' | 'po' | 'payroll' | 'ai'
 
 export function InteractiveFeaturePreview() {
     const [activeTab, setActiveTab] = useState<TabKey>('invoicing')
 
     const tabs = [
         { id: 'invoicing', label: 'GST Invoicing', icon: FileText },
-        { id: 'crm', label: 'CRM & Pipeline', icon: Sparkles },
+        { id: 'tally', label: 'Tally Prime Sync', icon: Download },
+        { id: 'ca', label: 'CA Delegation', icon: ShieldCheck },
         { id: 'bookkeeping', label: 'Double-Entry Books', icon: BookOpen },
+        { id: 'crm', label: 'CRM & Pipeline', icon: Sparkles },
         { id: 'po', label: 'Purchase Orders', icon: ShoppingBag },
         { id: 'payroll', label: 'Payroll & Payslips', icon: DollarSign },
         { id: 'ai', label: 'AI Accountant', icon: Bot },
@@ -93,6 +95,104 @@ export function InteractiveFeaturePreview() {
                                 <div className="flex justify-between items-center pt-3 border-t border-slate-200 text-sm font-extrabold">
                                     <span className="text-slate-950">Total Paid</span>
                                     <span className="text-emerald-600 font-mono text-lg">₹47,200.00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {activeTab === 'tally' && (
+                    <div className="grid lg:grid-cols-2 gap-10 items-center animate-in fade-in duration-500">
+                        <div className="space-y-5">
+                            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                                <Download className="h-3.5 w-3.5" /> 1-Click Tally Prime Sync
+                            </div>
+                            <h3 className="text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-tight leading-tight">
+                                Export full Daybook XML directly to Tally Prime.
+                            </h3>
+                            <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
+                                Never re-enter another invoice or journal entry manually. BillBook generates standard Tally XML Daybook & Master ledgers with 100% field parity.
+                            </p>
+                            <div className="grid grid-cols-2 gap-3 pt-2 text-xs font-medium text-slate-700">
+                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> Standard Tally XML Format</div>
+                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> Multi-Ledger Voucher Sync</div>
+                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> Date Range Filtration</div>
+                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> Zero Re-entry Errors</div>
+                            </div>
+                        </div>
+
+                        {/* Minimalist Apple Mockup */}
+                        <div className="bg-slate-900 text-white rounded-2xl p-6 border border-slate-800 shadow-md space-y-4">
+                            <div className="flex justify-between items-center pb-3 border-b border-slate-800">
+                                <div className="flex items-center gap-2">
+                                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                                    <span className="text-xs font-bold text-slate-200">Tally Prime XML Engine</span>
+                                </div>
+                                <span className="text-[10px] font-mono font-bold bg-emerald-950 text-emerald-300 px-2 py-0.5 rounded-md border border-emerald-800">
+                                    TALLY READY
+                                </span>
+                            </div>
+                            <div className="space-y-2 text-xs font-mono text-slate-300 bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+                                <div className="text-emerald-400">&lt;ENVELOPE&gt;</div>
+                                <div className="pl-4 text-slate-400">&lt;BODY&gt;&lt;DESC&gt;TallyDaybookExport&lt;/DESC&gt;</div>
+                                <div className="pl-8 text-blue-400">&lt;VOUCHER VCHTYPE="Sales" ACTION="Create"&gt;</div>
+                                <div className="pl-12 text-slate-300">&lt;LEDGERNAME&gt;Sundry Debtors&lt;/LEDGERNAME&gt;</div>
+                                <div className="pl-12 text-emerald-400">&lt;AMOUNT&gt;-47200.00&lt;/AMOUNT&gt;</div>
+                                <div className="pl-8 text-blue-400">&lt;/VOUCHER&gt;</div>
+                                <div className="text-emerald-400">&lt;/ENVELOPE&gt;</div>
+                            </div>
+                            <div className="flex items-center justify-between text-xs text-slate-400 pt-1">
+                                <span>Daybook generated: 142 Vouchers</span>
+                                <span className="text-emerald-400 font-bold">1-Click Download</span>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {activeTab === 'ca' && (
+                    <div className="grid lg:grid-cols-2 gap-10 items-center animate-in fade-in duration-500">
+                        <div className="space-y-5">
+                            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200/60">
+                                <ShieldCheck className="h-3.5 w-3.5" /> CA Collaboration & Delegation
+                            </div>
+                            <h3 className="text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-tight leading-tight">
+                                Grant your CA real-time access. Revoke anytime.
+                            </h3>
+                            <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
+                                Delegate scoped permissions to your Chartered Accountant (View-Only, Bookkeeping, or Full GST Filing) without sharing master passwords.
+                            </p>
+                            <div className="grid grid-cols-2 gap-3 pt-2 text-xs font-medium text-slate-700">
+                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-indigo-600" /> Scoped Role Delegation</div>
+                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-indigo-600" /> 1-Click Instant Revoke</div>
+                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-indigo-600" /> Real-time Audit Trail</div>
+                                <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-indigo-600" /> Live GST Health Scores</div>
+                            </div>
+                        </div>
+
+                        {/* Minimalist Apple Mockup */}
+                        <div className="bg-slate-50/80 rounded-2xl p-6 border border-slate-200/80 shadow-sm space-y-3 text-xs">
+                            <div className="flex justify-between items-center pb-2 border-b border-slate-200 font-bold">
+                                <span className="text-slate-900">Active CA Delegations</span>
+                                <span className="text-indigo-600 font-mono">1 Active CA</span>
+                            </div>
+                            <div className="p-3.5 bg-white rounded-xl border border-slate-200 shadow-xs space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-xs">
+                                            CA
+                                        </div>
+                                        <div>
+                                            <div className="font-bold text-slate-900">Sharma & Associates</div>
+                                            <div className="text-[10px] text-slate-500">ICAI Reg: #528910</div>
+                                        </div>
+                                    </div>
+                                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                                        ACTIVE
+                                    </span>
+                                </div>
+                                <div className="flex items-center justify-between text-[11px] text-slate-600 pt-1 border-t border-slate-100">
+                                    <span>Scope: <strong>Bookkeeping + GST</strong></span>
+                                    <span className="text-rose-600 font-bold cursor-pointer">Revoke Access</span>
                                 </div>
                             </div>
                         </div>

@@ -29,16 +29,16 @@ const TestimonialCarousel = dynamicImport(() => import('./_components/Testimonia
 
 const ALL_FEATURES = [
     { icon: FileText, title: 'GST Compliant Invoicing', desc: 'Create CGST, SGST, IGST invoices with QR code payment in under 30 seconds', color: 'blue' },
-    { icon: Sparkles, title: 'CRM & Sales Pipeline', desc: 'Visual deal stages, activity timeline follow-ups, and win rate forecasts', color: 'black' },
+    { icon: RefreshCw, title: 'Tally Prime 1-Click Sync', desc: 'Export full Daybook XML and Master Ledgers directly into Tally with zero manual re-entry', color: 'blue' },
+    { icon: ShieldCheck, title: 'CA Client Delegation & Audit', desc: 'Securely grant your CA scoped, time-bounded access with instant 1-click revocation', color: 'black' },
     { icon: BookOpen, title: 'Double-Entry Bookkeeping', desc: 'Chart of Accounts, Trial Balance, P&L, Balance Sheet & Bank Reconciliation', color: 'blue' },
+    { icon: Sparkles, title: 'CRM & Sales Pipeline', desc: 'Visual deal stages, activity timeline follow-ups, and win rate forecasts', color: 'black' },
     { icon: ShoppingBag, title: 'Purchase Orders', desc: 'Issue vendor POs, track partial deliveries, and auto-update stock inventory', color: 'black' },
     { icon: DollarSign, title: 'Payroll & Salary Slips', desc: 'Employee salary structures, PF/ESI/TDS deductions, and PDF payslips', color: 'blue' },
     { icon: Layers, title: 'Inventory Valuation', desc: 'Weighted average stock valuation, batch/lot tracking, and reorder alerts', color: 'black' },
     { icon: Bot, title: 'AI Accountant Assistant', desc: 'Ask natural language tax & finance questions powered by AI logic', color: 'blue' },
-    { icon: Users, title: 'CA Marketplace & Audit', desc: 'Connect with certified CAs for tax filing, audit reports, and advice', color: 'black' },
-    { icon: RefreshCw, title: 'Recurring Subscriptions', desc: 'Automate monthly and annual invoice generation with auto reminders', color: 'blue' },
+    { icon: Users, title: 'CA Marketplace & Network', desc: 'Connect with certified CAs for tax filing, audit reports, and advice', color: 'black' },
     { icon: Smartphone, title: 'WhatsApp Direct Share', desc: 'Send PDF invoice links directly to client WhatsApp numbers in 1 click', color: 'black' },
-    { icon: ShieldCheck, title: 'Multi-User Team Roles', desc: 'Assign Owner, Admin, Manager, and Accountant access permissions', color: 'blue' },
     { icon: Lock, title: 'Bank Grade Security', desc: '256-bit encryption, automated daily backups, and complete data privacy', color: 'black' },
 ]
 
@@ -110,12 +110,12 @@ export default async function Home() {
                 </div>
             )}
 
-            {/* Apple-style Sticky Navigation */}
-            <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 transition-all duration-300">
+            {/* Apple-grade Sticky Navigation */}
+            <nav className="apple-glass sticky top-0 z-50 border-b border-black/[0.06] transition-all duration-300">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-16 sm:h-20">
-                        <Link href="/" className="flex items-center gap-2.5">
-                            <div className="relative w-8 h-8 sm:w-9 sm:h-9">
+                        <Link href="/" className="flex items-center gap-2.5 group">
+                            <div className="relative w-8 h-8 sm:w-9 sm:h-9 transition-transform duration-300 group-hover:scale-105">
                                 <Image 
                                     src="/logo-icon.svg" 
                                     alt="BillBooky" 
@@ -124,18 +124,18 @@ export default async function Home() {
                                     priority
                                 />
                             </div>
-                            <span className="text-xl sm:text-2xl font-black tracking-tight text-slate-950">
+                            <span className="text-xl sm:text-2xl font-black tracking-tight text-slate-950 font-sans">
                                 Bill<span className="text-blue-600">Booky</span>
                             </span>
                         </Link>
                         
-                        <div className="hidden lg:flex items-center gap-6 xl:gap-8 text-sm font-semibold text-slate-600">
-                            <Link href="#features" className="hover:text-black transition-colors">Features</Link>
-                            <Link href="#showcase" className="hover:text-black transition-colors">Live Preview</Link>
-                            <Link href="#pricing" className="hover:text-black transition-colors">Pricing</Link>
-                            <Link href="/ca-marketplace" className="hover:text-black transition-colors">CA Services</Link>
-                            <Link href="/ca-registration" className="hover:text-blue-600 font-bold transition-colors">Register as CA</Link>
-                            <Link href="/contact" className="hover:text-black transition-colors">Contact</Link>
+                        <div className="hidden lg:flex items-center gap-6 xl:gap-8 text-[13px] font-medium tracking-tight text-slate-600">
+                            <Link href="#features" className="apple-nav-link hover:text-slate-950">Features</Link>
+                            <Link href="#showcase" className="apple-nav-link hover:text-slate-950">Live Preview</Link>
+                            <Link href="#pricing" className="apple-nav-link hover:text-slate-950">Pricing</Link>
+                            <Link href="/ca-marketplace" className="apple-nav-link hover:text-slate-950">CA Services</Link>
+                            <Link href="/ca-registration" className="apple-nav-link text-blue-600 font-semibold hover:text-blue-700">Register as CA</Link>
+                            <Link href="/contact" className="apple-nav-link hover:text-slate-950">Contact</Link>
                         </div>
 
                         <div className="flex items-center gap-2 sm:gap-3">
@@ -154,15 +154,15 @@ export default async function Home() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                     <div className="text-center max-w-4xl mx-auto space-y-6 sm:space-y-8">
                         {/* Apple Pill Badge */}
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-200/80 shadow-xs">
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50/90 dark:bg-blue-950/50 border border-blue-200/80 dark:border-blue-800/60 shadow-xs micro-float">
                             <span className="h-2 w-2 rounded-full bg-blue-600 animate-ping" />
-                            <span className="text-xs sm:text-sm font-bold text-blue-800 tracking-wide uppercase">
+                            <span className="text-xs sm:text-sm font-bold text-blue-800 dark:text-blue-300 tracking-wide uppercase">
                                 {isAuthenticated ? 'Welcome Back • Workspace Active' : (cms?.hero?.badge || '100% GST Compliant Invoice Generator & Operating System')}
                             </span>
                         </div>
 
                         {/* Main Title */}
-                        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black text-slate-950 -tracking-tight leading-[1.08]">
+                        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black text-slate-950 -tracking-tight leading-[1.08] font-sans">
                             {cms?.hero?.headline || 'Accounting, Invoicing, CRM & Payroll. Simple. Fast. Compliant.'}
                         </h1>
 
@@ -170,19 +170,19 @@ export default async function Home() {
                             {cms?.hero?.subheadline || 'Create GST invoices, track CRM sales pipelines, manage double-entry books, issue vendor POs, and run monthly staff payroll — all in one elegant workspace.'}
                         </p>
 
-                        {/* Apple Action Buttons */}
+                        {/* Apple Action Buttons with Micro-motion */}
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-2 w-full sm:w-auto">
                             {isAuthenticated ? (
                                 <>
                                     <Link href="/dashboard" className="w-full sm:w-auto">
-                                        <Button size="lg" className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-extrabold px-8 py-4 rounded-full shadow-lg shadow-blue-600/25 hover:shadow-2xl hover:-translate-y-0.5 transition-all duration-300 text-base min-h-[52px] gap-2.5">
+                                        <Button size="lg" className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-extrabold px-8 py-4 rounded-full shadow-lg shadow-blue-600/25 hover:shadow-2xl hover:-translate-y-0.5 active:scale-95 transition-all duration-300 text-base min-h-[52px] gap-2.5 shimmer-button">
                                             <LayoutDashboard className="h-5 w-5" />
                                             Go to Dashboard
                                             <ArrowRight className="h-5 w-5" />
                                         </Button>
                                     </Link>
                                     <Link href="/invoices/new" className="w-full sm:w-auto">
-                                        <Button size="lg" className="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 text-slate-900 font-bold px-8 py-4 rounded-full border border-slate-200 hover:-translate-y-0.5 transition-all duration-300 text-base min-h-[52px] gap-2">
+                                        <Button size="lg" className="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 text-slate-900 font-bold px-8 py-4 rounded-full border border-slate-200 hover:-translate-y-0.5 active:scale-95 transition-all duration-300 text-base min-h-[52px] gap-2">
                                             <PlusCircle className="h-5 w-5 text-blue-600" />
                                             Create New Invoice
                                         </Button>
@@ -191,13 +191,13 @@ export default async function Home() {
                             ) : (
                                 <>
                                     <Link href={cms?.hero?.primaryButtonUrl || '/signup'} className="w-full sm:w-auto">
-                                        <Button size="lg" className="w-full sm:w-auto bg-black hover:bg-slate-900 text-white font-extrabold px-8 py-4 rounded-full shadow-lg shadow-black/10 hover:shadow-2xl hover:-translate-y-0.5 transition-all duration-300 text-base min-h-[52px] gap-2">
+                                        <Button size="lg" className="w-full sm:w-auto bg-black hover:bg-slate-900 text-white font-extrabold px-8 py-4 rounded-full shadow-lg shadow-black/10 hover:shadow-2xl hover:-translate-y-0.5 active:scale-95 transition-all duration-300 text-base min-h-[52px] gap-2 shimmer-button">
                                             {cms?.hero?.primaryButtonText || 'Start Free Account'}
                                             <ArrowRight className="h-5 w-5" />
                                         </Button>
                                     </Link>
                                     <Link href={cms?.hero?.secondaryButtonUrl || '#features'} className="w-full sm:w-auto">
-                                        <Button size="lg" className="w-full sm:w-auto bg-slate-100/90 hover:bg-slate-200 text-slate-900 font-bold px-8 py-4 rounded-full border border-slate-200/80 hover:-translate-y-0.5 transition-all duration-300 text-base min-h-[52px]">
+                                        <Button size="lg" className="w-full sm:w-auto bg-slate-100/90 hover:bg-slate-200 text-slate-900 font-bold px-8 py-4 rounded-full border border-slate-200/80 hover:-translate-y-0.5 active:scale-95 transition-all duration-300 text-base min-h-[52px]">
                                             {cms?.hero?.secondaryButtonText || 'Explore Features'}
                                         </Button>
                                     </Link>

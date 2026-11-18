@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { 
     Search, 
     Filter, 
@@ -61,11 +62,17 @@ export default function UserManagementTable({
     users: legacyUsers,
     initialUsers 
 }: UserManagementTableProps) {
+    const searchParams = useSearchParams()
+    const filterParam = searchParams.get('filter') || searchParams.get('status')
+    const initialStatus = (filterParam === 'inactive' || filterParam === 'active' || filterParam === 'trial' || filterParam === 'suspended')
+        ? filterParam
+        : 'all'
+
     const rawUsers = initialUsers ?? legacyUsers ?? []
     const [userList, setUserList] = useState<UserWithDetails[]>(rawUsers)
     const [searchQuery, setSearchQuery] = useState('')
     const [roleFilter, setRoleFilter] = useState<'all' | 'user' | 'admin' | 'super_admin'>('all')
-    const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'trial' | 'suspended' | 'inactive'>('all')
+    const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'trial' | 'suspended' | 'inactive'>(initialStatus)
     const [planFilter, setPlanFilter] = useState<string>('all')
     const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'name'>('newest')
     

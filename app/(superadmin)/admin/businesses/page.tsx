@@ -19,6 +19,16 @@ export default async function BusinessesManagementPage() {
             <div className="max-w-7xl mx-auto space-y-6">
                 {/* Header */}
                 <div>
+                    <div className="flex items-center gap-2 mb-1.5">
+                        <Link
+                            href="/admin"
+                            className="inline-flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 transition-colors"
+                        >
+                            <span>← Command Center</span>
+                        </Link>
+                        <span className="text-slate-300 dark:text-slate-700">/</span>
+                        <span className="text-xs font-semibold text-purple-600 dark:text-purple-400">Businesses</span>
+                    </div>
                     <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
                         <Building2 className="h-8 w-8 text-purple-600" />
                         Business Management

@@ -27,9 +27,19 @@ export default async function AnalyticsPage() {
     return (
         <div className="min-h-screen p-4 md:p-6 lg:p-8">
             <div className="max-w-7xl mx-auto space-y-6">
-                {/* Header */}
-                <div className="flex items-center justify-between">
+                {/* Header with Navigation */}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2">
                     <div>
+                        <div className="flex items-center gap-2 mb-1.5">
+                            <Link
+                                href="/admin"
+                                className="inline-flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 transition-colors"
+                            >
+                                <span>← Command Center</span>
+                            </Link>
+                            <span className="text-slate-300 dark:text-slate-700">/</span>
+                            <span className="text-xs font-semibold text-blue-600 dark:text-blue-400">Demographics & Types</span>
+                        </div>
                         <h1 className="text-3xl font-bold flex items-center gap-2">
                             <BarChart3 className="h-8 w-8 text-blue-600" />
                             Business Type Analytics
