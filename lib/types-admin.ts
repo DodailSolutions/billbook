@@ -173,6 +173,9 @@ export interface DashboardStats {
     active_subscriptions: number
     pending_refunds: number
     open_tickets: number
+    active_users_today?: number
+    active_users_7d?: number
+    inactive_users_7d?: number
 }
 
 export interface UserWithDetails extends UserProfile {

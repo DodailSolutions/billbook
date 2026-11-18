@@ -1,95 +1,113 @@
-// Support Tickets
-import { Ticket, Clock, CheckCircle, XCircle } from 'lucide-react'
+import { Ticket, Clock, CheckCircle2, AlertTriangle, MessageSquare, Shield, ArrowLeft, Filter, User } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import Link from 'next/link'
+import { getSupportTickets, getSupportStats } from '@/lib/support-actions'
+import { SupportTicketsClientTable } from './SupportTicketsClientTable'
 
-export default function SupportManagementPage() {
-    // Placeholder data - implement with real database queries later
-    const tickets = []
+export const metadata = {
+    title: 'Support Tickets & SLA Manager | Super Admin',
+    description: 'Manage customer inquiries, live chat requests, and SLA performance.'
+}
+
+export default async function SupportManagementPage() {
+    const [tickets, stats] = await Promise.all([
+        getSupportTickets(),
+        getSupportStats()
+    ])
 
     return (
-        <div className="min-h-screen p-4 md:p-6 lg:p-8">
-            <div className="max-w-7xl mx-auto space-y-6">
-                {/* Header */}
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                            <Ticket className="h-8 w-8 text-pink-600" />
-                            Support Tickets
+        <div className="min-h-screen p-4 md:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <div className="flex items-center gap-2">
+                        <div className="p-2 rounded-xl bg-pink-50 dark:bg-pink-950/40 text-pink-600 dark:text-pink-400">
+                            <Ticket className="h-6 w-6" />
+                        </div>
+                        <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+                            Support & Helpdesk Command
                         </h1>
-                        <p className="text-gray-600 dark:text-gray-400 mt-2">
-                            Manage customer support requests and inquiries
-                        </p>
                     </div>
+                    <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
+                        SLA resolution tracking, customer live chat inquiries, and escalation queue.
+                    </p>
+                </div>
+                <div className="flex items-center gap-2">
                     <Link href="/admin">
-                        <Button variant="outline">Back to Dashboard</Button>
+                        <Button variant="outline" size="sm" className="text-xs gap-1.5 h-9">
+                            <ArrowLeft className="h-3.5 w-3.5" />
+                            Admin Overview
+                        </Button>
                     </Link>
                 </div>
+            </div>
 
-                {/* Stats */}
-                <div className="grid gap-4 md:grid-cols-4">
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                                Total Tickets
-                            </CardTitle>
-                            <Ticket className="h-4 w-4 text-gray-600" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold text-gray-900 dark:text-white">0</div>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                                Open
-                            </CardTitle>
-                            <Clock className="h-4 w-4 text-yellow-600" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold text-yellow-600">0</div>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                                Resolved
-                            </CardTitle>
-                            <CheckCircle className="h-4 w-4 text-green-600" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold text-green-600">0</div>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                                Closed
-                            </CardTitle>
-                            <XCircle className="h-4 w-4 text-gray-600" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold text-gray-600">0</div>
-                        </CardContent>
-                    </Card>
-                </div>
-
-                {/* Tickets List */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle>All Support Tickets</CardTitle>
-                        <CardDescription>Customer support requests</CardDescription>
+            {/* SLA & Ticket Metrics Banner */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
+                <Card className="border-gray-200 dark:border-gray-800 shadow-2xs">
+                    <CardHeader className="flex flex-row items-center justify-between pb-2">
+                        <CardTitle className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+                            Total Inquiries
+                        </CardTitle>
+                        <Ticket className="h-4 w-4 text-blue-600" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-center py-12">
-                            <Ticket className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                            <p className="text-gray-500 text-lg mb-2">No support tickets yet</p>
-                            <p className="text-gray-400 text-sm">Support ticket system will be available soon</p>
+                        <div className="text-2xl font-black text-gray-900 dark:text-white font-mono">
+                            {stats.total}
                         </div>
+                        <p className="text-[11px] text-gray-400 mt-0.5">All customer tickets</p>
+                    </CardContent>
+                </Card>
+
+                <Card className="border-gray-200 dark:border-gray-800 shadow-2xs">
+                    <CardHeader className="flex flex-row items-center justify-between pb-2">
+                        <CardTitle className="text-xs font-semibold uppercase tracking-wider text-amber-600">
+                            Open & Active
+                        </CardTitle>
+                        <Clock className="h-4 w-4 text-amber-600" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-black text-amber-600 font-mono">
+                            {stats.open + stats.inProgress}
+                        </div>
+                        <p className="text-[11px] text-gray-400 mt-0.5">{stats.open} unassigned, {stats.inProgress} in progress</p>
+                    </CardContent>
+                </Card>
+
+                <Card className="border-gray-200 dark:border-gray-800 shadow-2xs">
+                    <CardHeader className="flex flex-row items-center justify-between pb-2">
+                        <CardTitle className="text-xs font-semibold uppercase tracking-wider text-rose-600">
+                            SLA Breached
+                        </CardTitle>
+                        <AlertTriangle className="h-4 w-4 text-rose-600" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className={`text-2xl font-black font-mono ${stats.slaBreached > 0 ? 'text-rose-600' : 'text-gray-900 dark:text-white'}`}>
+                            {stats.slaBreached}
+                        </div>
+                        <p className="text-[11px] text-gray-400 mt-0.5">{stats.slaComplianceRate}% compliance rate</p>
+                    </CardContent>
+                </Card>
+
+                <Card className="border-gray-200 dark:border-gray-800 shadow-2xs">
+                    <CardHeader className="flex flex-row items-center justify-between pb-2">
+                        <CardTitle className="text-xs font-semibold uppercase tracking-wider text-emerald-600">
+                            Resolved
+                        </CardTitle>
+                        <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-black text-emerald-600 font-mono">
+                            {stats.resolved + stats.closed}
+                        </div>
+                        <p className="text-[11px] text-gray-400 mt-0.5">Closed & settled</p>
                     </CardContent>
                 </Card>
             </div>
+
+            {/* Interactive Tickets Table with Status Updating & SLA Badges */}
+            <SupportTicketsClientTable initialTickets={tickets} />
         </div>
     )
 }

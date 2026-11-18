@@ -34,6 +34,22 @@ export async function getDashboardStats(): Promise<DashboardStats | null> {
         const active_subscriptions = subsRes.count || 0
         const open_tickets = ticketsRes.count || 0
 
+        const now = new Date()
+        const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString()
+        const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString()
+
+        // Fetch active users in last 24h and last 7 days
+        const [active24hRes, active7dRes, inv24hRes, inv7dRes] = await Promise.all([
+            supabase.from('audit_logs').select('user_id', { count: 'exact', head: true }).gte('created_at', oneDayAgo),
+            supabase.from('audit_logs').select('user_id', { count: 'exact', head: true }).gte('created_at', sevenDaysAgo),
+            supabase.from('invoices').select('user_id', { count: 'exact', head: true }).gte('created_at', oneDayAgo),
+            supabase.from('invoices').select('user_id', { count: 'exact', head: true }).gte('created_at', sevenDaysAgo)
+        ])
+
+        const active_users_today = Math.min(total_users, Math.max(active24hRes.count || 0, inv24hRes.count || 0, total_users > 0 ? 1 : 0))
+        const active_users_7d = Math.min(total_users, Math.max(active7dRes.count || 0, inv7dRes.count || 0, active_users_today))
+        const inactive_users_7d = Math.max(0, total_users - active_users_7d)
+
         const total_payments = payments
             .filter(p => p.status === 'completed')
             .reduce((sum, p) => sum + (p.amount || 0), 0)
@@ -60,7 +76,10 @@ export async function getDashboardStats(): Promise<DashboardStats | null> {
             total_users: total_users || 0,
             active_subscriptions: active_subscriptions || 0,
             pending_refunds,
-            open_tickets: open_tickets || 0
+            open_tickets: open_tickets || 0,
+            active_users_today,
+            active_users_7d,
+            inactive_users_7d
         }
     } catch (error) {
         console.error('Error fetching dashboard stats:', error)

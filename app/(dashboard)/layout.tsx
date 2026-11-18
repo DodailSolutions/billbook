@@ -1,6 +1,7 @@
 import { Sidebar } from "@/components/Sidebar"
 import { MobileSidebar } from "@/components/MobileSidebar"
 import { PlanExpiryChecker } from "@/components/PlanExpiryChecker"
+import { SupportChatbot } from "@/components/SupportChatbot"
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 
@@ -45,6 +46,9 @@ export default async function DashboardLayout({
                     {children}
                 </div>
             </main>
+
+            {/* Live Customer Support & Admin Chatbot */}
+            <SupportChatbot />
         </div>
     )
 }

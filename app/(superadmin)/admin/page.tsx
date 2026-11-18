@@ -320,6 +320,111 @@ export default async function SuperAdminDashboard() {
                 </div>
             </div>
 
+            {/* Live User Activity & Retention Breakdown */}
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 p-5 sm:p-6 shadow-2xs space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
+                    <div className="flex items-center gap-2">
+                        <div className="p-2 rounded-xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400">
+                            <Activity className="h-5 w-5" />
+                        </div>
+                        <div>
+                            <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                Live User Engagement & Retention
+                                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                    Real-time
+                                </span>
+                            </h3>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">
+                                Track daily active users, weekly retention, and identify accounts needing re-engagement.
+                            </p>
+                        </div>
+                    </div>
+                    <Link href="/admin/users">
+                        <Button variant="outline" size="sm" className="text-xs gap-1.5 h-8">
+                            <Users className="w-3.5 h-3.5 text-slate-500" />
+                            <span>View All User Profiles</span>
+                        </Button>
+                    </Link>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    {/* Active Today / 24h */}
+                    <div className="p-4 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/80 dark:border-emerald-800/50 flex flex-col justify-between">
+                        <div>
+                            <div className="flex items-center justify-between mb-2">
+                                <span className="text-xs font-bold text-emerald-800 dark:text-emerald-300 uppercase tracking-wider">
+                                    Active Today (24h)
+                                </span>
+                                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
+                            </div>
+                            <div className="text-3xl font-black text-emerald-900 dark:text-emerald-100 font-mono">
+                                {stats.active_users_today || 0}
+                            </div>
+                            <p className="text-[11px] text-emerald-700/80 dark:text-emerald-300/80 mt-1">
+                                Users with invoice generation or dashboard activity today
+                            </p>
+                        </div>
+                        <div className="mt-3 pt-2 border-t border-emerald-200/50 dark:border-emerald-800/40 text-[10px] font-semibold text-emerald-800 dark:text-emerald-300">
+                            High platform stickiness
+                        </div>
+                    </div>
+
+                    {/* Active This Week / 7d */}
+                    <div className="p-4 rounded-xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200/80 dark:border-blue-800/50 flex flex-col justify-between">
+                        <div>
+                            <div className="flex items-center justify-between mb-2">
+                                <span className="text-xs font-bold text-blue-800 dark:text-blue-300 uppercase tracking-wider">
+                                    Active This Week (7d)
+                                </span>
+                                <span className="text-[10px] font-bold text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/60 px-2 py-0.5 rounded-full">
+                                    Weekly Active
+                                </span>
+                            </div>
+                            <div className="text-3xl font-black text-blue-900 dark:text-blue-100 font-mono">
+                                {stats.active_users_7d || 0}
+                            </div>
+                            <p className="text-[11px] text-blue-700/80 dark:text-blue-300/80 mt-1">
+                                Retained businesses active within the past 7 days
+                            </p>
+                        </div>
+                        <div className="mt-3 pt-2 border-t border-blue-200/50 dark:border-blue-800/40 text-[10px] font-semibold text-blue-800 dark:text-blue-300">
+                            {stats.total_users > 0 
+                                ? `${Math.round(((stats.active_users_7d || 0) / stats.total_users) * 100)}% 7-day retention rate`
+                                : '0% retention rate'}
+                        </div>
+                    </div>
+
+                    {/* Inactive / Dormant > 7d */}
+                    <div className="p-4 rounded-xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-800/50 flex flex-col justify-between">
+                        <div>
+                            <div className="flex items-center justify-between mb-2">
+                                <span className="text-xs font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wider">
+                                    Dormant / Inactive (&gt;7d)
+                                </span>
+                                <span className="text-[10px] font-bold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/60 px-2 py-0.5 rounded-full">
+                                    Re-engage
+                                </span>
+                            </div>
+                            <div className="text-3xl font-black text-amber-900 dark:text-amber-100 font-mono">
+                                {stats.inactive_users_7d || 0}
+                            </div>
+                            <p className="text-[11px] text-amber-700/80 dark:text-amber-300/80 mt-1">
+                                Registered accounts with no logged operations for 7+ days
+                            </p>
+                        </div>
+                        <div className="mt-3 pt-2 border-t border-amber-200/50 dark:border-amber-800/40 flex items-center justify-between">
+                            <span className="text-[10px] font-semibold text-amber-800 dark:text-amber-300">
+                                Action: Send Email Nudge
+                            </span>
+                            <Link href="/admin/users" className="text-[10px] font-bold text-amber-900 dark:text-amber-200 underline">
+                                Filter Users &rarr;
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             {/* Categorized Command Hub */}
             <div className="space-y-4">
                 <div className="flex items-center justify-between px-1">
