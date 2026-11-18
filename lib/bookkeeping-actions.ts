@@ -1309,3 +1309,296 @@ export async function postPayrollJournalEntry(
     }
 }
 
+/**
+ * ERP Standard: Real-time Journal Entry on Invoice Creation / Finalization
+ * Debit: Accounts Receivable (1100) or Bank (1020) if paid
+ * Credit: Sales Revenue (4010) (Base amount)
+ * Credit: GST / Tax Output Liability (2100) (Tax amount)
+ */
+export async function postInvoiceJournalEntry(params: {
+    invoiceId: string
+    invoiceNumber: string
+    totalAmount: number
+    taxAmount?: number
+    isPaid?: boolean
+    invoiceDate?: string
+    customerName?: string
+}): Promise<{ success: boolean; entryId?: string; error?: string }> {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { success: false, error: 'Unauthorized' }
+
+    const { invoiceId, invoiceNumber, totalAmount, taxAmount = 0, isPaid = false, invoiceDate, customerName } = params
+    if (totalAmount <= 0) return { success: true } // Nothing to post
+
+    const ref = `INV-${invoiceNumber || invoiceId.slice(0, 8)}`
+
+    // Check if journal entry already exists for idempotency
+    const { data: existing } = await supabase
+        .from('journal_entries')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('reference', ref)
+        .maybeSingle()
+
+    if (existing) {
+        return { success: true, entryId: existing.id }
+    }
+
+    const coa = await getChartOfAccounts()
+    const bankAcc = coa.find(a => a.account_code === '1020') || coa.find(a => a.account_type === 'asset')
+    const arAcc = coa.find(a => a.account_code === '1100') || coa.find(a => a.account_type === 'asset')
+    const salesAcc = coa.find(a => a.account_code === '4010') || coa.find(a => a.account_type === 'revenue')
+    const gstAcc = coa.find(a => a.account_code === '2100') || coa.find(a => a.account_type === 'liability')
+
+    if (!salesAcc || !bankAcc) {
+        return { success: false, error: 'Required accounts (Sales / Bank) missing in Chart of Accounts' }
+    }
+
+    const debitAccount = isPaid ? bankAcc : (arAcc || bankAcc)
+    const baseAmount = totalAmount - taxAmount
+
+    const lines = [
+        {
+            account_id: debitAccount.id,
+            debit_amount: totalAmount,
+            credit_amount: 0,
+            memo: `Invoice #${invoiceNumber || ''} ${isPaid ? 'Payment Direct' : 'Receivable from ' + (customerName || 'Customer')}`
+        },
+        {
+            account_id: salesAcc.id,
+            debit_amount: 0,
+            credit_amount: baseAmount > 0 ? baseAmount : totalAmount,
+            memo: `Sales Revenue on Invoice #${invoiceNumber || ''}`
+        }
+    ]
+
+    if (taxAmount > 0 && gstAcc) {
+        lines.push({
+            account_id: gstAcc.id,
+            debit_amount: 0,
+            credit_amount: taxAmount,
+            memo: `GST Output on Invoice #${invoiceNumber || ''}`
+        })
+    }
+
+    const result = await createJournalEntry({
+        entry_date: invoiceDate || new Date().toISOString().slice(0, 10),
+        description: `Sales Invoice #${invoiceNumber || invoiceId.slice(0, 8)}${customerName ? ' - ' + customerName : ''}`,
+        reference: ref,
+        source: 'invoice',
+        lines
+    })
+
+    return result.success ? { success: true, entryId: result.data?.id } : { success: false, error: result.error }
+}
+
+/**
+ * ERP Standard: Real-time Journal Entry on Payment Receipt
+ * Debit: Bank Operating Account (1020) or Cash (1010)
+ * Credit: Accounts Receivable (1100)
+ */
+export async function postPaymentReceiptJournalEntry(params: {
+    paymentId?: string
+    invoiceId: string
+    invoiceNumber: string
+    amount: number
+    paymentDate?: string
+    paymentMethod?: string
+    customerName?: string
+}): Promise<{ success: boolean; entryId?: string; error?: string }> {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { success: false, error: 'Unauthorized' }
+
+    const { paymentId, invoiceId, invoiceNumber, amount, paymentDate, paymentMethod, customerName } = params
+    if (amount <= 0) return { success: true }
+
+    const ref = paymentId ? `PAY-${paymentId.slice(0, 8)}` : `PAY-INV-${invoiceNumber}-${Date.now().toString().slice(-4)}`
+
+    const coa = await getChartOfAccounts()
+    const cashAcc = coa.find(a => a.account_code === '1010') || coa.find(a => a.account_type === 'asset')
+    const bankAcc = coa.find(a => a.account_code === '1020') || coa.find(a => a.account_type === 'asset')
+    const arAcc = coa.find(a => a.account_code === '1100') || coa.find(a => a.account_type === 'asset')
+
+    if (!bankAcc || !arAcc) {
+        return { success: false, error: 'Required accounts (Bank / Accounts Receivable) missing' }
+    }
+
+    const isCash = paymentMethod?.toLowerCase().includes('cash')
+    const depositAccount = (isCash && cashAcc) ? cashAcc : bankAcc
+
+    const lines = [
+        {
+            account_id: depositAccount.id,
+            debit_amount: amount,
+            credit_amount: 0,
+            memo: `Payment received for Invoice #${invoiceNumber || ''} via ${paymentMethod || 'Bank'}`
+        },
+        {
+            account_id: arAcc.id,
+            debit_amount: 0,
+            credit_amount: amount,
+            memo: `Clear Accounts Receivable for #${invoiceNumber || ''}${customerName ? ' (' + customerName + ')' : ''}`
+        }
+    ]
+
+    const result = await createJournalEntry({
+        entry_date: paymentDate || new Date().toISOString().slice(0, 10),
+        description: `Payment Received on Invoice #${invoiceNumber || ''}`,
+        reference: ref,
+        source: 'payment',
+        lines
+    })
+
+    return result.success ? { success: true, entryId: result.data?.id } : { success: false, error: result.error }
+}
+
+/**
+ * ERP Standard: Real-time Journal Entry on Purchase Order Receipt / Vendor Bill
+ * Debit: Merchandise Inventory (1200) or Cost of Goods Sold (5010)
+ * Credit: Accounts Payable (2010)
+ */
+export async function postPOJournalEntry(params: {
+    poId: string
+    poNumber: string
+    totalAmount: number
+    vendorName?: string
+    poDate?: string
+}): Promise<{ success: boolean; entryId?: string; error?: string }> {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { success: false, error: 'Unauthorized' }
+
+    const { poId, poNumber, totalAmount, vendorName, poDate } = params
+    if (totalAmount <= 0) return { success: true }
+
+    const ref = `PO-${poNumber || poId.slice(0, 8)}`
+
+    // Check if entry already exists
+    const { data: existing } = await supabase
+        .from('journal_entries')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('reference', ref)
+        .maybeSingle()
+
+    if (existing) {
+        return { success: true, entryId: existing.id }
+    }
+
+    const coa = await getChartOfAccounts()
+    const inventoryAcc = coa.find(a => a.account_code === '1200') || coa.find(a => a.account_code === '5010') || coa.find(a => a.account_type === 'asset')
+    const apAcc = coa.find(a => a.account_code === '2010') || coa.find(a => a.account_type === 'liability')
+
+    if (!inventoryAcc || !apAcc) {
+        return { success: false, error: 'Required accounts (Inventory / Accounts Payable) missing' }
+    }
+
+    const lines = [
+        {
+            account_id: inventoryAcc.id,
+            debit_amount: totalAmount,
+            credit_amount: 0,
+            memo: `Inventory stock replenished via PO #${poNumber || ''}${vendorName ? ' from ' + vendorName : ''}`
+        },
+        {
+            account_id: apAcc.id,
+            debit_amount: 0,
+            credit_amount: totalAmount,
+            memo: `Vendor payable liability on PO #${poNumber || ''}`
+        }
+    ]
+
+    const result = await createJournalEntry({
+        entry_date: poDate || new Date().toISOString().slice(0, 10),
+        description: `Purchase Order Receipt #${poNumber || poId.slice(0, 8)}${vendorName ? ' - ' + vendorName : ''}`,
+        reference: ref,
+        source: 'purchase_order',
+        lines
+    })
+
+    return result.success ? { success: true, entryId: result.data?.id } : { success: false, error: result.error }
+}
+
+/**
+ * ERP Standard: Real-time Journal Entry on Expense Creation
+ * Debit: Operating Expense (Categorized or 5900)
+ * Credit: Bank Operating Account (1020) or Cash (1010)
+ */
+export async function postExpenseJournalEntry(params: {
+    expenseId: string
+    category: string
+    amount: number
+    paymentMethod?: string
+    expenseDate?: string
+    description?: string
+}): Promise<{ success: boolean; entryId?: string; error?: string }> {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { success: false, error: 'Unauthorized' }
+
+    const { expenseId, category, amount, paymentMethod, expenseDate, description } = params
+    if (amount <= 0) return { success: true }
+
+    const ref = `EXP-${expenseId.slice(0, 8)}`
+
+    const { data: existing } = await supabase
+        .from('journal_entries')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('reference', ref)
+        .maybeSingle()
+
+    if (existing) {
+        return { success: true, entryId: existing.id }
+    }
+
+    const coa = await getChartOfAccounts()
+    const bankAcc = coa.find(a => a.account_code === '1020') || coa.find(a => a.account_type === 'asset')
+    const cashAcc = coa.find(a => a.account_code === '1010') || coa.find(a => a.account_type === 'asset')
+    
+    // Category mapping
+    const catLower = (category || '').toLowerCase()
+    let expAcc = coa.find(a => a.account_type === 'expense' && a.category.toLowerCase().includes(catLower))
+    if (!expAcc) {
+        if (catLower.includes('rent')) expAcc = coa.find(a => a.account_code === '5100')
+        else if (catLower.includes('util') || catLower.includes('software')) expAcc = coa.find(a => a.account_code === '5200')
+        else if (catLower.includes('market') || catLower.includes('travel')) expAcc = coa.find(a => a.account_code === '5400')
+        else if (catLower.includes('salary') || catLower.includes('payroll')) expAcc = coa.find(a => a.account_code === '5300')
+        else expAcc = coa.find(a => a.account_code === '5900') || coa.find(a => a.account_type === 'expense')
+    }
+
+    if (!expAcc || !bankAcc) {
+        return { success: false, error: 'Required accounts (Expense / Bank) missing in Chart of Accounts' }
+    }
+
+    const isCash = paymentMethod?.toLowerCase().includes('cash')
+    const creditAccount = (isCash && cashAcc) ? cashAcc : bankAcc
+
+    const lines = [
+        {
+            account_id: expAcc.id,
+            debit_amount: amount,
+            credit_amount: 0,
+            memo: `${category || 'Operating Expense'} - ${description || ''}`
+        },
+        {
+            account_id: creditAccount.id,
+            debit_amount: 0,
+            credit_amount: amount,
+            memo: `Paid via ${paymentMethod || 'Bank'} for ${category || 'expense'}`
+        }
+    ]
+
+    const result = await createJournalEntry({
+        entry_date: expenseDate || new Date().toISOString().slice(0, 10),
+        description: `Expense - ${category || 'General'}${description ? ': ' + description : ''}`,
+        reference: ref,
+        source: 'expense',
+        lines
+    })
+
+    return result.success ? { success: true, entryId: result.data?.id } : { success: false, error: result.error }
+}
+

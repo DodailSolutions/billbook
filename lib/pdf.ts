@@ -41,6 +41,8 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
     const showSignature = settings?.show_signature ?? true
     const companyStampUrl = settings?.company_stamp_url || ''
     const showStamp = settings?.show_stamp ?? true
+    const isPaid = invoice.status === 'paid'
+    const showBankDetailsWhenPaid = Boolean((settings as any)?.show_bank_details_when_paid)
 
     // Safe fallbacks for customer and items
     const customer = invoice.customer || {
@@ -397,7 +399,21 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
         </div>
         ` : ''}
         
-        ${(paymentInstructions || (showQrCode && paymentQrCodeUrl)) ? `
+        ${isPaid ? `
+        <div style="margin: 14px 0; padding: 12px 16px; background-color: #f0fdf4; border: 1.5px solid #22c55e; border-radius: 8px; display: flex; align-items: center; justify-content: space-between;">
+            <div style="font-size: 13px; font-weight: 800; color: #15803d; text-transform: uppercase; letter-spacing: 0.08em;">
+                ✓ FULLY PAID
+            </div>
+            ${(invoice.paid_at || invoice.payment_method) ? `
+            <div style="font-size: 11px; color: #166534; font-weight: 500;">
+                ${invoice.paid_at ? `Settled on ${new Date(invoice.paid_at).toLocaleDateString('en-IN')}` : ''}
+                ${invoice.payment_method ? ` · ${invoice.payment_method.replace('_', ' ').toUpperCase()}` : ''}
+            </div>
+            ` : ''}
+        </div>
+        ` : ''}
+
+        ${((!isPaid || showBankDetailsWhenPaid) && (paymentInstructions || (showQrCode && paymentQrCodeUrl))) ? `
         <div class="notes-section" style="page-break-inside: avoid;">
             ${paymentInstructions && (showQrCode && paymentQrCodeUrl) ? `
             <div style="display: flex; gap: 24px; align-items: flex-start;">
@@ -506,6 +522,8 @@ export async function generatePurchaseOrderPDF(po: PurchaseOrder): Promise<strin
     const showSignature = settings?.show_signature ?? true
     const companyStampUrl = settings?.company_stamp_url || ''
     const showStamp = settings?.show_stamp ?? true
+    const isPaid = invoice.status === 'paid'
+    const showBankDetailsWhenPaid = Boolean((settings as any)?.show_bank_details_when_paid)
     
     // Determine if Intra-State (CGST+SGST) or Inter-State (IGST) transaction based on state codes
     const buyerStateCode = companyGstin ? companyGstin.trim().slice(0, 2) : '';

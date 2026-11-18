@@ -39,6 +39,7 @@ export interface InvoiceSettings {
     show_signature?: boolean
     company_stamp_url?: string
     show_stamp?: boolean
+    show_bank_details_when_paid?: boolean
 }
 
 export async function getInvoiceSettings(): Promise<InvoiceSettings | null> {
@@ -78,6 +79,7 @@ const MIGRATION_COLUMNS = [
     'payment_qr_code_url', 'show_qr_code',
     'digital_signature_url', 'show_signature',
     'company_stamp_url', 'show_stamp',
+    'show_bank_details_when_paid',
 ]
 
 function splitSettings(data: Record<string, unknown>) {

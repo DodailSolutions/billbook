@@ -9,21 +9,18 @@ export default function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-10">
           {/* Logo & Subtitle */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="relative w-8 h-8 shrink-0">
-                <Image 
-                  src="/logo-icon.svg" 
-                  alt="BillBooky Logo" 
-                  width={32} 
-                  height={32}
-                />
-              </div>
-              <h4 className="text-xl font-black text-slate-950 tracking-tight">
-                Bill<span className="text-blue-600">Booky</span>
-              </h4>
-            </div>
+            <Link href="/" className="inline-block">
+              <Image 
+                src="/logo-full.svg" 
+                alt="BillBooky" 
+                width={136} 
+                height={38}
+                className="h-9 w-auto"
+                priority
+              />
+            </Link>
             <p className="text-xs text-slate-600 font-medium leading-relaxed max-w-xs">
-              Professional invoicing, CRM, double-entry bookkeeping, purchase orders & payroll for Indian businesses.
+              Professional invoicing, CRM, double-entry bookkeeping, purchase orders & payroll for modern businesses.
             </p>
           </div>
           
@@ -59,10 +56,22 @@ export default function Footer() {
         </div>
         
         {/* Bottom Bar matching screenshot */}
-        <div className="pt-8 border-t border-slate-200/80 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-600 font-medium">
-          <div className="flex items-center gap-2">
-            <span className="font-extrabold text-slate-950 text-base">Bill<span className="text-blue-600">Booky</span></span>
-            <span className="text-slate-500">© 2026 BillBooky Inc. All rights reserved.</span>
+        <div className="pt-8 border-t border-slate-200/80 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500 font-medium">
+          <div className="flex items-center gap-2.5">
+            <Image 
+              src="/logo-icon.svg" 
+              alt="BillBooky" 
+              width={20} 
+              height={20} 
+              className="w-5 h-5 shrink-0"
+            />
+            <span className="font-extrabold text-slate-950 text-sm tracking-tight">
+              Bill<span className="text-blue-600">Booky</span>
+            </span>
+            <span className="text-slate-300">|</span>
+            <span className="text-slate-500 text-xs">
+              © {new Date().getFullYear()} BillBooky Inc. All rights reserved.
+            </span>
           </div>
           <RegionSwitcher variant="footer" />
         </div>

@@ -97,6 +97,7 @@ export default function InvoiceSettingsForm({ initialSettings, onPreviewUpdate }
     const [stampUrl, setStampUrl] = useState(initialSettings?.company_stamp_url || '')
     const [stampPreview, setStampPreview] = useState(initialSettings?.company_stamp_url || '')
     const [showStamp, setShowStamp] = useState(initialSettings?.show_stamp ?? true)
+    const [showBankDetailsWhenPaid, setShowBankDetailsWhenPaid] = useState<boolean>((initialSettings as any)?.show_bank_details_when_paid ?? false)
 
     const handleSignatureUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
@@ -205,6 +206,7 @@ export default function InvoiceSettingsForm({ initialSettings, onPreviewUpdate }
                 show_signature: showSignature,
                 company_stamp_url: stampPreview,
                 show_stamp: showStamp,
+                show_bank_details_when_paid: showBankDetailsWhenPaid,
             })
         }
     }, [
@@ -262,7 +264,8 @@ export default function InvoiceSettingsForm({ initialSettings, onPreviewUpdate }
                 digital_signature_url: normalizedSignatureUrl,
                 show_signature: showSignature,
                 company_stamp_url: normalizedStampUrl,
-                show_stamp: showStamp
+                show_stamp: showStamp,
+                show_bank_details_when_paid: showBankDetailsWhenPaid
             })
 
             alert('Invoice settings saved successfully!')
@@ -849,6 +852,19 @@ export default function InvoiceSettingsForm({ initialSettings, onPreviewUpdate }
                                 className="w-4 h-4 rounded border-gray-300"
                             />
                             <span className="text-sm text-gray-700">Show GSTIN on invoice</span>
+                        </label>
+
+                        <label className="flex items-start gap-3 cursor-pointer pt-2">
+                            <input
+                                type="checkbox"
+                                checked={showBankDetailsWhenPaid}
+                                onChange={(e) => setShowBankDetailsWhenPaid(e.target.checked)}
+                                className="w-4 h-4 rounded border-gray-300 mt-0.5"
+                            />
+                            <div>
+                                <span className="text-sm font-medium text-gray-700">Show Bank Details & QR Code on Fully Paid Invoices</span>
+                                <p className="text-xs text-gray-500">By default, bank instructions and QR code are hidden once an invoice is completely settled.</p>
+                            </div>
                         </label>
                     </div>
                 </div>

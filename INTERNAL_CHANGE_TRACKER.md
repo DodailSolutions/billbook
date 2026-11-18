@@ -4,6 +4,32 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 
 ---
 
+## [Release v1.4.0 - Planning & Implementation] - 2026-11-18
+
+### Production Readiness & End-to-End Enterprise Module Sync
+
+#### 1. Invoicing & Payment Corrections
+- **Payment Received Date Picker**: Enable explicit date selection (with today as default) in both 'Mark as Paid' and 'Record Partial Payment' dialogs.
+- **Payment History Edit & Void**: Add full Edit (date, amount, method, notes) and Void/Delete capabilities on payment history records, with automatic recalculation of invoice status (`paid`, `partial`, `unpaid`) and remaining balance.
+
+#### 2. Real-Time Bookkeeping & Accounting Automation
+- **Automated Ledger Posting**:
+  - Invoices: Automatically create journal entries upon invoice creation/approval (Debit: Accounts Receivable, Credit: Sales Revenue & GST Payable).
+  - Payments: Automatically record receipt journal entry (Debit: Bank/Cash, Credit: Accounts Receivable).
+  - Expenses: Automatically record disbursement journal entry (Debit: Category Expense Account, Credit: Bank/Cash/AP).
+- **One-Click Historical Ledger Sync**: Add a 'Sync Invoices & Expenses to Ledger' button on the Bookkeeping dashboard to backfill historical transactions seamlessly.
+
+#### 3. Purchase Orders (PO) Integration
+- Link completed/received purchase orders to vendor bills and inventory replenishment.
+- Automatically record journal entries (Debit: Inventory/Expense, Credit: Accounts Payable).
+
+#### 4. Real-Time Inventory Sync with Invoicing
+- **Stock Depletion on Invoice**: Invoicing line items decrement `current_stock` in `inventory_items` and create audit movement records.
+- **Stock Reversal on Void/Cancel**: Canceling or deleting an invoice restores inventory stock with a reversal log.
+- **Stock Availability Warning**: Validate item availability during invoice creation to prevent overselling.
+
+---
+
 ## [Release v1.3.1] - 2026-11-18
 
 ### 1. Feature & Fix: Full Database Sync for Regional Lifetime Tiers in Super Admin

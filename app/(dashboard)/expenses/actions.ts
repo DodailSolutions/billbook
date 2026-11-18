@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { postExpenseJournalEntry } from '@/lib/bookkeeping-actions'
 
 export async function getExpensesList() {
     const supabase = await createClient()
@@ -135,14 +136,34 @@ export async function createExpenseAction(formData: FormData) {
         submitted_by: user.id
     }
 
-    const { error } = await supabase.from('expenses').insert([expenseData])
+    const { data: insertedExpense, error } = await supabase
+        .from('expenses')
+        .insert([expenseData])
+        .select('id')
+        .single()
+
     if (error) {
         console.error('Error inserting expense:', error.message)
         return { success: false, error: error.message }
     }
 
+    // ERP Standard: Automatically post real-time journal entry
+    try {
+        await postExpenseJournalEntry({
+            expenseId: insertedExpense?.id || expenseNumber,
+            category: 'Operating Expense',
+            amount: totalAmount,
+            paymentMethod: expenseData.payment_method || expenseData.expense_type,
+            expenseDate: expenseDate,
+            description: payeeName ? `Paid to ${payeeName}` : undefined
+        })
+    } catch (e) {
+        console.warn('ERP Expense ledger posting warning:', e)
+    }
+
     revalidatePath('/expenses')
     revalidatePath('/dashboard')
+    revalidatePath('/bookkeeping')
     return { success: true }
 }
 

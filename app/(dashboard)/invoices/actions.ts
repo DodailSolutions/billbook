@@ -9,6 +9,7 @@ import {
   calculateRoundOff,
   getCurrentFinancialYear
 } from '@/lib/advanced-gst-utils'
+import { postInvoiceJournalEntry, postPaymentReceiptJournalEntry } from '@/lib/bookkeeping-actions'
 import type { Invoice, InvoiceWithDetails, InvoiceItem } from '@/lib/types'
 
 type InventoryLinkedInvoiceItem = {
@@ -540,6 +541,20 @@ export async function createInvoice(data: CreateInvoiceData) {
         } catch (syncErr) {
             console.warn('Stock sync error:', syncErr)
         }
+
+        // ERP Standard: Automatically post real-time journal entry to General Ledger
+        try {
+            await postInvoiceJournalEntry({
+                invoiceId: invoice.id,
+                invoiceNumber: invoice_number,
+                totalAmount: Number(invoice.total || roundOff.roundedAmount),
+                taxAmount: Number(gstComponents.totalTax || 0),
+                isPaid: !!(data.mark_as_paid && data.payment_amount && data.payment_amount >= (invoice.total || roundOff.roundedAmount)),
+                invoiceDate: data.invoice_date,
+            })
+        } catch (jeErr) {
+            console.warn('ERP Ledger posting warning for invoice:', jeErr)
+        }
     
     // Handle payment collection if mark_as_paid is true
     if (data.mark_as_paid && data.payment_amount && data.payment_amount > 0) {
@@ -572,6 +587,19 @@ export async function createInvoice(data: CreateInvoiceData) {
 
             if (updateError) {
                 console.error('Error updating invoice payment status:', updateError)
+            }
+
+            // ERP Standard: Post payment receipt entry
+            try {
+                await postPaymentReceiptJournalEntry({
+                    invoiceId: invoice.id,
+                    invoiceNumber: invoice_number,
+                    amount: data.payment_amount,
+                    paymentDate: data.payment_date || new Date().toISOString().slice(0, 10),
+                    paymentMethod: data.payment_method || 'cash'
+                })
+            } catch (payErr) {
+                console.warn('ERP Payment ledger posting warning:', payErr)
             }
         }
     }

@@ -16,6 +16,7 @@ export function MarkAsPaidButton({ invoiceId, invoiceNumber }: MarkAsPaidButtonP
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [paymentMethod, setPaymentMethod] = useState('cash')
     const [paymentNotes, setPaymentNotes] = useState('')
+    const [paymentDate, setPaymentDate] = useState(() => new Date().toISOString().slice(0, 10))
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -28,7 +29,8 @@ export function MarkAsPaidButton({ invoiceId, invoiceNumber }: MarkAsPaidButtonP
                 body: JSON.stringify({
                     invoiceId,
                     paymentMethod,
-                    paymentNotes
+                    paymentNotes,
+                    paymentDate
                 })
             })
 
@@ -65,6 +67,20 @@ export function MarkAsPaidButton({ invoiceId, invoiceNumber }: MarkAsPaidButtonP
                 </p>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        <label htmlFor="paymentDate" className="block text-sm font-medium mb-2">
+                            Payment Date <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                            type="date"
+                            id="paymentDate"
+                            value={paymentDate}
+                            onChange={(e) => setPaymentDate(e.target.value)}
+                            required
+                            className="w-full px-3 py-2 border rounded-md bg-transparent"
+                        />
+                    </div>
+
                     <div>
                         <label htmlFor="paymentMethod" className="block text-sm font-medium mb-2">
                             Payment Method <span className="text-red-500">*</span>

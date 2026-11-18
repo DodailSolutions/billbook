@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { postPaymentReceiptJournalEntry } from '@/lib/bookkeeping-actions'
 
 export async function POST(request: Request) {
     try {
-        const { invoiceId, paymentMethod, paymentNotes } = await request.json()
+        const { invoiceId, paymentMethod, paymentNotes, paymentDate } = await request.json()
 
         if (!invoiceId || !paymentMethod) {
             return NextResponse.json(
@@ -23,10 +24,10 @@ export async function POST(request: Request) {
             )
         }
 
-        // Fetch the invoice to get total amount
+        // Fetch the invoice to get total amount and number
         const { data: invoice, error: fetchError } = await supabase
             .from('invoices')
-            .select('total')
+            .select('id, invoice_number, total')
             .eq('id', invoiceId)
             .eq('user_id', user.id)
             .single()
@@ -34,6 +35,8 @@ export async function POST(request: Request) {
         if (fetchError || !invoice) {
             return NextResponse.json({ error: 'Invoice not found' }, { status: 404 })
         }
+
+        const effectivePaymentDate = paymentDate || new Date().toISOString().slice(0, 10)
 
         // Phase 1: update core status + amount columns (exist after partial-payment migration)
         const { error: coreError } = await supabase
@@ -71,13 +74,27 @@ export async function POST(request: Request) {
             .update({
                 payment_method: paymentMethod,
                 payment_notes: paymentNotes || null,
-                paid_at: new Date().toISOString(),
+                paid_at: effectivePaymentDate,
             })
             .eq('id', invoiceId)
             .eq('user_id', user.id)
 
         if (phase2Error) {
             console.error('Phase 2 update error (non-fatal):', phase2Error)
+        }
+
+        // ERP Standard: Automatically post receipt journal entry to General Ledger
+        try {
+            await postPaymentReceiptJournalEntry({
+                invoiceId: invoice.id,
+                invoiceNumber: invoice.invoice_number || invoice.id.slice(0, 8),
+                amount: Number(invoice.total || 0),
+                paymentDate: effectivePaymentDate,
+                paymentMethod: paymentMethod,
+                notes: paymentNotes
+            })
+        } catch (jeErr) {
+            console.warn('ERP Payment receipt ledger posting warning:', jeErr)
         }
 
         revalidatePath('/invoices')

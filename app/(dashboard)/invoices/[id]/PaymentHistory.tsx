@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
-import { DollarSign, Calendar, FileText } from 'lucide-react'
+import { DollarSign, Calendar, FileText, Pencil, Check, X } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
 
 interface Payment {
@@ -34,6 +34,49 @@ export function PaymentHistory({ invoiceId }: PaymentHistoryProps) {
     const [payments, setPayments] = useState<Payment[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
+    const [editingPaymentId, setEditingPaymentId] = useState<string | null>(null)
+    const [editDate, setEditDate] = useState<string>('')
+    const [isUpdating, setIsUpdating] = useState<boolean>(false)
+
+    const startEditing = (payment: Payment) => {
+        setEditingPaymentId(payment.id)
+        // Convert to YYYY-MM-DD
+        const dateVal = payment.payment_date 
+            ? new Date(payment.payment_date).toISOString().slice(0, 10)
+            : new Date().toISOString().slice(0, 10)
+        setEditDate(dateVal)
+    }
+
+    const cancelEditing = () => {
+        setEditingPaymentId(null)
+        setEditDate('')
+    }
+
+    const savePaymentDate = async (paymentId: string) => {
+        if (!editDate) return
+        setIsUpdating(true)
+        try {
+            const res = await fetch('/api/invoices/partial-payment', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    paymentId,
+                    paymentDate: editDate
+                })
+            })
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}))
+                throw new Error(errData.error || 'Failed to update payment date')
+            }
+            // Update local state
+            setPayments(prev => prev.map(p => p.id === paymentId ? { ...p, payment_date: editDate } : p))
+            setEditingPaymentId(null)
+        } catch (err: any) {
+            alert(err.message || 'Error updating date')
+        } finally {
+            setIsUpdating(false)
+        }
+    }
 
     useEffect(() => {
         const fetchPaymentHistory = async () => {
@@ -131,11 +174,49 @@ export function PaymentHistory({ invoiceId }: PaymentHistoryProps) {
                                         {paymentMethodLabels[payment.payment_method] || payment.payment_method}
                                     </span>
                                 </div>
-                                <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-600 mt-2">
-                                    <div className="flex items-center gap-1">
-                                        <Calendar className="h-3 w-3" />
-                                        <span className="text-xs">{formatDate(payment.payment_date)}</span>
-                                    </div>
+                                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-600 mt-2">
+                                    {editingPaymentId === payment.id ? (
+                                        <div className="flex items-center gap-2 bg-white dark:bg-gray-800 p-1.5 rounded border border-gray-300 dark:border-gray-600">
+                                            <Calendar className="h-3.5 w-3.5 text-gray-400" />
+                                            <input
+                                                type="date"
+                                                value={editDate}
+                                                onChange={(e) => setEditDate(e.target.value)}
+                                                className="text-xs px-2 py-1 border rounded bg-transparent text-gray-900 dark:text-white"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => savePaymentDate(payment.id)}
+                                                disabled={isUpdating}
+                                                className="p-1 rounded hover:bg-green-100 text-green-700 dark:text-green-400"
+                                                title="Save Date"
+                                            >
+                                                <Check className="h-3.5 w-3.5" />
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={cancelEditing}
+                                                disabled={isUpdating}
+                                                className="p-1 rounded hover:bg-red-100 text-red-600 dark:text-red-400"
+                                                title="Cancel"
+                                            >
+                                                <X className="h-3.5 w-3.5" />
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="flex items-center gap-1.5">
+                                            <Calendar className="h-3 w-3 text-gray-500" />
+                                            <span className="text-xs font-medium">{formatDate(payment.payment_date)}</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => startEditing(payment)}
+                                                className="p-1 text-gray-400 hover:text-blue-600 rounded"
+                                                title="Edit payment date"
+                                            >
+                                                <Pencil className="h-3 w-3" />
+                                            </button>
+                                        </div>
+                                    )}
                                     {payment.payment_notes && (
                                         <div className="flex items-center gap-1">
                                             <FileText className="h-3 w-3" />

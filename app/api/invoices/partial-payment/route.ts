@@ -129,7 +129,61 @@ export async function POST(request: Request) {
     }
 }
 
-// Get payment history for an invoice
+// Update payment details (e.g. correct payment entry date)
+export async function PATCH(request: Request) {
+    try {
+        const supabase = await createClient()
+        const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+        if (authError || !user) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        }
+
+        const { paymentId, paymentDate, paymentNotes, paymentMethod } = await request.json()
+
+        if (!paymentId || !paymentDate) {
+            return NextResponse.json({ error: 'Payment ID and Payment Date are required' }, { status: 400 })
+        }
+
+        // Update payment record
+        const updatePayload: Record<string, any> = {
+            payment_date: paymentDate
+        }
+        if (paymentNotes !== undefined) updatePayload.payment_notes = paymentNotes
+        if (paymentMethod !== undefined) updatePayload.payment_method = paymentMethod
+
+        const { data: updatedPayment, error: updateError } = await supabase
+            .from('invoice_payments')
+            .update(updatePayload)
+            .eq('id', paymentId)
+            .eq('user_id', user.id)
+            .select()
+            .single()
+
+        if (updateError) {
+            console.error('Error updating payment date:', updateError)
+            return NextResponse.json({ error: 'Failed to update payment: ' + updateError.message }, { status: 500 })
+        }
+
+        // Also update invoice paid_at if this is linked to invoice
+        if (updatedPayment?.invoice_id) {
+            await supabase
+                .from('invoices')
+                .update({ paid_at: paymentDate })
+                .eq('id', updatedPayment.invoice_id)
+                .eq('user_id', user.id)
+        }
+
+        return NextResponse.json({
+            success: true,
+            payment: updatedPayment,
+            message: 'Payment date updated successfully'
+        })
+    } catch (error) {
+        console.error('Update payment error:', error)
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    }
+}
 export async function GET(request: Request) {
     try {
         const supabase = await createClient()

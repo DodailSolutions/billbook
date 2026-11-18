@@ -887,8 +887,34 @@ export async function getCAProfile(): Promise<CAProfile | null> {
     .eq('user_id', user.id)
     .single()
 
-  if (error) return null
-  return data
+  if (data) return data
+
+  // Fallback to ca_professionals from CA marketplace
+  const { data: profData } = await supabase
+    .from('ca_professionals')
+    .select('*')
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  if (profData) {
+    return {
+      id: profData.id,
+      user_id: profData.user_id,
+      ca_name: profData.full_name,
+      ca_firm_name: profData.firm_name,
+      membership_number: profData.icai_membership_number,
+      email: profData.email,
+      phone: profData.phone,
+      address: profData.office_address,
+      is_verified: profData.verification_status === 'verified',
+      verified_at: profData.verified_at,
+      specializations: profData.specializations || [],
+      created_at: profData.created_at,
+      updated_at: profData.updated_at
+    } as CAProfile
+  }
+
+  return null
 }
 
 /**

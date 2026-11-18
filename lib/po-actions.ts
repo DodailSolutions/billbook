@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { PurchaseOrder, CreatePOInput, UpdatePOInput, POStatus } from "./po-types"
 import { revalidatePath } from "next/cache"
+import { postPOJournalEntry } from "./bookkeeping-actions"
 
 export async function getPurchaseOrders(): Promise<PurchaseOrder[]> {
     const supabase = await createClient()
@@ -263,6 +264,26 @@ export async function receivePOItems(
             .from('purchase_orders')
             .update({ status: newStatus, updated_at: new Date().toISOString() })
             .eq('id', poId)
+
+        // ERP Standard: Automatically post Inventory & AP journal entry on goods receipt
+        try {
+            const receivedValue = receipts.reduce((sum, r) => {
+                const item = updatedPo.items?.find(it => it.id === r.itemId)
+                return sum + (Number(r.qtyReceivedNow || 0) * Number(item?.unit_price || 0))
+            }, 0)
+
+            if (receivedValue > 0) {
+                await postPOJournalEntry({
+                    poId: po.id,
+                    poNumber: po.po_number,
+                    totalAmount: receivedValue,
+                    vendorName: (po as any).vendor_name,
+                    poDate: new Date().toISOString().slice(0, 10)
+                })
+            }
+        } catch (jeErr) {
+            console.warn('ERP PO ledger posting warning:', jeErr)
+        }
     }
 
     revalidatePath('/purchase-orders')

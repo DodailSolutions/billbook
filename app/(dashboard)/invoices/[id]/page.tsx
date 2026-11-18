@@ -9,6 +9,7 @@ import { ShareInvoiceButton } from "./ShareInvoiceButton"
 import { MarkAsPaidButton } from "./MarkAsPaidButton"
 import { PartialPaymentButton } from "./PartialPaymentButton"
 import { PaymentHistory } from "./PaymentHistory"
+import { PaidStatusCard } from "./PaidStatusCard"
 import { formatDate } from "@/lib/utils"
 
 export default async function InvoiceDetailPage({
@@ -274,8 +275,8 @@ export default async function InvoiceDetailPage({
                     </div>
                 )}
 
-                {/* Bank Details */}
-                {invoiceSettings?.payment_instructions && (
+                {/* Bank Details — hidden when invoice is fully paid, unless explicitly configured */}
+                {invoiceSettings?.payment_instructions && (!isPaid || (invoiceSettings as any)?.show_bank_details_when_paid) && (
                     <div className="border-t border-gray-200 dark:border-gray-700 px-5 py-4 bg-blue-50/40 dark:bg-blue-900/10">
                         <p className="text-xs font-semibold text-blue-700 dark:text-blue-400 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
                             🏦 Bank / Payment Details
@@ -327,23 +328,13 @@ export default async function InvoiceDetailPage({
                 {/* Payment Status */}
                 <div className="border-t border-gray-200 dark:border-gray-700 px-4 sm:px-5 py-5">
                     {isPaid ? (
-                        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-xl p-4">
-                            <div className="flex items-center gap-3">
-                                <div className="h-10 w-10 rounded-full bg-green-100 dark:bg-green-900/50 flex items-center justify-center">
-                                    <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />
-                                </div>
-                                <div className="flex-1">
-                                    <p className="font-bold text-green-800 dark:text-green-300">Payment Received ✓</p>
-                                    <p className="text-sm text-green-600 dark:text-green-400">
-                                        {invoice.payment_method && `Via ${invoice.payment_method.replace('_', ' ')}`}
-                                        {invoice.paid_at && ` · ${formatDate(invoice.paid_at)}`}
-                                    </p>
-                                    {invoice.payment_notes && (
-                                        <p className="text-xs text-green-600 dark:text-green-400 mt-0.5">{invoice.payment_notes}</p>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
+                        <PaidStatusCard
+                            invoiceId={invoice.id}
+                            totalAmount={invoice.total}
+                            paymentMethod={invoice.payment_method}
+                            paidAt={invoice.paid_at}
+                            paymentNotes={invoice.payment_notes}
+                        />
                     ) : hasPartialPayment ? (
                         <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-xl p-4 space-y-4">
                             <div className="flex items-center justify-between">
