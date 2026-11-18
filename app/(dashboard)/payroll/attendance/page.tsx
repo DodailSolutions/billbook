@@ -7,7 +7,9 @@ import { Employee, AttendanceRecord } from '@/lib/payroll-types'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent } from '@/components/ui/Card'
 import { 
-    ArrowLeft, 
+    ArrowLeft,
+    Video,
+    Activity, 
     Save, 
     Calendar, 
     ChevronLeft, 
@@ -424,6 +426,40 @@ export default function AttendancePage() {
     return (
         <div className="space-y-5 max-w-full mx-auto pb-16 px-1 sm:px-2">
             <MigrationBanner />
+
+            {/* Quick Access to Vision AI CCTV & Shifts */}
+            <div className="flex flex-wrap items-center justify-between gap-3 bg-gradient-to-r from-indigo-50/80 via-blue-50/50 to-white dark:from-indigo-950/30 dark:via-gray-900 dark:to-gray-900 p-3.5 rounded-2xl border border-indigo-100 dark:border-indigo-900/40">
+                <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                        Touchless Vision AI & Movement Tracking:
+                    </span>
+                    <span className="text-[11px] text-slate-500 hidden sm:inline">
+                        Automate check-ins, break transitions, and departure logs via office CCTV.
+                    </span>
+                </div>
+                <div className="flex items-center gap-2">
+                    <Link href="/payroll/attendance/cctv">
+                        <Button variant="outline" size="sm" className="text-xs h-8 px-2.5 bg-white border-slate-200 text-slate-700 hover:text-indigo-600 gap-1.5 shadow-2xs">
+                            <Video className="w-3.5 h-3.5 text-indigo-600" />
+                            CCTV Streams
+                        </Button>
+                    </Link>
+                    <Link href="/payroll/attendance/movements">
+                        <Button variant="outline" size="sm" className="text-xs h-8 px-2.5 bg-white border-slate-200 text-slate-700 hover:text-emerald-600 gap-1.5 shadow-2xs">
+                            <Activity className="w-3.5 h-3.5 text-emerald-600" />
+                            Movements Audit
+                        </Button>
+                    </Link>
+                    <Link href="/payroll/settings/shifts">
+                        <Button variant="outline" size="sm" className="text-xs h-8 px-2.5 bg-white border-slate-200 text-slate-700 hover:text-amber-600 gap-1.5 shadow-2xs">
+                            <Clock className="w-3.5 h-3.5 text-amber-600" />
+                            Shift Rules
+                        </Button>
+                    </Link>
+                </div>
+            </div>
+
 
             {/* Header with Title and Actions */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-gray-900 p-4 sm:p-5 rounded-2xl border border-gray-200/80 dark:border-gray-800 shadow-xs">

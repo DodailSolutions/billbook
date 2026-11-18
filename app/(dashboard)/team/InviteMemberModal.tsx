@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from '@/components/ui/Input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { UserPlus, Loader2, AlertCircle } from 'lucide-react'
+import { UserPlus, Loader2, AlertCircle, Shield, Briefcase, Users, UserCheck } from 'lucide-react'
 
 interface InviteMemberModalProps {
   canAdd: boolean
@@ -27,13 +27,50 @@ export function InviteMemberModal({ canAdd, currentCount, maxAllowed, roles }: I
   const [email, setEmail] = useState('')
   const [selectedRole, setSelectedRole] = useState('')
 
+  // Built-in 4-tier roles hierarchy
+  const defaultRoles = [
+    { 
+      id: 'manager', 
+      name: 'Manager', 
+      slug: 'manager', 
+      description: 'Manage sales, clients, inventory, and approve team attendance.',
+      icon: Briefcase
+    },
+    { 
+      id: 'hr', 
+      name: 'HR Executive', 
+      slug: 'hr', 
+      description: 'Dedicated access to Payroll, Attendance, Leaves, Shifts & CCTV camera streams.',
+      icon: Users
+    },
+    { 
+      id: 'employee', 
+      name: 'Employee', 
+      slug: 'employee', 
+      description: 'Self-service portal to view payslips, daily movements, and apply for leaves.',
+      icon: UserCheck
+    },
+    { 
+      id: 'admin', 
+      name: 'Admin', 
+      slug: 'admin', 
+      description: 'Full organizational access across invoicing, banking, payroll, and settings.',
+      icon: Shield
+    }
+  ]
+
+  // Merge database roles with default hierarchy
+  const availableRoles = defaultRoles.map(def => {
+    const existing = roles?.find(r => r.slug === def.slug)
+    return existing ? { ...def, id: existing.id } : def
+  })
+
   const handleInvite = async () => {
     if (!email || !selectedRole) {
       setError('Please fill in all fields')
       return
     }
 
-    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) {
       setError('Please enter a valid email address')
@@ -56,7 +93,6 @@ export function InviteMemberModal({ canAdd, currentCount, maxAllowed, roles }: I
         throw new Error(data.error || 'Failed to send invite')
       }
 
-      // Success - close modal and reload
       setOpen(false)
       setEmail('')
       setSelectedRole('')
@@ -68,69 +104,74 @@ export function InviteMemberModal({ canAdd, currentCount, maxAllowed, roles }: I
     }
   }
 
-  // Filter out owner role from selection
-  const availableRoles = roles.filter(r => r.slug !== 'owner')
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button 
           disabled={!canAdd}
-          className="bg-blue-600 hover:bg-blue-700 text-white"
+          className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
         >
           <UserPlus className="h-4 w-4 mr-2" />
-          Invite Member
+          Invite Team Member
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Invite Team Member</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-xl font-bold text-slate-900">Invite Team Member</DialogTitle>
+          <DialogDescription className="text-xs text-slate-500">
             {canAdd ? (
-              `Send an invitation to join your team. ${currentCount} of ${maxAllowed} slots used.`
+              `Send an invitation to join your workspace. ${currentCount} of ${maxAllowed} team seats used.`
             ) : (
-              <span className="text-red-600 dark:text-red-400">
-                You&apos;ve reached your team member limit ({maxAllowed}). Upgrade your plan to add more members.
+              <span className="text-rose-600">
+                You have reached your team seat limit ({maxAllowed}). Upgrade your plan to add more members.
               </span>
             )}
           </DialogDescription>
         </DialogHeader>
 
         {canAdd && (
-          <div className="space-y-4 py-4">
+          <div className="space-y-4 py-3">
             {error && (
-              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 flex items-start gap-2">
-                <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
-                <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
+              <div className="bg-rose-50 border border-rose-200 rounded-xl p-3 flex items-start gap-2">
+                <AlertCircle className="h-4 w-4 text-rose-600 shrink-0 mt-0.5" />
+                <p className="text-xs text-rose-800">{error}</p>
               </div>
             )}
 
-            <div className="space-y-2">
-              <Label htmlFor="email">Email Address</Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="email" className="text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                Work Email Address *
+              </Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="colleague@example.com"
+                placeholder="colleague@company.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={loading}
+                className="text-sm rounded-lg"
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="role">Role</Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="role" className="text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                Organizational Role *
+              </Label>
               <Select value={selectedRole} onValueChange={setSelectedRole} disabled={loading}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a role" />
+                <SelectTrigger className="h-auto py-2.5 rounded-lg border-slate-200">
+                  <SelectValue placeholder="Select member role..." />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="max-h-72">
                   {availableRoles.map((role) => (
-                    <SelectItem key={role.id} value={role.id}>
-                      <div className="flex flex-col items-start">
-                        <span className="font-medium">{role.name}</span>
-                        <span className="text-xs text-gray-600">
-                          {role.description}
-                        </span>
+                    <SelectItem key={role.id} value={role.id} className="py-2 cursor-pointer">
+                      <div className="flex items-start gap-2.5 text-left">
+                        <role.icon className="w-4 h-4 text-indigo-600 mt-0.5 shrink-0" />
+                        <div>
+                          <p className="font-semibold text-xs text-slate-900">{role.name}</p>
+                          <p className="text-[11px] text-slate-500 leading-tight mt-0.5">
+                            {role.description}
+                          </p>
+                        </div>
                       </div>
                     </SelectItem>
                   ))}
@@ -138,35 +179,35 @@ export function InviteMemberModal({ canAdd, currentCount, maxAllowed, roles }: I
               </Select>
             </div>
 
-            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
-              <p className="text-sm text-blue-900">
-                💡 An email invitation will be sent to this address. The invite is valid for 7 days.
+            <div className="bg-indigo-50/70 border border-indigo-100 rounded-xl p-3 text-xs text-indigo-900">
+              <p className="font-medium">
+                💡 Members receive an instant email invitation link valid for 7 days to access their dedicated role portal.
               </p>
             </div>
 
-            <div className="flex gap-2 pt-4">
+            <div className="flex gap-2 pt-2">
               <Button
                 variant="outline"
                 onClick={() => setOpen(false)}
                 disabled={loading}
-                className="flex-1"
+                className="flex-1 border-slate-200 text-slate-700"
               >
                 Cancel
               </Button>
               <Button
                 onClick={handleInvite}
                 disabled={loading}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
               >
                 {loading ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Sending...
+                    Sending Invite...
                   </>
                 ) : (
                   <>
                     <UserPlus className="h-4 w-4 mr-2" />
-                    Send Invite
+                    Send Invitation
                   </>
                 )}
               </Button>
@@ -178,7 +219,7 @@ export function InviteMemberModal({ canAdd, currentCount, maxAllowed, roles }: I
           <div className="py-4">
             <Button
               onClick={() => window.location.href = '/pricing'}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
             >
               Upgrade Plan
             </Button>
