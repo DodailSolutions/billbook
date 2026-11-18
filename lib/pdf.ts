@@ -522,8 +522,6 @@ export async function generatePurchaseOrderPDF(po: PurchaseOrder): Promise<strin
     const showSignature = settings?.show_signature ?? true
     const companyStampUrl = settings?.company_stamp_url || ''
     const showStamp = settings?.show_stamp ?? true
-    const isPaid = invoice.status === 'paid'
-    const showBankDetailsWhenPaid = Boolean((settings as any)?.show_bank_details_when_paid)
     
     // Determine if Intra-State (CGST+SGST) or Inter-State (IGST) transaction based on state codes
     const buyerStateCode = companyGstin ? companyGstin.trim().slice(0, 2) : '';
