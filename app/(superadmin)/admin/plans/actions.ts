@@ -186,17 +186,108 @@ const STANDARD_REGIONAL_PLANS: PlanInput[] = [
         sort_order: 13
     },
     {
-        name: 'Lifetime Deal UAE',
-        slug: 'lifetime-ae',
-        description: 'Pay once, use forever for UAE freelancers & startups',
-        price: 499,
+        name: 'Pro UAE',
+        slug: 'pro-ae',
+        description: 'For growing UAE companies & agencies needing multi-user and advanced VAT',
+        price: 199,
         currency: 'AED',
-        billing_period: 'lifetime',
-        features: ['Unlimited VAT invoices forever', 'Arabic & English bilingual layout', 'TRN lookup & compliance', 'Zero recurring charges'],
+        billing_period: 'monthly',
+        features: ['Up to 5 users', 'Everything in Growth UAE', 'Advanced VAT return reports', 'Multi-currency', 'API access', 'Priority support'],
         limits: { invoices_per_month: 999999, customers: 999999 },
         is_active: true,
         is_popular: false,
         sort_order: 14
+    },
+    {
+        name: 'Pro UAE Yearly',
+        slug: 'pro-ae-yearly',
+        description: 'Annual Pro plan with 2 months free for UAE companies',
+        price: 1990,
+        currency: 'AED',
+        billing_period: 'yearly',
+        features: ['Everything in Pro UAE', '2 months free', 'Custom branding', 'Dedicated phone & WhatsApp support'],
+        limits: { invoices_per_month: 999999, customers: 999999 },
+        is_active: true,
+        is_popular: false,
+        sort_order: 15
+    },
+    {
+        name: 'Enterprise UAE',
+        slug: 'enterprise-ae',
+        description: 'For large UAE teams, Free Zone firms & enterprise operations',
+        price: 299,
+        currency: 'AED',
+        billing_period: 'monthly',
+        features: ['Up to 10 users', 'Everything in Pro UAE', 'AI Accountant Copilot', 'Custom integrations', 'Dedicated CA export'],
+        limits: { invoices_per_month: 999999, customers: 999999 },
+        is_active: true,
+        is_popular: false,
+        sort_order: 16
+    },
+    {
+        name: 'Enterprise UAE Yearly',
+        slug: 'enterprise-ae-yearly',
+        description: 'Annual enterprise billing for UAE operations with VIP onboarding',
+        price: 2990,
+        currency: 'AED',
+        billing_period: 'yearly',
+        features: ['Everything in Enterprise UAE', 'Save AED 598/yr', 'Dedicated account manager', 'Custom API integration'],
+        limits: { invoices_per_month: 999999, customers: 999999 },
+        is_active: true,
+        is_popular: false,
+        sort_order: 17
+    },
+    {
+        name: 'Starter Lifetime UAE',
+        slug: 'lifetime-ae',
+        description: 'Pay once, use forever for UAE freelancers & solo consultants',
+        price: 499,
+        currency: 'AED',
+        billing_period: 'lifetime',
+        features: ['1 user', '300 invoices/year', 'FTA 5% VAT-compliant', 'Client management', 'Email support'],
+        limits: { invoices_per_month: 999999, customers: 999999 },
+        is_active: true,
+        is_popular: false,
+        sort_order: 18
+    },
+    {
+        name: 'Growth Lifetime UAE',
+        slug: 'lifetime-growth-ae',
+        description: 'Pay once, use forever for UAE small businesses & trading firms',
+        price: 899,
+        currency: 'AED',
+        billing_period: 'lifetime',
+        features: ['Up to 3 users', '1,200 invoices/year', 'Recurring invoices', 'Payment reminders', 'VAT reports', 'Priority support'],
+        limits: { invoices_per_month: 999999, customers: 999999 },
+        is_active: true,
+        is_popular: true,
+        sort_order: 19
+    },
+    {
+        name: 'Pro Lifetime UAE',
+        slug: 'lifetime-pro-ae',
+        description: 'Pay once, use forever for UAE agencies & service providers',
+        price: 1499,
+        currency: 'AED',
+        billing_period: 'lifetime',
+        features: ['Up to 5 users', '3,000 invoices/year', 'Advanced VAT reports', 'Multi-currency', 'Custom templates', 'API access'],
+        limits: { invoices_per_month: 999999, customers: 999999 },
+        is_active: true,
+        is_popular: false,
+        sort_order: 20
+    },
+    {
+        name: 'Business Lifetime UAE',
+        slug: 'lifetime-enterprise-ae',
+        description: 'Pay once, use forever for established UAE enterprises',
+        price: 2499,
+        currency: 'AED',
+        billing_period: 'lifetime',
+        features: ['Up to 10 users', '10,000 invoices/year', 'White-label invoices', 'Client portal', 'Advanced analytics', 'Dedicated onboarding'],
+        limits: { invoices_per_month: 999999, customers: 999999 },
+        is_active: true,
+        is_popular: false,
+        sort_order: 21
     },
 
     // 🇺🇸 US & INTERNATIONAL (USD $)
@@ -211,7 +302,7 @@ const STANDARD_REGIONAL_PLANS: PlanInput[] = [
         limits: { invoices_per_month: 250, customers: 250 },
         is_active: true,
         is_popular: false,
-        sort_order: 20
+        sort_order: 30
     },
     {
         name: 'Starter US Yearly',
@@ -224,7 +315,7 @@ const STANDARD_REGIONAL_PLANS: PlanInput[] = [
         limits: { invoices_per_month: 999999, customers: 999999 },
         is_active: true,
         is_popular: false,
-        sort_order: 21
+        sort_order: 31
     },
     {
         name: 'Growth US',
@@ -237,7 +328,7 @@ const STANDARD_REGIONAL_PLANS: PlanInput[] = [
         limits: { invoices_per_month: 999999, customers: 999999 },
         is_active: true,
         is_popular: true,
-        sort_order: 22
+        sort_order: 32
     },
     {
         name: 'Growth US Yearly',
@@ -250,20 +341,111 @@ const STANDARD_REGIONAL_PLANS: PlanInput[] = [
         limits: { invoices_per_month: 999999, customers: 999999 },
         is_active: true,
         is_popular: false,
-        sort_order: 23
+        sort_order: 33
     },
     {
-        name: 'Lifetime US',
-        slug: 'lifetime-starter-us',
-        description: 'One-time investment for lifetime invoicing in USD',
-        price: 149,
+        name: 'Pro US',
+        slug: 'pro-us',
+        description: 'For agencies & consultants needing partial payments and custom branding',
+        price: 29,
         currency: 'USD',
-        billing_period: 'lifetime',
-        features: ['Unlimited US invoices forever', 'Sales tax auto-computation', 'No recurring subscription costs', 'VIP updates included'],
+        billing_period: 'monthly',
+        features: ['Up to 5 users', 'Partial payments', 'Advanced reports', 'Custom invoice branding', 'API access', 'Priority support'],
         limits: { invoices_per_month: 999999, customers: 999999 },
         is_active: true,
         is_popular: false,
-        sort_order: 24
+        sort_order: 34
+    },
+    {
+        name: 'Pro US Yearly',
+        slug: 'pro-us-yearly',
+        description: 'Annual Pro plan with maximum savings for global agencies',
+        price: 179,
+        currency: 'USD',
+        billing_period: 'yearly',
+        features: ['Everything in Pro US', 'Save $169/yr', 'Priority 24/7 support', 'Custom templates'],
+        limits: { invoices_per_month: 999999, customers: 999999 },
+        is_active: true,
+        is_popular: false,
+        sort_order: 35
+    },
+    {
+        name: 'Business US',
+        slug: 'business-us',
+        description: 'For established US firms, white-label agencies, and client portals',
+        price: 49,
+        currency: 'USD',
+        billing_period: 'monthly',
+        features: ['Up to 10 users', 'White-label invoices', 'Client portal', 'Role-based access', 'Advanced analytics', 'Dedicated onboarding'],
+        limits: { invoices_per_month: 999999, customers: 999999 },
+        is_active: true,
+        is_popular: false,
+        sort_order: 36
+    },
+    {
+        name: 'Business US Yearly',
+        slug: 'business-us-yearly',
+        description: 'Annual business subscription with white-label and client portal',
+        price: 299,
+        currency: 'USD',
+        billing_period: 'yearly',
+        features: ['Everything in Business US', 'Save $289/yr', 'Dedicated account manager', 'White-label branding'],
+        limits: { invoices_per_month: 999999, customers: 999999 },
+        is_active: true,
+        is_popular: false,
+        sort_order: 37
+    },
+    {
+        name: 'Starter Lifetime US',
+        slug: 'lifetime-starter-us',
+        description: 'One-time investment for lifetime invoicing in USD for freelancers & solo founders',
+        price: 149,
+        currency: 'USD',
+        billing_period: 'lifetime',
+        features: ['1 user', '250 invoices / year', 'Sales invoices & estimates', 'Auto tax calculation', 'Email invoices + PDF', 'Standard support'],
+        limits: { invoices_per_month: 999999, customers: 999999 },
+        is_active: true,
+        is_popular: false,
+        sort_order: 38
+    },
+    {
+        name: 'Growth Lifetime US',
+        slug: 'lifetime-growth-us',
+        description: 'One-time investment for small businesses - pay once, use forever',
+        price: 249,
+        currency: 'USD',
+        billing_period: 'lifetime',
+        features: ['Up to 3 users', '1,000 invoices / year', 'Recurring invoices', 'Payment reminders', 'Client statements', 'Multi-state tax handling', 'Priority support'],
+        limits: { invoices_per_month: 999999, customers: 999999 },
+        is_active: true,
+        is_popular: true,
+        sort_order: 39
+    },
+    {
+        name: 'Pro Lifetime US',
+        slug: 'lifetime-pro-us',
+        description: 'One-time investment for agencies & consultants with custom branding',
+        price: 399,
+        currency: 'USD',
+        billing_period: 'lifetime',
+        features: ['Up to 5 users', '3,000 invoices / year', 'Partial payments', 'Advanced reports', 'Custom invoice branding', 'API access', 'Priority support'],
+        limits: { invoices_per_month: 999999, customers: 999999 },
+        is_active: true,
+        is_popular: false,
+        sort_order: 40
+    },
+    {
+        name: 'Business Lifetime US',
+        slug: 'lifetime-business-us',
+        description: 'One-time investment for accounting firms and enterprises',
+        price: 599,
+        currency: 'USD',
+        billing_period: 'lifetime',
+        features: ['Up to 10 users', '10,000 invoices / year', 'White-label invoices', 'Client portal', 'Role-based access', 'Advanced analytics', 'Dedicated onboarding'],
+        limits: { invoices_per_month: 999999, customers: 999999 },
+        is_active: true,
+        is_popular: false,
+        sort_order: 41
     }
 ]
 
@@ -316,48 +498,46 @@ export async function getAllPlans(currency?: string): Promise<SubscriptionPlan[]
             }
         }
 
-        // Ensure founder-yearly plan exists for admin management
-        const hasFounderYearly = plans.some(p => p.slug === 'founder-yearly')
-        if (!hasFounderYearly && (!currency || currency === 'all' || currency === 'INR')) {
-            try {
-                const { data: inserted } = await supabase
-                    .from('subscription_plans')
-                    .insert({
-                        name: 'Founder Yearly Plan',
-                        slug: 'founder-yearly',
-                        description: 'Founder circle yearly access with locked-in founder rates',
-                        price: 2999,
-                        currency: 'INR',
-                        billing_period: 'yearly',
-                        features: [
-                            'Unlimited invoices for 12 months',
-                            'GST-ready billing & e-Way bill reports',
-                            'Automated payment reminders & WhatsApp',
-                            'Customer management & payment tracking',
-                            'Fast email invoice delivery',
-                            'Business analytics & reports'
-                        ],
-                        limits: { invoices_per_month: 999999, customers: 999999 },
-                        is_active: true,
-                        is_popular: false,
-                        sort_order: 8
-                    })
-                    .select()
-                    .single()
+        // Auto-seed any missing standard regional plans so Super Admin can manage every tier
+        for (const stdPlan of STANDARD_REGIONAL_PLANS) {
+            if (currency && currency !== 'all' && stdPlan.currency !== currency.toUpperCase()) {
+                continue
+            }
+            const exists = plans.some(p => p.slug === stdPlan.slug)
+            if (!exists) {
+                try {
+                    const { data: inserted } = await supabase
+                        .from('subscription_plans')
+                        .insert({
+                            name: stdPlan.name,
+                            slug: stdPlan.slug,
+                            description: stdPlan.description || '',
+                            price: stdPlan.price,
+                            currency: stdPlan.currency,
+                            billing_period: stdPlan.billing_period,
+                            features: stdPlan.features || [],
+                            limits: stdPlan.limits || {},
+                            is_active: stdPlan.is_active ?? true,
+                            is_popular: !!stdPlan.is_popular,
+                            sort_order: stdPlan.sort_order || 99,
+                            created_at: new Date().toISOString(),
+                            updated_at: new Date().toISOString()
+                        })
+                        .select()
+                        .single()
 
-                if (inserted) {
-                    plans.push(inserted as SubscriptionPlan)
-                    needsRevalidate = true
+                    if (inserted) {
+                        plans.push(inserted as SubscriptionPlan)
+                        needsRevalidate = true
+                    }
+                } catch (err) {
+                    console.warn(`Could not auto-insert missing plan ${stdPlan.slug}:`, err)
                 }
-            } catch (err) {
-                console.warn('Could not auto-insert founder-yearly plan:', err)
             }
         }
 
         if (needsRevalidate) {
-            revalidatePath('/admin/plans')
-            revalidatePath('/')
-            revalidatePath('/pricing')
+            revalidateAllPricingRoutes()
         }
 
         return plans
@@ -365,6 +545,16 @@ export async function getAllPlans(currency?: string): Promise<SubscriptionPlan[]
         console.error('Fatal error in getAllPlans:', error)
         return []
     }
+}
+
+export function revalidateAllPricingRoutes() {
+    revalidatePath('/admin/plans')
+    revalidatePath('/')
+    revalidatePath('/pricing')
+    revalidatePath('/ae')
+    revalidatePath('/ae/pricing')
+    revalidatePath('/us')
+    revalidatePath('/us/pricing')
 }
 
 export async function createPlan(data: PlanInput) {
@@ -406,9 +596,7 @@ export async function createPlan(data: PlanInput) {
             price: data.price
         })
 
-        revalidatePath('/admin/plans')
-        revalidatePath('/')
-        revalidatePath('/pricing')
+        revalidateAllPricingRoutes()
         return { success: true, plan: newPlan }
     } catch (error) {
         console.error('Error creating plan:', error)
@@ -450,9 +638,7 @@ export async function updatePlan(id: string, data: Partial<PlanInput>) {
 
         await createAuditLog('subscription_plan_updated', 'plan', id, updatePayload)
 
-        revalidatePath('/admin/plans')
-        revalidatePath('/')
-        revalidatePath('/pricing')
+        revalidateAllPricingRoutes()
         return { success: true }
     } catch (error) {
         console.error('Error updating plan:', error)
@@ -475,9 +661,7 @@ export async function togglePlanStatus(id: string, is_active: boolean) {
         if (error) throw error
 
         await createAuditLog('subscription_plan_status_toggled', 'plan', id, { is_active })
-        revalidatePath('/admin/plans')
-        revalidatePath('/')
-        revalidatePath('/pricing')
+        revalidateAllPricingRoutes()
         return { success: true }
     } catch (error) {
         console.error('Error toggling plan status:', error)
@@ -500,9 +684,7 @@ export async function togglePlanPopular(id: string, is_popular: boolean) {
         if (error) throw error
 
         await createAuditLog('subscription_plan_popular_toggled', 'plan', id, { is_popular })
-        revalidatePath('/admin/plans')
-        revalidatePath('/')
-        revalidatePath('/pricing')
+        revalidateAllPricingRoutes()
         return { success: true }
     } catch (error) {
         console.error('Error toggling plan popular status:', error)
@@ -530,7 +712,7 @@ export async function deletePlan(id: string) {
                 .update({ is_active: false, updated_at: new Date().toISOString() })
                 .eq('id', id)
             
-            revalidatePath('/admin/plans')
+            revalidateAllPricingRoutes()
             return { success: true, message: `Plan has ${count} existing subscriber(s). It has been deactivated instead of permanently deleted.` }
         }
 
@@ -542,7 +724,7 @@ export async function deletePlan(id: string) {
         if (error) throw error
 
         await createAuditLog('subscription_plan_deleted', 'plan', id)
-        revalidatePath('/admin/plans')
+        revalidateAllPricingRoutes()
         return { success: true }
     } catch (error) {
         console.error('Error deleting plan:', error)
@@ -608,13 +790,11 @@ export async function seedStandardRegionalPlans() {
             }
         }
 
-        revalidatePath('/admin/plans')
-        revalidatePath('/')
-        revalidatePath('/pricing')
+        revalidateAllPricingRoutes()
 
         return { 
             success: true, 
-            message: `Synchronized ${updatedCount} plan(s) with official rates (Starter ₹2,999, Professional ₹4,999, Enterprise ₹10,999) and added ${insertedCount} new regional plan(s)!` 
+            message: `Synchronized ${updatedCount} plan(s) and ensured all ${insertedCount} regional and lifetime tiers are active!` 
         }
     } catch (error) {
         console.error('Error seeding regional plans:', error)

@@ -4,6 +4,35 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 
 ---
 
+## [Release v1.3.1] - 2026-11-18
+
+### 1. Feature & Fix: Full Database Sync for Regional Lifetime Tiers in Super Admin
+- **Issue**: Lifetime tiers on UAE (`/ae/pricing`) and US (`/us/pricing`) were hardcoded with static prices, while Super Admin (`/admin/plans`) only showed a single lifetime tier per region. Disabling a lifetime deal in Super Admin had no effect on the frontend.
+- **Root Cause**: `STANDARD_REGIONAL_PLANS` in `app/(superadmin)/admin/plans/actions.ts` lacked entries for Growth, Pro, and Business/Enterprise lifetime plans for UAE (AED 899, AED 1,499, AED 2,499) and US (USD 249, USD 399, USD 599). Public pages also rendered static fallback cards even when database plans returned inactive.
+- **Resolution**:
+  - Expanded `STANDARD_REGIONAL_PLANS` to include all 4 UAE Lifetime tiers (`lifetime-ae`, `lifetime-growth-ae`, `lifetime-pro-ae`, `lifetime-enterprise-ae`) and all 4 US Lifetime tiers (`lifetime-starter-us`, `lifetime-growth-us`, `lifetime-pro-us`, `lifetime-business-us`), alongside Pro and Enterprise monthly/yearly plans.
+  - Updated `getAllPlans` to automatically seed any missing standard regional plan into `subscription_plans` on access, guaranteeing Super Admin can immediately view, edit prices, or toggle active/inactive states for all tiers.
+
+---
+
+### 2. Fix: Dynamic Rendering & Conditional Hiding of Inactive Lifetime Plans
+- **Issue**: Toggling lifetime plans to inactive (`is_active = false`) in Super Admin did not hide the plans on public regional pricing pages.
+- **Resolution**:
+  - In `app/ae/pricing/page.tsx`: Replaced static HTML cards with dynamic mapping over `activeLifetimePlans`. If a specific lifetime plan is deactivated, its card is immediately omitted. If all lifetime plans are deactivated, `<section id="lifetime">` is completely hidden.
+  - In `app/us/pricing/page.tsx`: Dynamically maps `activeLifetimePlans`. Deactivated lifetime cards are removed, and the entire section hides if none are active.
+  - In `app/(marketing)/pricing/FounderCircle.tsx`: Deactivated cards (Lifetime or Founder Yearly) are cleanly omitted, and the section hides completely if both are inactive.
+  - In `app/ae/page.tsx`: Comparison table conditionally checks `hasActiveLifetime` before rendering the lifetime founder deal row.
+
+---
+
+### 3. Fix: Complete Public Route Cache Invalidation
+- **Issue**: Next.js server components cached public pricing pages indefinitely when plans were updated in Super Admin.
+- **Resolution**:
+  - Centralized cache purging with `revalidateAllPricingRoutes()` in `app/(superadmin)/admin/plans/actions.ts`.
+  - Revalidates `/admin/plans`, `/`, `/pricing`, `/ae`, `/ae/pricing`, `/us`, and `/us/pricing` on all mutations (`updatePlan`, `createPlan`, `togglePlanStatus`, `togglePlanPopular`, `deletePlan`, `seedStandardRegionalPlans`).
+
+---
+
 ## [Release v1.2.0] - 2026-11-17
 
 ### 1. Fix: HTTP 413 (Payload Too Large) & Connection Reset on Invoice Settings

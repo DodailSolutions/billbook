@@ -41,16 +41,11 @@ export default async function USPricingPage() {
     console.error('Error loading USD plans:', err)
   }
 
-  const starterLifetimePrice = dbPlans.find(p => p.slug === 'lifetime-starter-us')?.price ?? 149
-  const growthLifetimePrice = dbPlans.find(p => p.slug === 'lifetime-growth-us')?.price ?? 249
-  const proLifetimePrice = dbPlans.find(p => p.slug === 'lifetime-pro-us')?.price ?? 399
-  const businessLifetimePrice = dbPlans.find(p => p.slug === 'lifetime-business-us')?.price ?? 599
-
-  const lifetimePlans = [
+  const lifetimeConfigs = [
     {
       name: 'Starter',
       slug: 'lifetime-starter-us',
-      price: Number(starterLifetimePrice),
+      defaultPrice: 149,
       description: 'Best for freelancers & solo founders',
       invoices: 250,
       features: [
@@ -61,13 +56,13 @@ export default async function USPricingPage() {
         'Email invoices + PDF',
         'Basic reports',
         'Standard support'
-      ]
+      ],
+      popular: false
     },
     {
       name: 'Growth',
       slug: 'lifetime-growth-us',
-      price: Number(growthLifetimePrice),
-      popular: true,
+      defaultPrice: 249,
       description: 'Best for small businesses',
       invoices: 1000,
       features: [
@@ -78,12 +73,13 @@ export default async function USPricingPage() {
         'Client statements',
         'Multi-state tax handling',
         'Priority email support'
-      ]
+      ],
+      popular: true
     },
     {
       name: 'Pro',
       slug: 'lifetime-pro-us',
-      price: Number(proLifetimePrice),
+      defaultPrice: 399,
       description: 'Best for agencies & consultants',
       invoices: 3000,
       features: [
@@ -94,12 +90,13 @@ export default async function USPricingPage() {
         'Custom invoice branding',
         'API access',
         'Priority support'
-      ]
+      ],
+      popular: false
     },
     {
       name: 'Business',
       slug: 'lifetime-business-us',
-      price: Number(businessLifetimePrice),
+      defaultPrice: 599,
       description: 'Best for accounting firms',
       invoices: 10000,
       features: [
@@ -110,9 +107,26 @@ export default async function USPricingPage() {
         'Role-based access',
         'Advanced analytics',
         'Dedicated onboarding'
-      ]
+      ],
+      popular: false
     }
   ]
+
+  // Filter ONLY active lifetime plans from database
+  const activeLifetimePlans = lifetimeConfigs
+    .map(cfg => {
+      const dbPlan = dbPlans.find(p => p.slug === cfg.slug)
+      if (!dbPlan || !dbPlan.is_active) return null
+      return {
+        ...cfg,
+        name: dbPlan.name || cfg.name,
+        price: Number(dbPlan.price),
+        slug: dbPlan.slug,
+        features: (Array.isArray(dbPlan.features) && dbPlan.features.length > 0) ? dbPlan.features : cfg.features,
+        popular: dbPlan.is_popular !== undefined ? dbPlan.is_popular : cfg.popular
+      }
+    })
+    .filter(Boolean) as (typeof lifetimeConfigs[0] & { price: number; slug: string })[]
 
   const addOns = [
     { name: 'AI Copilot', monthly: 9, yearly: 49 },
@@ -179,97 +193,99 @@ export default async function USPricingPage() {
         <USPricingToggleSection plans={dbPlans} />
       </section>
 
-      {/* Lifetime Plans */}
-      <section className="px-6 py-20 bg-linear-to-b from-amber-50 to-white dark:from-gray-900 dark:to-gray-950">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-100 dark:bg-amber-900/50 rounded-full border border-amber-200 dark:border-amber-800 mb-4">
-              <Zap className="h-4 w-4 text-amber-600" />
-              <span className="text-sm font-medium text-amber-900 dark:text-amber-100">One-Time Payment</span>
-            </div>
-            <h2 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4">
-              Lifetime Access Plans
-            </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              Pay once, use forever. Invoice limits reset every January 1st.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            {lifetimePlans.map((plan) => (
-              <div 
-                key={plan.slug}
-                className={`bg-white dark:bg-gray-800 rounded-2xl p-6 border-2 hover:shadow-xl transition-all ${
-                  plan.popular ? 'border-amber-500 relative scale-105' : 'border-gray-200 dark:border-gray-700'
-                }`}
-              >
-                {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                    <span className="bg-amber-500 text-white px-4 py-1 rounded-full text-sm font-semibold flex items-center gap-1">
-                      <Sparkles className="h-3 w-3" />
-                      Most Popular
-                    </span>
-                  </div>
-                )}
-                
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{plan.name} Lifetime</h3>
-                <div className="mb-4">
-                  <span className="text-4xl font-bold text-gray-900 dark:text-white">${plan.price}</span>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">one-time payment</p>
-                </div>
-                <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">{plan.description}</p>
-                
-                <ul className="space-y-3 mb-6">
-                  {plan.features.map((feature, index) => (
-                    <li key={index} className="flex items-start gap-2">
-                      <CheckCircle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
-                      <span className="text-sm text-gray-700 dark:text-gray-200">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-                
-                <Link href={`/us/pricing?checkout=${plan.slug}`}>
-                  <Button 
-                    className={`w-full ${
-                      plan.popular 
-                        ? 'bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white' 
-                        : 'bg-gray-900 hover:bg-gray-800 text-white dark:bg-gray-700'
-                    }`}
-                  >
-                    Buy Now
-                  </Button>
-                </Link>
+      {/* Lifetime Plans (Dynamically filtered from database - hidden if disabled in Super Admin) */}
+      {activeLifetimePlans.length > 0 && (
+        <section id="lifetime" className="px-6 py-20 bg-linear-to-b from-amber-50 to-white dark:from-gray-900 dark:to-gray-950">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-100 dark:bg-amber-900/50 rounded-full border border-amber-200 dark:border-amber-800 mb-4">
+                <Zap className="h-4 w-4 text-amber-600" />
+                <span className="text-sm font-medium text-amber-900 dark:text-amber-100">One-Time Payment</span>
               </div>
-            ))}
-          </div>
+              <h2 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4">
+                Lifetime Access Plans
+              </h2>
+              <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+                Pay once, use forever. Invoice limits reset every January 1st.
+              </p>
+            </div>
 
-          {/* Lifetime Safeguards */}
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-              <Shield className="h-5 w-5 text-blue-600" />
-              Lifetime Plan Safeguards
-            </h3>
-            <ul className="grid md:grid-cols-2 gap-3 text-sm text-gray-700 dark:text-gray-300">
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                <span>Invoice limits reset every January 1st</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                <span>Lifetime = software access, not free infrastructure forever</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                <span>Add-ons billed separately (monthly/yearly)</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                <span>Fair usage and abuse protection policy applies</span>
-              </li>
-            </ul>
+            <div className={`grid md:grid-cols-2 ${activeLifetimePlans.length >= 4 ? 'lg:grid-cols-4' : activeLifetimePlans.length === 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-2 max-w-4xl mx-auto'} gap-6 mb-12`}>
+              {activeLifetimePlans.map((plan) => (
+                <div 
+                  key={plan.slug}
+                  className={`bg-white dark:bg-gray-800 rounded-2xl p-6 border-2 hover:shadow-xl transition-all ${
+                    plan.popular ? 'border-amber-500 relative scale-105' : 'border-gray-200 dark:border-gray-700'
+                  }`}
+                >
+                  {plan.popular && (
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                      <span className="bg-amber-500 text-white px-4 py-1 rounded-full text-sm font-semibold flex items-center gap-1">
+                        <Sparkles className="h-3 w-3" />
+                        Most Popular
+                      </span>
+                    </div>
+                  )}
+                  
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{plan.name} Lifetime</h3>
+                  <div className="mb-4">
+                    <span className="text-4xl font-bold text-gray-900 dark:text-white">${plan.price}</span>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">one-time payment</p>
+                  </div>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">{plan.description}</p>
+                  
+                  <ul className="space-y-3 mb-6">
+                    {plan.features.map((feature, index) => (
+                      <li key={index} className="flex items-start gap-2">
+                        <CheckCircle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+                        <span className="text-sm text-gray-700 dark:text-gray-200">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  
+                  <Link href={`/us/pricing?checkout=${plan.slug}`}>
+                    <Button 
+                      className={`w-full ${
+                        plan.popular 
+                          ? 'bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white' 
+                          : 'bg-gray-900 hover:bg-gray-800 text-white dark:bg-gray-700'
+                      }`}
+                    >
+                      Buy Now
+                    </Button>
+                  </Link>
+                </div>
+              ))}
+            </div>
+
+            {/* Lifetime Safeguards */}
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <Shield className="h-5 w-5 text-blue-600" />
+                Lifetime Plan Safeguards
+              </h3>
+              <ul className="grid md:grid-cols-2 gap-3 text-sm text-gray-700 dark:text-gray-300">
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
+                  <span>Invoice limits reset every January 1st</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
+                  <span>Lifetime = software access, not free infrastructure forever</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
+                  <span>Add-ons billed separately (monthly/yearly)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
+                  <span>Fair usage and abuse protection policy applies</span>
+                </li>
+              </ul>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Add-ons */}
       <section className="px-6 py-16 max-w-7xl mx-auto">

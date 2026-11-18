@@ -35,11 +35,85 @@ export default async function UAEPricingPage() {
     console.error('Error fetching UAE plans from database:', error)
   }
 
-  // Dynamic lifetime rates configured in Super Admin
-  const lifetimeStarter = dbPlans.find(p => p.slug === 'lifetime-ae' || p.slug === 'starter-ae-lifetime')?.price ?? 499
-  const lifetimeGrowth = dbPlans.find(p => p.slug === 'lifetime-growth-ae')?.price ?? 899
-  const lifetimePro = dbPlans.find(p => p.slug === 'lifetime-pro-ae')?.price ?? 1499
-  const lifetimeBusiness = dbPlans.find(p => p.slug === 'lifetime-enterprise-ae')?.price ?? 2499
+  // Lifetime Plan definitions mapped against database plans
+  const lifetimeConfigs = [
+    {
+      slug: 'lifetime-ae',
+      altSlug: 'starter-ae-lifetime',
+      name: 'Starter Lifetime',
+      defaultPrice: 499,
+      subtitle: 'For freelancers',
+      features: [
+        '1 user',
+        '300 invoices/year',
+        'VAT-compliant',
+        'Client management',
+        'Email support'
+      ],
+      popular: false
+    },
+    {
+      slug: 'lifetime-growth-ae',
+      name: 'Growth Lifetime',
+      defaultPrice: 899,
+      subtitle: 'For small businesses',
+      features: [
+        'Up to 3 users',
+        '1,200 invoices/year',
+        'Recurring invoices',
+        'Payment reminders',
+        'VAT reports',
+        'Priority support'
+      ],
+      popular: true
+    },
+    {
+      slug: 'lifetime-pro-ae',
+      name: 'Pro Lifetime',
+      defaultPrice: 1499,
+      subtitle: 'For agencies',
+      features: [
+        'Up to 5 users',
+        '3,000 invoices/year',
+        'Advanced VAT reports',
+        'Multi-currency',
+        'Custom templates',
+        'API access'
+      ],
+      popular: false
+    },
+    {
+      slug: 'lifetime-enterprise-ae',
+      name: 'Business Lifetime',
+      defaultPrice: 2499,
+      subtitle: 'For enterprises',
+      features: [
+        'Up to 10 users',
+        '10,000 invoices/year',
+        'White-label invoices',
+        'Client portal',
+        'Advanced analytics',
+        'Dedicated onboarding'
+      ],
+      popular: false
+    }
+  ]
+
+  // Filter ONLY active lifetime plans from database
+  const activeLifetimePlans = lifetimeConfigs
+    .map(cfg => {
+      const dbPlan = dbPlans.find(p => p.slug === cfg.slug || (cfg.altSlug && p.slug === cfg.altSlug))
+      if (!dbPlan || !dbPlan.is_active) return null
+      return {
+        ...cfg,
+        name: dbPlan.name || cfg.name,
+        price: Number(dbPlan.price),
+        slug: dbPlan.slug,
+        features: (Array.isArray(dbPlan.features) && dbPlan.features.length > 0) ? dbPlan.features : cfg.features,
+        popular: dbPlan.is_popular !== undefined ? dbPlan.is_popular : cfg.popular
+      }
+    })
+    .filter(Boolean) as (typeof lifetimeConfigs[0] & { price: number; slug: string })[]
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950">
@@ -96,229 +170,98 @@ export default async function UAEPricingPage() {
         <UAEPricingToggleSection plans={dbPlans} />
       </section>
 
-      {/* Lifetime Plans */}
-      <section id="lifetime" className="px-6 py-20 bg-linear-to-b from-amber-50 to-white dark:from-gray-900 dark:to-gray-950">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-100 dark:bg-amber-900/50 rounded-full border border-amber-200 dark:border-amber-800 mb-4">
-              <Zap className="h-4 w-4 text-amber-600" />
-              <span className="text-sm font-medium text-amber-900 dark:text-amber-100">Limited Time Offer</span>
-            </div>
-            <h2 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4">
-              Lifetime Access Plans
-            </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              Pay once, use forever. No monthly fees. Perfect for established businesses.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Starter Lifetime */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border-2 border-gray-200 dark:border-gray-700 shadow-lg">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Starter Lifetime</h3>
-              <div className="mb-4">
-                <span className="text-3xl font-bold text-gray-900 dark:text-white">AED {lifetimeStarter}</span>
-                <p className="text-sm text-gray-600 dark:text-gray-400">one-time payment</p>
+      {/* Lifetime Plans (Dynamically filtered from database - hidden if disabled in Super Admin) */}
+      {activeLifetimePlans.length > 0 && (
+        <section id="lifetime" className="px-6 py-20 bg-linear-to-b from-amber-50 to-white dark:from-gray-900 dark:to-gray-950">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-100 dark:bg-amber-900/50 rounded-full border border-amber-200 dark:border-amber-800 mb-4">
+                <Zap className="h-4 w-4 text-amber-600" />
+                <span className="text-sm font-medium text-amber-900 dark:text-amber-100">Limited Time Offer</span>
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">For freelancers</p>
-              
-              <ul className="space-y-2 mb-6">
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                  <span className="text-xs text-gray-700 dark:text-gray-200">1 user</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                  <span className="text-xs text-gray-700 dark:text-gray-200">300 invoices/year</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                  <span className="text-xs text-gray-700 dark:text-gray-200">VAT-compliant</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                  <span className="text-xs text-gray-700 dark:text-gray-200">Client management</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                  <span className="text-xs text-gray-700 dark:text-gray-200">Email support</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <X className="h-4 w-4 text-gray-400 shrink-0 mt-0.5" />
-                  <span className="text-xs text-gray-500">No AI Copilot</span>
-                </li>
-              </ul>
-              
-              <Link href="/ae/pricing?checkout=lifetime-ae">
-                <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white font-bold text-sm">
-                  Get Lifetime Access
-                </Button>
-              </Link>
+              <h2 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4">
+                Lifetime Access Plans
+              </h2>
+              <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+                Pay once, use forever. No monthly fees. Perfect for established businesses.
+              </p>
             </div>
 
-            {/* Growth Lifetime - MOST POPULAR */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border-2 border-blue-600 shadow-xl relative">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                  MOST POPULAR
-                </span>
-              </div>
-              
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Growth Lifetime</h3>
-              <div className="mb-4">
-                <span className="text-3xl font-bold text-gray-900 dark:text-white">AED {lifetimeGrowth}</span>
-                <p className="text-sm text-gray-600 dark:text-gray-400">one-time payment</p>
-              </div>
-              <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">For small businesses</p>
-              
-              <ul className="space-y-2 mb-6">
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                  <span className="text-xs text-gray-700 dark:text-gray-200"><strong>Up to 3 users</strong></span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                  <span className="text-xs text-gray-700 dark:text-gray-200">1,200 invoices/year</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                  <span className="text-xs text-gray-700 dark:text-gray-200">Recurring invoices</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                  <span className="text-xs text-gray-700 dark:text-gray-200">Payment reminders</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                  <span className="text-xs text-gray-700 dark:text-gray-200">VAT reports</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                  <span className="text-xs text-gray-700 dark:text-gray-200">Priority support</span>
-                </li>
-              </ul>
-              
-              <Link href="/ae/pricing?checkout=lifetime-growth-ae">
-                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm">
-                  Get Lifetime Access
-                </Button>
-              </Link>
+            <div className={`grid md:grid-cols-2 ${activeLifetimePlans.length >= 4 ? 'lg:grid-cols-4' : activeLifetimePlans.length === 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-2 max-w-4xl mx-auto'} gap-6`}>
+              {activeLifetimePlans.map((plan) => (
+                <div 
+                  key={plan.slug}
+                  className={`bg-white dark:bg-gray-800 rounded-2xl p-6 border-2 transition-all ${
+                    plan.popular ? 'border-blue-600 shadow-xl relative' : 'border-gray-200 dark:border-gray-700 shadow-lg'
+                  }`}
+                >
+                  {plan.popular && (
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                      <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                        MOST POPULAR
+                      </span>
+                    </div>
+                  )}
+
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{plan.name}</h3>
+                  <div className="mb-4">
+                    <span className="text-3xl font-bold text-gray-900 dark:text-white">AED {plan.price}</span>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">one-time payment</p>
+                  </div>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">{plan.subtitle}</p>
+                  
+                  <ul className="space-y-2 mb-6">
+                    {plan.features.map((feat, idx) => (
+                      <li key={idx} className="flex items-start gap-2">
+                        <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
+                        <span className="text-xs text-gray-700 dark:text-gray-200">
+                          {feat.includes('Up to') || feat.includes('Everything') ? (
+                            <strong>{feat}</strong>
+                          ) : (
+                            feat
+                          )}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                  
+                  <Link href={`/ae/pricing?checkout=${plan.slug}`}>
+                    <Button className={`w-full ${plan.popular ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-900 hover:bg-gray-800'} text-white font-bold text-sm`}>
+                      Get Lifetime Access
+                    </Button>
+                  </Link>
+                </div>
+              ))}
             </div>
 
-            {/* Pro Lifetime */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border-2 border-gray-200 dark:border-gray-700 shadow-lg">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Pro Lifetime</h3>
-              <div className="mb-4">
-                <span className="text-3xl font-bold text-gray-900 dark:text-white">AED {lifetimePro}</span>
-                <p className="text-sm text-gray-600 dark:text-gray-400">one-time payment</p>
-              </div>
-              <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">For agencies</p>
-              
-              <ul className="space-y-2 mb-6">
+            {/* Lifetime Terms */}
+            <div className="mt-12 bg-amber-50 dark:bg-amber-900/20 rounded-xl p-6 max-w-4xl mx-auto">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <Shield className="h-5 w-5 text-amber-600" />
+                Lifetime Plan Details
+              </h3>
+              <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
                 <li className="flex items-start gap-2">
                   <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                  <span className="text-xs text-gray-700 dark:text-gray-200"><strong>Up to 5 users</strong></span>
+                  <span>Invoice limits reset yearly</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                  <span className="text-xs text-gray-700 dark:text-gray-200">3,000 invoices/year</span>
+                  <span>Lifetime = software access, infrastructure follows fair-usage policy</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                  <span className="text-xs text-gray-700 dark:text-gray-200">Advanced VAT reports</span>
+                  <span>All future feature updates included</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                  <span className="text-xs text-gray-700 dark:text-gray-200">Multi-currency</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                  <span className="text-xs text-gray-700 dark:text-gray-200">Custom templates</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                  <span className="text-xs text-gray-700 dark:text-gray-200">API access</span>
+                  <span>Add-ons (AI Copilot, WhatsApp, extra users) available for additional fee</span>
                 </li>
               </ul>
-              
-              <Link href="/ae/pricing?checkout=lifetime-pro-ae">
-                <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white font-bold text-sm">
-                  Get Lifetime Access
-                </Button>
-              </Link>
-            </div>
-
-            {/* Business Lifetime */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border-2 border-gray-200 dark:border-gray-700 shadow-lg">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Business Lifetime</h3>
-              <div className="mb-4">
-                <span className="text-3xl font-bold text-gray-900 dark:text-white">AED {lifetimeBusiness}</span>
-                <p className="text-sm text-gray-600 dark:text-gray-400">one-time payment</p>
-              </div>
-              <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">For enterprises</p>
-              
-              <ul className="space-y-2 mb-6">
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                  <span className="text-xs text-gray-700 dark:text-gray-200"><strong>Up to 10 users</strong></span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                  <span className="text-xs text-gray-700 dark:text-gray-200">10,000 invoices/year</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                  <span className="text-xs text-gray-700 dark:text-gray-200">White-label</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                  <span className="text-xs text-gray-700 dark:text-gray-200">Client portal</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                  <span className="text-xs text-gray-700 dark:text-gray-200">Advanced analytics</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                  <span className="text-xs text-gray-700 dark:text-gray-200">Dedicated onboarding</span>
-                </li>
-              </ul>
-              
-              <Link href="/ae/pricing?checkout=lifetime-enterprise-ae">
-                <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white font-bold text-sm">
-                  Get Lifetime Access
-                </Button>
-              </Link>
             </div>
           </div>
-
-          {/* Lifetime Terms */}
-          <div className="mt-12 bg-amber-50 dark:bg-amber-900/20 rounded-xl p-6 max-w-4xl mx-auto">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-              <Shield className="h-5 w-5 text-amber-600" />
-              Lifetime Plan Details
-            </h3>
-            <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                <span>Invoice limits reset yearly</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                <span>Lifetime = software access, infrastructure follows fair-usage policy</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                <span>All future feature updates included</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                <span>Add-ons (AI Copilot, WhatsApp, extra users) available for additional fee</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Add-ons Section */}
       <section className="px-6 py-16 bg-gray-50 dark:bg-gray-900/50">

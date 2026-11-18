@@ -119,11 +119,16 @@ export default async function UAELandingPage() {
 
     if (dbPlans && dbPlans.length > 0) {
       starterPrice = Number(dbPlans.find((p: any) => p.slug === 'starter-ae')?.price ?? 49)
-      lifetimePrice = Number(dbPlans.find((p: any) => p.slug === 'lifetime-ae' || p.slug === 'starter-ae-lifetime')?.price ?? 499)
+      const lifetime = dbPlans.find((p: any) => p.slug === 'lifetime-ae' || p.slug === 'starter-ae-lifetime' || p.slug?.startsWith('lifetime'))
+      if (lifetime) {
+        lifetimePrice = Number(lifetime.price)
+      }
     }
   } catch {
     // Graceful fallback
   }
+
+  const hasActiveLifetime = lifetimePrice > 0
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased selection:bg-blue-600 selection:text-white" dir="ltr">
@@ -335,12 +340,14 @@ export default async function UAELandingPage() {
                   <td className="py-4 px-4 text-slate-400">AED 75 - AED 290 / mo</td>
                   <td className="py-4 px-4 text-slate-400">~$35 / mo (USD only)</td>
                 </tr>
-                <tr>
-                  <td className="py-4 px-4 text-slate-300 font-bold">Lifetime Founder Deal</td>
-                  <td className="py-4 px-4 font-extrabold text-emerald-400 bg-emerald-950/40">✅ AED {lifetimePrice} Lifetime</td>
-                  <td className="py-4 px-4 text-rose-400">❌ Recurring monthly only</td>
-                  <td className="py-4 px-4 text-rose-400">❌ Recurring monthly only</td>
-                </tr>
+                {hasActiveLifetime && (
+                  <tr>
+                    <td className="py-4 px-4 text-slate-300 font-bold">Lifetime Access Deal</td>
+                    <td className="py-4 px-4 font-extrabold text-emerald-400 bg-emerald-950/40">✅ AED {lifetimePrice} Lifetime</td>
+                    <td className="py-4 px-4 text-rose-400">❌ Recurring monthly only</td>
+                    <td className="py-4 px-4 text-rose-400">❌ Recurring monthly only</td>
+                  </tr>
+                )}
                 <tr>
                   <td className="py-4 px-4 text-slate-300 font-bold">Bilingual Arabic & English PDFs</td>
                   <td className="py-4 px-4 font-bold text-white bg-emerald-950/40">✅ Included natively</td>
