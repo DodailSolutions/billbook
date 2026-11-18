@@ -1406,12 +1406,13 @@ export async function postPaymentReceiptJournalEntry(params: {
     paymentDate?: string
     paymentMethod?: string
     customerName?: string
+    notes?: string
 }): Promise<{ success: boolean; entryId?: string; error?: string }> {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return { success: false, error: 'Unauthorized' }
 
-    const { paymentId, invoiceId, invoiceNumber, amount, paymentDate, paymentMethod, customerName } = params
+    const { paymentId, invoiceId, invoiceNumber, amount, paymentDate, paymentMethod, customerName, notes } = params
     if (amount <= 0) return { success: true }
 
     const ref = paymentId ? `PAY-${paymentId.slice(0, 8)}` : `PAY-INV-${invoiceNumber}-${Date.now().toString().slice(-4)}`
@@ -1433,7 +1434,7 @@ export async function postPaymentReceiptJournalEntry(params: {
             account_id: depositAccount.id,
             debit_amount: amount,
             credit_amount: 0,
-            memo: `Payment received for Invoice #${invoiceNumber || ''} via ${paymentMethod || 'Bank'}`
+            memo: `Payment received for Invoice #${invoiceNumber || ''} via ${paymentMethod || 'Bank'}${notes ? ' - ' + notes : ''}`
         },
         {
             account_id: arAcc.id,
@@ -1445,7 +1446,7 @@ export async function postPaymentReceiptJournalEntry(params: {
 
     const result = await createJournalEntry({
         entry_date: paymentDate || new Date().toISOString().slice(0, 10),
-        description: `Payment Received on Invoice #${invoiceNumber || ''}`,
+        description: `Payment Received on Invoice #${invoiceNumber || ''}${notes ? ' - ' + notes : ''}`,
         reference: ref,
         source: 'payment',
         lines

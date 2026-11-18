@@ -1,7 +1,7 @@
 export type AccountType = 'asset' | 'liability' | 'equity' | 'revenue' | 'expense'
 
 export type JournalEntryStatus = 'draft' | 'posted' | 'void'
-export type JournalEntrySource = 'manual' | 'invoice' | 'expense' | 'payment' | 'payroll'
+export type JournalEntrySource = 'manual' | 'invoice' | 'expense' | 'payment' | 'payroll' | 'purchase_order'
 
 export interface ChartOfAccount {
     id: string
