@@ -1087,3 +1087,81 @@ async function createRecurringFromInvoice(
     revalidatePath('/invoices/recurring')
     revalidatePath('/reminders')
 }
+
+export async function updateInvoicePaymentDateAction(params: {
+    invoiceId: string
+    paymentId?: string
+    paymentDate: string
+    paymentMethod?: string
+    paymentNotes?: string
+}) {
+    try {
+        const supabase = await createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) {
+            return { success: false, error: 'Unauthorized' }
+        }
+
+        const { invoiceId, paymentId, paymentDate, paymentMethod, paymentNotes } = params
+        if (!invoiceId || !paymentDate) {
+            return { success: false, error: 'Invoice ID and payment date are required' }
+        }
+
+        // 1. Update invoice paid_at directly on the invoice
+        const invoiceUpdate: Record<string, any> = {
+            paid_at: paymentDate
+        }
+        if (paymentMethod) invoiceUpdate.payment_method = paymentMethod
+        if (paymentNotes !== undefined) invoiceUpdate.payment_notes = paymentNotes
+
+        const { error: invoiceErr } = await supabase
+            .from('invoices')
+            .update(invoiceUpdate)
+            .eq('id', invoiceId)
+            .eq('user_id', user.id)
+
+        if (invoiceErr) {
+            console.error('Error updating invoice paid_at:', invoiceErr)
+            return { success: false, error: invoiceErr.message }
+        }
+
+        // 2. If paymentId is specified or if invoice_payments exist, update them
+        if (paymentId) {
+            const paymentUpdate: Record<string, any> = { payment_date: paymentDate }
+            if (paymentMethod) paymentUpdate.payment_method = paymentMethod
+            if (paymentNotes !== undefined) paymentUpdate.payment_notes = paymentNotes
+
+            await supabase
+                .from('invoice_payments')
+                .update(paymentUpdate)
+                .eq('id', paymentId)
+                .eq('user_id', user.id)
+        } else {
+            await supabase
+                .from('invoice_payments')
+                .update({ payment_date: paymentDate })
+                .eq('invoice_id', invoiceId)
+                .eq('user_id', user.id)
+        }
+
+        // 3. Sync linked General Ledger Journal Entry date if one exists
+        try {
+            await supabase
+                .from('journal_entries')
+                .update({ entry_date: paymentDate })
+                .eq('user_id', user.id)
+                .like('reference', `%INV-${invoiceId.slice(0, 8)}%`)
+        } catch (jeErr) {
+            console.warn('Non-fatal: could not sync journal entry date:', jeErr)
+        }
+
+        revalidatePath('/invoices')
+        revalidatePath(`/invoices/${invoiceId}`)
+
+        return { success: true }
+    } catch (err: any) {
+        console.error('Error in updateInvoicePaymentDateAction:', err)
+        return { success: false, error: err?.message || 'Failed to update payment date' }
+    }
+}
+

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { CheckCircle2, ChevronDown, ChevronUp, Calendar, CreditCard, FileText, Pencil, Check, X } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
+import { updateInvoicePaymentDateAction } from '../actions'
 
 interface PaidStatusCardProps {
     invoiceId: string
@@ -29,24 +30,12 @@ export function PaidStatusCard({
         if (!tempDate) return
         setIsSaving(true)
         try {
-            // Find recent payment id or update via API
-            const historyRes = await fetch(`/api/invoices/partial-payment?invoiceId=${invoiceId}`)
-            const data = await historyRes.json().catch(() => ({}))
-            const firstPayment = data.payments?.[0]
-
-            if (firstPayment?.id) {
-                const patchRes = await fetch('/api/invoices/partial-payment', {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        paymentId: firstPayment.id,
-                        paymentDate: tempDate
-                    })
-                })
-                if (!patchRes.ok) {
-                    const err = await patchRes.json().catch(() => ({}))
-                    throw new Error(err.error || 'Failed to update payment date')
-                }
+            const res = await updateInvoicePaymentDateAction({
+                invoiceId,
+                paymentDate: tempDate
+            })
+            if (!res.success) {
+                throw new Error(res.error || 'Failed to update payment date')
             }
             setCurrentDate(tempDate)
             setIsEditingDate(false)

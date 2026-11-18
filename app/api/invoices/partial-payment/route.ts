@@ -139,10 +139,23 @@ export async function PATCH(request: Request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        const { paymentId, paymentDate, paymentNotes, paymentMethod } = await request.json()
+        const { paymentId, invoiceId, paymentDate, paymentNotes, paymentMethod } = await request.json()
 
-        if (!paymentId || !paymentDate) {
-            return NextResponse.json({ error: 'Payment ID and Payment Date are required' }, { status: 400 })
+        if ((!paymentId && !invoiceId) || !paymentDate) {
+            return NextResponse.json({ error: 'Payment ID or Invoice ID, and Payment Date are required' }, { status: 400 })
+        }
+
+        // If invoiceId is provided, ensure invoice is updated directly
+        if (invoiceId) {
+            const invoiceUpdate: Record<string, any> = { paid_at: paymentDate }
+            if (paymentMethod) invoiceUpdate.payment_method = paymentMethod
+            if (paymentNotes !== undefined) invoiceUpdate.payment_notes = paymentNotes
+
+            await supabase
+                .from('invoices')
+                .update(invoiceUpdate)
+                .eq('id', invoiceId)
+                .eq('user_id', user.id)
         }
 
         // Update payment record
@@ -152,17 +165,27 @@ export async function PATCH(request: Request) {
         if (paymentNotes !== undefined) updatePayload.payment_notes = paymentNotes
         if (paymentMethod !== undefined) updatePayload.payment_method = paymentMethod
 
-        const { data: updatedPayment, error: updateError } = await supabase
-            .from('invoice_payments')
-            .update(updatePayload)
-            .eq('id', paymentId)
-            .eq('user_id', user.id)
-            .select()
-            .single()
+        let updatedPayment = null
+        if (paymentId) {
+            const { data, error: updateError } = await supabase
+                .from('invoice_payments')
+                .update(updatePayload)
+                .eq('id', paymentId)
+                .eq('user_id', user.id)
+                .select()
+                .single()
 
-        if (updateError) {
-            console.error('Error updating payment date:', updateError)
-            return NextResponse.json({ error: 'Failed to update payment: ' + updateError.message }, { status: 500 })
+            if (updateError) {
+                console.warn('Non-fatal payment update error:', updateError)
+            } else {
+                updatedPayment = data
+            }
+        } else if (invoiceId) {
+            await supabase
+                .from('invoice_payments')
+                .update(updatePayload)
+                .eq('invoice_id', invoiceId)
+                .eq('user_id', user.id)
         }
 
         // Also update invoice paid_at if this is linked to invoice

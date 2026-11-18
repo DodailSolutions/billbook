@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { DollarSign, Calendar, FileText, Pencil, Check, X } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
+import { updateInvoicePaymentDateAction } from '../actions'
 
 interface Payment {
     id: string
@@ -56,17 +57,13 @@ export function PaymentHistory({ invoiceId }: PaymentHistoryProps) {
         if (!editDate) return
         setIsUpdating(true)
         try {
-            const res = await fetch('/api/invoices/partial-payment', {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    paymentId,
-                    paymentDate: editDate
-                })
+            const res = await updateInvoicePaymentDateAction({
+                invoiceId,
+                paymentId,
+                paymentDate: editDate
             })
-            if (!res.ok) {
-                const errData = await res.json().catch(() => ({}))
-                throw new Error(errData.error || 'Failed to update payment date')
+            if (!res.success) {
+                throw new Error(res.error || 'Failed to update payment date')
             }
             // Update local state
             setPayments(prev => prev.map(p => p.id === paymentId ? { ...p, payment_date: editDate } : p))
