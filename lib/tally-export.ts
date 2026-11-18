@@ -41,6 +41,7 @@ function getTallyParentGroup(accountType: string, category: string, code: string
 }
 
 export interface TallyExportOptions {
+    clientId?: string
     fromDate?: string
     toDate?: string
     includeMasters?: boolean
@@ -59,14 +60,47 @@ export async function generateTallyXml(options: TallyExportOptions = {}): Promis
     }
 
     const {
+        clientId,
         fromDate,
         toDate,
         includeMasters = true,
         includeVouchers = true
     } = options
 
-    // 1. Fetch Chart of Accounts
-    const accounts = await getChartOfAccounts()
+    let targetUserId = user.id
+    if (clientId && clientId !== user.id) {
+        // Verify CA delegation
+        const { data: caAccess } = await supabase
+            .from('client_ca_access')
+            .select('id, status')
+            .eq('ca_user_id', user.id)
+            .eq('client_user_id', clientId)
+            .eq('status', 'active')
+            .maybeSingle()
+
+        if (!caAccess) {
+            // Check fallback in ca_data_access or ca_engagements
+            const { data: caProfile } = await supabase
+                .from('ca_professionals')
+                .select('id')
+                .eq('user_id', user.id)
+                .maybeSingle()
+
+            if (!caProfile) {
+                throw new Error('Unauthorized: No active CA delegation for this client')
+            }
+        }
+        targetUserId = clientId
+    }
+
+    // 1. Fetch Chart of Accounts for target user
+    const { data: rawAccounts } = await supabase
+        .from('chart_of_accounts')
+        .select('*')
+        .eq('user_id', targetUserId)
+        .order('account_code', { ascending: true })
+
+    const accounts = rawAccounts || []
 
     // 2. Fetch Invoices (Sales Vouchers)
     let invoiceQuery = supabase
@@ -83,7 +117,7 @@ export async function generateTallyXml(options: TallyExportOptions = {}): Promis
             customer:customers(id, name, gstin, state),
             items:invoice_items(id, description, quantity, unit_price, total, tax_rate)
         `)
-        .eq('user_id', user.id)
+        .eq('user_id', targetUserId)
 
     if (fromDate) invoiceQuery = invoiceQuery.gte('issue_date', fromDate)
     if (toDate) invoiceQuery = invoiceQuery.lte('issue_date', toDate)
@@ -93,7 +127,7 @@ export async function generateTallyXml(options: TallyExportOptions = {}): Promis
     let expenseQuery = supabase
         .from('expenses')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('user_id', targetUserId)
 
     if (fromDate) expenseQuery = expenseQuery.gte('date', fromDate)
     if (toDate) expenseQuery = expenseQuery.lte('date', toDate)
@@ -110,7 +144,7 @@ export async function generateTallyXml(options: TallyExportOptions = {}): Promis
             status,
             vendor:vendors(id, name, gstin)
         `)
-        .eq('user_id', user.id)
+        .eq('user_id', targetUserId)
 
     if (fromDate) poQuery = poQuery.gte('po_date', fromDate)
     if (toDate) poQuery = poQuery.lte('po_date', toDate)

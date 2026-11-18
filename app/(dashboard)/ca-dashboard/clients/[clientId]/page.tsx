@@ -289,17 +289,17 @@ export default async function ClientDetailsPage({ params }: ClientDetailsPagePro
           <CardTitle>Quick Actions</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
             <Link href={`/ca-dashboard/clients/${params.clientId}/ai-audit`}>
               <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-700 dark:hover:bg-blue-600">
                 <Brain className="h-4 w-4 mr-2" />
-                AI Transaction Audit
+                AI Audit
               </Button>
             </Link>
             <Link href={`/ca-dashboard/clients/${params.clientId}/reports`}>
               <Button variant="outline" className="w-full">
                 <FileText className="h-4 w-4 mr-2" />
-                View Reports
+                Reports
               </Button>
             </Link>
             <Link href={`/ca-dashboard/clients/${params.clientId}/gst`}>
@@ -308,6 +308,12 @@ export default async function ClientDetailsPage({ params }: ClientDetailsPagePro
                 GST Returns
               </Button>
             </Link>
+            <a href={`/api/bookkeeping/tally-export?clientId=${params.clientId}`} download>
+              <Button variant="outline" className="w-full border-emerald-300 text-emerald-800 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-300">
+                <IndianRupee className="h-4 w-4 mr-2 text-emerald-600" />
+                Tally XML
+              </Button>
+            </a>
             <Link href={`/ca-dashboard/clients/${params.clientId}/activity`}>
               <Button variant="outline" className="w-full">
                 <Activity className="h-4 w-4 mr-2" />

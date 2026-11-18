@@ -6,8 +6,10 @@ export async function GET(request: Request) {
         const { searchParams } = new URL(request.url)
         const fromDate = searchParams.get('fromDate') || undefined
         const toDate = searchParams.get('toDate') || undefined
+        const clientId = searchParams.get('clientId') || undefined
 
         const xml = await generateTallyXml({
+            clientId,
             fromDate,
             toDate,
             includeMasters: true,
