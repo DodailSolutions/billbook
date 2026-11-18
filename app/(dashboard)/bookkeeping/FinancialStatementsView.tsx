@@ -327,74 +327,69 @@ export function FinancialStatementsView() {
             )}
 
             {/* Universal Filter & Controls Bar */}
-            <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-2xs space-y-3">
-                <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="bg-white dark:bg-gray-900 p-3.5 sm:p-4 rounded-xl border border-gray-200 dark:border-gray-800 shadow-2xs space-y-3">
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
                     {/* Left: Date Presets and Pickers */}
-                    <div className="flex flex-wrap items-center gap-2.5">
-                        <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium">
-                            <Calendar className="h-4 w-4 text-blue-600" />
-                            <span>Period:</span>
-                        </div>
-
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 flex-wrap">
                         {/* Quick Presets */}
-                        <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-lg text-[11px] font-semibold">
+                        <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg text-[11px] font-semibold overflow-x-auto scrollbar-none shrink-0">
+                            <span className="text-[10px] text-gray-500 uppercase px-1 hidden sm:inline">FY:</span>
                             <button 
                                 onClick={() => applyDatePreset('this_fy')} 
-                                className="px-2 py-0.5 rounded hover:bg-white transition-colors"
+                                className="px-2 py-0.5 rounded hover:bg-white dark:hover:bg-gray-700 transition-colors cursor-pointer"
                             >
                                 This FY
                             </button>
                             <button 
                                 onClick={() => applyDatePreset('last_fy')} 
-                                className="px-2 py-0.5 rounded hover:bg-white transition-colors"
+                                className="px-2 py-0.5 rounded hover:bg-white dark:hover:bg-gray-700 transition-colors cursor-pointer"
                             >
                                 Last FY
                             </button>
                             <button 
                                 onClick={() => applyDatePreset('this_month')} 
-                                className="px-2 py-0.5 rounded hover:bg-white transition-colors"
+                                className="px-2 py-0.5 rounded hover:bg-white dark:hover:bg-gray-700 transition-colors cursor-pointer"
                             >
-                                This Month
+                                Month
                             </button>
                             <button 
                                 onClick={() => applyDatePreset('this_quarter')} 
-                                className="px-2 py-0.5 rounded hover:bg-white transition-colors"
+                                className="px-2 py-0.5 rounded hover:bg-white dark:hover:bg-gray-700 transition-colors cursor-pointer"
                             >
                                 Qtr
                             </button>
                             <button 
                                 onClick={() => applyDatePreset('all_time')} 
-                                className="px-2 py-0.5 rounded hover:bg-white transition-colors"
+                                className="px-2 py-0.5 rounded hover:bg-white dark:hover:bg-gray-700 transition-colors cursor-pointer"
                             >
                                 All
                             </button>
                         </div>
 
                         {/* Explicit Date Inputs */}
-                        <div className="flex items-center gap-1.5 text-xs">
+                        <div className="grid grid-cols-2 sm:flex sm:items-center gap-1.5 text-xs w-full sm:w-auto">
                             <input
                                 type="date"
                                 value={fromDate}
                                 onChange={(e) => setFromDate(e.target.value)}
-                                className="px-2 py-1 text-xs border border-gray-200 rounded-lg focus:ring-1 focus:ring-blue-500 bg-slate-50 font-mono"
+                                className="w-full sm:w-auto px-2 py-1 text-xs border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-1 focus:ring-blue-500 bg-slate-50 dark:bg-gray-800 font-mono text-gray-900 dark:text-white"
                             />
-                            <span className="text-gray-400">to</span>
                             <input
                                 type="date"
                                 value={toDate}
                                 onChange={(e) => setToDate(e.target.value)}
-                                className="px-2 py-1 text-xs border border-gray-200 rounded-lg focus:ring-1 focus:ring-blue-500 bg-slate-50 font-mono"
+                                className="w-full sm:w-auto px-2 py-1 text-xs border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-1 focus:ring-blue-500 bg-slate-50 dark:bg-gray-800 font-mono text-gray-900 dark:text-white"
                             />
                         </div>
 
                         {/* Summary vs Detailed Toggle */}
                         {subTab !== 'cash_flow' && subTab !== 'general_ledger' && (
-                            <div className="flex items-center gap-1 border-l border-gray-200 pl-2">
+                            <div className="flex items-center gap-1 sm:border-l border-gray-200 dark:border-gray-700 sm:pl-2">
                                 <span className="text-[11px] text-gray-500">View:</span>
                                 <select
                                     value={viewMode}
                                     onChange={(e) => setViewMode(e.target.value as 'summary' | 'detailed')}
-                                    className="px-2 py-1 text-xs border border-gray-200 rounded-lg focus:ring-1 focus:ring-blue-500 bg-slate-50 font-medium"
+                                    className="px-2 py-1 text-xs border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-1 focus:ring-blue-500 bg-slate-50 dark:bg-gray-800 font-medium text-gray-900 dark:text-white"
                                 >
                                     <option value="detailed">Detailed</option>
                                     <option value="summary">Summary</option>
@@ -403,12 +398,12 @@ export function FinancialStatementsView() {
                         )}
 
                         {/* Hide Zero Balances Toggle */}
-                        <div className="flex items-center gap-1 border-l border-gray-200 pl-2">
+                        <div className="flex items-center gap-1 sm:border-l border-gray-200 dark:border-gray-700 sm:pl-2">
                             <span className="text-[11px] text-gray-500">Hide Zero:</span>
                             <select
                                 value={hideZero ? 'yes' : 'no'}
                                 onChange={(e) => setHideZero(e.target.value === 'yes')}
-                                className="px-2 py-1 text-xs border border-gray-200 rounded-lg focus:ring-1 focus:ring-blue-500 bg-slate-50 font-medium"
+                                className="px-2 py-1 text-xs border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-1 focus:ring-blue-500 bg-slate-50 dark:bg-gray-800 font-medium text-gray-900 dark:text-white"
                             >
                                 <option value="yes">Yes</option>
                                 <option value="no">No</option>
@@ -417,7 +412,7 @@ export function FinancialStatementsView() {
 
                         {/* Account Selector for General Ledger */}
                         {subTab === 'general_ledger' && (
-                            <div className="flex items-center gap-1 border-l border-gray-200 pl-2">
+                            <div className="flex items-center gap-1 sm:border-l border-gray-200 dark:border-gray-700 sm:pl-2">
                                 <span className="text-[11px] text-gray-500 font-semibold">Account:</span>
                                 <select
                                     value={selectedAccountId}
@@ -434,45 +429,56 @@ export function FinancialStatementsView() {
                         )}
                     </div>
 
-                    {/* Right: Actions (Print, Export CSV, Refresh, Sync) */}
-                    <div className="flex items-center gap-2">
+                    {/* Right: Actions (Print, Export CSV, Tally XML, Refresh, Sync) */}
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => { window.location.href = `/api/bookkeeping/tally-export?fromDate=${fromDate}&toDate=${toDate}` }}
+                            className="text-xs gap-1 border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/40"
+                            title="Export standard Tally Prime XML for this date range"
+                        >
+                            <Download className="h-3 w-3 text-emerald-600" />
+                            <span>Tally XML</span>
+                        </Button>
+
                         <Button
                             variant="outline"
                             size="sm"
                             onClick={handleSync}
                             disabled={isPending}
-                            className="text-xs gap-1.5 border-blue-200 text-blue-700 hover:bg-blue-50"
+                            className="text-xs gap-1 border-blue-200 text-blue-700 hover:bg-blue-50"
                             title="Sync posted invoices and expenses directly into double-entry accounting records"
                         >
-                            <DatabaseZap className="h-3.5 w-3.5" />
-                            {isPending ? 'Syncing...' : 'Sync Invoices/Exp'}
+                            <DatabaseZap className="h-3 w-3" />
+                            <span>{isPending ? 'Syncing...' : 'Sync GL'}</span>
                         </Button>
 
                         <Button
                             variant="outline"
                             size="sm"
                             onClick={handleExportCSV}
-                            className="text-xs gap-1.5"
+                            className="text-xs gap-1"
                         >
-                            <Download className="h-3.5 w-3.5" />
-                            Export Excel
+                            <Download className="h-3 w-3" />
+                            <span>Excel</span>
                         </Button>
 
                         <Button
                             variant="outline"
                             size="sm"
                             onClick={handlePrint}
-                            className="text-xs gap-1.5"
+                            className="text-xs gap-1"
                         >
-                            <Printer className="h-3.5 w-3.5" />
-                            Print
+                            <Printer className="h-3 w-3" />
+                            <span>Print</span>
                         </Button>
 
                         <Button
                             variant="outline"
                             size="sm"
                             onClick={loadReports}
-                            className="text-xs p-2"
+                            className="text-xs p-1.5 sm:p-2"
                             title="Refresh Report Data"
                         >
                             <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} />
