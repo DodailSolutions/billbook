@@ -94,39 +94,53 @@ export async function seedDefaultCoA(): Promise<{ success: boolean; count?: numb
         return { success: false, error: error.message }
     }
 
-    revalidatePath('/bookkeeping')
+    try {
+        revalidatePath('/bookkeeping')
+    } catch {
+        // Safe to ignore in read/render context
+    }
     return { success: true, count: data.length }
 }
 
 export async function getChartOfAccounts(): Promise<ChartOfAccount[]> {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    try {
+        const supabase = await createClient()
+        const { data: { user } } = await supabase.auth.getUser()
 
-    if (!user) return []
+        if (!user) return []
 
-    const { data, error } = await supabase
-        .from('chart_of_accounts')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('account_code', { ascending: true })
-
-    if (error) {
-        console.error('Error fetching Chart of Accounts:', error)
-        return []
-    }
-
-    // Auto-seed if empty
-    if (!data || data.length === 0) {
-        await seedDefaultCoA()
-        const { data: seededData } = await supabase
+        const { data, error } = await supabase
             .from('chart_of_accounts')
             .select('*')
             .eq('user_id', user.id)
             .order('account_code', { ascending: true })
-        return (seededData as ChartOfAccount[]) || []
-    }
 
-    return data as ChartOfAccount[]
+        if (error) {
+            console.error('Error fetching Chart of Accounts:', error)
+            return []
+        }
+
+        // Auto-seed if empty
+        if (!data || data.length === 0) {
+            try {
+                await seedDefaultCoA()
+                const { data: seededData } = await supabase
+                    .from('chart_of_accounts')
+                    .select('*')
+                    .eq('user_id', user.id)
+                    .order('account_code', { ascending: true })
+                return (seededData as ChartOfAccount[]) || []
+            } catch (seedErr) {
+                console.warn('Auto-seed CoA error (non-fatal):', seedErr)
+                return []
+            }
+        }
+
+        return (data as ChartOfAccount[]) || []
+    } catch (err) {
+        console.error('Unexpected error in getChartOfAccounts:', err)
+        return []
+    }
 }
 
 export async function createAccount(input: CreateAccountInput): Promise<{ success: boolean; data?: ChartOfAccount; error?: string }> {
@@ -163,61 +177,84 @@ export async function createAccount(input: CreateAccountInput): Promise<{ succes
 }
 
 export async function getJournalEntries(): Promise<JournalEntry[]> {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    try {
+        const supabase = await createClient()
+        const { data: { user } } = await supabase.auth.getUser()
 
-    if (!user) return []
+        if (!user) return []
 
-    const { data: entries, error } = await supabase
-        .from('journal_entries')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('entry_date', { ascending: false })
+        const { data: entries, error } = await supabase
+            .from('journal_entries')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('entry_date', { ascending: false })
 
-    if (error || !entries) {
-        console.error('Error fetching journal entries:', error)
+        if (error || !entries) {
+            console.error('Error fetching journal entries:', error)
+            return []
+        }
+
+        const entryIds = entries.map(e => e.id)
+        if (entryIds.length === 0) return []
+
+        // Fetch lines safely
+        const { data: lines, error: linesErr } = await supabase
+            .from('journal_entry_lines')
+            .select('*')
+            .in('journal_entry_id', entryIds)
+
+        if (linesErr) {
+            console.warn('Non-fatal: Error fetching journal entry lines:', linesErr)
+        }
+
+        // Fetch user CoA map to resolve account names reliably without fragile join
+        const { data: coaAccounts } = await supabase
+            .from('chart_of_accounts')
+            .select('id, account_name, account_code')
+            .eq('user_id', user.id)
+
+        const coaMap = new Map<string, { account_name: string; account_code: string }>()
+        if (coaAccounts) {
+            for (const acc of coaAccounts) {
+                coaMap.set(acc.id, { account_name: acc.account_name, account_code: acc.account_code })
+            }
+        }
+
+        const linesByEntry = new Map<string, JournalEntryLine[]>()
+        if (lines) {
+            for (const l of lines) {
+                const entryId = l.journal_entry_id
+                if (!linesByEntry.has(entryId)) linesByEntry.set(entryId, [])
+                
+                const coa = coaMap.get(l.account_id)
+                linesByEntry.get(entryId)!.push({
+                    id: l.id,
+                    journal_entry_id: l.journal_entry_id,
+                    account_id: l.account_id,
+                    debit_amount: Number(l.debit_amount || 0),
+                    credit_amount: Number(l.credit_amount || 0),
+                    memo: l.memo,
+                    account_name: coa?.account_name || 'Account',
+                    account_code: coa?.account_code || ''
+                })
+            }
+        }
+
+        return entries.map(e => {
+            const entryLines = linesByEntry.get(e.id) || []
+            const total_debit = entryLines.reduce((sum, l) => sum + l.debit_amount, 0)
+            const total_credit = entryLines.reduce((sum, l) => sum + l.credit_amount, 0)
+            return {
+                ...e,
+                lines: entryLines,
+                total_debit,
+                total_credit
+            } as JournalEntry
+        })
+    } catch (err) {
+        console.error('Unexpected error in getJournalEntries:', err)
         return []
     }
-
-    const entryIds = entries.map(e => e.id)
-    if (entryIds.length === 0) return []
-
-    const { data: lines } = await supabase
-        .from('journal_entry_lines')
-        .select('*, chart_of_accounts(account_name, account_code)')
-        .in('journal_entry_id', entryIds)
-
-    const linesByEntry = new Map<string, JournalEntryLine[]>()
-    if (lines) {
-        for (const l of lines) {
-            const entryId = l.journal_entry_id
-            if (!linesByEntry.has(entryId)) linesByEntry.set(entryId, [])
-            
-            const coa = l.chart_of_accounts as any
-            linesByEntry.get(entryId)!.push({
-                id: l.id,
-                journal_entry_id: l.journal_entry_id,
-                account_id: l.account_id,
-                debit_amount: Number(l.debit_amount || 0),
-                credit_amount: Number(l.credit_amount || 0),
-                memo: l.memo,
-                account_name: coa?.account_name || 'Account',
-                account_code: coa?.account_code || ''
-            })
-        }
-    }
-
-    return entries.map(e => {
-        const entryLines = linesByEntry.get(e.id) || []
-        const total_debit = entryLines.reduce((sum, l) => sum + l.debit_amount, 0)
-        const total_credit = entryLines.reduce((sum, l) => sum + l.credit_amount, 0)
-        return {
-            ...e,
-            lines: entryLines,
-            total_debit,
-            total_credit
-        } as JournalEntry
-    })
 }
 
 export async function createJournalEntry(input: CreateJournalEntryInput): Promise<{ success: boolean; data?: any; error?: string }> {
@@ -1150,23 +1187,28 @@ export async function syncInvoicesAndExpensesToLedger(): Promise<{
 }
 
 export async function getBankAccounts(): Promise<BankAccount[]> {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    try {
+        const supabase = await createClient()
+        const { data: { user } } = await supabase.auth.getUser()
 
-    if (!user) return []
+        if (!user) return []
 
-    const { data, error } = await supabase
-        .from('bank_accounts')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
+        const { data, error } = await supabase
+            .from('bank_accounts')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
 
-    if (error) {
-        console.error('Error fetching bank accounts:', error)
+        if (error) {
+            console.error('Error fetching bank accounts:', error)
+            return []
+        }
+
+        return (data as BankAccount[]) || []
+    } catch (err) {
+        console.error('Unexpected error in getBankAccounts:', err)
         return []
     }
-
-    return data as BankAccount[]
 }
 
 export async function createBankAccount(input: CreateBankAccountInput): Promise<{ success: boolean; data?: BankAccount; error?: string }> {

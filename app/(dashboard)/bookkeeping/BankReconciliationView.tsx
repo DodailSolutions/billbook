@@ -28,12 +28,17 @@ export function BankReconciliationView() {
 
     const fetchAccounts = async () => {
         setLoading(true)
-        const data = await getBankAccounts()
-        setBankAccounts(data)
-        if (data.length > 0 && !selectedAccount) {
-            setSelectedAccount(data[0])
+        try {
+            const data = await getBankAccounts()
+            setBankAccounts(data || [])
+            if (data && data.length > 0 && !selectedAccount) {
+                setSelectedAccount(data[0])
+            }
+        } catch (e) {
+            console.error('Error fetching bank accounts:', e)
+        } finally {
+            setLoading(false)
         }
-        setLoading(false)
     }
 
     useEffect(() => {
