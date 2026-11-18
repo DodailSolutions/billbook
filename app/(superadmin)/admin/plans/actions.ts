@@ -547,7 +547,7 @@ export async function getAllPlans(currency?: string): Promise<SubscriptionPlan[]
     }
 }
 
-export function revalidateAllPricingRoutes() {
+export async function revalidateAllPricingRoutes() {
     revalidatePath('/admin/plans')
     revalidatePath('/')
     revalidatePath('/pricing')

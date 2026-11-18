@@ -249,25 +249,6 @@ export default function FounderCircle({ isAuthenticated = false, plans = [] }: F
             </div>
           )}
         </div>
-                      <>
-                        <Zap className="h-3.5 w-3.5 text-indigo-600 fill-indigo-600" />
-                        <span>Try 14 Days Free</span>
-                      </>
-                    )}
-                  </button>
-                </>
-              ) : (
-                <button disabled className="w-full h-12 bg-gray-300 dark:bg-gray-800 text-gray-500 font-bold rounded-xl text-sm sm:text-base cursor-not-allowed">
-                  Sold Out
-                </button>
-              )}
-
-              <p className="text-[11px] text-center text-slate-500 dark:text-slate-400">
-                Cancel anytime during trial • Instant activation upon purchase
-              </p>
-            </div>
-          </div>
-        </div>
 
         {/* Bottom Application Link */}
         <div className="text-center pt-4">
