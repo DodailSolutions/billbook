@@ -225,8 +225,32 @@ export function CameraLiveMonitor({ camera }: CameraLiveMonitorProps) {
             </div>
 
             {webcamError && (
-                <div className="absolute bottom-10 left-3 right-3 bg-rose-950/90 border border-rose-500/50 p-2 rounded text-[11px] text-rose-200 z-30">
-                    {webcamError}
+                <div className="absolute bottom-10 left-3 right-3 bg-slate-900/95 border border-rose-500/60 p-3 rounded-xl text-xs text-slate-200 z-30 shadow-2xl backdrop-blur-md flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                    <div className="flex items-start sm:items-center gap-2">
+                        <div className="w-6 h-6 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0">
+                            ✕
+                        </div>
+                        <div>
+                            <p className="font-bold text-white text-[11px]">Browser Camera Access Blocked</p>
+                            <p className="text-[10px] text-slate-400 leading-tight">
+                                Click the <strong>lock / camera icon</strong> on the left side of your browser URL address bar and change Camera to <strong>&ldquo;Allow&rdquo;</strong>, or enable Chrome in <strong>macOS System Settings &rarr; Privacy &rarr; Camera</strong>.
+                            </p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                        <button
+                            onClick={toggleWebcam}
+                            className="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-[11px] rounded-lg transition-colors cursor-pointer"
+                        >
+                            Try Again
+                        </button>
+                        <button
+                            onClick={() => setWebcamError(null)}
+                            className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white text-[11px] rounded-lg transition-colors"
+                        >
+                            Dismiss
+                        </button>
+                    </div>
                 </div>
             )}
         </div>
