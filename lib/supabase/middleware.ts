@@ -17,10 +17,10 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
     // Referrer policy
     response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
     
-    // Permissions policy
+    // Permissions policy - allow camera on self for CCTV biometric kiosk and scanning
     response.headers.set(
         'Permissions-Policy',
-        'camera=(), microphone=(), geolocation=(), interest-cohort=()'
+        'camera=(self), microphone=(), geolocation=(), interest-cohort=()'
     )
     
     // Content Security Policy (CSP)

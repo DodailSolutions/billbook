@@ -24,6 +24,7 @@ export function CameraLiveMonitor({ camera }: CameraLiveMonitorProps) {
     const [currentTime, setCurrentTime] = useState('')
     const [fps, setFps] = useState('15.0')
     const [isWebcamActive, setIsWebcamActive] = useState(false)
+    const [useSimulatedFeed, setUseSimulatedFeed] = useState(false)
     const [webcamError, setWebcamError] = useState<string | null>(null)
     const [isFullscreen, setIsFullscreen] = useState(false)
     const videoRef = useRef<HTMLVideoElement | null>(null)
@@ -62,6 +63,7 @@ export function CameraLiveMonitor({ camera }: CameraLiveMonitorProps) {
             setIsWebcamActive(false)
             setWebcamError(null)
         } else {
+            setUseSimulatedFeed(false)
             setWebcamError(null)
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ 
@@ -76,6 +78,21 @@ export function CameraLiveMonitor({ camera }: CameraLiveMonitorProps) {
                 console.error('Webcam error:', err)
                 setWebcamError(err?.message || 'Camera permission denied or camera unavailable.')
             }
+        }
+    }
+
+    const toggleSimulatedFeed = () => {
+        if (useSimulatedFeed) {
+            setUseSimulatedFeed(false)
+        } else {
+            if (isWebcamActive && videoRef.current && videoRef.current.srcObject) {
+                const stream = videoRef.current.srcObject as MediaStream
+                stream.getTracks().forEach(track => track.stop())
+                videoRef.current.srcObject = null
+                setIsWebcamActive(false)
+            }
+            setUseSimulatedFeed(true)
+            setWebcamError(null)
         }
     }
 
@@ -117,6 +134,18 @@ export function CameraLiveMonitor({ camera }: CameraLiveMonitorProps) {
                 className={`absolute inset-0 w-full h-full object-cover z-0 ${isWebcamActive ? 'block' : 'hidden'}`}
             />
 
+            {/* Simulated Live CCTV Feed */}
+            {useSimulatedFeed && (
+                <video 
+                    src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="absolute inset-0 w-full h-full object-cover z-0 block"
+                />
+            )}
+
             {/* Scanline & Grid Effect Overlay */}
             <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_50%,rgba(0,0,0,0.4)_51%)] bg-[length:100%_4px] pointer-events-none opacity-50 z-10" />
 
@@ -134,7 +163,7 @@ export function CameraLiveMonitor({ camera }: CameraLiveMonitorProps) {
                             : 'bg-slate-800 text-slate-400'
                     }`}>
                         <span className={`w-1.5 h-1.5 rounded-full ${camera.is_active ? 'bg-white animate-pulse' : 'bg-slate-400'}`} />
-                        {camera.is_active ? (isWebcamActive ? 'LIVE WEBCAM' : 'LIVE FEED') : 'PAUSED'}
+                        {camera.is_active ? (isWebcamActive ? 'LIVE WEBCAM' : useSimulatedFeed ? 'CCTV TEST FEED' : 'LIVE FEED') : 'PAUSED'}
                     </span>
 
                     {displaySerial && (
@@ -205,6 +234,20 @@ export function CameraLiveMonitor({ camera }: CameraLiveMonitorProps) {
                 </div>
 
                 <div className="flex items-center gap-2">
+                    {/* Sample CCTV Video Toggle */}
+                    <button
+                        onClick={toggleSimulatedFeed}
+                        className={`px-2 py-0.5 rounded text-[10px] font-sans font-semibold flex items-center gap-1 transition-colors cursor-pointer ${
+                            useSimulatedFeed 
+                                ? 'bg-amber-600 text-white hover:bg-amber-700' 
+                                : 'bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700'
+                        }`}
+                        title="Toggle sample CCTV video loop"
+                    >
+                        <Video className="w-3 h-3" />
+                        {useSimulatedFeed ? 'Stop Sample' : 'Sample Feed'}
+                    </button>
+
                     {/* Live Webcam Toggle Button for immediate real camera preview */}
                     <button
                         onClick={toggleWebcam}
@@ -238,6 +281,12 @@ export function CameraLiveMonitor({ camera }: CameraLiveMonitorProps) {
                         </div>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
+                        <button
+                            onClick={toggleSimulatedFeed}
+                            className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-[11px] rounded-lg transition-colors cursor-pointer"
+                        >
+                            Play Sample Feed
+                        </button>
                         <button
                             onClick={toggleWebcam}
                             className="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-[11px] rounded-lg transition-colors cursor-pointer"
