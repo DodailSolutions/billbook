@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json({ 
             success: true, 
-            movement: result.movement,
+            movement_id: result.movement_id,
             message: `Attendance punch '${event_type}' logged successfully.` 
         })
     } catch (err: any) {
