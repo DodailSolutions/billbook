@@ -62,13 +62,16 @@ export default function CctvConnectorPage() {
 
     // Form Mode: 'easy_p2p' (default EasyView-like) or 'manual_rtsp'
     const [connectionMode, setConnectionMode] = useState<'easy_p2p' | 'manual_rtsp'>('easy_p2p')
-    const [selectedBrand, setSelectedBrand] = useState('uniview')
+    const [selectedBrand, setSelectedBrand] = useState('dahua')
+    const [deviceSerial, setDeviceSerial] = useState('')
     const [deviceHost, setDeviceHost] = useState('192.168.1.108')
     const [devicePort, setDevicePort] = useState('554')
     const [deviceUser, setDeviceUser] = useState('admin')
     const [devicePass, setDevicePass] = useState('')
     const [deviceChannel, setDeviceChannel] = useState('1')
     const [showPassword, setShowPassword] = useState(false)
+    const [scanningLan, setScanningLan] = useState(false)
+    const [discoveredDvrs, setDiscoveredDvrs] = useState<any[]>([])
 
     // Form Common State
     const [editingCamera, setEditingCamera] = useState<CctvCamera | null>(null)
@@ -115,7 +118,9 @@ export default function CctvConnectorPage() {
     }
 
     const effectiveStreamUrl = connectionMode === 'easy_p2p'
-        ? buildRTSPUrl(selectedBrand, deviceHost, devicePort, deviceUser, devicePass, deviceChannel)
+        ? (deviceHost.trim()
+            ? buildRTSPUrl(selectedBrand, deviceHost, devicePort, deviceUser, devicePass, deviceChannel)
+            : (deviceSerial.trim() ? `p2p://${selectedBrand}:${deviceSerial.trim()}:${encodeURIComponent(deviceUser)}:${encodeURIComponent(devicePass)}@cloud/ch${deviceChannel}` : ''))
         : streamUrl
 
     const loadCameras = async () => {
@@ -138,8 +143,9 @@ export default function CctvConnectorPage() {
         setEditingCamera(null)
         setCameraName('')
         setConnectionMode('easy_p2p')
-        setSelectedBrand('uniview')
-        setDeviceHost('192.168.1.108')
+        setSelectedBrand('dahua')
+        setDeviceSerial('')
+        setDeviceHost('')
         setDevicePort('554')
         setDeviceUser('admin')
         setDevicePass('')
@@ -148,6 +154,7 @@ export default function CctvConnectorPage() {
         setLocation('Main Entrance')
         setDirectionMode('bidirectional')
         setStreamTestResult(null)
+        setDiscoveredDvrs([])
         setIsModalOpen(true)
     }
 
@@ -162,29 +169,84 @@ export default function CctvConnectorPage() {
         setIsModalOpen(true)
     }
 
-    const handleTestStream = async () => {
-        const urlToTest = effectiveStreamUrl
-        if (!urlToTest || (!deviceHost && connectionMode === 'easy_p2p')) {
-            setStreamTestResult({ success: false, msg: 'Please enter camera IP / DVR details first.' })
-            return
+    const handleScanLan = async () => {
+        setScanningLan(true)
+        setDiscoveredDvrs([])
+        try {
+            const res = await fetch(`${bridgeHost}/devices/scan`, { signal: AbortSignal.timeout(3500) })
+            const data = await res.json()
+            if (data.success && data.devices && data.devices.length > 0) {
+                setDiscoveredDvrs(data.devices)
+            } else {
+                setStreamTestResult({
+                    success: false,
+                    msg: 'No DVRs detected automatically on local network. Ensure Vision Bridge is running.'
+                })
+            }
+        } catch (err: any) {
+            setStreamTestResult({
+                success: false,
+                msg: `Could not reach Vision Bridge at ${bridgeHost} to scan local network.`
+            })
+        } finally {
+            setScanningLan(false)
         }
+    }
+
+    const handleTestStream = async () => {
         setTestingStream(true)
         setStreamTestResult(null)
 
         try {
+            let hostToProbe = deviceHost
+
+            // If Serial Number provided, attempt SN resolution via bridge first
+            if (deviceSerial.trim() && !hostToProbe) {
+                try {
+                    const rRes = await fetch(`${bridgeHost}/camera/resolve-sn`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            sn: deviceSerial.trim(),
+                            brand: selectedBrand,
+                            username: deviceUser,
+                            password: devicePass,
+                            channel: deviceChannel
+                        }),
+                        signal: AbortSignal.timeout(3000)
+                    })
+                    const rData = await rRes.json()
+                    if (rData.success && rData.rtsp_url) {
+                        setStreamUrl(rData.rtsp_url)
+                        setStreamTestResult({
+                            success: true,
+                            msg: `✅ DVR matched by SN (${deviceSerial}). Resolved live stream: ${rData.rtsp_url}`
+                        })
+                        setTestingStream(false)
+                        return
+                    }
+                } catch {}
+            }
+
+            const urlToTest = effectiveStreamUrl || hostToProbe
+            if (!urlToTest && !deviceSerial) {
+                setTestingStream(false)
+                setStreamTestResult({ success: false, msg: 'Please enter Device Serial Number (SN) or Camera IP first.' })
+                return
+            }
+
             // Real TCP port probe to camera DVR
             const probeRes = await fetch('/api/payroll/attendance/cctv/probe', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    host: connectionMode === 'easy_p2p' ? deviceHost : urlToTest,
+                    host: connectionMode === 'easy_p2p' ? (hostToProbe || '127.0.0.1') : urlToTest,
                     port: devicePort || 554,
                     brand: selectedBrand
                 })
             })
             const probeData = await probeRes.json()
 
-            // Also check local vision bridge health
             let bridgeOnline = false
             try {
                 const bRes = await fetch(`${bridgeHost}/`, { signal: AbortSignal.timeout(1500) })
@@ -214,10 +276,33 @@ export default function CctvConnectorPage() {
 
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault()
-        const finalUrl = effectiveStreamUrl
+        let finalUrl = effectiveStreamUrl
+
+        if (connectionMode === 'easy_p2p' && deviceSerial.trim() && !deviceHost.trim()) {
+            setSaving(true)
+            try {
+                const rRes = await fetch(`${bridgeHost}/camera/resolve-sn`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sn: deviceSerial.trim(),
+                        brand: selectedBrand,
+                        username: deviceUser,
+                        password: devicePass,
+                        channel: deviceChannel
+                    }),
+                    signal: AbortSignal.timeout(2500)
+                })
+                const rData = await rRes.json()
+                if (rData.success && rData.rtsp_url) {
+                    finalUrl = rData.rtsp_url
+                }
+            } catch {}
+        }
 
         if (!cameraName.trim() || !finalUrl.trim()) {
-            setMsg({ text: 'Camera Name and valid DVR / Camera details are required.', type: 'error' })
+            setSaving(false)
+            setMsg({ text: 'Camera Name and valid DVR Serial Number or IP details are required.', type: 'error' })
             return
         }
 
@@ -240,7 +325,7 @@ export default function CctvConnectorPage() {
 
             // Non-blocking registration with local CCTV vision bridge
             try {
-                fetch('http://localhost:5000/camera/register', {
+                fetch(`${bridgeHost}/camera/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -662,14 +747,68 @@ export default function CctvConnectorPage() {
                                         </div>
                                     </div>
 
+                                    {/* Serial Number & Cloud Discovery (DMSS / EasyView style) */}
+                                    <div>
+                                        <div className="flex items-center justify-between mb-1">
+                                            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                                                Device Serial Number (SN / Cloud ID) *
+                                            </label>
+                                            <button
+                                                type="button"
+                                                onClick={handleScanLan}
+                                                disabled={scanningLan}
+                                                className="text-[11px] text-indigo-600 hover:text-indigo-700 font-semibold flex items-center gap-1"
+                                            >
+                                                {scanningLan ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Search className="w-3 h-3" />}
+                                                Scan Local Network
+                                            </button>
+                                        </div>
+                                        <input
+                                            type="text"
+                                            placeholder="e.g. 7M0AE22PCA5725A (from DVR QR Code or DMSS app)"
+                                            value={deviceSerial}
+                                            onChange={(e) => setDeviceSerial(e.target.value.toUpperCase())}
+                                            className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm font-mono text-slate-900 bg-white uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                                        />
+                                        <p className="text-[11px] text-slate-400 mt-1">
+                                            Found on your DVR bottom label, monitor system info, or mobile app settings.
+                                        </p>
+                                    </div>
+
+                                    {/* Discovered Devices Picker */}
+                                    {discoveredDvrs.length > 0 && (
+                                        <div className="p-3 bg-indigo-50/70 rounded-xl border border-indigo-100 text-xs space-y-1.5">
+                                            <p className="font-semibold text-indigo-900 flex items-center gap-1">
+                                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                                                Found {discoveredDvrs.length} DVR(s) on your office network:
+                                            </p>
+                                            <div className="space-y-1">
+                                                {discoveredDvrs.map((d, idx) => (
+                                                    <button
+                                                        key={idx}
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setDeviceSerial(d.sn)
+                                                            setDeviceHost(d.ip)
+                                                            if (d.name) setCameraName(d.name)
+                                                        }}
+                                                        className="w-full text-left p-2 rounded bg-white hover:bg-indigo-100/50 border border-indigo-200/60 font-mono text-xs flex items-center justify-between"
+                                                    >
+                                                        <span className="font-semibold text-slate-800">{d.name || 'Dahua/CP Plus DVR'}</span>
+                                                        <span className="text-slate-500">{d.ip} • SN: {d.sn}</span>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
                                     <div className="grid grid-cols-3 gap-3">
                                         <div className="col-span-2">
                                             <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-                                                Camera IP or DVR Host *
+                                                Camera IP or DVR Host (Optional if SN entered)
                                             </label>
                                             <input
                                                 type="text"
-                                                required
                                                 placeholder="192.168.1.108"
                                                 value={deviceHost}
                                                 onChange={(e) => setDeviceHost(e.target.value)}

@@ -263,10 +263,50 @@ def health_check():
     return {
         "status": "ok",
         "service": "billbook-cctv-vision-bridge",
-        "version": "1.2.0",
+        "version": "1.3.0",
         "attendance_api": BILLBOOK_API_URL,
         "security": "Tenant-Isolated & E2EE DTLS/SRTP"
     }
+
+
+@app.get("/devices/scan")
+def scan_devices():
+    """
+    Scans the local network for all connected Dahua, CP Plus, Uniview, and ONVIF DVRs/cameras.
+    Returns their live IP, Serial Number, and RTSP ports.
+    """
+    try:
+        from discovery import scan_network_for_dvrs
+        devices = scan_network_for_dvrs()
+        return {"success": True, "count": len(devices), "devices": devices}
+    except Exception as e:
+        logger.error("Network scan error: %s", e)
+        return {"success": False, "error": str(e), "devices": []}
+
+
+@app.post("/camera/resolve-sn")
+async def resolve_sn_endpoint(request: Request):
+    """
+    Resolves a user-entered Serial Number (SN) to its live network RTSP URL.
+    """
+    try:
+        from discovery import resolve_sn_to_rtsp
+        body = await request.json()
+        sn = body.get("sn", "")
+        brand = body.get("brand", "dahua")
+        user = body.get("username", "admin")
+        pwd = body.get("password", "")
+        ch = str(body.get("channel", "1"))
+
+        rtsp = resolve_sn_to_rtsp(sn, brand=brand, user=user, password=pwd, channel=ch)
+        if rtsp:
+            return {"success": True, "sn": sn, "rtsp_url": rtsp}
+        return {
+            "success": False, 
+            "error": f"Device with Serial Number '{sn}' not found on the local network. Make sure your DVR is powered on and connected to the same router."
+        }
+    except Exception as e:
+        return {"success": False, "error": str(e)}
 
 
 @app.post("/camera/register")
