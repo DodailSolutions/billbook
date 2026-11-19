@@ -38,6 +38,7 @@ import {
     CctvCamera 
 } from '@/lib/cctv-attendance-actions'
 import { DownloadBridgeModal } from '@/components/DownloadBridgeModal'
+import { CameraLiveMonitor } from '@/components/payroll/CameraLiveMonitor'
 
 export default function CctvConnectorPage() {
     const [cameras, setCameras] = useState<CctvCamera[]>([])
@@ -431,41 +432,8 @@ export default function CctvConnectorPage() {
                             return (
                                 <Card key={cam.id} className="border-slate-200/90 shadow-sm bg-white overflow-hidden flex flex-col justify-between">
                                     <div>
-                                        {/* Video Stream Preview Placeholder */}
-                                        <div className="relative h-44 bg-slate-950 flex flex-col justify-between p-3 overflow-hidden group">
-                                            {/* Scanline Overlay */}
-                                            <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_50%,rgba(0,0,0,0.5)_51%)] bg-[length:100%_4px] pointer-events-none opacity-40" />
-
-                                            {/* Top Stream Status Bar */}
-                                            <div className="relative z-10 flex items-center justify-between">
-                                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold tracking-wide uppercase ${
-                                                    cam.is_active 
-                                                        ? 'bg-emerald-500/90 text-white' 
-                                                        : 'bg-slate-700/80 text-slate-300'
-                                                }`}>
-                                                    <span className={`w-1.5 h-1.5 rounded-full ${cam.is_active ? 'bg-white animate-pulse' : 'bg-slate-400'}`} />
-                                                    {cam.is_active ? 'LIVE FEED' : 'PAUSED'}
-                                                </span>
-
-                                                <span className="text-[11px] font-mono text-slate-300 bg-black/60 px-2 py-0.5 rounded">
-                                                    {isP2P ? 'P2P Cloud' : 'RTSP'} • 15 FPS
-                                                </span>
-                                            </div>
-
-                                            {/* Center Simulated Bounding Box */}
-                                            <div className="relative z-10 my-auto text-center">
-                                                <div className="w-20 h-24 border-2 border-dashed border-indigo-400/70 rounded-lg mx-auto flex items-center justify-center">
-                                                    <Eye className="w-6 h-6 text-indigo-300/80" />
-                                                </div>
-                                                <p className="text-[10px] text-slate-400 font-mono mt-1">Vision Detection Zone</p>
-                                            </div>
-
-                                            {/* Bottom Stream Info */}
-                                            <div className="relative z-10 flex items-center justify-between text-[11px] font-mono text-slate-300">
-                                                <span className="truncate max-w-[200px]">{cam.location}</span>
-                                                <span className="capitalize text-indigo-300 font-semibold">{cam.direction_mode.replace('_', ' ')}</span>
-                                            </div>
-                                        </div>
+                                        {/* Dynamic Live Video / Camera Monitor Feed */}
+                                        <CameraLiveMonitor camera={cam} />
 
                                         {/* Camera Details */}
                                         <CardContent className="p-4 space-y-3">
