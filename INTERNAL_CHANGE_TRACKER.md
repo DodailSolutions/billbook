@@ -4,6 +4,36 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 
 ---
 
+## [Roadmap / Pending Implementations]
+
+### 1. Barcode Generation & Hardware Barcode Reader Integration (Inventory & Invoicing)
+- **Organization-Level Feature Toggle (`enable_barcode_system`)**:
+  - Located in Settings -> Inventory / Business Preferences (default: disabled).
+  - Service, consulting, and IT firms keep it disabled for a clean, distraction-free UI.
+  - Retailers, jewelry stores, supermarkets, and warehouses enable it with one click.
+- **Products & Items Barcode Management**:
+  - Auto-generate standard EAN-13 / Code 128 barcodes from SKU or custom product codes.
+  - Printable barcode label generator supporting single thermal stickers and standard multi-up sheets (e.g., A4 24/48-label rolls).
+- **Universal Hardware Barcode Scanner & POS Integration**:
+  - Global HID keyboard wedge listener across Item Management and Invoice/POS creation.
+  - Scanning an item instantly resolves the SKU, adds the product to line items, increments quantity, and updates stock.
+- **Camera Scan Fallback**:
+  - Built-in webcam/mobile camera barcode scanner for quick lookups on phones or tablets without external hardware.
+
+### 2. WhatsApp Invoices Hub UI (`/whatsapp-invoices`)
+- Live message threads, invoice quick-share, template management, and delivery status tracking.
+
+### 3. Smart Pricing & Margin Insights Dashboard (`/pricing-insights`)
+- Margin analytics dashboard, price floor alerts, and bulk re-pricing actions.
+
+### 4. Multi-Currency & FX Gain/Loss Settings (`/settings/currency`)
+- Exchange rate provider controls, real-time FX calculator, and realized vs. unrealized gain/loss reports.
+
+### 5. Customer Blacklist & Defaulter Rules UI (`/customers/blacklist`)
+- Defaulter registry UI, overdue threshold configuration, and invoice block rules.
+
+---
+
 ## [Release v1.5.0 - Implemented] - 2026-11-19
 
 ### Multi-Tenant Live CCTV AI Attendance & P2P Stream Pipeline
