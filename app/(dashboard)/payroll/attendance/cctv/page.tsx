@@ -30,7 +30,8 @@ import {
     ExternalLink,
     AlertTriangle,
     X,
-    Monitor
+    Monitor,
+    Search
 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent } from '@/components/ui/Card'
