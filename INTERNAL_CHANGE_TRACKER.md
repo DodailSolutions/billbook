@@ -11,12 +11,20 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
   - Located in Settings -> Inventory / Business Preferences (default: disabled).
   - Service, consulting, and IT firms keep it disabled for a clean, distraction-free UI.
   - Retailers, jewelry stores, supermarkets, and warehouses enable it with one click.
-- **Products & Items Barcode Management**:
-  - Auto-generate standard EAN-13 / Code 128 barcodes from SKU or custom product codes.
-  - Printable barcode label generator supporting single thermal stickers and standard multi-up sheets (e.g., A4 24/48-label rolls).
+- **Dedicated "Jewelry Shop & Ornaments" Business Profile**:
+  - Selectable business type in Company Settings (`jewelry_retail`).
+  - Automatically enables the Barcode system, item tag tracking, and specialized jewelry fields:
+    - Gross Weight, Net Weight, Metal Purity (24K, 22K, 18K, 14K, 916 Hallmarked), Making Charges (per gram or flat rate), and Gemstone/Diamond Carat weights.
+- **Hardware Printer Connection & Label Printing Hub**:
+  - Settings -> Hardware & Printers configuration modal.
+  - Supports USB, Bluetooth, Network (LAN IP), and Browser Print drivers.
+  - Printer profiles:
+    - **Thermal Barcode / Label Printers** (Zebra, TSC, Citizen, Xprinter): Prints jewelry butterfly/dumbbell tag labels and standard 38x25mm / 50x25mm inventory stickers.
+    - **Thermal POS Receipt Printers** (58mm & 80mm ESC/POS) for fast counter billing.
+    - **Standard Office Printers** (A4 / Letter 24-up / 48-up label sheets).
 - **Universal Hardware Barcode Scanner & POS Integration**:
   - Global HID keyboard wedge listener across Item Management and Invoice/POS creation.
-  - Scanning an item instantly resolves the SKU, adds the product to line items, increments quantity, and updates stock.
+  - Scanning an item instantly resolves the SKU/Tag, adds the product to line items, calculates weight-based rates, increments quantity, and updates stock.
 - **Camera Scan Fallback**:
   - Built-in webcam/mobile camera barcode scanner for quick lookups on phones or tablets without external hardware.
 
