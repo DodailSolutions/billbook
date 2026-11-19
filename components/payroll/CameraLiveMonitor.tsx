@@ -248,18 +248,18 @@ export function CameraLiveMonitor({ camera }: CameraLiveMonitorProps) {
                         {useSimulatedFeed ? 'Stop Sample' : 'Sample Feed'}
                     </button>
 
-                    {/* Live Webcam Toggle Button for immediate real camera preview */}
+                    {/* Optional Laptop Webcam Toggle Button */}
                     <button
                         onClick={toggleWebcam}
                         className={`px-2 py-0.5 rounded text-[10px] font-sans font-semibold flex items-center gap-1 transition-colors cursor-pointer ${
                             isWebcamActive 
                                 ? 'bg-rose-600 text-white hover:bg-rose-700' 
-                                : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                                : 'bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700'
                         }`}
-                        title="Test with your computer camera"
+                        title="Optional: Test with your laptop webcam instead of external CCTV"
                     >
                         <Camera className="w-3 h-3" />
-                        {isWebcamActive ? 'Stop Webcam' : 'Test Live Cam'}
+                        {isWebcamActive ? 'Stop Laptop Cam' : 'Test Laptop Cam'}
                     </button>
                     <span className="capitalize text-indigo-300 font-semibold hidden sm:inline">
                         {camera.direction_mode.replace('_', ' ')}
