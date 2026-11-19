@@ -162,17 +162,17 @@ export function SupportChatbot() {
     }
 
     return (
-        <div className="fixed bottom-5 right-5 z-90 font-sans">
+        <div className="fixed bottom-20 sm:bottom-6 right-4 sm:right-6 z-40 md:z-90 font-sans">
             {/* Floating Trigger Button */}
             {!isOpen && (
                 <button
                     onClick={() => setIsOpen(true)}
-                    className="relative flex items-center gap-2.5 px-4 py-3 bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer"
+                    className="relative flex items-center gap-2 sm:gap-2.5 px-3.5 py-2.5 sm:px-4 sm:py-3 bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 group cursor-pointer border border-white/20"
                     aria-label="Open Support & Live Chat"
                 >
                     <div className="relative">
-                        <Headphones className="w-5 h-5 text-white transition-transform group-hover:scale-110" />
-                        <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-400 border-2 border-white rounded-full animate-pulse" />
+                        <Headphones className="w-4 h-4 sm:w-5 sm:h-5 text-white transition-transform group-hover:scale-110" />
+                        <span className="absolute -top-1 -right-1 w-2 h-2 sm:w-2.5 sm:h-2.5 bg-emerald-400 border-2 border-white rounded-full animate-pulse" />
                     </div>
                     <span className="text-xs font-bold tracking-wide pr-1">Support & Help</span>
                 </button>
@@ -180,7 +180,7 @@ export function SupportChatbot() {
 
             {/* Chatbot Window */}
             {isOpen && (
-                <div className="flex flex-col w-[360px] sm:w-[400px] h-[540px] max-h-[85vh] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden transition-all duration-200 animate-in fade-in slide-in-from-bottom-4">
+                <div className="flex flex-col w-[calc(100vw-2rem)] sm:w-[400px] h-[520px] max-h-[calc(100vh-7rem)] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden transition-all duration-200 animate-in fade-in slide-in-from-bottom-4">
                     {/* Header */}
                     <div className="bg-linear-to-r from-blue-600 to-indigo-700 text-white p-4 shrink-0">
                         <div className="flex items-center justify-between">

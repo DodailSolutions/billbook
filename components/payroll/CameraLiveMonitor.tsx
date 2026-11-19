@@ -10,9 +10,10 @@ import {
     ShieldCheck, 
     Wifi, 
     Scan,
-    Sparkles,
-    Sliders,
-    Layers
+    Layers,
+    Terminal,
+    CheckCircle2,
+    Activity
 } from 'lucide-react'
 import { CctvCamera } from '@/lib/cctv-attendance-actions'
 
@@ -27,7 +28,7 @@ export function CameraLiveMonitor({ camera }: CameraLiveMonitorProps) {
     const [streamQuality, setStreamQuality] = useState<'main' | 'sub'>('main')
     const [isRefreshing, setIsRefreshing] = useState(false)
     const [isFullscreen, setIsFullscreen] = useState(false)
-    const videoRef = useRef<HTMLVideoElement | null>(null)
+    const [streamConnected, setStreamConnected] = useState(false)
     const containerRef = useRef<HTMLDivElement | null>(null)
 
     // Real-time surveillance millisecond timestamp clock
@@ -56,6 +57,26 @@ export function CameraLiveMonitor({ camera }: CameraLiveMonitorProps) {
         return () => clearInterval(interval)
     }, [camera.is_active])
 
+    // Check if local Python OpenCV / MJPEG vision bridge is active
+    useEffect(() => {
+        if (!camera.is_active) return
+        let isMounted = true
+        const checkBridge = async () => {
+            try {
+                const res = await fetch(`http://localhost:5000/status?camera=${encodeURIComponent(camera.id)}`, { mode: 'no-cors' })
+                if (isMounted) setStreamConnected(true)
+            } catch {
+                if (isMounted) setStreamConnected(false)
+            }
+        }
+        checkBridge()
+        const timer = setInterval(checkBridge, 5000)
+        return () => {
+            isMounted = false
+            clearInterval(timer)
+        }
+    }, [camera.id, camera.is_active])
+
     // Toggle Fullscreen
     const toggleFullscreen = () => {
         if (!containerRef.current) return
@@ -68,19 +89,13 @@ export function CameraLiveMonitor({ camera }: CameraLiveMonitorProps) {
         }
     }
 
-    // Refresh stream connection
     const handleRefreshStream = () => {
         setIsRefreshing(true)
-        if (videoRef.current) {
-            videoRef.current.currentTime = 0
-            videoRef.current.play().catch(() => {})
-        }
         setTimeout(() => {
             setIsRefreshing(false)
         }, 800)
     }
 
-    // Determine stream source
     const isP2P = camera.stream_url.startsWith('p2p://')
     let displaySerial = ''
     if (isP2P) {
@@ -88,14 +103,11 @@ export function CameraLiveMonitor({ camera }: CameraLiveMonitorProps) {
             const parsed = new URL(camera.stream_url)
             displaySerial = parsed.hostname
         } catch {
-            displaySerial = 'P2P-ONLINE'
+            displaySerial = 'P2P-DEVICE'
         }
     }
 
-    // If stream_url is an http/https video or HLS stream, use it, otherwise use local high-reliability CCTV office feed
-    const videoSource = camera.stream_url.startsWith('http://') || camera.stream_url.startsWith('https://')
-        ? camera.stream_url
-        : '/videos/cctv-office-feed.mp4'
+    const isDirectHttpStream = camera.stream_url.startsWith('http://') || camera.stream_url.startsWith('https://')
 
     return (
         <div 
@@ -104,17 +116,29 @@ export function CameraLiveMonitor({ camera }: CameraLiveMonitorProps) {
                 isFullscreen ? 'fixed inset-0 z-50 h-screen w-screen' : 'h-52'
             }`}
         >
-            {/* Live CCTV Video Feed (Autoplays seamlessly for external CCTV cameras) */}
+            {/* Live Feed Rendering */}
             {camera.is_active ? (
-                <video 
-                    ref={videoRef}
-                    src={videoSource}
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    className="absolute inset-0 w-full h-full object-cover z-0 block"
-                />
+                isDirectHttpStream ? (
+                    <video 
+                        src={camera.stream_url}
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        className="absolute inset-0 w-full h-full object-cover z-0 block"
+                    />
+                ) : streamConnected ? (
+                    <img 
+                        src={`http://localhost:5000/feed/${camera.id}`}
+                        alt="Live Python Vision Feed"
+                        className="absolute inset-0 w-full h-full object-cover z-0 block"
+                    />
+                ) : (
+                    /* Live CCTV Surveillance Grid Background */
+                    <div className="absolute inset-0 bg-radial-[circle_at_center,#0f172a_0%,#020617_100%] z-0 flex items-center justify-center">
+                        <div className="absolute inset-0 opacity-15 bg-[linear-gradient(to_right,#334155_1px,transparent_1px),linear-gradient(to_bottom,#334155_1px,transparent_1px)] bg-[size:24px_24px]" />
+                    </div>
+                )
             ) : (
                 <div className="absolute inset-0 bg-slate-950 flex flex-col items-center justify-center text-slate-500 z-0 space-y-2">
                     <VideoOff className="w-10 h-10 opacity-40 text-slate-500" />
@@ -122,13 +146,10 @@ export function CameraLiveMonitor({ camera }: CameraLiveMonitorProps) {
                 </div>
             )}
 
-            {/* Scanline CRT overlay for surveillance authenticity */}
+            {/* CRT Scanline Overlay */}
             <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_50%,rgba(0,0,0,0.35)_51%)] bg-[length:100%_4px] pointer-events-none opacity-40 z-10" />
 
-            {/* Subtle Vignette */}
-            <div className="absolute inset-0 bg-radial-[circle_at_center,transparent_40%,rgba(0,0,0,0.6)_100%] pointer-events-none z-10" />
-
-            {/* Sweeping Laser Scan Line (when camera is active) */}
+            {/* Sweeping Laser Scan Line */}
             {camera.is_active && (
                 <div className="absolute inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent animate-[scan_3.5s_ease-in-out_infinite] pointer-events-none z-10 shadow-[0_0_10px_rgba(52,211,153,0.8)]" />
             )}
@@ -142,13 +163,13 @@ export function CameraLiveMonitor({ camera }: CameraLiveMonitorProps) {
                             : 'bg-slate-800 text-slate-400'
                     }`}>
                         <span className={`w-1.5 h-1.5 rounded-full ${camera.is_active ? 'bg-white animate-pulse' : 'bg-slate-400'}`} />
-                        {camera.is_active ? (isP2P ? 'P2P CLOUD LIVE' : 'RTSP STREAM LIVE') : 'OFFLINE'}
+                        {camera.is_active ? (isP2P ? 'P2P CLOUD SYNCED' : 'RTSP LIVE') : 'OFFLINE'}
                     </span>
 
                     {displaySerial && (
                         <span className="hidden sm:inline-flex items-center gap-1 text-[10px] text-indigo-300 font-semibold bg-indigo-950/80 border border-indigo-700/60 px-1.5 py-0.5 rounded backdrop-blur-xs">
                             <Wifi className="w-2.5 h-2.5 text-emerald-400" />
-                            SN: {displaySerial.slice(0, 8)}...
+                            SN: {displaySerial}
                         </span>
                     )}
 
@@ -166,7 +187,7 @@ export function CameraLiveMonitor({ camera }: CameraLiveMonitorProps) {
                     <button
                         onClick={handleRefreshStream}
                         className="text-slate-400 hover:text-white p-1 rounded bg-black/50 hover:bg-black/80 transition-colors cursor-pointer"
-                        title="Reconnect / Re-sync stream"
+                        title="Reconnect stream"
                     >
                         <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-emerald-400' : ''}`} />
                     </button>
@@ -195,7 +216,7 @@ export function CameraLiveMonitor({ camera }: CameraLiveMonitorProps) {
                             <div className="absolute -bottom-1 -right-1 w-2.5 h-2.5 border-b-2 border-r-2 border-emerald-300" />
 
                             <div className="flex justify-between items-center text-[9px] text-emerald-400 font-mono font-bold">
-                                <span className="animate-pulse">TRACKING</span>
+                                <span className="animate-pulse">AI SCAN</span>
                                 <span>99.4%</span>
                             </div>
 
@@ -209,9 +230,9 @@ export function CameraLiveMonitor({ camera }: CameraLiveMonitorProps) {
                         </div>
 
                         <div className="mt-1.5 flex items-center justify-center gap-1.5">
-                            <span className="text-[10px] text-emerald-200 font-mono bg-black/70 px-2 py-0.5 rounded-full border border-emerald-500/30 backdrop-blur-xs flex items-center gap-1">
+                            <span className="text-[10px] text-emerald-200 font-mono bg-black/75 px-2.5 py-0.5 rounded-full border border-emerald-500/30 backdrop-blur-xs flex items-center gap-1">
                                 <ShieldCheck className="w-3 h-3 text-emerald-400" />
-                                AI CCTV Recognition Active
+                                Python Vision Engine Ready
                             </span>
                         </div>
                     </div>
@@ -231,7 +252,7 @@ export function CameraLiveMonitor({ camera }: CameraLiveMonitorProps) {
                     <button
                         onClick={() => setStreamQuality(q => q === 'main' ? 'sub' : 'main')}
                         className="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer border border-white/10 flex items-center gap-1"
-                        title="Switch between Main Stream (High Res) and Sub Stream (Low Bandwidth)"
+                        title="Switch between Main Stream (1080p) and Sub Stream (D1)"
                     >
                         <Layers className="w-3 h-3 text-indigo-400" />
                         {streamQuality === 'main' ? 'Main (1080p)' : 'Sub (D1)'}
