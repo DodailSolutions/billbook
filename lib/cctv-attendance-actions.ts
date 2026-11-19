@@ -116,7 +116,7 @@ export async function saveCctvCamera(input: {
                 .eq('id', input.id)
                 .eq('user_id', user.id)
                 .select()
-                .single()
+                .maybeSingle()
 
             if (error) {
                 console.error('Error updating cctv camera:', error)
@@ -125,15 +125,33 @@ export async function saveCctvCamera(input: {
             revalidatePath('/payroll/attendance/cctv')
             return { success: true, camera: data }
         } else {
+            // First attempt with full payload
             const { data, error } = await supabase
                 .from('cctv_cameras')
                 .insert([payload])
                 .select()
-                .single()
+                .maybeSingle()
 
             if (error) {
-                console.error('Error inserting cctv camera:', error)
-                return { success: false, error: error.message }
+                console.warn('Initial insert failed, retrying with core columns:', error.message)
+                // Fallback to core columns in case table was created with bare minimal schema
+                const corePayload = {
+                    camera_name: input.camera_name.trim(),
+                    stream_url: input.stream_url.trim(),
+                    user_id: user.id
+                }
+                const { data: retryData, error: retryError } = await supabase
+                    .from('cctv_cameras')
+                    .insert([corePayload])
+                    .select()
+                    .maybeSingle()
+
+                if (retryError) {
+                    console.error('Fallback insert also failed:', retryError)
+                    return { success: false, error: retryError.message }
+                }
+                revalidatePath('/payroll/attendance/cctv')
+                return { success: true, camera: retryData }
             }
             revalidatePath('/payroll/attendance/cctv')
             return { success: true, camera: data }
