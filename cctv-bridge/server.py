@@ -426,6 +426,6 @@ async def webrtc_offer(request: Request, camera: Optional[str] = None, token: Op
 
 if __name__ == "__main__":
     import uvicorn
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 5050))
     logger.info("Starting Multi-Tenant CCTV AI & P2P Stream Bridge on port %d...", port)
     uvicorn.run(app, host="0.0.0.0", port=port)

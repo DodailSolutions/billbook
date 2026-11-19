@@ -84,7 +84,7 @@ export default function CctvConnectorPage() {
     // Local bridge stream failure map: { [camId]: boolean }
     const [failedStreams, setFailedStreams] = useState<Record<string, boolean>>({})
     const [enlargedCamera, setEnlargedCamera] = useState<CctvCamera | null>(null)
-    const [bridgeHost, setBridgeHost] = useState('http://localhost:5000')
+    const [bridgeHost, setBridgeHost] = useState('http://localhost:5050')
     const [streamTimestamp, setStreamTimestamp] = useState(Date.now())
 
     // Auto-detect bridge or saved host
@@ -1094,7 +1094,7 @@ export default function CctvConnectorPage() {
                                             localStorage.setItem('cctv_bridge_host', e.target.value)
                                         }
                                     }}
-                                    placeholder="http://localhost:5000"
+                                    placeholder="http://localhost:5050"
                                     className="px-2.5 py-1 bg-slate-900 border border-slate-800 rounded text-slate-200 font-mono text-xs w-56 focus:outline-none focus:border-indigo-500"
                                 />
                             </div>
