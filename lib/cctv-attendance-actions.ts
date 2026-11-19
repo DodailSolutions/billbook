@@ -100,14 +100,13 @@ export async function saveCctvCamera(input: {
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) return { success: false, error: 'Unauthorized. Please sign in.' }
 
-        const payload = {
+        const payload: Record<string, any> = {
             camera_name: input.camera_name.trim(),
             stream_url: input.stream_url.trim(),
             location: input.location.trim() || 'Main Entrance',
             direction_mode: input.direction_mode || 'bidirectional',
             is_active: input.is_active !== undefined ? input.is_active : true,
-            user_id: user.id,
-            updated_at: new Date().toISOString()
+            user_id: user.id
         }
 
         if (input.id) {
@@ -119,17 +118,23 @@ export async function saveCctvCamera(input: {
                 .select()
                 .single()
 
-            if (error) return { success: false, error: error.message }
+            if (error) {
+                console.error('Error updating cctv camera:', error)
+                return { success: false, error: error.message }
+            }
             revalidatePath('/payroll/attendance/cctv')
             return { success: true, camera: data }
         } else {
             const { data, error } = await supabase
                 .from('cctv_cameras')
-                .insert([{ ...payload, last_ping_at: new Date().toISOString() }])
+                .insert([payload])
                 .select()
                 .single()
 
-            if (error) return { success: false, error: error.message }
+            if (error) {
+                console.error('Error inserting cctv camera:', error)
+                return { success: false, error: error.message }
+            }
             revalidatePath('/payroll/attendance/cctv')
             return { success: true, camera: data }
         }

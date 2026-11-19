@@ -1,0 +1,8 @@
+@echo off
+title BillBooky Vision AI Bridge Runner
+echo ============================================================
+echo   BillBooky Vision AI Bridge Setup for Windows
+echo ============================================================
+echo Installing and starting background service on port 8989...
+npx -y @billbooky/vision-bridge
+pause

@@ -46,6 +46,7 @@ export default function CctvConnectorPage() {
     const [isOptedIn, setIsOptedIn] = useState<boolean>(false)
     const [optInLoading, setOptInLoading] = useState(false)
     const [isModalOpen, setIsModalOpen] = useState(false)
+    const [modalError, setModalError] = useState<string | null>(null)
     const [msg, setMsg] = useState<{ text: string; type: 'success' | 'error' } | null>(null)
     const [testingStream, setTestingStream] = useState(false)
     const [streamTestResult, setStreamTestResult] = useState<{ success: boolean; msg: string } | null>(null)
@@ -126,6 +127,7 @@ export default function CctvConnectorPage() {
         setLocation('Main Entrance')
         setDirectionMode('bidirectional')
         setStreamTestResult(null)
+        setModalError(null)
         setIsModalOpen(true)
     }
 
@@ -135,6 +137,7 @@ export default function CctvConnectorPage() {
         setLocation(cam.location)
         setDirectionMode(cam.direction_mode)
         setStreamTestResult(null)
+        setModalError(null)
 
         if (cam.stream_url.startsWith('p2p://')) {
             setConnectMode('p2p')
@@ -211,6 +214,7 @@ export default function CctvConnectorPage() {
 
         setSaving(true)
         setMsg(null)
+        setModalError(null)
         const res = await saveCctvCamera({
             id: editingCamera?.id,
             camera_name: cameraName,
@@ -226,7 +230,7 @@ export default function CctvConnectorPage() {
             setIsModalOpen(false)
             loadCameras()
         } else {
-            setMsg({ text: res.error || 'Failed to save camera.', type: 'error' })
+            setModalError(res.error || 'Failed to save camera.')
         }
     }
 
@@ -812,6 +816,14 @@ export default function CctvConnectorPage() {
                                     </select>
                                 </div>
                             </div>
+
+                            {/* Modal Error Alert */}
+                            {modalError && (
+                                <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl text-xs flex items-center gap-2">
+                                    <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                                    <span>{modalError}</span>
+                                </div>
+                            )}
 
                             {/* Modal Footer */}
                             <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">

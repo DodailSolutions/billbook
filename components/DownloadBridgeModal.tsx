@@ -14,7 +14,9 @@ import {
     Info,
     Terminal,
     KeyRound,
-    AlertCircle
+    AlertCircle,
+    Copy,
+    Check
 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
@@ -30,6 +32,13 @@ export function DownloadBridgeModal({ triggerButton }: DownloadBridgeModalProps)
     const [downloading, setDownloading] = useState<'windows' | 'mac' | null>(null)
     const [downloadSuccess, setDownloadSuccess] = useState<string | null>(null)
     const [downloadError, setDownloadError] = useState<string | null>(null)
+    const [copied, setCopied] = useState(false)
+
+    const handleCopyCli = () => {
+        navigator.clipboard.writeText('npx @billbooky/vision-bridge')
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2000)
+    }
 
     const handleDownload = async (os: 'windows' | 'mac') => {
         setDownloading(os)
@@ -45,22 +54,15 @@ export function DownloadBridgeModal({ triggerButton }: DownloadBridgeModalProps)
                 return
             }
 
-            // Generate verified companion script / installer payload
-            const installerContent = os === 'windows' 
-                ? `@echo off\r\necho ====================================================\r\necho BillBooky Vision AI Bridge Runner for Windows\r\necho Auto-discovering local CCTV streams and P2P cameras...\r\necho ====================================================\r\necho Running background loopback on http://127.0.0.1:8989\r\nnpx -y @billbooky/vision-bridge-service\r\npause\r\n`
-                : `#!/bin/bash\necho "===================================================="\necho "BillBooky Vision AI Bridge Runner for macOS"\necho "Auto-discovering local CCTV streams and P2P cameras..."\necho "===================================================="\necho "Running background loopback on http://127.0.0.1:8989"\nnpx -y @billbooky/vision-bridge-service\n`
-
-            const blob = new Blob([installerContent], { type: os === 'windows' ? 'application/x-bat' : 'application/x-sh' })
-            const url = URL.createObjectURL(blob)
+            // Trigger direct download of real installable package
             const a = document.createElement('a')
-            a.href = url
-            a.download = os === 'windows' ? 'billbooky-vision-bridge-setup.bat' : 'billbooky-vision-bridge-mac.command'
+            a.href = os === 'windows' ? '/downloads/billbooky-vision-bridge-setup.exe' : '/downloads/billbooky-vision-bridge-mac.pkg'
+            a.download = os === 'windows' ? 'billbooky-vision-bridge-setup.exe' : 'billbooky-vision-bridge-mac.pkg'
             document.body.appendChild(a)
             a.click()
             document.body.removeChild(a)
-            URL.revokeObjectURL(url)
 
-            setDownloadSuccess(`Successfully initiated ${os === 'windows' ? 'Windows' : 'macOS'} Vision Bridge package!`)
+            setDownloadSuccess(`Successfully downloaded ${os === 'windows' ? 'Windows installer (.exe)' : 'macOS installer (.pkg)'}!`)
         } catch (err: any) {
             console.error('Download error:', err)
             setDownloadError('An unexpected error occurred. Please ensure you are logged in.')
@@ -156,7 +158,7 @@ export function DownloadBridgeModal({ triggerButton }: DownloadBridgeModalProps)
                                         </div>
                                     </div>
                                     <p className="text-[11px] text-slate-500 leading-relaxed">
-                                        Windows companion service. Runs in the system notification tray with automated loopback on port 8989.
+                                        Standard Windows setup installer (.exe). Runs silently in system notification tray with automated loopback on port 8989.
                                     </p>
                                     <Button
                                         onClick={() => handleDownload('windows')}
@@ -164,7 +166,7 @@ export function DownloadBridgeModal({ triggerButton }: DownloadBridgeModalProps)
                                         className="w-full bg-slate-900 hover:bg-black text-white text-xs font-semibold rounded-xl h-9 gap-1.5"
                                     >
                                         <Download className="w-3.5 h-3.5" />
-                                        {downloading === 'windows' ? 'Starting...' : 'Download Windows Runner'}
+                                        {downloading === 'windows' ? 'Downloading...' : 'Download Windows Installer (.exe)'}
                                     </Button>
                                 </div>
 
@@ -176,11 +178,11 @@ export function DownloadBridgeModal({ triggerButton }: DownloadBridgeModalProps)
                                         </div>
                                         <div>
                                             <h4 className="font-bold text-sm text-slate-900">macOS</h4>
-                                            <p className="text-[11px] text-slate-500">Apple Silicon (M1/M2/M3/M4) & Intel</p>
+                                            <p className="text-[11px] text-slate-500">Apple Silicon (M1–M4) & Intel</p>
                                         </div>
                                     </div>
                                     <p className="text-[11px] text-slate-500 leading-relaxed">
-                                        macOS companion menu-bar service. Universal bundle with hardware-accelerated face vector extraction.
+                                        Standard Apple Installer package (.pkg). Installs directly into Applications and runs as background menu bar service.
                                     </p>
                                     <Button
                                         onClick={() => handleDownload('mac')}
@@ -188,18 +190,44 @@ export function DownloadBridgeModal({ triggerButton }: DownloadBridgeModalProps)
                                         className="w-full bg-slate-900 hover:bg-black text-white text-xs font-semibold rounded-xl h-9 gap-1.5"
                                     >
                                         <Download className="w-3.5 h-3.5" />
-                                        {downloading === 'mac' ? 'Starting...' : 'Download macOS Runner'}
+                                        {downloading === 'mac' ? 'Downloading...' : 'Download macOS Installer (.pkg)'}
                                     </Button>
                                 </div>
                             </div>
 
-                            {/* CLI One-Liner Option */}
-                            <div className="bg-slate-900 rounded-2xl p-3.5 text-xs font-mono text-slate-300 space-y-1">
+                            {/* CLI One-Liner Option (Bypasses Gatekeeper completely) */}
+                            <div className="bg-slate-900 rounded-2xl p-4 text-xs font-mono text-slate-300 space-y-2">
                                 <div className="flex items-center justify-between text-[11px] text-slate-400">
-                                    <span className="flex items-center gap-1.5"><Terminal className="w-3.5 h-3.5 text-indigo-400" /> CLI / Terminal (Zero Install)</span>
-                                    <span>Port 8989</span>
+                                    <span className="flex items-center gap-1.5 font-sans font-semibold text-slate-200">
+                                        <Terminal className="w-4 h-4 text-indigo-400" /> Instant Terminal Runner (Zero Install & Zero Warnings)
+                                    </span>
+                                    <span className="text-slate-400">Port 8989</span>
                                 </div>
-                                <p className="text-emerald-400 select-all font-semibold">npx @billbooky/vision-bridge</p>
+                                <div className="flex items-center justify-between bg-black/50 p-2.5 rounded-xl border border-slate-800">
+                                    <code className="text-emerald-400 font-semibold select-all">npx @billbooky/vision-bridge</code>
+                                    <button 
+                                        type="button" 
+                                        onClick={handleCopyCli}
+                                        className="text-slate-400 hover:text-white p-1 rounded-md transition-colors"
+                                        title="Copy command"
+                                    >
+                                        {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                                    </button>
+                                </div>
+                                <p className="text-[11px] text-slate-400 font-sans">
+                                    Paste this command in your Mac Terminal or Windows Command Prompt to launch immediately without any security dialogs.
+                                </p>
+                            </div>
+
+                            {/* macOS Tip */}
+                            <div className="p-3 bg-amber-50/90 border border-amber-200 rounded-2xl text-xs text-amber-900 space-y-1">
+                                <p className="font-semibold flex items-center gap-1.5">
+                                    <Info className="w-4 h-4 text-amber-600 shrink-0" />
+                                    macOS First-Time Security Tip:
+                                </p>
+                                <p className="text-[11px] text-amber-800 leading-relaxed pl-5">
+                                    If macOS shows <em>"Apple could not verify..."</em>, simply <strong>Right-Click (or Control-Click)</strong> the downloaded <code>.pkg</code> in your Downloads folder, choose <strong>Open</strong>, and click <strong>Open</strong> in the dialog.
+                                </p>
                             </div>
 
                             {/* Privacy Pill */}
@@ -222,7 +250,7 @@ export function DownloadBridgeModal({ triggerButton }: DownloadBridgeModalProps)
                                     <div>
                                         <h5 className="font-bold text-xs text-slate-900">Download & Start the Companion</h5>
                                         <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
-                                            Download for your PC (Windows or Mac) on your office Wi-Fi. Double-click to launch. It starts a secure local loopback service on <code>http://127.0.0.1:8989</code>.
+                                            Download the installer package (.pkg for Mac or .exe for Windows) on the office PC connected to your camera Wi-Fi. Double-click to launch. It starts a secure local loopback service on <code>http://127.0.0.1:8989</code>.
                                         </p>
                                     </div>
                                 </div>
