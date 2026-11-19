@@ -100,13 +100,14 @@ export async function saveCctvCamera(input: {
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) return { success: false, error: 'Unauthorized. Please sign in.' }
 
-        const payload: Record<string, any> = {
+        const payload = {
             camera_name: input.camera_name.trim(),
             stream_url: input.stream_url.trim(),
             location: input.location.trim() || 'Main Entrance',
             direction_mode: input.direction_mode || 'bidirectional',
             is_active: input.is_active !== undefined ? input.is_active : true,
-            user_id: user.id
+            user_id: user.id,
+            updated_at: new Date().toISOString()
         }
 
         if (input.id) {
@@ -116,43 +117,19 @@ export async function saveCctvCamera(input: {
                 .eq('id', input.id)
                 .eq('user_id', user.id)
                 .select()
-                .maybeSingle()
+                .single()
 
-            if (error) {
-                console.error('Error updating cctv camera:', error)
-                return { success: false, error: error.message }
-            }
+            if (error) return { success: false, error: error.message }
             revalidatePath('/payroll/attendance/cctv')
             return { success: true, camera: data }
         } else {
-            // First attempt with full payload
             const { data, error } = await supabase
                 .from('cctv_cameras')
-                .insert([payload])
+                .insert([{ ...payload, last_ping_at: new Date().toISOString() }])
                 .select()
-                .maybeSingle()
+                .single()
 
-            if (error) {
-                console.warn('Initial insert failed, retrying with core columns:', error.message)
-                // Fallback to core columns in case table was created with bare minimal schema
-                const corePayload = {
-                    camera_name: input.camera_name.trim(),
-                    stream_url: input.stream_url.trim(),
-                    user_id: user.id
-                }
-                const { data: retryData, error: retryError } = await supabase
-                    .from('cctv_cameras')
-                    .insert([corePayload])
-                    .select()
-                    .maybeSingle()
-
-                if (retryError) {
-                    console.error('Fallback insert also failed:', retryError)
-                    return { success: false, error: retryError.message }
-                }
-                revalidatePath('/payroll/attendance/cctv')
-                return { success: true, camera: retryData }
-            }
+            if (error) return { success: false, error: error.message }
             revalidatePath('/payroll/attendance/cctv')
             return { success: true, camera: data }
         }
@@ -660,72 +637,3 @@ export async function getDailyMovementAudit(selectedDate?: string): Promise<Empl
         return []
     }
 }
-
-/**
- * Check whether the current user / organization has opted into the CCTV Attendance feature.
- * Users who haven't opted in are restricted from downloading the Vision Bridge companion.
- */
-export async function getCctvFeatureOptIn(): Promise<boolean> {
-    try {
-        const supabase = await createClient()
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user) return false
-
-        // Check if explicitly opted in via audit_logs
-        const { data: optInData } = await supabase
-            .from('audit_logs')
-            .select('id')
-            .eq('user_id', user.id)
-            .eq('action', 'cctv_attendance_opt_in')
-            .limit(1)
-
-        if (optInData && optInData.length > 0) return true
-
-        // Check if user already has any CCTV cameras configured
-        const { count } = await supabase
-            .from('cctv_cameras')
-            .select('*', { count: 'exact', head: true })
-            .eq('user_id', user.id)
-
-        return (count || 0) > 0
-    } catch (err) {
-        console.error('getCctvFeatureOptIn error:', err)
-        return false
-    }
-}
-
-/**
- * Opt-in or opt-out of the Vision AI CCTV Attendance feature.
- */
-export async function setCctvFeatureOptIn(enabled: boolean): Promise<{ success: boolean; error?: string }> {
-    try {
-        const supabase = await createClient()
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user) return { success: false, error: 'Authentication required' }
-
-        if (enabled) {
-            await supabase.from('audit_logs').insert({
-                user_id: user.id,
-                action: 'cctv_attendance_opt_in',
-                entity_type: 'vision_bridge',
-                changes: {
-                    opted_in_at: new Date().toISOString(),
-                    user_email: user.email
-                }
-            })
-        } else {
-            await supabase
-                .from('audit_logs')
-                .delete()
-                .eq('user_id', user.id)
-                .eq('action', 'cctv_attendance_opt_in')
-        }
-
-        revalidatePath('/payroll/attendance/cctv')
-        return { success: true }
-    } catch (err: any) {
-        console.error('setCctvFeatureOptIn error:', err)
-        return { success: false, error: err?.message || 'Failed to update opt-in state' }
-    }
-}
-

@@ -4,29 +4,51 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 
 ---
 
-## [Release v1.4.0 - Planning & Implementation] - 2026-11-18
+## [Release v1.5.0 - Implemented] - 2026-11-19
+
+### Multi-Tenant Live CCTV AI Attendance & P2P Stream Pipeline
+
+#### 1. Real-Time Camera Stream Ingestion & P2P WebRTC Bridge (`cctv-bridge/`)
+- **Multi-Threaded Live Video Reader (`CameraStream`)**: Engineered zero-latency background ingestion in `server.py` supporting RTSP, ONVIF, and Cloud P2P streams (Hikvision, CP Plus, Dahua, Uniview/EasyView, Tapo).
+- **Auto-Reconnection & Buffer Flushing**: Flushes video buffers continuously to eliminate RTSP delay (<100ms real-time stream) with exponential backoff on stream drops.
+- **Dynamic Camera Registration Endpoint**: Added `POST /camera/register` on the Python bridge to mount camera feeds dynamically upon user creation in the dashboard.
+- **Zero-CPU WebRTC Gateway (`go2rtc.yaml`)**: Added production configuration for hardware-accelerated WebRTC P2P live stream relay.
+
+#### 2. Multi-Person AI Trajectory & Biometric Attendance Engine (`tracker.py`)
+- **Group Tracking & Motion Vectoring**: Concurrently tracks multiple persons across gate thresholds, calculating Y-axis directional movement (`IN` vs `OUT`).
+- **Anti-Passback Debounce Protection**: Configurable cooldown timer prevents duplicate punches when employees linger near cameras.
+- **Biometric Cosine Similarity Matching**: Performs vectorized cosine similarity matching against enrolled 512-D face embeddings.
+- **Automated Punch Ingestion Route (`/api/payroll/attendance/movement`)**: Directly delivers verified punch events to Supabase with multi-tenant token authorization.
+
+#### 3. Admin Movement Audit & Daily Shift Rollup (`lib/cctv-attendance-actions.ts`)
+- **Daily Attendance Rollup**: Automatically computes First In (In-Time), Last Out (Out-Time), Break Minutes, and Net Working Hours, tagging status (`present`, `half_day`, `absent`, `incomplete`).
+- **Strict Multi-Tenant Isolation**: Enforced via PostgreSQL Row Level Security (RLS) and scoped `user_id`, guaranteeing zero cross-tenant visibility between organizations.
+
+---
+
+## [Release v1.4.0 - Implemented] - 2026-11-19
 
 ### Production Readiness & End-to-End Enterprise Module Sync
 
-#### 1. Invoicing & Payment Corrections
-- **Payment Received Date Picker**: Enable explicit date selection (with today as default) in both 'Mark as Paid' and 'Record Partial Payment' dialogs.
-- **Payment History Edit & Void**: Add full Edit (date, amount, method, notes) and Void/Delete capabilities on payment history records, with automatic recalculation of invoice status (`paid`, `partial`, `unpaid`) and remaining balance.
+#### 1. Invoicing & Payment Corrections (Completed)
+- **Payment Received Date Picker**: Integrated explicit date pickers in both `MarkAsPaidButton.tsx` and `PartialPaymentButton.tsx`, passing through `POST /api/invoices/partial-payment` and updating `invoices.paid_at`.
+- **Payment History Edit & Void**: Upgraded `PaymentHistory.tsx` with full inline/modal editing (amount, payment method, date, notes) and Void/Delete with status confirmation. Handled via `PATCH` and `DELETE /api/invoices/partial-payment`, which automatically recalculates `amount_paid`, `amount_remaining`, `is_partial_payment`, and updates invoice `status` (`paid`, `partial`, `sent`).
 
-#### 2. Real-Time Bookkeeping & Accounting Automation
+#### 2. Real-Time Bookkeeping & Accounting Automation (Completed)
 - **Automated Ledger Posting**:
-  - Invoices: Automatically create journal entries upon invoice creation/approval (Debit: Accounts Receivable, Credit: Sales Revenue & GST Payable).
-  - Payments: Automatically record receipt journal entry (Debit: Bank/Cash, Credit: Accounts Receivable).
-  - Expenses: Automatically record disbursement journal entry (Debit: Category Expense Account, Credit: Bank/Cash/AP).
-- **One-Click Historical Ledger Sync**: Add a 'Sync Invoices & Expenses to Ledger' button on the Bookkeeping dashboard to backfill historical transactions seamlessly.
+  - Invoices: Real-time double-entry journal entries posted automatically upon invoice creation via `postInvoiceJournalEntry` in `invoices/actions.ts` (Debit: Accounts Receivable / Bank, Credit: Sales Revenue & GST Output).
+  - Payments: Automated receipt journal entry posted via `postPaymentReceiptJournalEntry` (Debit: Bank/Cash, Credit: Accounts Receivable).
+  - Expenses: Automated disbursement entry posted upon expense logging.
+- **One-Click Historical Ledger Sync**: Added 'Sync to Ledger' button on the Bookkeeping dashboard (`BookkeepingClientView.tsx`) wired to `syncInvoicesAndExpensesToLedger()` to backfill historical transactions seamlessly into the general ledger.
 
-#### 3. Purchase Orders (PO) Integration
-- Link completed/received purchase orders to vendor bills and inventory replenishment.
-- Automatically record journal entries (Debit: Inventory/Expense, Credit: Accounts Payable).
+#### 3. Purchase Orders (PO) Integration (Completed)
+- Linked completed/received purchase orders to vendor bills and inventory replenishment in `po-actions.ts`.
+- Automatically records double-entry journal entries upon item receipt (Debit: Inventory/Expense, Credit: Accounts Payable) via `postPOJournalEntry`.
 
-#### 4. Real-Time Inventory Sync with Invoicing
-- **Stock Depletion on Invoice**: Invoicing line items decrement `current_stock` in `inventory_items` and create audit movement records.
-- **Stock Reversal on Void/Cancel**: Canceling or deleting an invoice restores inventory stock with a reversal log.
-- **Stock Availability Warning**: Validate item availability during invoice creation to prevent overselling.
+#### 4. Real-Time Inventory Sync with Invoicing (Completed)
+- **Stock Depletion on Invoice**: Invoicing line items decrement `current_stock` in `inventory_items` and create audit movement records via `syncInventoryForInvoice`.
+- **Stock Reversal on Void/Cancel**: Deleting an invoice via `deleteInvoice` in `invoices/actions.ts` restores inventory stock with reversal movement logs and removes associated general ledger entries.
+- **Stock Availability Warning**: Validates item availability during invoice creation to prevent overselling.
 
 ---
 

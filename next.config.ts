@@ -88,7 +88,7 @@ const nextConfig: NextConfig = {
           // Content Security Policy
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: blob:; connect-src 'self' https://*.supabase.co https://api.razorpay.com wss://*.supabase.co https://fonts.googleapis.com https://fonts.gstatic.com; frame-src 'self' https://checkout.razorpay.com https://api.razorpay.com; object-src 'none';",
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: blob: http://localhost:* http://127.0.0.1:*; media-src 'self' blob: data: http://localhost:* http://127.0.0.1:*; connect-src 'self' http://localhost:* http://127.0.0.1:* ws://localhost:* ws://127.0.0.1:* https://*.supabase.co https://api.razorpay.com wss://*.supabase.co https://fonts.googleapis.com https://fonts.gstatic.com; frame-src 'self' https://checkout.razorpay.com https://api.razorpay.com; object-src 'none';",
           },
           // Security headers
           {

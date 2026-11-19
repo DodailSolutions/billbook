@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { ChartOfAccount, JournalEntry } from "@/lib/bookkeeping-types"
-import { getChartOfAccounts, getJournalEntries } from "@/lib/bookkeeping-actions"
+import { getChartOfAccounts, getJournalEntries, syncInvoicesAndExpensesToLedger } from "@/lib/bookkeeping-actions"
 import { ChartOfAccountsView } from "./ChartOfAccountsView"
 import { JournalEntryModal } from "./JournalEntryModal"
 import { FinancialStatementsView } from "./FinancialStatementsView"
@@ -38,6 +38,7 @@ export function BookkeepingClientView({
     const [journalEntries, setJournalEntries] = useState<JournalEntry[]>(initialJournalEntries)
     const [loading, setLoading] = useState(false)
     const [isExportingTally, setIsExportingTally] = useState(false)
+    const [isSyncingLedger, setIsSyncingLedger] = useState(false)
 
     const [activeTab, setActiveTab] = useState<'accounts' | 'journal' | 'statements' | 'bank'>('accounts')
     const [isJournalModalOpen, setIsJournalModalOpen] = useState(false)
@@ -92,6 +93,28 @@ export function BookkeepingClientView({
         }
     }
 
+    const handleSyncLedger = async () => {
+        setIsSyncingLedger(true)
+        try {
+            const res = await syncInvoicesAndExpensesToLedger()
+            if (res.success) {
+                alert(`Ledger sync complete: ${res.syncedInvoices} invoice(s) and ${res.syncedExpenses} expense(s) posted to General Ledger.`)
+                const [freshAccounts, freshEntries] = await Promise.all([
+                    getChartOfAccounts(),
+                    getJournalEntries()
+                ])
+                setAccounts(freshAccounts || [])
+                setJournalEntries(freshEntries || [])
+            } else {
+                alert(res.message || 'Failed to sync ledger')
+            }
+        } catch (err: any) {
+            alert(err.message || 'Error syncing transactions to ledger')
+        } finally {
+            setIsSyncingLedger(false)
+        }
+    }
+
     return (
         <div className="space-y-4 sm:space-y-6 max-w-7xl mx-auto px-2 sm:px-4">
             {/* Header & Quick Action Bar */}
@@ -114,6 +137,18 @@ export function BookkeepingClientView({
 
                 {/* Header Action Buttons */}
                 <div className="flex items-center gap-2 flex-wrap">
+                    <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleSyncLedger}
+                        disabled={isSyncingLedger}
+                        className="text-xs font-semibold gap-1.5 border-indigo-300 dark:border-indigo-700 text-indigo-800 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/40"
+                        title="Scan historical invoices and expenses and post missing entries to General Ledger"
+                    >
+                        <ArrowRightLeft className={`h-3.5 w-3.5 text-indigo-600 ${isSyncingLedger ? 'animate-spin' : ''}`} />
+                        <span>{isSyncingLedger ? 'Syncing...' : 'Sync to Ledger'}</span>
+                    </Button>
+
                     <Button
                         type="button"
                         variant="outline"

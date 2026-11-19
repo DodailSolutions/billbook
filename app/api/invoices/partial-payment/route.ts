@@ -12,7 +12,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        const { invoiceId, amount, paymentMethod, paymentNotes } = await request.json()
+        const { invoiceId, amount, paymentMethod, paymentNotes, paymentDate } = await request.json()
 
         // Validate required fields
         if (!invoiceId || !amount) {
@@ -51,6 +51,10 @@ export async function POST(request: Request) {
 
         // Try to insert into invoice_payments table (requires partial-payment migration)
         let payment = null
+        const effectivePaymentDate = paymentDate 
+            ? (paymentDate.includes('T') ? paymentDate : new Date(paymentDate).toISOString())
+            : new Date().toISOString()
+
         const { data: paymentData, error: paymentError } = await supabase
             .from('invoice_payments')
             .insert({
@@ -59,7 +63,7 @@ export async function POST(request: Request) {
                 amount,
                 payment_method: paymentMethod,
                 payment_notes: paymentNotes,
-                payment_date: new Date().toISOString()
+                payment_date: effectivePaymentDate
             })
             .select()
             .single()
@@ -107,7 +111,7 @@ export async function POST(request: Request) {
             await supabase
                 .from('invoices')
                 .update({
-                    paid_at: new Date().toISOString(),
+                    paid_at: effectivePaymentDate,
                     payment_method: paymentMethod,
                     payment_notes: paymentNotes,
                 })
@@ -129,7 +133,56 @@ export async function POST(request: Request) {
     }
 }
 
-// Update payment details (e.g. correct payment entry date)
+async function recalculateInvoiceStatus(supabase: any, invoiceId: string, userId: string) {
+    try {
+        const { data: payments } = await supabase
+            .from('invoice_payments')
+            .select('amount, payment_date, payment_method, payment_notes')
+            .eq('invoice_id', invoiceId)
+            .eq('user_id', userId)
+            .order('payment_date', { ascending: false })
+
+        const { data: invoice } = await supabase
+            .from('invoices')
+            .select('id, total, status')
+            .eq('id', invoiceId)
+            .eq('user_id', userId)
+            .single()
+
+        if (!invoice) return
+
+        const totalPaid = (payments || []).reduce((sum: number, p: any) => sum + (Number(p.amount) || 0), 0)
+        const invoiceTotal = Number(invoice.total) || 0
+        const newRemaining = Math.max(0, invoiceTotal - totalPaid)
+        const isFullyPaid = totalPaid >= invoiceTotal && invoiceTotal > 0
+        const isPartial = totalPaid > 0 && !isFullyPaid
+
+        let newStatus = isFullyPaid ? 'paid' : (isPartial ? 'partial' : 'sent')
+        if (!isFullyPaid && !isPartial && invoice.status === 'draft') {
+            newStatus = 'draft'
+        }
+
+        const latestPayment = payments && payments.length > 0 ? payments[0] : null
+
+        await supabase
+            .from('invoices')
+            .update({
+                amount_paid: totalPaid,
+                amount_remaining: newRemaining,
+                is_partial_payment: isPartial,
+                status: newStatus,
+                paid_at: isFullyPaid ? (latestPayment?.payment_date || new Date().toISOString()) : (isPartial ? (latestPayment?.payment_date || null) : null),
+                payment_method: latestPayment?.payment_method || null,
+                payment_notes: latestPayment?.payment_notes || null
+            })
+            .eq('id', invoiceId)
+            .eq('user_id', userId)
+    } catch (err) {
+        console.error('Error recalculating invoice status:', err)
+    }
+}
+
+// Update payment details (e.g. correct payment entry date, amount, method, notes)
 export async function PATCH(request: Request) {
     try {
         const supabase = await createClient()
@@ -139,34 +192,36 @@ export async function PATCH(request: Request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        const { paymentId, invoiceId, paymentDate, paymentNotes, paymentMethod } = await request.json()
+        const { paymentId, invoiceId, paymentDate, paymentNotes, paymentMethod, amount } = await request.json()
 
-        if ((!paymentId && !invoiceId) || !paymentDate) {
-            return NextResponse.json({ error: 'Payment ID or Invoice ID, and Payment Date are required' }, { status: 400 })
-        }
-
-        // If invoiceId is provided, ensure invoice is updated directly
-        if (invoiceId) {
-            const invoiceUpdate: Record<string, any> = { paid_at: paymentDate }
-            if (paymentMethod) invoiceUpdate.payment_method = paymentMethod
-            if (paymentNotes !== undefined) invoiceUpdate.payment_notes = paymentNotes
-
-            await supabase
-                .from('invoices')
-                .update(invoiceUpdate)
-                .eq('id', invoiceId)
-                .eq('user_id', user.id)
+        if (!paymentId && !invoiceId) {
+            return NextResponse.json({ error: 'Payment ID or Invoice ID is required' }, { status: 400 })
         }
 
         // Update payment record
-        const updatePayload: Record<string, any> = {
-            payment_date: paymentDate
-        }
+        const updatePayload: Record<string, any> = {}
+        if (paymentDate) updatePayload.payment_date = paymentDate
         if (paymentNotes !== undefined) updatePayload.payment_notes = paymentNotes
         if (paymentMethod !== undefined) updatePayload.payment_method = paymentMethod
+        if (amount !== undefined && !isNaN(Number(amount)) && Number(amount) > 0) {
+            updatePayload.amount = Number(amount)
+        }
 
+        let targetInvoiceId = invoiceId
         let updatedPayment = null
+
         if (paymentId) {
+            const { data: existingPayment } = await supabase
+                .from('invoice_payments')
+                .select('invoice_id')
+                .eq('id', paymentId)
+                .eq('user_id', user.id)
+                .single()
+
+            if (existingPayment?.invoice_id) {
+                targetInvoiceId = existingPayment.invoice_id
+            }
+
             const { data, error: updateError } = await supabase
                 .from('invoice_payments')
                 .update(updatePayload)
@@ -176,10 +231,10 @@ export async function PATCH(request: Request) {
                 .single()
 
             if (updateError) {
-                console.warn('Non-fatal payment update error:', updateError)
-            } else {
-                updatedPayment = data
+                console.warn('Payment update error:', updateError)
+                return NextResponse.json({ error: updateError.message }, { status: 400 })
             }
+            updatedPayment = data
         } else if (invoiceId) {
             await supabase
                 .from('invoice_payments')
@@ -188,22 +243,72 @@ export async function PATCH(request: Request) {
                 .eq('user_id', user.id)
         }
 
-        // Also update invoice paid_at if this is linked to invoice
-        if (updatedPayment?.invoice_id) {
-            await supabase
-                .from('invoices')
-                .update({ paid_at: paymentDate })
-                .eq('id', updatedPayment.invoice_id)
-                .eq('user_id', user.id)
+        if (targetInvoiceId) {
+            await recalculateInvoiceStatus(supabase, targetInvoiceId, user.id)
         }
 
         return NextResponse.json({
             success: true,
             payment: updatedPayment,
-            message: 'Payment date updated successfully'
+            message: 'Payment updated successfully'
         })
     } catch (error) {
         console.error('Update payment error:', error)
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    }
+}
+
+// Void/Delete a payment record and recalculate invoice status
+export async function DELETE(request: Request) {
+    try {
+        const supabase = await createClient()
+        const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+        if (authError || !user) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        }
+
+        const { searchParams } = new URL(request.url)
+        const paymentId = searchParams.get('paymentId')
+        const invoiceIdParam = searchParams.get('invoiceId')
+
+        if (!paymentId) {
+            return NextResponse.json({ error: 'Payment ID is required' }, { status: 400 })
+        }
+
+        const { data: paymentRecord, error: fetchErr } = await supabase
+            .from('invoice_payments')
+            .select('id, invoice_id')
+            .eq('id', paymentId)
+            .eq('user_id', user.id)
+            .single()
+
+        if (fetchErr || !paymentRecord) {
+            return NextResponse.json({ error: 'Payment record not found' }, { status: 404 })
+        }
+
+        const targetInvoiceId = paymentRecord.invoice_id || invoiceIdParam
+
+        const { error: delErr } = await supabase
+            .from('invoice_payments')
+            .delete()
+            .eq('id', paymentId)
+            .eq('user_id', user.id)
+
+        if (delErr) {
+            return NextResponse.json({ error: delErr.message }, { status: 500 })
+        }
+
+        if (targetInvoiceId) {
+            await recalculateInvoiceStatus(supabase, targetInvoiceId, user.id)
+        }
+
+        return NextResponse.json({
+            success: true,
+            message: 'Payment voided successfully'
+        })
+    } catch (error) {
+        console.error('Void payment error:', error)
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }
 }

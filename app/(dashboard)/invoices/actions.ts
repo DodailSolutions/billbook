@@ -977,6 +977,39 @@ export async function deleteInvoice(id: string) {
             return { success: false, error: 'Not authenticated' }
         }
 
+        // 1. Fetch invoice items and invoice info before deletion to restore inventory
+        const { data: invoiceRecord } = await supabase
+            .from('invoices')
+            .select('invoice_number')
+            .eq('id', id)
+            .eq('user_id', user.id)
+            .single()
+
+        const { data: existingItems } = await supabase
+            .from('invoice_items')
+            .select('*')
+            .eq('invoice_id', id)
+
+        if (existingItems && existingItems.length > 0) {
+            try {
+                await syncInventoryForInvoice(supabase, user.id, id, existingItems, [])
+            } catch (stockErr) {
+                console.warn('Could not reverse inventory on invoice deletion:', stockErr)
+            }
+        }
+
+        // 2. Void or remove associated general ledger entries
+        try {
+            const invoiceNum = invoiceRecord?.invoice_number || id.slice(0, 8)
+            await supabase
+                .from('journal_entries')
+                .delete()
+                .eq('user_id', user.id)
+                .or(`reference.eq.INV-${invoiceNum},reference.like.%INV-${id.slice(0, 8)}%`)
+        } catch (jeErr) {
+            console.warn('Could not clean up journal entries on invoice deletion:', jeErr)
+        }
+
         const { error } = await supabase
             .from('invoices')
             .delete()

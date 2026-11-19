@@ -25,6 +25,7 @@ export function PartialPaymentButton({
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [paymentAmount, setPaymentAmount] = useState('')
     const [paymentMethod, setPaymentMethod] = useState('cash')
+    const [paymentDate, setPaymentDate] = useState(() => new Date().toISOString().slice(0, 10))
     const [paymentNotes, setPaymentNotes] = useState('')
     const [error, setError] = useState('')
 
@@ -56,7 +57,8 @@ export function PartialPaymentButton({
                     invoiceId,
                     amount,
                     paymentMethod,
-                    paymentNotes
+                    paymentNotes,
+                    paymentDate
                 })
             })
 
@@ -111,6 +113,20 @@ export function PartialPaymentButton({
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        <label htmlFor="paymentDate" className="block text-sm font-medium mb-2">
+                            Payment Date <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                            type="date"
+                            id="paymentDate"
+                            value={paymentDate}
+                            onChange={(e) => setPaymentDate(e.target.value)}
+                            required
+                            className="w-full px-3 py-2 border rounded-md bg-transparent"
+                        />
+                    </div>
+
                     <div>
                         <label htmlFor="paymentAmount" className="block text-sm font-medium mb-2">
                             Payment Amount <span className="text-red-500">*</span>
