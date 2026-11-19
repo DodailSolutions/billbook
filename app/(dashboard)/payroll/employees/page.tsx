@@ -6,6 +6,8 @@ import { getEmployees, createEmployee, updateEmployee } from '@/lib/payroll-acti
 import { Employee } from '@/lib/payroll-types'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent } from '@/components/ui/Card'
+import { FaceEnrollmentModal } from '@/components/payroll/FaceEnrollmentModal'
+import { getEnrolledFaceStatus } from '@/lib/cctv-attendance-actions'
 import { ArrowLeft, UserPlus, Users, DollarSign, Building2, Search, Sparkles, User, Edit, FileText } from 'lucide-react'
 import { MigrationBanner } from '@/components/MigrationBanner'
 
@@ -13,6 +15,7 @@ export default function EmployeeDirectoryPage() {
     const [employees, setEmployees] = useState<Employee[]>([])
     const [loading, setLoading] = useState(true)
     const [search, setSearch] = useState('')
+    const [faceStatusMap, setFaceStatusMap] = useState<Record<string, { enrolled: boolean }>>({})
     
     // Filters
     const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive' | 'terminated'>('all')
@@ -57,9 +60,18 @@ export default function EmployeeDirectoryPage() {
 
     const fetchEmp = async () => {
         setLoading(true)
-        const data = await getEmployees()
-        setEmployees(data)
-        setLoading(false)
+        try {
+            const [data, faceMap] = await Promise.all([
+                getEmployees(),
+                getEnrolledFaceStatus()
+            ])
+            setEmployees(data)
+            setFaceStatusMap(faceMap)
+        } catch (err) {
+            console.error('Failed to load employees or face status:', err)
+        } finally {
+            setLoading(false)
+        }
     }
 
     useEffect(() => {
@@ -340,7 +352,13 @@ export default function EmployeeDirectoryPage() {
                                                 <User className="h-3 w-3" /> View Profile
                                             </Button>
                                         </Link>
-                                        <Button variant="outline" size="sm" onClick={() => openEditModal(emp)} className="flex-1 text-xs gap-1.5 h-8">
+                                        <FaceEnrollmentModal
+                                            employeeId={emp.id}
+                                            employeeName={emp.name}
+                                            isEnrolled={Boolean(faceStatusMap[emp.id]?.enrolled)}
+                                            onSuccess={fetchEmp}
+                                        />
+                                        <Button variant="outline" size="sm" onClick={() => openEditModal(emp)} className="text-xs gap-1.5 h-8 px-2.5">
                                             <Edit className="h-3 w-3" /> Edit
                                         </Button>
                                     </div>

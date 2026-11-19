@@ -133,8 +133,21 @@ export function MobileSidebar() {
             ]
         },
         {
-            title: "HR & Payroll",
+            title: "HR & Team Operations",
             items: [
+                {
+                    label: 'HR Command Center',
+                    icon: ShieldCheck,
+                    href: '/hr-dashboard',
+                    color: "text-indigo-600",
+                    badge: 'NEW'
+                },
+                {
+                    label: 'Manager Operations',
+                    icon: Briefcase,
+                    href: '/manager-dashboard',
+                    color: "text-slate-900"
+                },
                 {
                     label: 'Payroll & Salaries',
                     icon: DollarSign,
@@ -154,13 +167,20 @@ export function MobileSidebar() {
                     color: "text-slate-700"
                 },
                 {
+                    label: 'CCTV Vision & Streams',
+                    icon: Video,
+                    href: '/payroll/attendance/cctv',
+                    color: "text-indigo-600",
+                    badge: 'AI'
+                },
+                {
                     label: 'Leave Management',
                     icon: CalendarOff,
                     href: '/payroll/leaves',
-                    color: "text-slate-705"
+                    color: "text-slate-700"
                 },
                 {
-                    label: 'Team Directory',
+                    label: 'Team & Roles',
                     icon: UserCog,
                     href: '/team',
                     color: "text-slate-900",

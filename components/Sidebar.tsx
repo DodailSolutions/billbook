@@ -5,7 +5,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { LayoutDashboard, FileText, Users, RefreshCw, Bell, Settings, User, Bot, UserCog, FileBarChart, HelpCircle, Briefcase, UserPlus, ChevronLeft, ChevronRight, Package, Receipt, Sparkles, BookOpen, ShoppingBag, DollarSign, Building2, CalendarDays, CalendarOff, Mail } from "lucide-react"
+import { LayoutDashboard, FileText, Users, RefreshCw, Bell, Settings, User, Bot, UserCog, FileBarChart, HelpCircle, Briefcase, UserPlus, ChevronLeft, ChevronRight, Package, Receipt, Sparkles, BookOpen, ShoppingBag, DollarSign, Building2, CalendarDays, CalendarOff, Mail, Video, ShieldCheck } from "lucide-react"
 import { SignOutButton } from "./SignOutButton"
 import { PlanBanner } from "./PlanBanner"
 import { getMyCAProfile } from "@/lib/ca-profile-actions"
@@ -119,8 +119,21 @@ export function Sidebar() {
             ]
         },
         {
-            title: "HR & Payroll",
+            title: "HR & Team Operations",
             items: [
+                {
+                    label: 'HR Command Center',
+                    icon: ShieldCheck,
+                    href: '/hr-dashboard',
+                    color: "text-indigo-600",
+                    badge: 'NEW'
+                },
+                {
+                    label: 'Manager Operations',
+                    icon: Briefcase,
+                    href: '/manager-dashboard',
+                    color: "text-slate-900"
+                },
                 {
                     label: 'Payroll & Salaries',
                     icon: DollarSign,
@@ -140,13 +153,20 @@ export function Sidebar() {
                     color: "text-slate-700"
                 },
                 {
+                    label: 'CCTV Vision & Streams',
+                    icon: Video,
+                    href: '/payroll/attendance/cctv',
+                    color: "text-indigo-600",
+                    badge: 'AI'
+                },
+                {
                     label: 'Leave Management',
                     icon: CalendarOff,
                     href: '/payroll/leaves',
                     color: "text-slate-700"
                 },
                 {
-                    label: 'Team Directory',
+                    label: 'Team & Roles',
                     icon: UserCog,
                     href: '/team',
                     color: "text-slate-900",
