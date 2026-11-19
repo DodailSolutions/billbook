@@ -637,3 +637,72 @@ export async function getDailyMovementAudit(selectedDate?: string): Promise<Empl
         return []
     }
 }
+
+/**
+ * Check whether the current user / organization has opted into the CCTV Attendance feature.
+ * Users who haven't opted in are restricted from downloading the Vision Bridge companion.
+ */
+export async function getCctvFeatureOptIn(): Promise<boolean> {
+    try {
+        const supabase = await createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) return false
+
+        // Check if explicitly opted in via audit_logs
+        const { data: optInData } = await supabase
+            .from('audit_logs')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('action', 'cctv_attendance_opt_in')
+            .limit(1)
+
+        if (optInData && optInData.length > 0) return true
+
+        // Check if user already has any CCTV cameras configured
+        const { count } = await supabase
+            .from('cctv_cameras')
+            .select('*', { count: 'exact', head: true })
+            .eq('user_id', user.id)
+
+        return (count || 0) > 0
+    } catch (err) {
+        console.error('getCctvFeatureOptIn error:', err)
+        return false
+    }
+}
+
+/**
+ * Opt-in or opt-out of the Vision AI CCTV Attendance feature.
+ */
+export async function setCctvFeatureOptIn(enabled: boolean): Promise<{ success: boolean; error?: string }> {
+    try {
+        const supabase = await createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) return { success: false, error: 'Authentication required' }
+
+        if (enabled) {
+            await supabase.from('audit_logs').insert({
+                user_id: user.id,
+                action: 'cctv_attendance_opt_in',
+                entity_type: 'vision_bridge',
+                changes: {
+                    opted_in_at: new Date().toISOString(),
+                    user_email: user.email
+                }
+            })
+        } else {
+            await supabase
+                .from('audit_logs')
+                .delete()
+                .eq('user_id', user.id)
+                .eq('action', 'cctv_attendance_opt_in')
+        }
+
+        revalidatePath('/payroll/attendance/cctv')
+        return { success: true }
+    } catch (err: any) {
+        console.error('setCctvFeatureOptIn error:', err)
+        return { success: false, error: err?.message || 'Failed to update opt-in state' }
+    }
+}
+

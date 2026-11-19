@@ -6,7 +6,8 @@ import {
     FileText, Users, IndianRupee, Zap, CheckCircle, Shield, TrendingUp, 
     RefreshCw, Clock, Building2, ArrowRight, Star, Check, BarChart3, 
     Smartphone, Globe, Lock, Sparkles, BookOpen, ShoppingBag, DollarSign, 
-    Bot, Layers, ChevronRight, ShieldCheck, Award, LayoutDashboard, PlusCircle
+    Bot, Layers, ChevronRight, ShieldCheck, Award, LayoutDashboard, PlusCircle,
+    Video, Camera
 } from 'lucide-react'
 import { InteractiveFeaturePreview } from './_components/InteractiveFeaturePreview'
 import { HomePricingSection } from './_components/HomePricingSection'
@@ -28,6 +29,7 @@ const TestimonialCarousel = dynamicImport(() => import('./_components/Testimonia
 })
 
 const ALL_FEATURES = [
+    { icon: Video, title: 'AI CCTV Touchless Attendance', desc: 'Connect office CCTV streams (CP Plus, Dahua, Hikvision, Tapo) for biometric face recognition check-ins with 100% DPDP compliance (zero raw video stored)', color: 'blue' },
     { icon: FileText, title: 'GST Compliant Invoicing', desc: 'Create CGST, SGST, IGST invoices with QR code payment in under 30 seconds', color: 'blue' },
     { icon: RefreshCw, title: 'Tally Prime 1-Click Sync', desc: 'Export full Daybook XML and Master Ledgers directly into Tally with zero manual re-entry', color: 'blue' },
     { icon: ShieldCheck, title: 'CA Client Delegation & Audit', desc: 'Securely grant your CA scoped, time-bounded access with instant 1-click revocation', color: 'black' },
@@ -261,6 +263,57 @@ export default async function Home() {
                     </div>
 
                     <InteractiveFeaturePreview />
+                </div>
+            </section>
+
+            {/* Flagship Innovation: AI CCTV Touchless Attendance Showcase */}
+            <section className="py-20 sm:py-24 bg-gradient-to-b from-white via-indigo-50/20 to-slate-50/40 border-t border-slate-200/60 overflow-hidden relative">
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 relative z-10">
+                    <div className="text-center max-w-3xl mx-auto space-y-4">
+                        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-50 border border-indigo-200/80 text-indigo-700 text-xs font-bold uppercase tracking-wider">
+                            <Video className="w-3.5 h-3.5 text-indigo-600 animate-pulse" />
+                            Hardware-Free Attendance Innovation
+                        </div>
+                        <h2 className="text-3xl sm:text-5xl font-black text-slate-950 -tracking-tight">
+                            Touchless Attendance Powered by Your Existing Office CCTV
+                        </h2>
+                        <p className="text-slate-600 text-sm sm:text-base font-medium leading-relaxed max-w-2xl mx-auto">
+                            No expensive biometric kiosks or card readers required. BillBooky links directly to your CP Plus, Dahua, Hikvision, or Tapo cameras for instant facial recognition check-ins and automated payroll calculation.
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="bg-white p-7 rounded-[24px] border border-slate-200/80 shadow-xs space-y-3">
+                            <div className="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600">
+                                <Camera className="w-6 h-6" />
+                            </div>
+                            <h3 className="text-lg font-bold text-slate-950">Zero Hardware Setup</h3>
+                            <p className="text-slate-500 text-xs leading-relaxed font-medium">
+                                Connect via P2P serial number or RTSP stream. Works with CP Plus EasyViewer, Dahua, Hikvision, and standard NVR systems in under 2 minutes.
+                            </p>
+                        </div>
+
+                        <div className="bg-white p-7 rounded-[24px] border border-slate-200/80 shadow-xs space-y-3">
+                            <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
+                                <ShieldCheck className="w-6 h-6" />
+                            </div>
+                            <h3 className="text-lg font-bold text-slate-950">100% DPDP Act Compliant</h3>
+                            <p className="text-slate-500 text-xs leading-relaxed font-medium">
+                                Strict employee data privacy. Face embeddings are computed in local RAM as 512-D vectors. Zero raw video feeds or images are ever stored.
+                            </p>
+                        </div>
+
+                        <div className="bg-white p-7 rounded-[24px] border border-slate-200/80 shadow-xs space-y-3">
+                            <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600">
+                                <Clock className="w-6 h-6" />
+                            </div>
+                            <h3 className="text-lg font-bold text-slate-950">Automated Shift & Payroll Sync</h3>
+                            <p className="text-slate-500 text-xs leading-relaxed font-medium">
+                                Logs morning arrivals, tea/lunch breaks, and evening departures with grace periods. Automatically calculates net hours and monthly payroll deductions.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </section>
 

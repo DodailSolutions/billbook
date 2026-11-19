@@ -1,8 +1,9 @@
 'use client'
 
-import { FileText, Users, IndianRupee, CheckCircle, RefreshCw, Clock } from 'lucide-react'
+import { FileText, Users, IndianRupee, CheckCircle, RefreshCw, Clock, Video } from 'lucide-react'
 
 const FEATURES = [
+  { icon: Video, title: 'AI CCTV Touchless Attendance', desc: 'Face-recognition attendance using existing office cameras with 100% DPDP privacy', color: 'indigo' },
   { icon: FileText, title: 'Quick Invoice Creation', desc: 'Create professional invoices in under 60 seconds', color: 'blue' },
   { icon: IndianRupee, title: 'GST Compliant', desc: 'Automatic GST calculations with GSTIN support', color: 'indigo' },
   { icon: Users, title: 'Customer Management', desc: 'Store and organize all customer details securely', color: 'purple' },

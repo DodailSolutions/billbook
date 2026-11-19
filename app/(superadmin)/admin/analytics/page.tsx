@@ -1,6 +1,7 @@
-import { BarChart3, Building2, TrendingUp, Users } from 'lucide-react'
+import { BarChart3, Building2, TrendingUp, Users, Download, Monitor, Apple, ShieldCheck, Clock } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { getBusinessTypeAnalytics } from './actions'
+import { getBridgeDownloadMetrics } from '@/lib/bridge-download-actions'
 import Link from 'next/link'
 
 const BUSINESS_TYPE_LABELS: Record<string, string> = {
@@ -18,7 +19,10 @@ const BUSINESS_TYPE_LABELS: Record<string, string> = {
 }
 
 export default async function AnalyticsPage() {
-    const analytics = await getBusinessTypeAnalytics()
+    const [analytics, bridgeMetrics] = await Promise.all([
+        getBusinessTypeAnalytics(),
+        getBridgeDownloadMetrics()
+    ])
     
     const totalUsers = analytics.reduce((sum, item) => sum + item.total_users, 0)
     const totalPaying = analytics.reduce((sum, item) => sum + item.paying_users, 0)
@@ -42,16 +46,16 @@ export default async function AnalyticsPage() {
                         </div>
                         <h1 className="text-3xl font-bold flex items-center gap-2">
                             <BarChart3 className="h-8 w-8 text-blue-600" />
-                            Business Type Analytics
+                            Business Type & System Analytics
                         </h1>
                         <p className="text-gray-600 dark:text-gray-400 mt-1">
-                            Analyze which business types are using BillBooky
+                            Analyze registered businesses and Vision AI Bridge desktop companion downloads
                         </p>
                     </div>
                 </div>
 
                 {/* Summary Cards */}
-                <div className="grid md:grid-cols-3 gap-6">
+                <div className="grid md:grid-cols-4 gap-6">
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-sm font-medium">Total Users</CardTitle>
@@ -84,7 +88,94 @@ export default async function AnalyticsPage() {
                             <p className="text-xs text-gray-500 mt-1">Free to paid conversion</p>
                         </CardContent>
                     </Card>
+
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium">Bridge Downloads</CardTitle>
+                            <Download className="h-4 w-4 text-indigo-600" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold text-indigo-600">
+                                {bridgeMetrics ? bridgeMetrics.totalDownloads : 0}
+                            </div>
+                            <p className="text-xs text-gray-500 mt-1">
+                                {bridgeMetrics ? `${bridgeMetrics.windowsDownloads} Win • ${bridgeMetrics.macDownloads} Mac` : '0 downloads'}
+                            </p>
+                        </CardContent>
+                    </Card>
                 </div>
+
+                {/* Vision Bridge Download Tracking Table for Super Admin */}
+                {bridgeMetrics && (
+                    <Card className="border-indigo-100 shadow-sm">
+                        <CardHeader className="border-b border-slate-100 bg-slate-50/50">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <CardTitle className="text-base font-bold flex items-center gap-2 text-slate-900">
+                                        <Download className="w-5 h-5 text-indigo-600" />
+                                        Desktop Vision Bridge Downloads Tracker
+                                    </CardTitle>
+                                    <CardDescription>
+                                        Super Admin log of authenticated users who downloaded the Windows (.exe) and macOS (.dmg) runners
+                                    </CardDescription>
+                                </div>
+                                <div className="text-right">
+                                    <span className="text-xs font-semibold px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-full border border-indigo-200">
+                                        {bridgeMetrics.uniqueUsers} Unique Active Accounts
+                                    </span>
+                                </div>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="p-0">
+                            {bridgeMetrics.userBreakdown.length === 0 ? (
+                                <div className="text-center py-10 text-gray-500 text-sm">
+                                    No desktop bridge downloads logged yet.
+                                </div>
+                            ) : (
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-left text-xs">
+                                        <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
+                                            <tr>
+                                                <th className="py-3 px-4">User Account</th>
+                                                <th className="py-3 px-4 text-center">Total Downloads</th>
+                                                <th className="py-3 px-4 text-center">OS Breakdown</th>
+                                                <th className="py-3 px-4 text-right">Last Downloaded</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-slate-100">
+                                            {bridgeMetrics.userBreakdown.map((item) => (
+                                                <tr key={item.email} className="hover:bg-slate-50/80 transition-colors">
+                                                    <td className="py-3 px-4 font-medium text-slate-900">
+                                                        {item.email}
+                                                    </td>
+                                                    <td className="py-3 px-4 text-center font-bold text-indigo-600">
+                                                        {item.count} {item.count === 1 ? 'time' : 'times'}
+                                                    </td>
+                                                    <td className="py-3 px-4 text-center">
+                                                        <span className="inline-flex items-center gap-2 text-[11px] font-mono text-slate-600">
+                                                            <span className="flex items-center gap-1"><Monitor className="w-3 h-3 text-blue-500" /> {item.osBreakdown.windows}</span>
+                                                            <span className="text-slate-300">|</span>
+                                                            <span className="flex items-center gap-1"><Apple className="w-3 h-3 text-slate-700" /> {item.osBreakdown.mac}</span>
+                                                        </span>
+                                                    </td>
+                                                    <td className="py-3 px-4 text-right text-slate-500">
+                                                        {new Date(item.lastDownloaded).toLocaleString('en-IN', {
+                                                            day: 'numeric',
+                                                            month: 'short',
+                                                            year: 'numeric',
+                                                            hour: '2-digit',
+                                                            minute: '2-digit'
+                                                        })}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                )}
 
                 {/* Business Type Breakdown */}
                 <Card>
