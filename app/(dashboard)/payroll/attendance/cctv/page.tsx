@@ -24,7 +24,13 @@ import {
     Sparkles,
     Server,
     Layers,
-    Tv
+    Tv,
+    Maximize2,
+    Minimize2,
+    ExternalLink,
+    AlertTriangle,
+    X,
+    Monitor
 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent } from '@/components/ui/Card'
@@ -73,6 +79,17 @@ export default function CctvConnectorPage() {
 
     // Local bridge stream failure map: { [camId]: boolean }
     const [failedStreams, setFailedStreams] = useState<Record<string, boolean>>({})
+    const [enlargedCamera, setEnlargedCamera] = useState<CctvCamera | null>(null)
+    const [bridgeHost, setBridgeHost] = useState('http://localhost:5000')
+    const [streamTimestamp, setStreamTimestamp] = useState(Date.now())
+
+    // Auto-detect bridge or saved host
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem('cctv_bridge_host')
+            if (saved) setBridgeHost(saved)
+        }
+    }, [])
 
     const buildRTSPUrl = (brand: string, host: string, port: string, user: string, pass: string, ch: string) => {
         const u = encodeURIComponent(user.trim() || 'admin')
@@ -145,7 +162,7 @@ export default function CctvConnectorPage() {
         setIsModalOpen(true)
     }
 
-    const handleTestStream = () => {
+    const handleTestStream = async () => {
         const urlToTest = effectiveStreamUrl
         if (!urlToTest || (!deviceHost && connectionMode === 'easy_p2p')) {
             setStreamTestResult({ success: false, msg: 'Please enter camera IP / DVR details first.' })
@@ -153,13 +170,46 @@ export default function CctvConnectorPage() {
         }
         setTestingStream(true)
         setStreamTestResult(null)
-        setTimeout(() => {
-            setTestingStream(false)
-            setStreamTestResult({ 
-                success: true, 
-                msg: `Connected to ${selectedBrand.toUpperCase()} NVR. Stream authenticated for user "${deviceUser || 'admin'}".` 
+
+        try {
+            // Real TCP port probe to camera DVR
+            const probeRes = await fetch('/api/payroll/attendance/cctv/probe', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    host: connectionMode === 'easy_p2p' ? deviceHost : urlToTest,
+                    port: devicePort || 554,
+                    brand: selectedBrand
+                })
             })
-        }, 1200)
+            const probeData = await probeRes.json()
+
+            // Also check local vision bridge health
+            let bridgeOnline = false
+            try {
+                const bRes = await fetch(`${bridgeHost}/`, { signal: AbortSignal.timeout(1500) })
+                bridgeOnline = bRes.ok
+            } catch {}
+
+            setTestingStream(false)
+            if (probeData.success) {
+                setStreamTestResult({ 
+                    success: true, 
+                    msg: `${probeData.message} ${bridgeOnline ? '• Vision Bridge service is ONLINE.' : '• (Notice: Start local Python bridge on port 5000 for browser playback)'}` 
+                })
+            } else {
+                setStreamTestResult({
+                    success: false,
+                    msg: probeData.message || probeData.error || 'Connection failed. Please check camera power and network subnet.'
+                })
+            }
+        } catch (err: any) {
+            setTestingStream(false)
+            setStreamTestResult({
+                success: false,
+                msg: `Failed to probe camera: ${err.message}`
+            })
+        }
     }
 
     const handleSave = async (e: React.FormEvent) => {
@@ -391,7 +441,7 @@ export default function CctvConnectorPage() {
                                         <div className="relative h-48 bg-slate-950 flex flex-col justify-between p-3 overflow-hidden group">
                                             {isLiveBridgeStream ? (
                                                 <img 
-                                                    src={`http://localhost:5000/stream?camera=${cam.id}`}
+                                                    src={`${bridgeHost}/stream?camera=${cam.id}&t=${streamTimestamp}`}
                                                     alt="Live Stream"
                                                     onError={() => setFailedStreams(prev => ({ ...prev, [cam.id]: true }))}
                                                     className="absolute inset-0 w-full h-full object-cover"
@@ -411,24 +461,53 @@ export default function CctvConnectorPage() {
                                                     {cam.is_active ? 'LIVE P2P' : 'PAUSED'}
                                                 </span>
 
-                                                <span className="text-[11px] font-mono text-slate-300 bg-black/60 px-2 py-0.5 rounded">
-                                                    15 FPS • E2EE
-                                                </span>
+                                                <div className="flex items-center gap-1.5">
+                                                    <span className="text-[11px] font-mono text-slate-300 bg-black/60 px-2 py-0.5 rounded">
+                                                        15 FPS • E2EE
+                                                    </span>
+                                                    <button 
+                                                        onClick={() => setEnlargedCamera(cam)}
+                                                        title="Enlarge Live Stream"
+                                                        className="p-1 rounded bg-black/60 hover:bg-black/90 text-white transition-colors cursor-pointer"
+                                                    >
+                                                        <Maximize2 className="w-3.5 h-3.5" />
+                                                    </button>
+                                                </div>
                                             </div>
 
                                             {/* Center Simulated Bounding Box when offline */}
                                             {!isLiveBridgeStream && (
-                                                <div className="relative z-10 my-auto text-center">
-                                                    <div className="w-20 h-24 border-2 border-dashed border-indigo-400/70 rounded-lg mx-auto flex items-center justify-center">
+                                                <div className="relative z-10 my-auto text-center flex flex-col items-center">
+                                                    <div className="w-16 h-16 border-2 border-dashed border-indigo-400/70 rounded-lg flex items-center justify-center">
                                                         <Eye className="w-6 h-6 text-indigo-300/80" />
                                                     </div>
-                                                    <p className="text-[10px] text-slate-400 font-mono mt-1">Multi-Person Detection Zone</p>
+                                                    <button 
+                                                        onClick={() => setEnlargedCamera(cam)}
+                                                        className="inline-flex items-center gap-1 text-[11px] font-medium text-indigo-200 hover:text-white bg-indigo-900/60 hover:bg-indigo-800 border border-indigo-700/60 rounded px-2 py-0.5 mt-2 transition-colors cursor-pointer"
+                                                    >
+                                                        <Maximize2 className="w-3 h-3" />
+                                                        Enlarge Feed
+                                                    </button>
+                                                    <button 
+                                                        onClick={() => {
+                                                            setFailedStreams(prev => {
+                                                                const n = { ...prev }
+                                                                delete n[cam.id]
+                                                                return n
+                                                            })
+                                                            setStreamTimestamp(Date.now())
+                                                        }}
+                                                        className="inline-flex items-center gap-1 text-[10px] text-slate-400 hover:text-slate-200 mt-1 transition-colors cursor-pointer"
+                                                    >
+                                                        <RefreshCw className="w-2.5 h-2.5" />
+                                                        Retry Stream
+                                                    </button>
                                                 </div>
                                             )}
 
                                             {/* Bottom Stream Info */}
                                             <div className="relative z-10 flex items-center justify-between text-[11px] font-mono text-slate-300 bg-black/40 px-2 py-1 rounded">
-                                                <span className="truncate max-w-[180px]">{cam.location}</span>
+                                                <span className="truncate max-w-[160px]">{cam.location}</span>
                                                 <span className="capitalize text-indigo-300 font-semibold">{cam.direction_mode.replace('_', ' ')}</span>
                                             </div>
                                         </div>
@@ -744,6 +823,160 @@ export default function CctvConnectorPage() {
                                 </Button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Enlarge / Full-Screen Live Stream Modal */}
+            {enlargedCamera && (
+                <div className="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-150">
+                    <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-5xl w-full overflow-hidden shadow-2xl flex flex-col max-h-[95vh]">
+                        {/* Modal Header */}
+                        <div className="p-4 bg-slate-950 border-b border-slate-800/80 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 rounded-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
+                                    <Video className="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <div className="flex items-center gap-2">
+                                        <h2 className="text-base font-semibold text-white tracking-tight">
+                                            {enlargedCamera.camera_name}
+                                        </h2>
+                                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase ${
+                                            enlargedCamera.is_active && !failedStreams[enlargedCamera.id]
+                                                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+                                                : 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
+                                        }`}>
+                                            <span className={`w-1.5 h-1.5 rounded-full ${
+                                                enlargedCamera.is_active && !failedStreams[enlargedCamera.id] ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'
+                                            }`} />
+                                            {enlargedCamera.is_active && !failedStreams[enlargedCamera.id] ? 'LIVE FEED' : 'CONNECTING / OFFLINE'}
+                                        </span>
+                                    </div>
+                                    <p className="text-xs text-slate-400 flex items-center gap-2 mt-0.5 font-mono">
+                                        <span>{enlargedCamera.location}</span>
+                                        <span>•</span>
+                                        <span className="capitalize text-indigo-300">{enlargedCamera.direction_mode.replace('_', ' ')} Gate</span>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                        setFailedStreams(prev => {
+                                            const next = { ...prev }
+                                            delete next[enlargedCamera.id]
+                                            return next
+                                        })
+                                        setStreamTimestamp(Date.now())
+                                    }}
+                                    className="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700"
+                                >
+                                    <RefreshCw className="w-3.5 h-3.5 mr-1" />
+                                    Reconnect Stream
+                                </Button>
+                                <button
+                                    onClick={() => setEnlargedCamera(null)}
+                                    className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+                                >
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Modal Live Player Container */}
+                        <div className="relative bg-black flex-1 min-h-[380px] max-h-[62vh] flex items-center justify-center overflow-hidden p-2">
+                            {enlargedCamera.is_active && !failedStreams[enlargedCamera.id] ? (
+                                <img
+                                    src={`${bridgeHost}/stream?camera=${enlargedCamera.id}&t=${streamTimestamp}`}
+                                    alt={enlargedCamera.camera_name}
+                                    onError={() => setFailedStreams(prev => ({ ...prev, [enlargedCamera.id]: true }))}
+                                    className="w-full h-full max-h-[58vh] object-contain rounded-lg"
+                                />
+                            ) : (
+                                <div className="text-center p-6 max-w-md">
+                                    <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto mb-3">
+                                        <AlertTriangle className="w-7 h-7" />
+                                    </div>
+                                    <h4 className="text-base font-semibold text-white mb-1">Live Video Stream Signal Pending</h4>
+                                    <p className="text-xs text-slate-400 leading-relaxed mb-4">
+                                        Your office CCTV cameras reside on your local network (LAN). To stream them with live AI face tracking and bounding boxes in your browser, start your local Python bridge service.
+                                    </p>
+
+                                    <div className="bg-slate-950/80 rounded-xl p-3 border border-slate-800 text-left font-mono text-[11px] text-slate-300 space-y-1 mb-4">
+                                        <p className="text-slate-500 text-[10px] uppercase font-semibold">Start Local Bridge Service:</p>
+                                        <p className="text-emerald-400 font-semibold select-all">cd billbook/cctv-bridge</p>
+                                        <p className="text-emerald-400 font-semibold select-all">python server.py --port 5000</p>
+                                    </div>
+
+                                    <div className="flex items-center justify-center gap-2">
+                                        <Button
+                                            size="sm"
+                                            onClick={() => {
+                                                setFailedStreams(prev => {
+                                                    const next = { ...prev }
+                                                    delete next[enlargedCamera.id]
+                                                    return next
+                                                })
+                                                setStreamTimestamp(Date.now())
+                                            }}
+                                            className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs"
+                                        >
+                                            <RefreshCw className="w-3.5 h-3.5 mr-1" />
+                                            Retry Stream Feed
+                                        </Button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Stream HUD Watermark Overlay */}
+                            <div className="absolute bottom-4 left-4 z-10 flex items-center gap-2 bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10 text-xs font-mono text-slate-300">
+                                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                                <span>Multi-Person AI Vision Mesh</span>
+                                <span>•</span>
+                                <span className="text-slate-400">Gate: {enlargedCamera.direction_mode}</span>
+                            </div>
+                        </div>
+
+                        {/* Modal Footer & Bridge Settings */}
+                        <div className="p-4 bg-slate-950 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                            <div className="flex items-center gap-2 w-full sm:w-auto">
+                                <span className="text-slate-400 font-medium">Vision Bridge Endpoint:</span>
+                                <input
+                                    type="text"
+                                    value={bridgeHost}
+                                    onChange={(e) => {
+                                        setBridgeHost(e.target.value)
+                                        if (typeof window !== 'undefined') {
+                                            localStorage.setItem('cctv_bridge_host', e.target.value)
+                                        }
+                                    }}
+                                    placeholder="http://localhost:5000"
+                                    className="px-2.5 py-1 bg-slate-900 border border-slate-800 rounded text-slate-200 font-mono text-xs w-56 focus:outline-none focus:border-indigo-500"
+                                />
+                            </div>
+
+                            <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+                                <Link
+                                    href="/payroll/attendance/movements"
+                                    className="text-xs text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1"
+                                >
+                                    <Activity className="w-3.5 h-3.5" />
+                                    View Live Attendance Movements
+                                </Link>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setEnlargedCamera(null)}
+                                    className="bg-slate-800 hover:bg-slate-700 text-slate-300 border-slate-700 text-xs"
+                                >
+                                    Close Full View
+                                </Button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}
