@@ -671,6 +671,7 @@ interface UpdateInvoiceData {
     notes?: string
     discount_type?: 'percentage' | 'flat'
     discount_value?: number
+    show_bank_details_when_paid?: boolean
     items: Array<{
         description: string
         details?: string
