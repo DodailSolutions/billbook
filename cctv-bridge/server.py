@@ -70,6 +70,13 @@ ORGANIZATION_TOKEN = os.environ.get("ORGANIZATION_TOKEN", "billbook_local_dev_to
 ASSIGNED_USER_ID = os.environ.get("ADMIN_USER_ID", "default_admin")
 BILLBOOK_API_URL = os.environ.get("BILLBOOK_ATTENDANCE_API", "http://localhost:3000/api/payroll/attendance/movement")
 
+# WebRTC ICE Servers (STUN/TURN) for NAT traversal
+# Default to public Google STUN servers; override with env vars for production TURN
+WEBRTC_STUN_SERVERS = os.environ.get("WEBRTC_STUN_SERVERS", "stun:stun.l.google.com:19302,stun:stun1.l.google.com:19302,stun:stun2.l.google.com:19302").split(",")
+WEBRTC_TURN_SERVERS = os.environ.get("WEBRTC_TURN_SERVERS", "").split(",") if os.environ.get("WEBRTC_TURN_SERVERS") else []
+WEBRTC_TURN_USERNAME = os.environ.get("WEBRTC_TURN_USERNAME", "")
+WEBRTC_TURN_CREDENTIAL = os.environ.get("WEBRTC_TURN_CREDENTIAL", "")
+
 
 class CameraStream:
     """
@@ -475,17 +482,42 @@ def mjpeg_stream(request: Request, camera: Optional[str] = None, token: Optional
 
 
 @app.websocket("/ws/stream")
-async def websocket_stream(websocket: WebSocket, camera: Optional[str] = None):
+async def websocket_stream(websocket: WebSocket, camera: Optional[str] = None, token: Optional[str] = None):
     """
     Zero-latency WebSocket MJPEG stream relay.
     Bypasses browser Mixed-Content restrictions when accessed from an HTTPS dashboard (https://billbooky.dodail.com).
+    Enforces tenant isolation via token authentication.
     """
     await websocket.accept()
     cam_id = camera or websocket.query_params.get("camera", "default")
 
+    # Verify tenant access - extract token from query params if not provided
+    auth_token = token or websocket.query_params.get("token")
+
+    # Create a mock request for verify_tenant_access
+    from fastapi import Request
+    from starlette.datastructures import Headers
+
+    class MockRequest:
+        def __init__(self, headers_dict: dict):
+            self.headers = Headers(headers_dict)
+
+    headers = {"Authorization": f"Bearer {auth_token}"} if auth_token else {}
+    if "X-Admin-Token" in websocket.headers:
+        headers["X-Admin-Token"] = websocket.headers["X-Admin-Token"]
+
+    mock_request = MockRequest(headers)
+
+    try:
+        tenant_id = verify_tenant_access(mock_request, cam_id, auth_token)
+    except Exception as e:
+        await websocket.close(code=4001, reason="Unauthorized: Invalid tenant token")
+        logger.warning("WebSocket auth failed for camera %s: %s", cam_id, e)
+        return
+
     try:
         while True:
-            stream = active_streams.get(cam_id)
+            stream = tenant_streams.get(tenant_id, {}).get(cam_id)
             frame_bytes = None
             if stream:
                 with stream.lock:
@@ -504,17 +536,42 @@ async def websocket_stream(websocket: WebSocket, camera: Optional[str] = None):
 
 
 @app.websocket("/ws/status")
-async def websocket_status(websocket: WebSocket):
+async def websocket_status(websocket: WebSocket, token: Optional[str] = None):
     """
     Live WebSocket heartbeat & camera telemetry channel for cloud dashboard.
+    Enforces tenant isolation.
     """
     await websocket.accept()
+
+    # Verify tenant access
+    auth_token = token or websocket.query_params.get("token")
+    from fastapi import Request
+    from starlette.datastructures import Headers
+
+    class MockRequest:
+        def __init__(self, headers_dict: dict):
+            self.headers = Headers(headers_dict)
+
+    headers = {"Authorization": f"Bearer {auth_token}"} if auth_token else {}
+    if "X-Admin-Token" in websocket.headers:
+        headers["X-Admin-Token"] = websocket.headers["X-Admin-Token"]
+
+    mock_request = MockRequest(headers)
+
+    try:
+        tenant_id = verify_tenant_access(mock_request, "status", auth_token)
+    except Exception as e:
+        await websocket.close(code=4001, reason="Unauthorized: Invalid tenant token")
+        logger.warning("WebSocket status auth failed: %s", e)
+        return
+
     try:
         while True:
+            tenant_stream_count = len(tenant_streams.get(tenant_id, {}))
             await websocket.send_json({
                 "service": "BillBook Vision AI Bridge",
                 "status": "online",
-                "active_streams": len(active_streams),
+                "active_streams": tenant_stream_count,
                 "timestamp": time.time()
             })
             await asyncio.sleep(2.0)
@@ -524,18 +581,61 @@ async def websocket_status(websocket: WebSocket):
         pass
 
 
+def build_ice_servers() -> List[Dict[str, Any]]:
+    """Build ICE server configuration from environment variables."""
+    ice_servers = []
+
+    # Add STUN servers
+    for stun in WEBRTC_STUN_SERVERS:
+        stun = stun.strip()
+        if stun:
+            ice_servers.append({"urls": stun})
+
+    # Add TURN servers if configured
+    for turn in WEBRTC_TURN_SERVERS:
+        turn = turn.strip()
+        if turn:
+            turn_config = {"urls": turn}
+            if WEBRTC_TURN_USERNAME:
+                turn_config["username"] = WEBRTC_TURN_USERNAME
+            if WEBRTC_TURN_CREDENTIAL:
+                turn_config["credential"] = WEBRTC_TURN_CREDENTIAL
+            ice_servers.append(turn_config)
+
+    return ice_servers
+
+
+@app.get("/webrtc/ice-servers")
+async def webrtc_ice_servers(request: Request, camera: Optional[str] = None, token: Optional[str] = None):
+    """Return ICE server configuration for WebRTC clients."""
+    cam_id = camera or "default"
+    tenant_id = verify_tenant_access(request, cam_id, token)
+
+    ice_servers = build_ice_servers()
+    return JSONResponse({
+        "ice_servers": ice_servers,
+        "tenant_id": tenant_id
+    })
+
+
 @app.post("/webrtc/offer")
 async def webrtc_offer(request: Request, camera: Optional[str] = None, token: Optional[str] = None):
     cam_id = camera or "default"
     tenant_id = verify_tenant_access(request, cam_id, token)
 
     try:
-        from aiortc import RTCPeerConnection, RTCSessionDescription
+        from aiortc import RTCPeerConnection, RTCSessionDescription, RTCConfiguration, RTCIceServer
+
+        # Build ICE configuration
+        ice_servers_list = build_ice_servers()
+        ice_servers = [RTCIceServer(**s) for s in ice_servers_list]
+        config = RTCConfiguration(iceServers=ice_servers)
+
         params = await request.json()
         offer = RTCSessionDescription(sdp=params["sdp"], type=params["type"])
 
-        pc = RTCPeerConnection()
-        
+        pc = RTCPeerConnection(configuration=config)
+
         @pc.on("iceconnectionstatechange")
         async def on_ice():
             logger.info("[%s] ICE Connection State: %s", tenant_id, pc.iceConnectionState)
@@ -549,7 +649,8 @@ async def webrtc_offer(request: Request, camera: Optional[str] = None, token: Op
         return JSONResponse({
             "sdp": pc.localDescription.sdp,
             "type": pc.localDescription.type,
-            "tenant_id": tenant_id
+            "tenant_id": tenant_id,
+            "ice_servers": ice_servers_list
         })
     except ImportError:
         return JSONResponse({

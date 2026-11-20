@@ -307,6 +307,28 @@ export async function saveEmployeeFaceEmbedding(input: {
             return { success: false, error: 'Invalid mathematical embedding vector' }
         }
 
+        // Validate embedding dimension - must be 512-D for face recognition
+        const EXPECTED_DIMENSION = 512
+        if (input.embedding.length !== EXPECTED_DIMENSION) {
+            return {
+                success: false,
+                error: `Face embedding must be exactly ${EXPECTED_DIMENSION} dimensions (received ${input.embedding.length}). Please use a 512-D face encoder (e.g., ArcFace, FaceNet, or InsightFace).`
+            }
+        }
+
+        // Validate all values are finite numbers
+        const hasInvalidValues = input.embedding.some(v => !Number.isFinite(v))
+        if (hasInvalidValues) {
+            return { success: false, error: 'Face embedding contains invalid values (NaN or Infinity)' }
+        }
+
+        // Validate vector is normalized (approximately unit length for cosine similarity)
+        const norm = Math.sqrt(input.embedding.reduce((sum, v) => sum + v * v, 0))
+        if (norm < 0.1 || norm > 10) {
+            // Warn but don't fail - some encoders output unnormalized vectors
+            console.warn(`Face embedding norm is ${norm.toFixed(4)}, expected ~1.0 for normalized vectors`)
+        }
+
         const { error } = await supabase
             .from('employee_face_embeddings')
             .upsert({
@@ -327,7 +349,7 @@ export async function saveEmployeeFaceEmbedding(input: {
     }
 }
 
-export async function getEnrolledFaceStatus(): Promise<Record<string, { enrolled: boolean; enrolled_at?: string }>> {
+export async function getEnrolledFaceStatus(): Promise<Record<string, { enrolled: boolean; enrolled_at?: string; dimension?: number }>> {
     try {
         const supabase = await createClient()
         const { data: { user } } = await supabase.auth.getUser()
@@ -335,7 +357,7 @@ export async function getEnrolledFaceStatus(): Promise<Record<string, { enrolled
 
         const { data, error } = await supabase
             .from('employee_face_embeddings')
-            .select('employee_id, created_at')
+            .select('employee_id, created_at, embedding')
             .eq('user_id', user.id)
 
         if (error) {
@@ -343,9 +365,13 @@ export async function getEnrolledFaceStatus(): Promise<Record<string, { enrolled
             return {}
         }
 
-        const map: Record<string, { enrolled: boolean; enrolled_at?: string }> = {}
+        const map: Record<string, { enrolled: boolean; enrolled_at?: string; dimension?: number }> = {}
         data?.forEach((row: any) => {
-            map[row.employee_id] = { enrolled: true, enrolled_at: row.created_at }
+            map[row.employee_id] = {
+                enrolled: true,
+                enrolled_at: row.created_at,
+                dimension: Array.isArray(row.embedding) ? row.embedding.length : undefined
+            }
         })
         return map
     } catch (err) {

@@ -668,11 +668,14 @@ export default function CctvConnectorPage() {
                                         {/* Video Stream Preview */}
                                         <div className="relative h-48 bg-slate-950 flex flex-col justify-between p-3 overflow-hidden group">
                                             {isLiveBridgeStream ? (
-                                                <CctvLivePlayer 
+                                                <CctvLivePlayer
                                                     bridgeHost={bridgeHost}
                                                     cameraId={cam.id}
                                                     cameraName={cam.camera_name}
                                                     fallbackTimestamp={streamTimestamp}
+                                                    token="billbook_local_dev_token"
+                                                    enableAutoRecovery={true}
+                                                    recoveryIntervalMs={30000}
                                                     onError={() => setFailedStreams(prev => ({ ...prev, [cam.id]: true }))}
                                                     className="absolute inset-0 w-full h-full object-cover"
                                                 />
@@ -1179,6 +1182,9 @@ export default function CctvConnectorPage() {
                                     cameraId={enlargedCamera.id}
                                     cameraName={enlargedCamera.camera_name}
                                     fallbackTimestamp={streamTimestamp}
+                                    token="billbook_local_dev_token"
+                                    enableAutoRecovery={true}
+                                    recoveryIntervalMs={30000}
                                     onError={() => setFailedStreams(prev => ({ ...prev, [enlargedCamera.id]: true }))}
                                     className="w-full h-full max-h-[58vh] object-contain rounded-lg"
                                 />

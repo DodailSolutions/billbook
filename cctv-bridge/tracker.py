@@ -194,11 +194,13 @@ class MultiPersonTracker:
     def load_enrolled_profiles(self, profiles: List[Dict[str, Any]]):
         """
         Loads enrolled employee 512-D face vectors into active memory for real-time cosine comparison.
+        Validates that all embeddings are 512-dimensional.
         """
         self.enrolled_profiles = []
+        valid_count = 0
         for p in profiles:
             vec = np.array(p.get("embedding", []), dtype=np.float32)
-            if vec.size > 0:
+            if vec.size == 512:
                 self.enrolled_profiles.append(
                     EnrolledProfile(
                         employee_id=p["id"],
@@ -207,7 +209,10 @@ class MultiPersonTracker:
                         embedding=vec
                     )
                 )
-        logger.info("Loaded %d enrolled biometric profiles into memory.", len(self.enrolled_profiles))
+                valid_count += 1
+            elif vec.size > 0:
+                logger.warning("Skipping profile for %s: expected 512-D embedding, got %d-D", p.get("id"), vec.size)
+        logger.info("Loaded %d enrolled biometric profiles into memory (%d skipped due to invalid dimensions).", valid_count, len(profiles) - valid_count)
 
     def match_face_vector(self, face_embedding: np.ndarray, threshold: float = 0.65) -> Optional[Tuple[str, str, str, float]]:
         """
@@ -215,6 +220,11 @@ class MultiPersonTracker:
         Returns (employee_id, name, code, confidence) if matched above threshold.
         """
         if not self.enrolled_profiles or face_embedding is None:
+            return None
+
+        # Validate input embedding dimension
+        if face_embedding.size != 512:
+            logger.warning("match_face_vector: expected 512-D embedding, got %d-D", face_embedding.size)
             return None
 
         norm = np.linalg.norm(face_embedding)

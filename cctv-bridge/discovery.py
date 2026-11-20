@@ -14,7 +14,7 @@ from typing import List, Dict, Any, Optional
 logger = logging.getLogger("cctv_discovery")
 
 
-def discover_dahua_devices(timeout: float = 2.0) -> List[Dict[str, Any]]:
+def discover_dahua_devices(timeout: float = 3.0) -> List[Dict[str, Any]]:
     """
     Broadcasts Dahua/CP Plus UDP discovery packet on port 37810 and collects device responses.
     Returns list of discovered devices with their SN, IP, Port, and Model.
@@ -93,7 +93,7 @@ def discover_dahua_devices(timeout: float = 2.0) -> List[Dict[str, Any]]:
     return devices
 
 
-def discover_onvif_devices(timeout: float = 2.0) -> List[Dict[str, Any]]:
+def discover_onvif_devices(timeout: float = 3.0) -> List[Dict[str, Any]]:
     """
     Standard ONVIF WS-Discovery probe across UDP port 3702.
     Works across Hikvision, Uniview, Dahua, CP Plus, and generic ONVIF devices.
@@ -168,9 +168,10 @@ def scan_network_for_dvrs() -> List[Dict[str, Any]]:
     """
     Runs multi-protocol local network discovery (Dahua/CP Plus UDP 37810 + ONVIF 3702).
     """
-    dahua_devs = discover_dahua_devices(timeout=1.5)
-    onvif_devs = discover_onvif_devices(timeout=1.5)
-    
+    # Increased timeout to 3s for slower DVRs on congested networks
+    dahua_devs = discover_dahua_devices(timeout=3.0)
+    onvif_devs = discover_onvif_devices(timeout=3.0)
+
     # Merge and deduplicate by IP
     merged: Dict[str, Dict[str, Any]] = {}
     for d in dahua_devs:
