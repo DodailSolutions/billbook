@@ -1,5 +1,7 @@
 'use client'
 
+import { useState } from 'react'
+
 interface InvoicePreviewProps {
     settings: {
         company_name: string
@@ -34,10 +36,12 @@ interface InvoicePreviewProps {
         show_signature?: boolean
         company_stamp_url?: string
         show_stamp?: boolean
+        show_bank_details_when_paid?: boolean
     }
 }
 
 export default function InvoicePreview({ settings }: InvoicePreviewProps) {
+    const [previewStatus, setPreviewStatus] = useState<'pending' | 'paid'>('pending')
     const {
         company_name,
         company_email,
@@ -56,9 +60,30 @@ export default function InvoicePreview({ settings }: InvoicePreviewProps) {
     const invoiceFontFamily = settings.invoice_font_family || 'Arial'
     const invoiceFontSize = settings.invoice_font_size || 12
 
+    const isPaid = previewStatus === 'paid'
+    const shouldShowPaymentDetails = !isPaid || Boolean(settings.show_bank_details_when_paid)
+
     return (
         <div className="bg-white p-8 rounded-lg shadow-lg" style={{ fontFamily: invoiceFontFamily, fontSize: `${invoiceFontSize}px` }}>
-            <h3 className="text-lg font-semibold mb-4 text-gray-900">Preview</h3>
+            <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">Live Preview</h3>
+                <div className="inline-flex items-center p-1 bg-gray-100 rounded-lg text-xs font-medium">
+                    <button
+                        type="button"
+                        onClick={() => setPreviewStatus('pending')}
+                        className={`px-2.5 py-1 rounded-md transition-colors ${previewStatus === 'pending' ? 'bg-white shadow text-gray-900 font-semibold' : 'text-gray-500 hover:text-gray-900'}`}
+                    >
+                        Unpaid Preview
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setPreviewStatus('paid')}
+                        className={`px-2.5 py-1 rounded-md transition-colors ${previewStatus === 'paid' ? 'bg-green-600 shadow text-white font-semibold' : 'text-gray-500 hover:text-gray-900'}`}
+                    >
+                        Paid Preview {settings.show_bank_details_when_paid ? '(Shows Bank/QR)' : '(Hides Bank/QR)'}
+                    </button>
+                </div>
+            </div>
             <div className="border border-gray-200 rounded-lg p-6 bg-white">
                 {/* Header */}
                 <div 
@@ -207,8 +232,21 @@ export default function InvoicePreview({ settings }: InvoicePreviewProps) {
                     </div>
                 </div>
 
+                {/* Paid Status Stamp if in Paid Preview */}
+                {isPaid && (
+                    <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <span className="inline-block w-2.5 h-2.5 rounded-full bg-green-500"></span>
+                            <span className="text-xs font-bold text-green-800 uppercase tracking-wider">Invoice Fully Paid & Settled</span>
+                        </div>
+                        {!shouldShowPaymentDetails && (
+                            <span className="text-xs text-green-700 italic">Payment QR & Bank details hidden</span>
+                        )}
+                    </div>
+                )}
+
                 {/* Payment Instructions + QR side by side */}
-                {(payment_instructions || (settings.show_qr_code && settings.payment_qr_code_url?.startsWith('data:image'))) && (
+                {shouldShowPaymentDetails && (payment_instructions || (settings.show_qr_code && settings.payment_qr_code_url?.startsWith('data:image'))) && (
                     <div className="mb-6 pt-4 border-t">
                         <div className="flex gap-4 items-start">
                             {payment_instructions && (

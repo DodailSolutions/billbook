@@ -20,7 +20,13 @@ export async function GET(
             return new NextResponse('Invoice not found', { status: 404 })
         }
 
-        const html = await generateInvoicePDF(invoice)
+        const showBankDetailsQuery = url.searchParams.get('show_bank_details_when_paid')
+        const showBankDetailsOverride = showBankDetailsQuery !== null ? showBankDetailsQuery === 'true' : undefined
+
+        const html = await generateInvoicePDF(
+            invoice,
+            showBankDetailsOverride !== undefined ? { show_bank_details_when_paid: showBankDetailsOverride } : undefined
+        )
     
     // Add enhanced print-optimized wrapper
     const pdfHtml = `

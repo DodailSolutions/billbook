@@ -83,7 +83,8 @@ export function ImprovedInvoiceForm({
     payment_amount: 0,
     payment_method: '' as '' | 'cash' | 'bank_transfer' | 'upi' | 'card' | 'cheque',
     payment_date: new Date().toISOString().split('T')[0],
-    payment_notes: ''
+    payment_notes: '',
+    show_bank_details_when_paid: false
   })
 
   const [items, setItems] = useState<InvoiceItem[]>([
@@ -347,6 +348,7 @@ export function ImprovedInvoiceForm({
         payment_method: formData.mark_as_paid ? (formData.payment_method as 'cash' | 'bank_transfer' | 'upi' | 'card' | 'cheque' | undefined) : undefined,
         payment_date: formData.mark_as_paid ? formData.payment_date : undefined,
         payment_notes: formData.mark_as_paid && formData.payment_notes ? formData.payment_notes : undefined,
+        show_bank_details_when_paid: formData.show_bank_details_when_paid,
       }
 
       const result = await createInvoice(invoiceData)
@@ -1254,6 +1256,28 @@ export function ImprovedInvoiceForm({
                               </p>
                             </div>
                           )}
+
+                          <div className="pt-3 border-t border-blue-200">
+                            <label className="flex items-start gap-3 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={formData.show_bank_details_when_paid}
+                                onChange={(e) => setFormData({
+                                  ...formData,
+                                  show_bank_details_when_paid: e.target.checked
+                                })}
+                                className="w-4 h-4 text-blue-600 rounded border-gray-300 mt-0.5"
+                              />
+                              <div>
+                                <span className="text-sm font-semibold text-gray-900">
+                                  Show Bank Details & QR Code on Paid Invoice
+                                </span>
+                                <p className="text-xs text-gray-600">
+                                  Uncheck to hide company bank details and QR code since payment has already been collected.
+                                </p>
+                              </div>
+                            </label>
+                          </div>
                         </div>
                       )}
                     </CardContent>

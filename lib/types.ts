@@ -9,6 +9,9 @@ export interface SavedItem {
     hsn_sac_code?: string
     hsn_sac_type?: 'HSN' | 'SAC'
     gst_rate?: number
+    barcode?: string
+    barcode_format?: string
+    jewelry_attributes?: any
     created_at: string
     updated_at: string
 }
@@ -18,6 +21,9 @@ export interface InventoryItem {
     user_id: string
     name: string
     sku?: string
+    barcode?: string
+    barcode_format?: string
+    jewelry_attributes?: any
     description?: string
     unit: string
     current_stock: number
@@ -94,6 +100,7 @@ export interface Invoice {
     discount_type?: 'percentage' | 'flat'
     discount_value?: number
     discount_amount?: number
+    show_bank_details_when_paid?: boolean
     created_at: string
     updated_at: string
 }

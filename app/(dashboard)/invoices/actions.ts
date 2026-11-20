@@ -323,6 +323,7 @@ interface CreateInvoiceData {
     payment_method?: 'cash' | 'bank_transfer' | 'upi' | 'card' | 'cheque'
     payment_date?: string
     payment_notes?: string
+    show_bank_details_when_paid?: boolean
 }
 
 export async function createInvoice(data: CreateInvoiceData) {
@@ -419,6 +420,7 @@ export async function createInvoice(data: CreateInvoiceData) {
             discount_amount: discountAmount > 0 ? discountAmount : null,
             discount_type: discountAmount > 0 ? (data.discount_type || null) : null,
             discount_value: discountAmount > 0 ? (data.discount_value || null) : null,
+            ...(data.show_bank_details_when_paid !== undefined ? { show_bank_details_when_paid: data.show_bank_details_when_paid } : {}),
         }
 
         const { data: invFull, error: errFull } = await supabase
@@ -746,6 +748,7 @@ export async function updateInvoice(id: string, data: UpdateInvoiceData) {
                 discount_amount: discountAmount > 0 ? discountAmount : null,
                 discount_type: discountAmount > 0 ? (data.discount_type || null) : null,
                 discount_value: discountAmount > 0 ? (data.discount_value || null) : null,
+                ...(data.show_bank_details_when_paid !== undefined ? { show_bank_details_when_paid: data.show_bank_details_when_paid } : {}),
             })
             .eq('id', id)
             .eq('user_id', user.id)
@@ -1195,6 +1198,30 @@ export async function updateInvoicePaymentDateAction(params: {
     } catch (err: any) {
         console.error('Error in updateInvoicePaymentDateAction:', err)
         return { success: false, error: err?.message || 'Failed to update payment date' }
+    }
+}
+
+export async function toggleInvoiceBankDetailsWhenPaid(invoiceId: string, show: boolean) {
+    try {
+        const supabase = await createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) return { success: false, error: 'Not authenticated' }
+
+        const { error } = await supabase
+            .from('invoices')
+            .update({ show_bank_details_when_paid: show })
+            .eq('id', invoiceId)
+            .eq('user_id', user.id)
+
+        if (error) {
+            console.warn('Could not update show_bank_details_when_paid on invoice (column may be optional):', error.message)
+        }
+
+        revalidatePath(`/invoices/${invoiceId}`)
+        return { success: true }
+    } catch (err: any) {
+        console.error('Error in toggleInvoiceBankDetailsWhenPaid:', err)
+        return { success: false, error: err?.message || 'Failed to toggle payment details visibility' }
     }
 }
 

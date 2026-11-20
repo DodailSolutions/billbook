@@ -854,16 +854,16 @@ export default function InvoiceSettingsForm({ initialSettings, onPreviewUpdate }
                             <span className="text-sm text-gray-700">Show GSTIN on invoice</span>
                         </label>
 
-                        <label className="flex items-start gap-3 cursor-pointer pt-2">
+                        <label className="flex items-start gap-3 cursor-pointer pt-2 p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50/70 dark:bg-gray-800/50 hover:bg-gray-100/70 dark:hover:bg-gray-800 transition-colors">
                             <input
                                 type="checkbox"
                                 checked={showBankDetailsWhenPaid}
                                 onChange={(e) => setShowBankDetailsWhenPaid(e.target.checked)}
-                                className="w-4 h-4 rounded border-gray-300 mt-0.5"
+                                className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 mt-0.5"
                             />
                             <div>
-                                <span className="text-sm font-medium text-gray-700">Show Bank Details & QR Code on Fully Paid Invoices</span>
-                                <p className="text-xs text-gray-500">By default, bank instructions and QR code are hidden once an invoice is completely settled.</p>
+                                <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">Show Bank Details & QR Code on Fully Paid Invoices</span>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">When disabled, bank instructions and QR code will automatically be hidden on settled invoices. Enable this if you always want payment details visible even after payment.</p>
                             </div>
                         </label>
                     </div>

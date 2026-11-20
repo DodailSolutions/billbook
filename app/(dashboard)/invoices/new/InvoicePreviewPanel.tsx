@@ -45,6 +45,7 @@ interface InvoiceSettings {
     show_signature?: boolean
     company_stamp_url?: string
     show_stamp?: boolean
+    show_bank_details_when_paid?: boolean
 }
 
 interface InvoicePreviewPanelProps {
@@ -57,6 +58,8 @@ interface InvoicePreviewPanelProps {
     invoiceDate: string
     dueDate?: string
     notes?: string
+    isPaid?: boolean
+    showBankDetailsWhenPaid?: boolean
 }
 
 export function InvoicePreviewPanel({
@@ -68,6 +71,10 @@ export function InvoicePreviewPanel({
     reverseCharge,
     invoiceDate,
     dueDate,
+    notes,
+    isPaid = false,
+    showBankDetailsWhenPaid,
+}: InvoicePreviewPanelProps) {
     notes
 }: InvoicePreviewPanelProps) {
     const [settings, setSettings] = useState<InvoiceSettings | null>(null)
@@ -341,8 +348,18 @@ export function InvoicePreviewPanel({
                     </div>
                 )}
 
+                {/* Paid Status banner if marked as paid */}
+                {isPaid && (
+                    <div className="mb-3 p-2 bg-green-50 border border-green-200 rounded text-xs flex items-center justify-between text-green-800">
+                        <span className="font-semibold">✓ Invoice Marked As Paid</span>
+                        {!(!isPaid || (showBankDetailsWhenPaid !== undefined ? showBankDetailsWhenPaid : Boolean(settings.show_bank_details_when_paid))) && (
+                            <span className="text-gray-500 italic">QR & bank details hidden</span>
+                        )}
+                    </div>
+                )}
+
                 {/* Payment Instructions + QR side by side */}
-                {(settings.payment_instructions || (settings.show_qr_code && settings.payment_qr_code_url?.startsWith('data:image'))) && (
+                {(!isPaid || (showBankDetailsWhenPaid !== undefined ? showBankDetailsWhenPaid : Boolean(settings.show_bank_details_when_paid))) && (settings.payment_instructions || (settings.show_qr_code && settings.payment_qr_code_url?.startsWith('data:image'))) && (
                     <div className="mb-3 pt-3 border-t flex gap-3 items-start">
                         {settings.payment_instructions && (
                             <div className="flex-1">

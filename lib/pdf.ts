@@ -5,9 +5,13 @@ import type { PurchaseOrder } from '@/lib/po-types'
 import { formatDate } from '@/lib/utils'
 import { getInvoiceSettings } from '@/app/(dashboard)/invoices/settings/actions'
 
-export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<string> {
+export async function generateInvoicePDF(
+    invoice: InvoiceWithDetails,
+    overrides?: Partial<InvoiceSettings>
+): Promise<string> {
     // Get customization settings
-    const settings = await getInvoiceSettings()
+    const dbSettings = await getInvoiceSettings()
+    const settings = { ...dbSettings, ...overrides }
     
     const primaryColor = settings?.primary_color || '#3B82F6'
     const secondaryColor = settings?.secondary_color || '#8B5CF6'
@@ -42,7 +46,11 @@ export async function generateInvoicePDF(invoice: InvoiceWithDetails): Promise<s
     const companyStampUrl = settings?.company_stamp_url || ''
     const showStamp = settings?.show_stamp ?? true
     const isPaid = invoice.status === 'paid'
-    const showBankDetailsWhenPaid = Boolean((settings as any)?.show_bank_details_when_paid)
+    const showBankDetailsWhenPaid = overrides?.show_bank_details_when_paid !== undefined
+        ? Boolean(overrides.show_bank_details_when_paid)
+        : (invoice as any)?.show_bank_details_when_paid !== undefined && (invoice as any)?.show_bank_details_when_paid !== null
+            ? Boolean((invoice as any).show_bank_details_when_paid)
+            : Boolean((settings as any)?.show_bank_details_when_paid)
 
     // Safe fallbacks for customer and items
     const customer = invoice.customer || {

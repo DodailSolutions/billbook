@@ -1,15 +1,32 @@
 'use client'
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Loader2, FileDown } from "lucide-react"
 import { Button } from "@/components/ui/Button"
 
 interface DownloadPDFButtonProps {
     invoiceId: string
+    isPaid?: boolean
+    initialShowBankDetails?: boolean
 }
 
-export function DownloadPDFButton({ invoiceId }: DownloadPDFButtonProps) {
+export function DownloadPDFButton({
+    invoiceId,
+    isPaid = false,
+    initialShowBankDetails = false,
+}: DownloadPDFButtonProps) {
     const [isDownloading, setIsDownloading] = useState(false)
+    const [showBankDetails, setShowBankDetails] = useState(initialShowBankDetails)
+
+    useEffect(() => {
+        const handler = (e: any) => {
+            if (e.detail?.invoiceId === invoiceId) {
+                setShowBankDetails(Boolean(e.detail.show))
+            }
+        }
+        window.addEventListener('invoice_payment_details_toggle', handler)
+        return () => window.removeEventListener('invoice_payment_details_toggle', handler)
+    }, [invoiceId])
 
     const handleDownload = async () => {
         setIsDownloading(true)
@@ -20,8 +37,12 @@ export function DownloadPDFButton({ invoiceId }: DownloadPDFButtonProps) {
                 import('html2canvas')
             ])
 
-            // Fetch the invoice HTML
-            const response = await fetch(`/api/invoices/${invoiceId}/pdf?mode=html`)
+            // Fetch the invoice HTML with paid bank details toggle
+            const queryParams = new URLSearchParams({ mode: 'html' })
+            if (isPaid) {
+                queryParams.set('show_bank_details_when_paid', String(showBankDetails))
+            }
+            const response = await fetch(`/api/invoices/${invoiceId}/pdf?${queryParams.toString()}`)
             
             if (!response.ok) {
                 throw new Error('Failed to fetch invoice')
@@ -164,7 +185,11 @@ export function DownloadPDFButton({ invoiceId }: DownloadPDFButtonProps) {
         } catch (error) {
             console.warn('Client-side jsPDF download failed, opening native print/PDF viewer:', error)
             // Fallback: open print dialog
-            window.open(`/api/invoices/${invoiceId}/pdf?mode=download`, '_blank')
+            const fallbackParams = new URLSearchParams({ mode: 'download' })
+            if (isPaid) {
+                fallbackParams.set('show_bank_details_when_paid', String(showBankDetails))
+            }
+            window.open(`/api/invoices/${invoiceId}/pdf?${fallbackParams.toString()}`, '_blank')
         } finally {
             if (iframe && iframe.parentNode) {
                 iframe.parentNode.removeChild(iframe)

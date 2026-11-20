@@ -39,6 +39,7 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
     const [invoiceDate, setInvoiceDate] = useState(invoice?.invoice_date || new Date().toISOString().split('T')[0])
     const [dueDate, setDueDate] = useState(invoice?.due_date || '')
     const [notes, setNotes] = useState(invoice?.notes || '')
+    const [showBankDetailsWhenPaid, setShowBankDetailsWhenPaid] = useState<boolean>(invoice?.show_bank_details_when_paid ?? false)
     const [simplifiedView, setSimplifiedView] = useState(true)
     const [items, setItems] = useState<InvoiceItem[]>(
         (invoice?.invoice_items || []).map(item => ({
@@ -277,7 +278,8 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                 is_recurring: isRecurring,
                 recurring_frequency: isRecurring ? recurringFrequency : undefined,
                 recurring_start_date: isRecurring ? recurringStartDate : undefined,
-                recurring_end_date: isRecurring && recurringEndDate ? recurringEndDate : undefined
+                recurring_end_date: isRecurring && recurringEndDate ? recurringEndDate : undefined,
+                show_bank_details_when_paid: showBankDetailsWhenPaid
             }
 
             if (mode === 'edit' && invoice) {
@@ -650,6 +652,26 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                     </div>
                 </div>
 
+                {/* Payment Details Visibility on Paid Invoice Toggle */}
+                <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-4">
+                    <label className="flex items-start gap-3 cursor-pointer">
+                        <input
+                            type="checkbox"
+                            checked={showBankDetailsWhenPaid}
+                            onChange={(e) => setShowBankDetailsWhenPaid(e.target.checked)}
+                            className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 mt-0.5"
+                        />
+                        <div>
+                            <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                                Show Bank Details & Payment QR Code if invoice is Paid
+                            </span>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                When disabled, bank instructions and QR code will automatically be hidden once the invoice is marked as paid.
+                            </p>
+                        </div>
+                    </label>
+                </div>
+
                 {/* Recurring Invoice Section */}
                 <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm overflow-hidden">
                     <div className="px-4 py-3 flex items-center gap-3">
@@ -720,6 +742,8 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                         invoiceDate={invoiceDate}
                         dueDate={dueDate}
                         notes={notes}
+                        isPaid={invoice?.status === 'paid'}
+                        showBankDetailsWhenPaid={showBankDetailsWhenPaid}
                     />
                 </div>
             </div>

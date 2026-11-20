@@ -40,6 +40,38 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 ### 5. Customer Blacklist & Defaulter Rules UI (`/customers/blacklist`)
 - Defaulter registry UI, overdue threshold configuration, and invoice block rules.
 
+### 6. CCTV Desktop Bridge Connection & Local Signal Booster
+- Fix CCTV stream connection failure between the web application and the local installable bridge (`cctv-bridge` / `vision-bridge`).
+- Resolve local relay/signaling handshakes, network discovery, and local installable packaging to boost feed reliability without packet drop.
+
+---
+
+## [Release v1.5.1 - Implemented] - 2026-11-20
+
+### Paid Invoice Payment Details & QR Code Visibility Toggles
+
+#### 1. Invoice Settings & Live Preview
+- **Organization-Level Preference (`/invoices/settings`)**: Added a persistent toggle (`show_bank_details_when_paid`) allowing businesses to choose whether already paid invoices display organization bank details and payment QR codes or hide them.
+- **Interactive Live Preview (`InvoicePreview.tsx`)**: Added an immediate Unpaid vs. Paid preview mode switcher with real-time feedback reflecting the toggle state.
+
+#### 2. Invoice Creation & Editing Forms
+- **New & Edit Form Toggles (`ImprovedInvoiceForm.tsx`, `InvoiceForm.tsx`, `InvoicePreviewPanel.tsx`)**:
+  - Added "Show Bank Details & QR Code if Invoice is Paid" toggle directly in the payment collection section and under Notes.
+  - Live creation preview (`InvoicePreviewPanel.tsx`) immediately responds to the payment collected state and toggle.
+  - Multi-tier progressive fallback payload handles `show_bank_details_when_paid` gracefully in `invoices/actions.ts` (`createInvoice` & `updateInvoice`).
+
+#### 3. Invoice View & Pre-Download PDF Customization (`/invoices/[id]`)
+- **Interactive Action Bar & Section (`PaidInvoicePaymentDetailsSection.tsx`)**:
+  - Live toggle on paid invoices allows instant visibility switching directly on the screen.
+  - Real-time event broadcasting synchronizes choices with `DownloadPDFButton`.
+  - Background persistence via `toggleInvoiceBankDetailsWhenPaid`.
+- **Dynamic PDF Generator (`lib/pdf.ts`, `app/api/invoices/[id]/pdf/route.ts`)**:
+  - `generateInvoicePDF` accepts runtime overrides for `show_bank_details_when_paid`.
+  - PDF route supports `?show_bank_details_when_paid=true/false` query parameter to enforce user selection when generating exported PDFs.
+
+#### 4. Database Migration
+- Generated `supabase-invoice-paid-payment-details-toggle.sql` adding `show_bank_details_when_paid` to `invoice_settings` and `invoices` with safe column defaults.
+
 ---
 
 ## [Release v1.5.0 - Implemented] - 2026-11-19

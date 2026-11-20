@@ -10,6 +10,7 @@ import { MarkAsPaidButton } from "./MarkAsPaidButton"
 import { PartialPaymentButton } from "./PartialPaymentButton"
 import { PaymentHistory } from "./PaymentHistory"
 import { PaidStatusCard } from "./PaidStatusCard"
+import { PaidInvoicePaymentDetailsSection } from "./PaidInvoicePaymentDetailsSection"
 import { formatDate } from "@/lib/utils"
 
 export default async function InvoiceDetailPage({
@@ -28,6 +29,9 @@ export default async function InvoiceDetailPage({
     }
 
     const isPaid = invoice.status === 'paid'
+    const showBankDetailsWhenPaid = invoice.show_bank_details_when_paid !== undefined && invoice.show_bank_details_when_paid !== null
+        ? Boolean(invoice.show_bank_details_when_paid)
+        : Boolean((invoiceSettings as any)?.show_bank_details_when_paid)
     const hasPartialPayment = (invoice.is_partial_payment ?? false) || ((invoice.amount_paid ?? 0) > 0 && (invoice.amount_paid ?? 0) < invoice.total)
     const amountPaid = invoice.amount_paid ?? 0
     const amountRemaining = invoice.amount_remaining ?? (invoice.total - amountPaid)
@@ -70,7 +74,11 @@ export default async function InvoiceDetailPage({
                             <Pencil className="h-3.5 w-3.5" />Edit
                         </Button>
                     </Link>
-                    <DownloadPDFButton invoiceId={id} />
+                    <DownloadPDFButton 
+                        invoiceId={id} 
+                        isPaid={isPaid}
+                        initialShowBankDetails={showBankDetailsWhenPaid}
+                    />
                 </div>
             </div>
 
@@ -275,15 +283,16 @@ export default async function InvoiceDetailPage({
                     </div>
                 )}
 
-                {/* Bank Details — hidden when invoice is fully paid, unless explicitly configured */}
-                {invoiceSettings?.payment_instructions && (!isPaid || (invoiceSettings as any)?.show_bank_details_when_paid) && (
-                    <div className="border-t border-gray-200 dark:border-gray-700 px-5 py-4 bg-blue-50/40 dark:bg-blue-900/10">
-                        <p className="text-xs font-semibold text-blue-700 dark:text-blue-400 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
-                            🏦 Bank / Payment Details
-                        </p>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">{invoiceSettings.payment_instructions}</p>
-                    </div>
-                )}
+                {/* Bank & Payment Details — togglable on paid invoices, always shown on unpaid */}
+                <PaidInvoicePaymentDetailsSection
+                    invoiceId={id}
+                    isPaid={isPaid}
+                    initialShowBankDetails={showBankDetailsWhenPaid}
+                    paymentInstructions={invoiceSettings?.payment_instructions}
+                    paymentQrCodeUrl={invoiceSettings?.payment_qr_code_url}
+                    showQrCode={invoiceSettings?.show_qr_code ?? true}
+                    primaryColor={invoiceSettings?.primary_color || '#3B82F6'}
+                />
 
                 {/* Signature, Stamp & Client Signature — always shown */}
                 <div className="border-t border-gray-200 dark:border-gray-700 px-4 sm:px-5 py-5">
