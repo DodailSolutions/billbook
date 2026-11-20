@@ -75,8 +75,6 @@ export function InvoicePreviewPanel({
     isPaid = false,
     showBankDetailsWhenPaid,
 }: InvoicePreviewPanelProps) {
-    notes
-}: InvoicePreviewPanelProps) {
     const [settings, setSettings] = useState<InvoiceSettings | null>(null)
 
     useEffect(() => {
