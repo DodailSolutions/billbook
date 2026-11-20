@@ -8,7 +8,7 @@ import http from 'http'
 import { testP2PHandshake } from './p2p-relay'
 import { probeSubnetCameras } from './onvif-discovery'
 
-const PORT = 8989
+const PORT = parseInt(process.env.PORT || '5050', 10)
 const HOST = '127.0.0.1'
 
 interface P2PDevice {
@@ -26,10 +26,12 @@ const activeStreams = new Map<string, P2PDevice>()
  * Handle incoming HTTP loopback requests from BillBooky Web Dashboard
  */
 export const server = http.createServer(async (req, res) => {
-    // Set CORS headers so BillBooky dashboard can communicate securely over loopback
-    res.setHeader('Access-Control-Allow-Origin', '*')
+    // Set CORS & Private Network Access (PNA) headers for secure cloud dashboard connectivity
+    res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*')
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+    res.setHeader('Access-Control-Allow-Private-Network', 'true')
+    res.setHeader('Access-Control-Allow-Credentials', 'true')
 
     if (req.method === 'OPTIONS') {
         res.writeHead(204)

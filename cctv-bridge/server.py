@@ -17,7 +17,7 @@ import threading
 import time
 from typing import Dict, Any, Optional, List
 
-from fastapi import FastAPI, Request, Response, HTTPException, Security, Depends, status
+from fastapi import FastAPI, Request, Response, HTTPException, Security, Depends, status, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.responses import StreamingResponse, JSONResponse
@@ -32,12 +32,35 @@ app = FastAPI(
     version="1.2.0"
 )
 
-# Enable CORS for all local dashboard ports
+# Enable CORS and Chrome Private Network Access (PNA) for cloud HTTPS web dashboard
+@app.middleware("http")
+async def add_pna_and_cors_headers(request: Request, call_next):
+    origin = request.headers.get("origin", "*")
+    if request.method == "OPTIONS":
+        response = Response(status_code=204)
+        response.headers["Access-Control-Allow-Origin"] = origin
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+        response.headers["Access-Control-Allow-Headers"] = request.headers.get(
+            "access-control-request-headers", "*"
+        )
+        response.headers["Access-Control-Allow-Private-Network"] = "true"
+        return response
+
+    response = await call_next(request)
+    if origin and origin != "*":
+        response.headers["Access-Control-Allow-Origin"] = origin
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+    else:
+        response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Private-Network"] = "true"
+    return response
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origin_regex=r"https?://.*",
     allow_credentials=True,
-    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
@@ -385,6 +408,56 @@ def mjpeg_stream(request: Request, camera: Optional[str] = None, token: Optional
         iter_frames(),
         media_type="multipart/x-mixed-replace; boundary=frame"
     )
+
+
+@app.websocket("/ws/stream")
+async def websocket_stream(websocket: WebSocket, camera: Optional[str] = None):
+    """
+    Zero-latency WebSocket MJPEG stream relay.
+    Bypasses browser Mixed-Content restrictions when accessed from an HTTPS dashboard (https://billbooky.dodail.com).
+    """
+    await websocket.accept()
+    cam_id = camera or websocket.query_params.get("camera", "default")
+
+    try:
+        while True:
+            stream = active_streams.get(cam_id)
+            frame_bytes = None
+            if stream:
+                with stream.lock:
+                    frame_bytes = stream.latest_jpeg
+            if not frame_bytes:
+                msg = stream.error_msg if stream else "Connecting to camera feed..."
+                frame_bytes = generate_offline_banner(cam_id, msg)
+
+            if frame_bytes:
+                await websocket.send_bytes(frame_bytes)
+            await asyncio.sleep(0.045)  # ~22 FPS
+    except WebSocketDisconnect:
+        pass
+    except Exception as e:
+        logger.debug("WebSocket stream disconnected: %s", e)
+
+
+@app.websocket("/ws/status")
+async def websocket_status(websocket: WebSocket):
+    """
+    Live WebSocket heartbeat & camera telemetry channel for cloud dashboard.
+    """
+    await websocket.accept()
+    try:
+        while True:
+            await websocket.send_json({
+                "service": "BillBook Vision AI Bridge",
+                "status": "online",
+                "active_streams": len(active_streams),
+                "timestamp": time.time()
+            })
+            await asyncio.sleep(2.0)
+    except WebSocketDisconnect:
+        pass
+    except Exception:
+        pass
 
 
 @app.post("/webrtc/offer")

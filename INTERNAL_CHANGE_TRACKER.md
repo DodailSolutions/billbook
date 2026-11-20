@@ -40,9 +40,28 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 ### 5. Customer Blacklist & Defaulter Rules UI (`/customers/blacklist`)
 - Defaulter registry UI, overdue threshold configuration, and invoice block rules.
 
-### 6. CCTV Desktop Bridge Connection & Local Signal Booster
-- Fix CCTV stream connection failure between the web application and the local installable bridge (`cctv-bridge` / `vision-bridge`).
-- Resolve local relay/signaling handshakes, network discovery, and local installable packaging to boost feed reliability without packet drop.
+---
+
+## [Release v1.5.2 - Implemented] - 2026-11-20
+
+### CCTV Local Desktop Bridge Connection & Signal Booster Relay
+
+#### 1. Chrome Private Network Access (PNA) & CORS Preflight Compliance
+- Added custom middleware and preflight handlers returning `Access-Control-Allow-Private-Network: true` and credentials-safe origin reflection in both `cctv-bridge/server.py` and `apps/vision-bridge/src/index.ts`.
+- Resolves browser blocks when cloud dashboard (`https://billbooky.dodail.com`) sends requests to loopback (`http://127.0.0.1:5050`).
+
+#### 2. Mixed-Content Elimination via WebSocket MJPEG Stream Relay
+- Added `@app.websocket("/ws/stream")` in `cctv-bridge/server.py` streaming raw binary JPEG frames at 22+ FPS over loopback WebSocket.
+- Added `@app.websocket("/ws/status")` providing continuous bidirectional heartbeat and camera telemetry.
+- WebSockets over loopback are fully compliant with HTTPS security policies and completely avoid browser mixed-content video drops.
+
+#### 3. Dual-Mode Low-Latency Stream Player (`CctvLivePlayer.tsx`)
+- Created `CctvLivePlayer.tsx` with zero-copy object URL memory management for high-FPS, tear-free rendering.
+- Automatically attempts WebSocket connection first with instant fallback to MJPEG.
+
+#### 4. In-App Bridge Diagnostic Hub (`/payroll/attendance/cctv`)
+- Added real-time Vision Bridge status banner with dynamic signal indicator (🟢 Bridge Online 100% / 🟡 Testing Handshake / 🔴 Offline).
+- Added 1-click "Test Handshake" diagnostic trigger and direct desktop bridge launcher documentation.
 
 ---
 
