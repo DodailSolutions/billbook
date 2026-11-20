@@ -1624,7 +1624,8 @@ export function ImprovedInvoiceForm({
                       payment_amount: 0,
                       payment_method: '',
                       payment_date: new Date().toISOString().split('T')[0],
-                      payment_notes: ''
+                      payment_notes: '',
+                      show_bank_details_when_paid: false
                     })
                     setItems([{
                       id: crypto.randomUUID(),
