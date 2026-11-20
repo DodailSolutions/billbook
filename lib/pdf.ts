@@ -3,7 +3,7 @@
 import type { InvoiceWithDetails } from '@/lib/types'
 import type { PurchaseOrder } from '@/lib/po-types'
 import { formatDate } from '@/lib/utils'
-import { getInvoiceSettings } from '@/app/(dashboard)/invoices/settings/actions'
+import { getInvoiceSettings, type InvoiceSettings } from '@/app/(dashboard)/invoices/settings/actions'
 
 export async function generateInvoicePDF(
     invoice: InvoiceWithDetails,
