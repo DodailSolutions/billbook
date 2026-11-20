@@ -8,7 +8,7 @@ import {
     CheckCircle2, AlertCircle, Camera, Globe, Clock,
     Crown, Zap, Eye, EyeOff, Building2, FileText, Check,
     Sparkles, ArrowRight, RotateCcw, Copy, CheckCheck, Loader2,
-    Trash2, UploadCloud
+    Trash2, UploadCloud, Barcode
 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -865,6 +865,30 @@ export default function SettingsContent({ initialProfile, planStatus: initialPla
                                     </Button>
                                 </div>
                             </form>
+
+                            {/* Barcode & Hardware Printers Gateway */}
+                            <div className="m-5 sm:m-6 p-5 bg-gradient-to-r from-indigo-50/60 via-purple-50/40 to-white dark:from-slate-800 dark:to-slate-800/60 rounded-2xl border border-indigo-100 dark:border-slate-700 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                <div className="space-y-1">
+                                    <div className="flex items-center gap-2">
+                                        <Barcode className="h-5 w-5 text-indigo-600" />
+                                        <h3 className="font-bold text-slate-900 dark:text-white text-sm">
+                                            Barcode &amp; Hardware Printers Integration
+                                        </h3>
+                                        <span className="text-[10px] bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 px-2 py-0.5 rounded-full font-semibold">
+                                            Jewelry &amp; Retail Ready
+                                        </span>
+                                    </div>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                                        Configure industry business profiles (Jewelry, Retail, Wholesale), thermal label sticker formats (Zebra, TSC), and USB/Bluetooth barcode guns.
+                                    </p>
+                                </div>
+                                <Link href="/settings/barcode">
+                                    <Button className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs px-4 py-2 rounded-xl flex items-center gap-1.5 shadow-sm">
+                                        <span>Manage Barcodes &amp; Printers</span>
+                                        <ArrowRight className="h-3.5 w-3.5" />
+                                    </Button>
+                                </Link>
+                            </div>
                         </div>
                     )}
 

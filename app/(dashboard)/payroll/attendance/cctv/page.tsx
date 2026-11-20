@@ -280,29 +280,69 @@ export default function CctvConnectorPage() {
                 return
             }
 
-            // Real TCP port probe to camera DVR
-            const probeRes = await fetch('/api/payroll/attendance/cctv/probe', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    host: connectionMode === 'easy_p2p' ? (hostToProbe || '127.0.0.1') : urlToTest,
-                    port: devicePort || 554,
-                    brand: selectedBrand
-                })
-            })
-            const probeData = await probeRes.json()
+            const rawTargetHost = connectionMode === 'easy_p2p' ? (hostToProbe || '127.0.0.1') : (urlToTest.replace(/^rtsp:\/\//i, '').split('/')[0].split('@').pop()?.split(':')[0] || urlToTest)
+            const targetPort = Number(devicePort) || 554
+            const isLocalSubnet = /^(127\.|192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.|localhost)/i.test(rawTargetHost)
 
-            let bridgeOnline = false
-            try {
-                const bRes = await fetch(`${bridgeHost}/`, { signal: AbortSignal.timeout(1500) })
-                bridgeOnline = bRes.ok
-            } catch {}
+            let probeData: { success: boolean; message?: string; error?: string } = { success: false }
+
+            // If the local bridge is connected, probe directly through the local LAN bridge
+            if (bridgeStatus === 'connected') {
+                try {
+                    const bridgeProbeRes = await fetch(`${bridgeHost}/camera/probe`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            host: rawTargetHost,
+                            port: targetPort,
+                            brand: selectedBrand,
+                            rtsp_url: urlToTest
+                        }),
+                        signal: AbortSignal.timeout(4000)
+                    })
+                    probeData = await bridgeProbeRes.json()
+                } catch (bridgeErr: any) {
+                    console.warn('Bridge probe error, falling back to cloud probe:', bridgeErr)
+                }
+            }
+
+            // If bridge probe was not used or did not respond
+            if (!probeData.success) {
+                if (isLocalSubnet && bridgeStatus !== 'connected') {
+                    setTestingStream(false)
+                    setStreamTestResult({
+                        success: false,
+                        msg: `Camera IP (${rawTargetHost}) is on your private local network. Cloud servers cannot reach internal LAN subnets directly. Please launch the local Vision Bridge (port 5050) so it can boost and relay the signal.`
+                    })
+                    return
+                }
+
+                // Cloud probe fallback for public DDNS or external hostnames
+                const probeRes = await fetch('/api/payroll/attendance/cctv/probe', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        host: connectionMode === 'easy_p2p' ? (hostToProbe || '127.0.0.1') : urlToTest,
+                        port: targetPort,
+                        brand: selectedBrand
+                    })
+                })
+                probeData = await probeRes.json()
+            }
+
+            let bridgeOnline = bridgeStatus === 'connected'
+            if (!bridgeOnline) {
+                try {
+                    const bRes = await fetch(`${bridgeHost}/`, { signal: AbortSignal.timeout(1500) })
+                    bridgeOnline = bRes.ok
+                } catch {}
+            }
 
             setTestingStream(false)
             if (probeData.success) {
                 setStreamTestResult({ 
                     success: true, 
-                    msg: `${probeData.message} ${bridgeOnline ? '• Vision Bridge service is ONLINE.' : '• (Notice: Start local Python bridge on port 5000 for browser playback)'}` 
+                    msg: `${probeData.message} ${bridgeOnline ? '• Vision Bridge service is ONLINE.' : '• (Notice: Start local Vision Bridge on port 5050 for browser playback)'}` 
                 })
             } else {
                 setStreamTestResult({

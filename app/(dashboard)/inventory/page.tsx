@@ -1,17 +1,19 @@
 import Link from 'next/link'
-import { Plus, AlertTriangle, Boxes, IndianRupee, Clock3 } from 'lucide-react'
+import { Plus, AlertTriangle, Boxes, IndianRupee, Clock3, Barcode, Printer } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { getInventoryItems, getRecentInventoryTransactions } from './actions'
+import { getBarcodeSettings } from '@/lib/barcode-actions'
 import { InventoryCsvControls } from './InventoryCsvControls'
 import { InventoryList } from './InventoryList'
 
 export const dynamic = 'force-dynamic'
 
 export default async function InventoryPage() {
-    const [items, transactions] = await Promise.all([
+    const [items, transactions, barcodeSettings] = await Promise.all([
         getInventoryItems(),
         getRecentInventoryTransactions(8),
+        getBarcodeSettings()
     ])
 
     const totalItems = items.length
@@ -27,6 +29,14 @@ export default async function InventoryPage() {
                     <p className="text-sm text-muted-foreground mt-1">Track stock levels, manage SKUs, and log stock movement.</p>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                    {barcodeSettings.enable_barcode_system && (
+                        <Link href="/settings/barcode" className="w-full sm:w-auto">
+                            <Button variant="outline" className="gap-2 w-full sm:w-auto border-indigo-200 text-indigo-700 hover:bg-indigo-50">
+                                <Barcode className="h-4 w-4 text-indigo-600" />
+                                Barcode & Printers
+                            </Button>
+                        </Link>
+                    )}
                     <InventoryCsvControls />
                     <Link href="/inventory/new" className="w-full sm:w-auto">
                         <Button className="gap-2 w-full sm:w-auto">
@@ -96,7 +106,11 @@ export default async function InventoryPage() {
                     </CardContent>
                 </Card>
             ) : (
-                <InventoryList items={items} />
+                <InventoryList 
+                    items={items} 
+                    enableBarcode={barcodeSettings.enable_barcode_system}
+                    businessType={barcodeSettings.business_type}
+                />
             )}
 
             <Card>

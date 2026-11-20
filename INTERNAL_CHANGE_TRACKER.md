@@ -6,39 +6,38 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 
 ## [Roadmap / Pending Implementations]
 
-### 1. Barcode Generation & Hardware Barcode Reader Integration (Inventory & Invoicing)
-- **Organization-Level Feature Toggle (`enable_barcode_system`)**:
-  - Located in Settings -> Inventory / Business Preferences (default: disabled).
-  - Service, consulting, and IT firms keep it disabled for a clean, distraction-free UI.
-  - Retailers, jewelry stores, supermarkets, and warehouses enable it with one click.
-- **Dedicated "Jewelry Shop & Ornaments" Business Profile**:
-  - Selectable business type in Company Settings (`jewelry_retail`).
-  - Automatically enables the Barcode system, item tag tracking, and specialized jewelry fields:
-    - Gross Weight, Net Weight, Metal Purity (24K, 22K, 18K, 14K, 916 Hallmarked), Making Charges (per gram or flat rate), and Gemstone/Diamond Carat weights.
-- **Hardware Printer Connection & Label Printing Hub**:
-  - Settings -> Hardware & Printers configuration modal.
-  - Supports USB, Bluetooth, Network (LAN IP), and Browser Print drivers.
-  - Printer profiles:
-    - **Thermal Barcode / Label Printers** (Zebra, TSC, Citizen, Xprinter): Prints jewelry butterfly/dumbbell tag labels and standard 38x25mm / 50x25mm inventory stickers.
-    - **Thermal POS Receipt Printers** (58mm & 80mm ESC/POS) for fast counter billing.
-    - **Standard Office Printers** (A4 / Letter 24-up / 48-up label sheets).
-- **Universal Hardware Barcode Scanner & POS Integration**:
-  - Global HID keyboard wedge listener across Item Management and Invoice/POS creation.
-  - Scanning an item instantly resolves the SKU/Tag, adds the product to line items, calculates weight-based rates, increments quantity, and updates stock.
-- **Camera Scan Fallback**:
-  - Built-in webcam/mobile camera barcode scanner for quick lookups on phones or tablets without external hardware.
-
-### 2. WhatsApp Invoices Hub UI (`/whatsapp-invoices`)
+### 1. WhatsApp Invoices Hub UI (`/whatsapp-invoices`)
 - Live message threads, invoice quick-share, template management, and delivery status tracking.
 
-### 3. Smart Pricing & Margin Insights Dashboard (`/pricing-insights`)
+### 2. Smart Pricing & Margin Insights Dashboard (`/pricing-insights`)
 - Margin analytics dashboard, price floor alerts, and bulk re-pricing actions.
 
-### 4. Multi-Currency & FX Gain/Loss Settings (`/settings/currency`)
+### 3. Multi-Currency & FX Gain/Loss Settings (`/settings/currency`)
 - Exchange rate provider controls, real-time FX calculator, and realized vs. unrealized gain/loss reports.
 
-### 5. Customer Blacklist & Defaulter Rules UI (`/customers/blacklist`)
+### 4. Customer Blacklist & Defaulter Rules UI (`/customers/blacklist`)
 - Defaulter registry UI, overdue threshold configuration, and invoice block rules.
+
+---
+
+## [Release v1.5.3 - Implemented] - 2026-11-20
+
+### Barcode Generation, Hardware Label Printers & Jewelry Business Profile
+
+#### 1. Settings & Organization Profile Management (`/settings/barcode`)
+- **Feature Toggle (`enable_barcode_system`)**: Configurable in Settings to keep UI distraction-free for service firms while enabling instant barcodes for retail & jewelry businesses.
+- **Industry Profile Selector**: Support for `jewelry_retail`, `electronics_retail`, `supermarket`, `apparel_footwear`, and `wholesale_fmcg`.
+- **Specialized Jewelry Fields**: Gross weight, net weight, gold/silver purity (24K, 22K 916, 18K), making charges (per gram, percentage, flat), and BIS HUID hallmark numbers.
+
+#### 2. Hardware Printer & Label Printing Hub (`components/barcode/BarcodeLabelPrinter.tsx`)
+- Thermal label printer formats:
+  - Jewelry Dumbbell / Butterfly tags (68x12mm)
+  - Standard Retail Barcode stickers (50x25mm and 38x25mm)
+  - Full A4 24-up label sheets
+- Fast direct browser and ESC/POS thermal printing with clean CSS page-break rules.
+
+#### 3. Hardware Barcode Scanner Listener (`hooks/useBarcodeScanner.ts`)
+- Global HID keyboard wedge scanner hook with timestamp timing buffer, auto-incrementing line items and stock lookups on hardware scan.
 
 ---
 
@@ -62,6 +61,10 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 #### 4. In-App Bridge Diagnostic Hub (`/payroll/attendance/cctv`)
 - Added real-time Vision Bridge status banner with dynamic signal indicator (🟢 Bridge Online 100% / 🟡 Testing Handshake / 🔴 Offline).
 - Added 1-click "Test Handshake" diagnostic trigger and direct desktop bridge launcher documentation.
+- Integrated LAN Camera Probe routing: camera connection tests directly route to the local bridge's `/camera/probe` endpoint when online, preventing cloud private-subnet timeout failures on `192.168.x.x` addresses.
+
+#### 5. 1-Click Desktop Launchers (`cctv-bridge/`)
+- Created `start-bridge.command` for macOS and `start-bridge.bat` for Windows with automatic Python virtual environment detection, dependency verification, and startup on port 5050.
 
 ---
 

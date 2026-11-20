@@ -5,13 +5,28 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
-import { AlertCircle, Loader2 } from 'lucide-react'
+import { AlertCircle, Loader2, Barcode, Sparkles, Gem, ChevronDown, ChevronUp } from 'lucide-react'
 import { createInventoryItem } from '../actions'
+import { generateUniqueBarcode } from '@/lib/barcode-utils'
 
 export function NewInventoryItemForm() {
     const router = useRouter()
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const [barcodeVal, setBarcodeVal] = useState<string>('')
+    const [showJewelry, setShowJewelry] = useState(false)
+
+    // Jewelry specific state
+    const [purity, setPurity] = useState('22K_916')
+    const [grossWeight, setGrossWeight] = useState('')
+    const [netWeight, setNetWeight] = useState('')
+    const [makingCharge, setMakingCharge] = useState('')
+    const [makingType, setMakingType] = useState('per_gram')
+    const [huid, setHuid] = useState('')
+
+    const handleGenerateBarcode = () => {
+        setBarcodeVal(generateUniqueBarcode())
+    }
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -20,6 +35,19 @@ export function NewInventoryItemForm() {
 
         try {
             const formData = new FormData(e.currentTarget)
+            
+            if (showJewelry && (grossWeight || netWeight)) {
+                const jewelryData = {
+                    purity,
+                    gross_weight_grams: parseFloat(grossWeight) || 0,
+                    net_weight_grams: parseFloat(netWeight) || 0,
+                    making_charge_type: makingType,
+                    making_charge_value: parseFloat(makingCharge) || 0,
+                    huid_number: huid.trim() || undefined
+                }
+                formData.set('jewelry_attributes', JSON.stringify(jewelryData))
+            }
+
             const result = await createInventoryItem(formData)
 
             if (result.success) {
@@ -67,8 +95,33 @@ export function NewInventoryItemForm() {
                 </div>
 
                 <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                        <label htmlFor="barcode" className="text-sm font-semibold text-gray-900 flex items-center gap-1.5">
+                            <Barcode className="w-3.5 h-3.5 text-indigo-600" />
+                            Barcode / Tag ID
+                        </label>
+                        <button
+                            type="button"
+                            onClick={handleGenerateBarcode}
+                            className="text-[11px] text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1"
+                        >
+                            <Sparkles className="w-3 h-3" />
+                            Auto-Generate
+                        </button>
+                    </div>
+                    <Input 
+                        id="barcode" 
+                        name="barcode" 
+                        value={barcodeVal} 
+                        onChange={(e) => setBarcodeVal(e.target.value)} 
+                        placeholder="Scan or click Auto-Generate" 
+                        className="font-mono text-xs"
+                    />
+                </div>
+
+                <div className="space-y-2">
                     <label htmlFor="unit" className="text-sm font-semibold text-gray-900">Unit of Measurement</label>
-                    <Input id="unit" name="unit" defaultValue="pcs" placeholder="pcs, kg, box, mtr" />
+                    <Input id="unit" name="unit" defaultValue="pcs" placeholder="pcs, kg, g, box, mtr" />
                 </div>
 
                 <div className="space-y-2 sm:col-span-2">
@@ -105,6 +158,97 @@ export function NewInventoryItemForm() {
                 <div className="space-y-2 sm:col-span-2">
                     <label htmlFor="location" className="text-sm font-semibold text-gray-900">Storage Location</label>
                     <Input id="location" name="location" placeholder="e.g. Warehouse A - Rack 2, Shelf 3" />
+                </div>
+
+                {/* Optional Jewelry & Ornament Specifications */}
+                <div className="sm:col-span-2 border border-amber-200/80 rounded-xl p-4 bg-amber-50/30 space-y-3">
+                    <div 
+                        onClick={() => setShowJewelry(!showJewelry)}
+                        className="flex items-center justify-between cursor-pointer select-none"
+                    >
+                        <div className="flex items-center gap-2">
+                            <Gem className="w-4 h-4 text-amber-600" />
+                            <span className="text-sm font-bold text-slate-900">Jewelry & Ornament Specifications</span>
+                            <span className="text-[11px] text-amber-700 bg-amber-100/80 px-2 py-0.5 rounded-full font-medium">
+                                Optional for Gold, Silver & Diamond items
+                            </span>
+                        </div>
+                        {showJewelry ? <ChevronUp className="w-4 h-4 text-slate-500" /> : <ChevronDown className="w-4 h-4 text-slate-500" />}
+                    </div>
+
+                    {showJewelry && (
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs border-t border-amber-200/50">
+                            <div>
+                                <label className="font-semibold text-slate-800 block mb-1">Metal Purity</label>
+                                <select 
+                                    value={purity} 
+                                    onChange={(e) => setPurity(e.target.value)}
+                                    className="w-full rounded-md border-gray-300 text-xs py-2 px-2.5 bg-white shadow-xs focus:ring-amber-500"
+                                >
+                                    <option value="24K">24K (99.9% Fine Gold)</option>
+                                    <option value="22K_916">22K 916 (Standard Hallmarked)</option>
+                                    <option value="18K_750">18K 750 (Diamond/Studded)</option>
+                                    <option value="14K_585">14K 585 (Lightweight)</option>
+                                    <option value="Silver_925">Silver 925 (Sterling)</option>
+                                    <option value="Platinum_950">Platinum 950</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="font-semibold text-slate-800 block mb-1">Gross Weight (grams)</label>
+                                <Input 
+                                    type="number" 
+                                    step="0.001" 
+                                    value={grossWeight} 
+                                    onChange={(e) => setGrossWeight(e.target.value)} 
+                                    placeholder="e.g. 8.420" 
+                                    className="h-8 text-xs" 
+                                />
+                            </div>
+                            <div>
+                                <label className="font-semibold text-slate-800 block mb-1">Net Weight (grams)</label>
+                                <Input 
+                                    type="number" 
+                                    step="0.001" 
+                                    value={netWeight} 
+                                    onChange={(e) => setNetWeight(e.target.value)} 
+                                    placeholder="e.g. 7.950" 
+                                    className="h-8 text-xs" 
+                                />
+                            </div>
+                            <div>
+                                <label className="font-semibold text-slate-800 block mb-1">Making Charge Type</label>
+                                <select 
+                                    value={makingType} 
+                                    onChange={(e) => setMakingType(e.target.value)}
+                                    className="w-full rounded-md border-gray-300 text-xs py-2 px-2.5 bg-white shadow-xs focus:ring-amber-500"
+                                >
+                                    <option value="per_gram">Per Gram (₹/g)</option>
+                                    <option value="percentage">Percentage (%)</option>
+                                    <option value="flat">Flat Amount (₹)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="font-semibold text-slate-800 block mb-1">Making Charge Value</label>
+                                <Input 
+                                    type="number" 
+                                    step="0.01" 
+                                    value={makingCharge} 
+                                    onChange={(e) => setMakingCharge(e.target.value)} 
+                                    placeholder="e.g. 450" 
+                                    className="h-8 text-xs" 
+                                />
+                            </div>
+                            <div>
+                                <label className="font-semibold text-slate-800 block mb-1">BIS HUID / Hallmark No.</label>
+                                <Input 
+                                    value={huid} 
+                                    onChange={(e) => setHuid(e.target.value.toUpperCase())} 
+                                    placeholder="e.g. HUID-7X8921" 
+                                    className="h-8 text-xs font-mono uppercase" 
+                                />
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 

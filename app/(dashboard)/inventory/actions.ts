@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import type { InventoryItem, InventoryTransaction } from '@/lib/types'
+import { generateUniqueBarcode } from '@/lib/barcode-utils'
 
 export async function getInventoryItems(): Promise<InventoryItem[]> {
     try {
@@ -38,6 +39,8 @@ export async function getInventoryItems(): Promise<InventoryItem[]> {
             ...item,
             name: item.name || item.item_name || 'Unnamed Item',
             sku: item.sku || item.item_code || '',
+            barcode: item.barcode || item.sku || '',
+            jewelry_attributes: item.jewelry_attributes || null,
             unit: item.unit || item.unit_of_measurement || 'pcs',
             current_stock: Number(item.current_stock ?? item.quantity_on_hand ?? 0),
             reorder_level: Number(item.reorder_level ?? item.reorder_point ?? item.minimum_stock_level ?? 0),
@@ -139,6 +142,14 @@ export async function createInventoryItem(formData: FormData): Promise<{ success
         const selling_price = Number(formData.get('selling_price') || 0)
         const location = ((formData.get('location') as string) || '').trim() || null
         const itemCode = sku || `ITEM-${Date.now().toString(36).toUpperCase()}`
+        const rawBarcode = ((formData.get('barcode') as string) || '').trim()
+        const barcode = rawBarcode || generateUniqueBarcode(sku || undefined)
+        
+        let jewelry_attributes = null
+        const rawJewelry = formData.get('jewelry_attributes') as string
+        if (rawJewelry) {
+            try { jewelry_attributes = JSON.parse(rawJewelry) } catch {}
+        }
 
         // Attempt 1: Full hybrid payload matching both standard and enterprise schema columns
         const fullPayload = {
@@ -146,6 +157,9 @@ export async function createInventoryItem(formData: FormData): Promise<{ success
             name,
             item_name: name,
             sku,
+            barcode,
+            barcode_format: 'CODE128',
+            jewelry_attributes,
             item_code: itemCode,
             item_type: 'product',
             unit,
