@@ -137,7 +137,8 @@ export async function signup(formData: FormData) {
 
         // If user is created, store business profile & trial subscription (using admin client to bypass RLS)
         if (data?.user) {
-            console.log('User created successfully:', data.user.id)
+            const userId = data.user.id
+            console.log('User created successfully:', userId)
             
             try {
                 let dbClient = supabase
@@ -152,7 +153,7 @@ export async function signup(formData: FormData) {
                 const { error: profileError } = await dbClient
                     .from('user_profiles')
                     .upsert({
-                        id: data.user.id,
+                        id: userId,
                         role: 'user',
                         business_name: businessName || undefined,
                         business_type: businessType || undefined,
@@ -176,7 +177,7 @@ export async function signup(formData: FormData) {
                     await dbClient
                         .from('invoice_settings')
                         .upsert({
-                            user_id: data.user.id,
+                            user_id: userId,
                             business_type: businessType || 'retail',
                             updated_at: new Date().toISOString()
                         }, { onConflict: 'user_id' })
@@ -187,7 +188,7 @@ export async function signup(formData: FormData) {
                     const starterItems = INDUSTRY_CATALOG_PRESETS[verticalKey]
                     if (starterItems && starterItems.length > 0) {
                         const itemsToInsert = starterItems.map(p => ({
-                            user_id: data.user.id,
+                            user_id: userId,
                             name: p.name,
                             unit_price: p.unit_price,
                             gst_rate: p.gst_rate,
@@ -213,7 +214,7 @@ export async function signup(formData: FormData) {
                             const now = new Date()
                             const trialEnd = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000)
                             await dbClient.from('user_subscriptions').upsert({
-                                user_id: data.user.id,
+                                user_id: userId,
                                 plan_id: planData.id,
                                 status: 'trial',
                                 start_date: now.toISOString(),
