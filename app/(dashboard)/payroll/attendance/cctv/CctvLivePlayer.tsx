@@ -121,7 +121,7 @@ export function CctvLivePlayer({
                     if (!isCancelledRef.current) {
                         setIsWsActive(false)
                         // Schedule recovery if not manually stopped
-                        if (enableAutoRecovery && !streamFailed) {
+                        if (enableAutoRecovery) {
                             scheduleRecovery()
                         }
                     }
@@ -147,7 +147,7 @@ export function CctvLivePlayer({
                 activeUrlRef.current = null
             }
         }
-    }, [buildWsUrl, enableAutoRecovery, streamFailed, scheduleRecovery, clearRecoveryTimer])
+    }, [buildWsUrl, enableAutoRecovery, scheduleRecovery, clearRecoveryTimer])
 
     // MJPEG fallback effect - updates URL when fallbackTimestamp changes
     const mjpegUrl = buildMjpegUrl()
@@ -172,8 +172,7 @@ export function CctvLivePlayer({
     // HTTP / MJPEG Fallback or Recovery/Error State
     return (
         <div className="relative w-full h-full">
-            {/* MJPEG Image */}
-            // eslint-disable-next-line @next/next/no-img-element
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
                 src={mjpegUrl}
                 alt={cameraName || 'CCTV Live Feed'}

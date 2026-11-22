@@ -1201,7 +1201,7 @@ export default function CctvConnectorPage() {
                                     <div className="bg-slate-950/80 rounded-xl p-3 border border-slate-800 text-left font-mono text-[11px] text-slate-300 space-y-1 mb-4">
                                         <p className="text-slate-500 text-[10px] uppercase font-semibold">Start Local Bridge Service:</p>
                                         <p className="text-emerald-400 font-semibold select-all">cd billbook/cctv-bridge</p>
-                                        <p className="text-emerald-400 font-semibold select-all">python server.py --port 5000</p>
+                                        <p className="text-emerald-400 font-semibold select-all">python server.py --port 5050</p>
                                     </div>
 
                                     <div className="flex items-center justify-center gap-2">

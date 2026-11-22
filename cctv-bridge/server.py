@@ -1,6 +1,6 @@
 """
 FastAPI Real-Time RTSP & P2P CCTV Streaming Bridge with Strict Multi-Tenant Isolation
-Listens on port 5000 and delivers end-to-end encrypted video feeds with tenant-level authorization.
+Listens on port 5050 and delivers end-to-end encrypted video feeds with tenant-level authorization.
 Supports Cloud P2P (EasyView, Hik-Connect, DMSS), ONVIF, RTSP, and local camera streams.
 """
 
