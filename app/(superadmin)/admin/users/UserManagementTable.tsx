@@ -195,12 +195,14 @@ export default function UserManagementTable({
             case 'admin':
                 return {
                     label: 'Admin',
-                    className: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
+                    className: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800'
                 }
+            case 'user':
             default:
+                // Primary account creators who register workspaces are the Workspace Owners
                 return {
-                    label: 'User',
-                    className: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700'
+                    label: 'Workspace Owner',
+                    className: 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
                 }
         }
     }

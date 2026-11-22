@@ -101,6 +101,28 @@ export const INDUSTRY_CATALOG_PRESETS: Record<BusinessType, PresetCatalogItem[]>
         { name: "High-Engagement Short-Form Video / Reel Production", unit_price: 6000, gst_rate: 18, hsn_sac_code: '998361', unit: 'deliverables', is_service: true },
         { name: "Technical SEO On-Page & Backlink Audit", unit_price: 15000, gst_rate: 18, hsn_sac_code: '998314', unit: 'audits', is_service: true }
     ],
+    resorts_farmhouses: [
+        { name: "Entire Luxury Farmhouse Villa Buyout (24-Hour)", unit_price: 15000, gst_rate: 18, hsn_sac_code: '996311', unit: 'days', is_service: true },
+        { name: "Deluxe Poolside Resort Suite (Per Night)", unit_price: 4500, gst_rate: 12, hsn_sac_code: '996311', unit: 'nights', is_service: true },
+        { name: "Private Event Lawn & Pool Venue Day Pass", unit_price: 25000, gst_rate: 18, hsn_sac_code: '996311', unit: 'events', is_service: true },
+        { name: "Farmhouse Barbecue & Grill Catering Setup", unit_price: 1200, gst_rate: 5, hsn_sac_code: '996331', unit: 'pax', is_service: true },
+        { name: "Refundable Security Caution Deposit", unit_price: 5000, gst_rate: 0, hsn_sac_code: '999799', unit: 'deposits', is_service: true }
+    ],
+    camping_outdoors: [
+        { name: "Glamping Geodesic Dome Luxury Stay (Per Night)", unit_price: 4500, gst_rate: 12, hsn_sac_code: '996311', unit: 'nights', is_service: true },
+        { name: "Waterproof Dome Tent Pitch (2-Person)", unit_price: 2200, gst_rate: 12, hsn_sac_code: '996311', unit: 'nights', is_service: true },
+        { name: "All-Inclusive Camper Pass (Dinner + Campfire + Breakfast)", unit_price: 1500, gst_rate: 5, hsn_sac_code: '996331', unit: 'pax', is_service: true },
+        { name: "Adventure Kayak & Life Jacket Rental (Hourly)", unit_price: 450, gst_rate: 18, hsn_sac_code: '997312', unit: 'hours', is_service: true },
+        { name: "Sleeping Bag & Trekking Pole Kit Rental", unit_price: 300, gst_rate: 18, hsn_sac_code: '997312', unit: 'sets', is_service: true }
+    ],
+    art_crafts: [
+        { name: "Original Fine Art Canvas Painting (Framed)", unit_price: 12000, gst_rate: 12, hsn_sac_code: '970110', unit: 'pieces', is_service: false },
+        { name: "Handmade Epoxy Resin Ocean Geode Clock", unit_price: 3500, gst_rate: 12, hsn_sac_code: '970300', unit: 'pieces', is_service: false },
+        { name: "Bespoke Ceramic Pottery / Mug Set (Handcrafted)", unit_price: 1800, gst_rate: 12, hsn_sac_code: '691200', unit: 'sets', is_service: false },
+        { name: "Limited Edition Archival Giclée Print (#/50)", unit_price: 2200, gst_rate: 12, hsn_sac_code: '491199', unit: 'pieces', is_service: false },
+        { name: "Custom Commissioned Portrait (50% Upfront Deposit)", unit_price: 8000, gst_rate: 18, hsn_sac_code: '998314', unit: 'commissions', is_service: true },
+        { name: "Certificate of Authenticity (Official Artist Provenance)", unit_price: 500, gst_rate: 18, hsn_sac_code: '998399', unit: 'certificates', is_service: true }
+    ],
     freelancer: [
         { name: "1-Page Scope Contract Deliverable (Phase 1)", unit_price: 25000, gst_rate: 18, hsn_sac_code: '998314', unit: 'deliverables', is_service: true },
         { name: "50% Upfront Project Kickoff Deposit", unit_price: 15000, gst_rate: 18, hsn_sac_code: '998314', unit: 'deposits', is_service: true },

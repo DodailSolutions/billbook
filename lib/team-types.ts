@@ -145,6 +145,27 @@ export const VERTICAL_TEAM_DESIGNATIONS: Record<string, string[]> = {
         'Stage & Audio-Visual Tech',
         'Artist & Hospitality Coordinator'
     ],
+    art_crafts: [
+        'Lead Artist / Studio Owner',
+        'Ceramic & Pottery Artisan',
+        'Resin & Woodcraft Specialist',
+        'Exhibition & Gallery Coordinator',
+        'Packaging & Provenance Assistant'
+    ],
+    resorts_farmhouses: [
+        'Estate General Manager',
+        'Villa & Guest Supervisor',
+        'Front Desk & Concierge Lead',
+        'Event Lawn & Banquet Coordinator',
+        'Head Chef & F&B Lead'
+    ],
+    camping_outdoors: [
+        'Campground Operations Director',
+        'Lead Trek & Kayak Guide',
+        'Campfire & Hospitality Host',
+        'Outdoor Gear & Safety Inspector',
+        'Camp Medic / Safety Coordinator'
+    ],
     default: [
         'Team Manager',
         'Executive',

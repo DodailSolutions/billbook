@@ -82,6 +82,13 @@ export function Sidebar() {
                     href: '/proposals',
                     color: "text-purple-600",
                     badge: 'AI'
+                },
+                {
+                    label: 'Counter POS',
+                    icon: Zap,
+                    href: '/pos',
+                    color: "text-amber-600",
+                    badge: 'FAST'
                 }
             ]
         },

@@ -9,6 +9,7 @@ export type BusinessType =
     | 'software_it'                 // Software Development, IT Services & SaaS
     | 'digital_marketing'           // Digital Marketing, Media Buying & Social Agencies
     | 'freelancer'                  // Solo Freelancers, Contractors & Creators
+    | 'art_crafts'                  // Art, Handcrafted Goods & Studio Commissions
     | 'salon_spa'                   // Salon, Beauty Parlor & Spa
     | 'dental_clinic'               // Dental Clinic
     | 'hospital_op'                 // Medical Clinic & Hospital Outpatient
@@ -17,7 +18,9 @@ export type BusinessType =
     | 'jewelry_retail'              // Jewellery Store & Goldsmiths
     | 'event_management'            // Corporate & Social Event Management
     | 'laundry_drycleaning'         // Laundry & Dry Cleaning
-    | 'resorts_farmhouses_camping'  // Resorts, Farmhouses, Camping & Outdoor Stays (PMS)
+    | 'resorts_farmhouses'          // Resorts & Luxury Farmhouses (Multi-Property Estate PMS)
+    | 'camping_outdoors'            // Campsites, Glamping & Outdoor Adventure Stays
+    | 'resorts_farmhouses_camping'  // Unified Hybrid PMS (Backward compatible alias)
     | 'real_estate'                 // Real Estate Brokerage & Property Listings
     | 'standard'                    // Generic
 
@@ -45,6 +48,11 @@ export interface BusinessVerticalConfig {
         hasFreelanceScopeContracts?: boolean
         hasChangeOrders?: boolean
         hasClientPortal?: boolean
+        hasPOS?: boolean
+        hasBOMCosting?: boolean
+        hasCertificateOfAuthenticity?: boolean
+        hasGearRentals?: boolean
+        hasMultiPropertyGrid?: boolean
     }
     customFieldLabels: {
         customer: string     // e.g. "Customer", "Patient", "Guest", "Client"
@@ -63,7 +71,7 @@ export const BUSINESS_VERTICALS: Record<BusinessType, BusinessVerticalConfig> = 
         description: 'Auto-calculates owner vs. barber 50/50 revenue splits, tip reconciliation, retail commissions, and prepaid client packages.',
         icon: '💈',
         primaryColor: 'text-pink-600',
-        features: { hasStaffSplits: true, hasBarcodes: false },
+        features: { hasStaffSplits: true, hasBarcodes: false, hasPOS: true },
         customFieldLabels: { customer: 'Client', items: 'Services & Treatments', unit: 'sittings', identifier: 'Stylist / Chair' }
     },
     dental_clinic: {
@@ -99,16 +107,49 @@ export const BUSINESS_VERTICALS: Record<BusinessType, BusinessVerticalConfig> = 
         features: { hasJobCards: true, hasStaffSplits: true, hasBarcodes: true },
         customFieldLabels: { customer: 'Vehicle Owner', items: 'Parts & Labor Services', unit: 'hrs/pcs', identifier: 'Vehicle Reg #' }
     },
+    resorts_farmhouses: {
+        id: 'resorts_farmhouses',
+        name: 'Resorts & Luxury Farmhouses',
+        category: 'hospitality',
+        tagline: 'Multi-property villa buyouts, rooms & event lawns',
+        description: 'Multi-property estate PMS with visual room & villa availability, per-night suite tariffs, 24-hr entire farmhouse buyouts, and caution deposits.',
+        icon: '🏡',
+        primaryColor: 'text-emerald-700',
+        features: { hasPmsRoomGrid: true, hasMultiPropertyGrid: true, hasPOS: true },
+        customFieldLabels: { customer: 'Guest / Host', items: 'Villas, Rooms & Lawns', unit: 'nights/days', identifier: 'Property / Villa #' }
+    },
+    camping_outdoors: {
+        id: 'camping_outdoors',
+        name: 'Campsites, Glamping & Outdoor Stays',
+        category: 'hospitality',
+        tagline: 'Tent pitches, per-person passes & adventure gear rentals',
+        description: 'Experiential outdoor hospitality system with visual dome/tent campground allocation, all-inclusive per-head night passes, campfire BBQ add-ons, and equipment rentals.',
+        icon: '⛺',
+        primaryColor: 'text-amber-700',
+        features: { hasPmsRoomGrid: true, hasGearRentals: true, hasPOS: true },
+        customFieldLabels: { customer: 'Camper / Group', items: 'Tents, Domes & Gear', unit: 'passes/tents', identifier: 'Pitch / Dome #' }
+    },
     resorts_farmhouses_camping: {
         id: 'resorts_farmhouses_camping',
-        name: 'Resorts, Farmhouses & Camping (PMS)',
+        name: 'Unified Hospitality & Stays (PMS)',
         category: 'hospitality',
         tagline: 'Visual room/tent grid, hourly/daily/bed rates & BBQ add-ons',
         description: 'Property management system with visual room/tent availability (Open/Booked), per-bed/tent/hour rates, and barbecue service packages.',
-        icon: '⛺',
+        icon: '🏨',
         primaryColor: 'text-emerald-600',
-        features: { hasPmsRoomGrid: true },
+        features: { hasPmsRoomGrid: true, hasMultiPropertyGrid: true, hasPOS: true },
         customFieldLabels: { customer: 'Guest', items: 'Rooms, Tents & Stays', unit: 'nights/hrs', identifier: 'Room / Tent #' }
+    },
+    art_crafts: {
+        id: 'art_crafts',
+        name: 'Art, Crafts & Handmade Studio',
+        category: 'commerce',
+        tagline: 'Artwork gallery, raw material BOM & Certificates of Authenticity',
+        description: 'Tailored for painters, sculptors, resin/clay artisans, and crafters. Features raw material recipe costing, custom commission 50% deposits, and printable Certificates of Authenticity with QR codes.',
+        icon: '🎨',
+        primaryColor: 'text-pink-600',
+        features: { hasBarcodes: true, hasBOMCosting: true, hasCertificateOfAuthenticity: true, hasPOS: true },
+        customFieldLabels: { customer: 'Collector / Client', items: 'Artworks & Handcrafted Goods', unit: 'pieces', identifier: 'Certificate / SKU #' }
     },
     tours_and_travels: {
         id: 'tours_and_travels',
@@ -129,7 +170,7 @@ export const BUSINESS_VERTICALS: Record<BusinessType, BusinessVerticalConfig> = 
         description: 'Dynamic gold/silver rate updates, weight-based calculations (Net wt, wastage, making charges), BIS HUID tracking, and old gold buybacks.',
         icon: '💍',
         primaryColor: 'text-yellow-600',
-        features: { hasBullionRates: true, hasBarcodes: true },
+        features: { hasBullionRates: true, hasBarcodes: true, hasPOS: true },
         customFieldLabels: { customer: 'Buyer', items: 'Ornaments & Bullion', unit: 'grams', identifier: 'BIS Hallmark HUID' }
     },
     laundry_drycleaning: {
@@ -140,7 +181,7 @@ export const BUSINESS_VERTICALS: Record<BusinessType, BusinessVerticalConfig> = 
         description: 'Multi-piece garment inwarding (Wash/Iron/DryClean), rack/shelf slot allocation, waterproof tag printing, and WhatsApp ready alerts.',
         icon: '🧺',
         primaryColor: 'text-indigo-600',
-        features: { hasLaundryTags: true, hasBarcodes: true },
+        features: { hasLaundryTags: true, hasBarcodes: true, hasPOS: true },
         customFieldLabels: { customer: 'Customer', items: 'Garments & Articles', unit: 'pieces', identifier: 'Rack / Slot #' }
     },
     real_estate: {
@@ -173,7 +214,7 @@ export const BUSINESS_VERTICALS: Record<BusinessType, BusinessVerticalConfig> = 
         description: 'Barcode scanning, instant shelf label generation, cash drawer balancing, and real-time inventory reorders.',
         icon: '🛒',
         primaryColor: 'text-emerald-600',
-        features: { hasBarcodes: true },
+        features: { hasBarcodes: true, hasPOS: true },
         customFieldLabels: { customer: 'Customer', items: 'Products', unit: 'pcs', identifier: 'Barcode / SKU' }
     },
     wholesale: {

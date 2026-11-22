@@ -4,15 +4,15 @@ import crypto from 'crypto'
 // Initialize Razorpay instance
 let razorpayInstance: Razorpay | null = null
 
-export function getRazorpayInstance(): Razorpay {
-    if (!razorpayInstance) {
-        const keyId = process.env.RAZORPAY_KEY_ID
-        const keySecret = process.env.RAZORPAY_KEY_SECRET
+export function getRazorpayInstance(customKeyId?: string, customKeySecret?: string): Razorpay {
+    const keyId = customKeyId || process.env.RAZORPAY_KEY_ID
+    const keySecret = customKeySecret || process.env.RAZORPAY_KEY_SECRET
 
-        if (!keyId || !keySecret) {
-            throw new Error('Razorpay credentials not configured')
-        }
+    if (!keyId || !keySecret) {
+        throw new Error('Razorpay credentials not configured')
+    }
 
+    if (!razorpayInstance || customKeyId) {
         razorpayInstance = new Razorpay({
             key_id: keyId,
             key_secret: keySecret,

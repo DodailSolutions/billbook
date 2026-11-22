@@ -57,14 +57,31 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Invalid amount' }, { status: 400 })
         }
 
-        // Verify Razorpay credentials
-        const keyId = process.env.RAZORPAY_KEY_ID
-        const keySecret = process.env.RAZORPAY_KEY_SECRET
+        // Verify Razorpay credentials (supports env vars and Super Admin system_settings fallback)
+        let keyId = process.env.RAZORPAY_KEY_ID
+        let keySecret = process.env.RAZORPAY_KEY_SECRET
+
+        if (!keyId || !keySecret) {
+            try {
+                const { data: gatewayData } = await supabase
+                    .from('system_settings')
+                    .select('value')
+                    .eq('key', 'payment_gateways_config')
+                    .maybeSingle()
+
+                if (gatewayData?.value?.razorpay?.keyId && gatewayData?.value?.razorpay?.keySecret) {
+                    keyId = gatewayData.value.razorpay.keyId
+                    keySecret = gatewayData.value.razorpay.keySecret
+                }
+            } catch (gwErr) {
+                console.warn('Could not read gateway config from system_settings:', gwErr)
+            }
+        }
 
         if (!keyId || !keySecret) {
             console.error('Razorpay credentials missing:', { keyId: !!keyId, keySecret: !!keySecret })
             return NextResponse.json(
-                { error: 'Payment service not configured' },
+                { error: 'Payment service not configured. Please set credentials in Super Admin Settings or environment variables.' },
                 { status: 500 }
             )
         }
@@ -72,7 +89,7 @@ export async function POST(request: NextRequest) {
         // Create Razorpay order
         console.log('Creating Razorpay order with amount:', orderAmount * 100, 'paise')
         
-        const razorpay = getRazorpayInstance()
+        const razorpay = getRazorpayInstance(keyId, keySecret)
         const orderOptions = {
             amount: Math.round(orderAmount * 100), // Razorpay expects amount in paise/fils
             currency: orderCurrency,
