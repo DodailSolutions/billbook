@@ -46,49 +46,18 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
   - Robust persistence in browser `localStorage` (`billbook_onboarding_completed`) and user preferences to ensure it never repeats after completion or skip.
   - On-demand "Replay Tour" trigger accessible from Settings and User Menu.
 
-### 2. Industry-Adaptive Multi-Tenant Business Profiles Architecture
-Architecting specialized ERP & CRM workflows dynamically tailored per industry with unique market differentiators:
-
-1. **Salon & Spa / Grooming Centers (`salon_spa`)**:
-   - **Owner-Configurable Stylist Commission Engine**: Owner specifies individual agreed commission % per stylist (e.g. 50%, 60%, 40%) plus line-item override.
-   - **Differentiated Service vs Retail Split**: Separate commission for service haircuts (e.g. 50%) vs retail shampoo/gels (e.g. 10%).
-   - **Stylist / Chair Performance Dashboard**: Real-time daily gross earnings, commission tally, retail product upsell incentive (e.g. 10% on grooming products vs 50% on haircuts).
-   - **Prepaid Service Wallets & Memberships**: Bundled sittings, wallet debits, and walk-in chair queue management.
-
-2. **Dental Clinic & Outpatient Hospitals (`dental_clinic`, `hospital_op`)**:
-   - **Patient UHID & Token Queue**: Outpatient registration, doctor token queue, and waiting room board.
-   - **Interactive Visual Odontogram (32-Tooth Chart)**: Click-to-chart tooth conditions (caries, RCT, crowns, implants) and phased treatment estimates.
-   - **Visiting Doctor / Consultant Fee Splits**: Procedure-based revenue share (e.g. 60% consultant, 40% hospital).
-   - **Digital E-Prescription & Care Instructions**: Automatic WhatsApp delivery of Rx and post-treatment guidance.
-   - **Healthcare GST Exemption**: Automated SAC 999312 handling.
-
-3. **Tours & Travels (`tours_and_travels`)**:
-   - **Interactive Day-Wise Itinerary Builder**: Timeline quotes with flight, hotel, and sightseeing inclusions.
-   - **PAX & Passenger Manifest**: Adults, children, infant counts, passport and visa document vault.
-   - **Supplier Payables vs Customer Receivables**: DMC, airline, and hotel voucher reconciliations with Indian GST (SAC 9985) and TCS.
-
-4. **Jewellery Retailing & Manufacturing (`jewelry_retail`)**:
-   - **Live Bullion Board Rate Sync**: 24K, 22K (916), 18K, and Silver daily rates.
-   - **Weight-Based Line Item Calculations**: Net Wt, Gross Wt, Stone Wt, Wastage (VA%), Making Charges, and Old Gold buyback.
-   - **BIS Hallmark HUID & Dumbbell Barcode Printing**: Regulatory compliance and butterfly thermal tag printing.
-
-5. **Corporate & Social Event Management (`event_management`)**:
-   - **Cost Center & Event P&L**: Client budget vs committed vendor POs (venue, catering, AV, staging).
-   - **Milestone Tranche Invoicing**: 25% booking, 35% vendor signoff, 30% execution, 10% settlement.
-   - **Subcontractor TDS Handling**: Automatic TDS 194C / 194J calculation.
-   - **Attendee Pass & QR Check-in**: Integrated with BillBook universal barcode/QR scanner.
-
-6. **Automobile Workshops & Garages (`auto_workshop`)**:
-   - **Digital Job Cards**: Odometer, fuel gauge, scratch diagram, parts vs labor billing, mechanic commission.
-
-7. **Laundry & Dry Cleaning Services (`laundry_drycleaning`)**:
-   - **Garment Piece Inwarding & Tags**: Wash & Fold (kg/piece), Steam Iron, Dry Clean, and waterproof thermal tag printing.
-   - **Rack & Shelf Slot Tracking**: Physical storage slot assignment (Rack/Hanger #) for fast customer handoff.
-   - **Turnaround Stages & WhatsApp Ready Alert**: Automated status alerts when order transitions to "Ready for Pickup".
-   - **Express Surcharge & Partial Delivery**: Same-day delivery premiums and split-pickup reconciliation.
-
-8. **Gyms, Fitness & Dance Studios (`gym_fitness`)**:
-   - **Memberships & PT Revenue Splits**: Personal trainer commission splits and biometric/QR check-in logs.
+### 2. Comprehensive 10-Vertical Gap Analysis & Unified Implementation Plan
+Deep market research and competitor benchmarking completed across 10 major industry verticals:
+1. **Salon & Spa (`salon_spa`)**: Stylist commission agreements (50/50, tiered, chair rent), separate retail vs service splits, daily settlement payouts, and prepaid service wallets.
+2. **Dental & Hospital OP (`dental_clinic`, `hospital_op`)**: Outpatient token queues, interactive 32-tooth odontogram, procedure billing, visiting specialist fee splits, and SAC 999312 GST exemption.
+3. **Automobile Workshops & Garages (`auto_workshop`)**: Digital vehicle job cards with 2D scratch diagram, odometer, parts inventory deduction vs labor billing, and periodic service alerts.
+4. **Resorts, Farmhouses & Camping (PMS) (`resorts_farmhouses_camping`)**: Visual Room/Tent availability grid (Open vs Occupied), flexible pricing (Per Room, Per Bed, Per Tent, Per Hour, Per Person), BBQ/bonfire add-ons, and guest ID register.
+5. **Real Estate Brokerage (`real_estate`)**: Property listing inventory, site visit tracking, buyer/seller commission splits, and RERA document checklists.
+6. **Corporate & Social Event Management (`event_management`)**: Budget vs actual cost centers, milestone tranche billing, vendor PO matching, and Section 194C/194J subcontractor TDS.
+7. **Laundry & Dry Cleaning (`laundry_drycleaning`)**: Garment piece inwarding, waterproof thermal tag printing, rack/shelf slot allocation, and WhatsApp pickup alerts.
+8. **Tours & Travels (`tours_and_travels`)**: Day-wise itinerary builder, PAX manifests, passport vault, supplier vouchers, and Tour Operator GST (5%) & TCS.
+9. **Jewellery Retail & Goldsmiths (`jewelry_retail`)**: Live bullion board rates, weight-based calculations, BIS Hallmark HUIDs, and old gold exchange buybacks.
+10. **Retail & Wholesale FMCG (`retail`, `wholesale`)**: High-speed barcode POS, carton tiers, and automated GSTR-3B filings.
 
 ---
 
