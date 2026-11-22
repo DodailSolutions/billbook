@@ -12,7 +12,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { email, role_id } = await request.json()
+    const { 
+      email, 
+      role_id, 
+      designation, 
+      allocated_hours, 
+      hourly_cost_rate, 
+      hourly_billing_rate 
+    } = await request.json()
 
     if (!email || !role_id) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
@@ -144,6 +151,10 @@ export async function POST(request: Request) {
     }
     if (finalRoleId) insertPayload.role_id = finalRoleId
     if (roleSlug) insertPayload.role = roleSlug
+    if (designation) insertPayload.designation = designation
+    if (allocated_hours !== undefined) insertPayload.allocated_hours = Number(allocated_hours) || 40
+    if (hourly_cost_rate !== undefined) insertPayload.hourly_cost_rate = Number(hourly_cost_rate) || 0
+    if (hourly_billing_rate !== undefined) insertPayload.hourly_billing_rate = Number(hourly_billing_rate) || 0
 
     const { data: member, error: insertError } = await supabase
       .from('team_members')

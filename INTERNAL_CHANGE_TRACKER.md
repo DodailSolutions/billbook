@@ -4,6 +4,32 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 
 ---
 
+## [Release v1.5.9 - Implemented] - 2026-11-22
+
+### Software & IT, Digital Marketing, Freelancer Verticals & Universal Team Capacity Radar
+
+#### 1. Vertical Domain Expansion (`lib/business-profile-types.ts`, `lib/industry-catalog-presets.ts`)
+- **New Core Industry Verticals**:
+  - `software_it`: Software development agencies, SaaS companies, and IT consultancies. Features sprint milestone tranches, developer cost rates vs bill rates, unbilled timesheets, scope creep change orders, and zero-rated LUT export invoices.
+  - `digital_marketing`: Digital marketing agencies and creative studios. Features 0% ad spend pass-through protection (Rule 33 pure agent disbursements), client creative approval decks, monthly post retainer quota overage billing, and subcontractor TDS.
+  - `freelancer`: Solo freelancers, indie creators, and specialist contractors. Features 1-page mobile touchscreen scope contracts, 50% advance deposit generation, and ₹20L GST turnover warning radar.
+- **Pre-Seeded Catalog Items**: Added 14 high-converting default items with accurate HSN/SAC codes (998314 for software engineering, 998361 for marketing retainers, 0% GST pass-throughs for ad disbursements).
+
+#### 2. Universal Team Capacity Planning & Margin Radar (`lib/team-types.ts`, `app/(dashboard)/team/`)
+- **Capacity Metric Engine**:
+  - Implemented 40 hours/week standard capacity tracking.
+  - Real-time bench risk warning (<20 hrs / 50% allocation) and burnout overcommitment alert (>40 hrs / 100% allocation).
+- **Industry Functional Designations**:
+  - Mapped vertical-specific roles (e.g. *Tech Lead, QA Automation, Media Buyer, Copywriter, Senior Stylist, Orthodontist*) dynamically based on the active workspace profile.
+- **Dual-Rate Cost vs. Billing Margin Engine**:
+  - Added internal hourly cost rate and hourly client billing rate fields with automated gross margin % calculation.
+  - Strict privacy shield: Cost and gross margin data are strictly visible to owners and admins, while staff members see only their assigned workload and deliverables.
+- **Interactive Team UI**:
+  - Embedded `<TeamCapacityRadar>` into `/team` with weekly hours summary, utilization progress bars, bench risk chips, and inline configuration drawers.
+  - Enhanced `InviteMemberModal` and `TeamMembersList` to support functional designations alongside administrative roles.
+
+---
+
 ## [Release v1.5.8 - Implemented] - 2026-11-22
 
 ### Super Admin Multi-Vertical Analytics, Tenant Distribution Grid & User Filtering

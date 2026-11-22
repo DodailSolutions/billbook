@@ -6,6 +6,9 @@ export type BusinessType =
     | 'retail'                      // Standard Retail & Supermarket
     | 'wholesale'                   // Wholesale & Distribution
     | 'services'                    // IT & Professional Consulting
+    | 'software_it'                 // Software Development, IT Services & SaaS
+    | 'digital_marketing'           // Digital Marketing, Media Buying & Social Agencies
+    | 'freelancer'                  // Solo Freelancers, Contractors & Creators
     | 'salon_spa'                   // Salon, Beauty Parlor & Spa
     | 'dental_clinic'               // Dental Clinic
     | 'hospital_op'                 // Medical Clinic & Hospital Outpatient
@@ -37,6 +40,11 @@ export interface BusinessVerticalConfig {
         hasPropertyListings?: boolean
         hasEventMilestones?: boolean
         hasBarcodes?: boolean
+        hasSprintMilestones?: boolean
+        hasAdSpendDisbursements?: boolean
+        hasFreelanceScopeContracts?: boolean
+        hasChangeOrders?: boolean
+        hasClientPortal?: boolean
     }
     customFieldLabels: {
         customer: string     // e.g. "Customer", "Patient", "Guest", "Client"
@@ -178,6 +186,39 @@ export const BUSINESS_VERTICALS: Record<BusinessType, BusinessVerticalConfig> = 
         primaryColor: 'text-amber-700',
         features: { hasBarcodes: true },
         customFieldLabels: { customer: 'Wholesale Buyer', items: 'Cases & Cartons', unit: 'boxes', identifier: 'Batch / SKU' }
+    },
+    software_it: {
+        id: 'software_it',
+        name: 'Software & IT Services',
+        category: 'services',
+        tagline: 'Sprint milestone tranches, dev cost rates & change orders',
+        description: 'Milestone progress billing, developer cost rates vs bill rates for gross margins, timesheet invoicing, scope creep change orders, and zero-rated LUT export invoices.',
+        icon: '💻',
+        primaryColor: 'text-blue-600',
+        features: { hasSprintMilestones: true, hasStaffSplits: true, hasChangeOrders: true, hasClientPortal: true, hasBarcodes: false },
+        customFieldLabels: { customer: 'Enterprise Client', items: 'Sprints & Deliverables', unit: 'sprints/hrs', identifier: 'Sprint / Milestone #' }
+    },
+    digital_marketing: {
+        id: 'digital_marketing',
+        name: 'Digital Marketing & Creative Agency',
+        category: 'services',
+        tagline: 'Ad spend pass-through (0% GST), client portals & retainer caps',
+        description: 'Separates 0% tax pass-through media disbursements from 18% agency fees, client creative approval deck, monthly post retainer quota overage billing, and subcontractor TDS.',
+        icon: '📢',
+        primaryColor: 'text-purple-600',
+        features: { hasAdSpendDisbursements: true, hasStaffSplits: true, hasClientPortal: true, hasBarcodes: false },
+        customFieldLabels: { customer: 'Agency Client', items: 'Campaigns & Creatives', unit: 'campaigns/hrs', identifier: 'Campaign / Retainer' }
+    },
+    freelancer: {
+        id: 'freelancer',
+        name: 'Freelancer & Indie Contractor',
+        category: 'services',
+        tagline: '1-page touchscreen scope contracts & 50% advance deposits',
+        description: 'Mobile e-sign scope agreements, automated 50% upfront deposit unlock workflows, ₹20L GST threshold warning radar, and client deliverable vaults.',
+        icon: '🚀',
+        primaryColor: 'text-emerald-600',
+        features: { hasFreelanceScopeContracts: true, hasClientPortal: true, hasBarcodes: false },
+        customFieldLabels: { customer: 'Direct Client', items: 'Milestones & Tasks', unit: 'deliverables', identifier: 'Scope Order #' }
     },
     services: {
         id: 'services',

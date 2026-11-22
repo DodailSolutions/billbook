@@ -87,6 +87,26 @@ export const INDUSTRY_CATALOG_PRESETS: Record<BusinessType, PresetCatalogItem[]>
     wholesale: [
         { name: "FMCG Bulk Master Carton (24 Units)", unit_price: 3600, gst_rate: 18, hsn_sac_code: '210690', unit: 'boxes', is_service: false }
     ],
+    software_it: [
+        { name: "Sprint Tranche 1: Architecture & UI/UX Prototype", unit_price: 75000, gst_rate: 18, hsn_sac_code: '998314', unit: 'sprints', is_service: true },
+        { name: "Senior Full-Stack Engineering (Hourly T&M)", unit_price: 2500, gst_rate: 18, hsn_sac_code: '998314', unit: 'hours', is_service: true },
+        { name: "Cloud DevOps & CI/CD Pipeline Setup", unit_price: 45000, gst_rate: 18, hsn_sac_code: '998315', unit: 'milestones', is_service: true },
+        { name: "Monthly SLA & Code Maintenance Retainer", unit_price: 35000, gst_rate: 18, hsn_sac_code: '998313', unit: 'months', is_service: true },
+        { name: "Approved Change Order Supplemental Hours", unit_price: 2800, gst_rate: 18, hsn_sac_code: '998314', unit: 'hours', is_service: true }
+    ],
+    digital_marketing: [
+        { name: "Monthly Retainer Package (16 Creatives + 4 Reels)", unit_price: 45000, gst_rate: 18, hsn_sac_code: '998361', unit: 'months', is_service: true },
+        { name: "Meta & Google Ad Spend (0% Pass-Through Reimbursement)", unit_price: 50000, gst_rate: 0, hsn_sac_code: '998361', unit: 'disbursements', is_service: true },
+        { name: "Performance Paid Ads Setup & Campaign Structuring", unit_price: 20000, gst_rate: 18, hsn_sac_code: '998361', unit: 'campaigns', is_service: true },
+        { name: "High-Engagement Short-Form Video / Reel Production", unit_price: 6000, gst_rate: 18, hsn_sac_code: '998361', unit: 'deliverables', is_service: true },
+        { name: "Technical SEO On-Page & Backlink Audit", unit_price: 15000, gst_rate: 18, hsn_sac_code: '998314', unit: 'audits', is_service: true }
+    ],
+    freelancer: [
+        { name: "1-Page Scope Contract Deliverable (Phase 1)", unit_price: 25000, gst_rate: 18, hsn_sac_code: '998314', unit: 'deliverables', is_service: true },
+        { name: "50% Upfront Project Kickoff Deposit", unit_price: 15000, gst_rate: 18, hsn_sac_code: '998314', unit: 'deposits', is_service: true },
+        { name: "Consulting & UI/UX Design (Hourly)", unit_price: 1200, gst_rate: 18, hsn_sac_code: '998311', unit: 'hours', is_service: true },
+        { name: "Brand Identity Guide & Vector Asset Kit", unit_price: 18000, gst_rate: 18, hsn_sac_code: '998399', unit: 'deliverables', is_service: true }
+    ],
     services: [
         { name: "Full-Stack Development Hours", unit_price: 1500, gst_rate: 18, hsn_sac_code: '998314', unit: 'hours', is_service: true },
         { name: "Monthly IT Maintenance Retainer", unit_price: 25000, gst_rate: 18, hsn_sac_code: '998313', unit: 'months', is_service: true }

@@ -26,6 +26,7 @@ export function InviteMemberModal({ canAdd, currentCount, maxAllowed, roles }: I
   const [error, setError] = useState('')
   const [email, setEmail] = useState('')
   const [selectedRole, setSelectedRole] = useState('')
+  const [designation, setDesignation] = useState('')
 
   // Built-in 4-tier roles hierarchy
   const defaultRoles = [
@@ -84,7 +85,7 @@ export function InviteMemberModal({ canAdd, currentCount, maxAllowed, roles }: I
       const response = await fetch('/api/team/invite', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, role_id: selectedRole })
+        body: JSON.stringify({ email, role_id: selectedRole, designation })
       })
 
       const data = await response.json()
@@ -96,6 +97,7 @@ export function InviteMemberModal({ canAdd, currentCount, maxAllowed, roles }: I
       setOpen(false)
       setEmail('')
       setSelectedRole('')
+      setDesignation('')
       window.location.reload()
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'An error occurred')
@@ -177,6 +179,21 @@ export function InviteMemberModal({ canAdd, currentCount, maxAllowed, roles }: I
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="designation" className="text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                Functional Title / Designation <span className="text-slate-400 font-normal lowercase">(optional)</span>
+              </Label>
+              <Input
+                id="designation"
+                type="text"
+                placeholder="e.g. Tech Lead, Media Buyer, Full-Stack Dev"
+                value={designation}
+                onChange={(e) => setDesignation(e.target.value)}
+                disabled={loading}
+                className="text-sm rounded-lg"
+              />
             </div>
 
             <div className="bg-indigo-50/70 border border-indigo-100 rounded-xl p-3 text-xs text-indigo-900">

@@ -12,6 +12,10 @@ interface TeamMember {
   id: string
   email: string
   status: 'pending' | 'active' | 'suspended' | 'removed'
+  designation?: string | null
+  allocated_hours?: number
+  hourly_cost_rate?: number
+  hourly_billing_rate?: number
   invited_at: string
   joined_at?: string
   last_active_at?: string
@@ -162,7 +166,14 @@ export function TeamMembersList({ members, roles }: TeamMembersListProps) {
           <TableBody>
             {members.map((member) => (
               <TableRow key={member.id}>
-                <TableCell className="font-medium">{member.email}</TableCell>
+                <TableCell className="font-medium">
+                  <div className="text-slate-900 dark:text-slate-100 font-medium">{member.email}</div>
+                  {member.designation && (
+                    <div className="text-xs text-indigo-600 dark:text-indigo-400 font-medium mt-0.5">
+                      {member.designation}
+                    </div>
+                  )}
+                </TableCell>
                 <TableCell>
                   <Badge variant="outline" className="font-normal">
                     <Shield className="h-3 w-3 mr-1" />

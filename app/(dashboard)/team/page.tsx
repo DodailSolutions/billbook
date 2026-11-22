@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { TeamMembersList } from './TeamMembersList'
 import { InviteMemberModal } from './InviteMemberModal'
 import { PurchaseAddonModal } from './PurchaseAddonModal'
+import { TeamCapacityRadar } from './TeamCapacityRadar'
 
 export default async function TeamMembersPage() {
   const supabase = await createClient()
@@ -54,6 +55,18 @@ export default async function TeamMembersPage() {
       .select('*')
       .order('name')
     if (Array.isArray(data)) roles = data
+  } catch {}
+
+  let businessType = 'software_it'
+  try {
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('business_type')
+      .eq('id', user.id)
+      .single()
+    if (profile?.business_type) {
+      businessType = profile.business_type
+    }
   } catch {}
 
   if (!hasTeamAccess) {
@@ -205,6 +218,13 @@ export default async function TeamMembersPage() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Team Capacity & Allocation Radar */}
+        <TeamCapacityRadar 
+          members={teamMembers || []} 
+          verticalId={businessType}
+          isOwnerOrAdmin={true}
+        />
 
         {/* Team Members List */}
         <Card>
