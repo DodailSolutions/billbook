@@ -26,6 +26,7 @@ import {
     ArrowUpDown
 } from 'lucide-react'
 import type { UserWithDetails } from '@/lib/types-admin'
+import { BUSINESS_VERTICALS, type BusinessType } from '@/lib/business-profile-types'
 import { updateUserStatus, updateUserRole, deleteUser } from './actions'
 import { UpgradePlanModal } from './UpgradePlanModal'
 
@@ -64,6 +65,7 @@ export default function UserManagementTable({
 }: UserManagementTableProps) {
     const searchParams = useSearchParams()
     const filterParam = searchParams.get('filter') || searchParams.get('status')
+    const verticalParam = searchParams.get('vertical')
     const initialStatus = (filterParam === 'inactive' || filterParam === 'active' || filterParam === 'trial' || filterParam === 'suspended')
         ? filterParam
         : 'all'
@@ -74,6 +76,7 @@ export default function UserManagementTable({
     const [roleFilter, setRoleFilter] = useState<'all' | 'user' | 'admin' | 'super_admin'>('all')
     const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'trial' | 'suspended' | 'inactive'>(initialStatus)
     const [planFilter, setPlanFilter] = useState<string>('all')
+    const [verticalFilter, setVerticalFilter] = useState<string>(verticalParam || 'all')
     const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'name'>('newest')
     
     // Pagination
@@ -276,6 +279,12 @@ export default function UserManagementTable({
                 if (planFilter.toLowerCase() !== 'free' && currentPlan !== planFilter.toLowerCase()) return false
             }
 
+            // Industry Vertical filter
+            if (verticalFilter !== 'all') {
+                const rawType = (user.business_type as string) || 'retail'
+                if (rawType !== verticalFilter) return false
+            }
+
             return true
         }).sort((a, b) => {
             if (sortBy === 'newest') {
@@ -291,7 +300,7 @@ export default function UserManagementTable({
             }
             return 0
         })
-    }, [userList, searchQuery, roleFilter, statusFilter, planFilter, sortBy])
+    }, [userList, searchQuery, roleFilter, statusFilter, planFilter, verticalFilter, sortBy])
 
     // Pagination calculations
     const totalCount = filteredUsers.length
@@ -407,6 +416,25 @@ export default function UserManagementTable({
                         </div>
                     )}
 
+                    {/* Vertical Filter */}
+                    <div className="relative">
+                        <select
+                            value={verticalFilter}
+                            onChange={(e) => {
+                                setVerticalFilter(e.target.value)
+                                setCurrentPage(1)
+                            }}
+                            className="text-xs font-medium bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer"
+                        >
+                            <option value="all">All Verticals ({Object.keys(BUSINESS_VERTICALS).length})</option>
+                            {Object.entries(BUSINESS_VERTICALS).map(([k, cfg]) => (
+                                <option key={k} value={k}>
+                                    {cfg.icon} {cfg.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
                     {/* Sort Order */}
                     <div className="relative">
                         <select
@@ -421,13 +449,14 @@ export default function UserManagementTable({
                     </div>
 
                     {/* Reset Filters */}
-                    {(searchQuery || roleFilter !== 'all' || statusFilter !== 'all' || planFilter !== 'all') && (
+                    {(searchQuery || roleFilter !== 'all' || statusFilter !== 'all' || planFilter !== 'all' || verticalFilter !== 'all') && (
                         <button
                             onClick={() => {
                                 setSearchQuery('')
                                 setRoleFilter('all')
                                 setStatusFilter('all')
                                 setPlanFilter('all')
+                                setVerticalFilter('all')
                                 setCurrentPage(1)
                             }}
                             className="text-xs font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 px-2 py-2"
@@ -445,6 +474,7 @@ export default function UserManagementTable({
                         <tr className="border-b border-slate-200/80 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/50 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                             <th className="py-3.5 px-4">User & Business</th>
                             <th className="py-3.5 px-4">Role</th>
+                            <th className="py-3.5 px-4">Vertical</th>
                             <th className="py-3.5 px-4">Status</th>
                             <th className="py-3.5 px-4">Subscription</th>
                             <th className="py-3.5 px-4">Joined</th>
@@ -503,6 +533,20 @@ export default function UserManagementTable({
                                             <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${roleBadge.className}`}>
                                                 {roleBadge.label}
                                             </span>
+                                        </td>
+
+                                        {/* Industry Vertical */}
+                                        <td className="py-3.5 px-4 whitespace-nowrap">
+                                            {(() => {
+                                                const rawType = (user.business_type as BusinessType) || 'retail'
+                                                const vert = BUSINESS_VERTICALS[rawType]
+                                                return (
+                                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">
+                                                        <span className="text-sm">{vert?.icon || '🏢'}</span>
+                                                        <span>{vert?.name || rawType}</span>
+                                                    </span>
+                                                )
+                                            })()}
                                         </td>
 
                                         {/* Status Badge */}

@@ -184,3 +184,26 @@ export interface UserWithDetails extends UserProfile {
     total_spent?: number
     invoice_count?: number
 }
+
+export interface VerticalDistributionStat {
+    id: string
+    name: string
+    category: string
+    icon: string
+    primaryColor: string
+    tagline: string
+    userCount: number
+    percentage: number
+    activeUserCount: number
+    totalInvoices: number
+    totalSales: number
+    status: 'leader' | 'growing' | 'early' | 'untapped'
+}
+
+export interface VerticalAnalyticsSummary {
+    totalTenants: number
+    totalActiveVerticals: number
+    totalUntappedVerticals: number
+    topVertical: { id: string; name: string; count: number; percentage: number } | null
+    verticals: VerticalDistributionStat[]
+}

@@ -1,8 +1,9 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import type { DashboardStats } from '@/lib/types-admin'
+import type { DashboardStats, VerticalAnalyticsSummary, VerticalDistributionStat } from '@/lib/types-admin'
 import { checkSuperAdminAccess } from '@/lib/admin-auth'
+import { BUSINESS_VERTICALS, type BusinessType } from '@/lib/business-profile-types'
 
 export async function getDashboardStats(): Promise<DashboardStats | null> {
     try {
@@ -106,5 +107,144 @@ export async function getRecentActivity() {
     } catch (error) {
         console.error('Error fetching recent activity:', error)
         return []
+    }
+}
+
+export async function getVerticalDistributionStats(): Promise<VerticalAnalyticsSummary> {
+    try {
+        const isSuperAdmin = await checkSuperAdminAccess()
+        if (!isSuperAdmin) {
+            return {
+                totalTenants: 0,
+                totalActiveVerticals: 0,
+                totalUntappedVerticals: 0,
+                topVertical: null,
+                verticals: []
+            }
+        }
+
+        const supabase = await createClient()
+
+        // Fetch all user profiles with business_type
+        const { data: profiles } = await supabase
+            .from('user_profiles')
+            .select('id, business_type, status, role')
+
+        // Fetch invoice aggregates per user to associate volume per vertical
+        const { data: invoices } = await supabase
+            .from('invoices')
+            .select('user_id, total, status')
+
+        // Build invoice aggregations map by user_id
+        const userInvoiceMap = new Map<string, { count: number; totalSales: number }>()
+        if (invoices) {
+            for (const inv of invoices) {
+                const current = userInvoiceMap.get(inv.user_id) || { count: 0, totalSales: 0 }
+                current.count += 1
+                current.totalSales += Number(inv.total || 0)
+                userInvoiceMap.set(inv.user_id, current)
+            }
+        }
+
+        // Tally profiles by vertical
+        const validProfiles = (profiles || []).filter(p => p.role !== 'superadmin')
+        const totalTenants = validProfiles.length
+
+        const verticalMap = new Map<string, {
+            users: number
+            activeUsers: number
+            invoices: number
+            sales: number
+        }>()
+
+        for (const [key] of Object.entries(BUSINESS_VERTICALS)) {
+            verticalMap.set(key, { users: 0, activeUsers: 0, invoices: 0, sales: 0 })
+        }
+
+        for (const p of validProfiles) {
+            const rawType = (p.business_type as string) || 'retail'
+            const matchedKey = BUSINESS_VERTICALS[rawType as BusinessType] 
+                ? rawType 
+                : 'retail'
+            
+            const stats = verticalMap.get(matchedKey) || { users: 0, activeUsers: 0, invoices: 0, sales: 0 }
+            stats.users += 1
+            if (p.status === 'active') {
+                stats.activeUsers += 1
+            }
+
+            const invData = userInvoiceMap.get(p.id)
+            if (invData) {
+                stats.invoices += invData.count
+                stats.sales += invData.totalSales
+            }
+
+            verticalMap.set(matchedKey, stats)
+        }
+
+        const resultList: VerticalDistributionStat[] = Object.entries(BUSINESS_VERTICALS).map(([key, config]) => {
+            const counts = verticalMap.get(key) || { users: 0, activeUsers: 0, invoices: 0, sales: 0 }
+            const percentage = totalTenants > 0 ? Number(((counts.users / totalTenants) * 100).toFixed(1)) : 0
+            
+            let status: 'leader' | 'growing' | 'early' | 'untapped' = 'untapped'
+            if (counts.users === 0) {
+                status = 'untapped'
+            } else if (percentage >= 25 || counts.users >= 10) {
+                status = 'leader'
+            } else if (counts.users >= 3 || percentage >= 5) {
+                status = 'growing'
+            } else {
+                status = 'early'
+            }
+
+            return {
+                id: key,
+                name: config.name,
+                category: config.category,
+                icon: config.icon,
+                primaryColor: config.primaryColor,
+                tagline: config.tagline,
+                userCount: counts.users,
+                percentage,
+                activeUserCount: counts.activeUsers,
+                totalInvoices: counts.invoices,
+                totalSales: counts.sales,
+                status
+            }
+        })
+
+        // Sort: leaders first, then by userCount desc, untapped last
+        resultList.sort((a, b) => {
+            if (a.userCount !== b.userCount) return b.userCount - a.userCount
+            return a.name.localeCompare(b.name)
+        })
+
+        const activeVerticals = resultList.filter(v => v.userCount > 0)
+        const untappedVerticals = resultList.filter(v => v.userCount === 0)
+        const topVertical = activeVerticals.length > 0 
+            ? {
+                id: activeVerticals[0].id,
+                name: activeVerticals[0].name,
+                count: activeVerticals[0].userCount,
+                percentage: activeVerticals[0].percentage
+            }
+            : null
+
+        return {
+            totalTenants,
+            totalActiveVerticals: activeVerticals.length,
+            totalUntappedVerticals: untappedVerticals.length,
+            topVertical,
+            verticals: resultList
+        }
+    } catch (err) {
+        console.error('Error fetching vertical distribution stats:', err)
+        return {
+            totalTenants: 0,
+            totalActiveVerticals: 0,
+            totalUntappedVerticals: 0,
+            topVertical: null,
+            verticals: []
+        }
     }
 }

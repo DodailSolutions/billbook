@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { Users, Shield, UserCheck, UserX, Crown, ArrowLeft, Plus, Sparkles, Building2, Zap } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
@@ -244,7 +245,9 @@ export default async function UsersManagementPage() {
                     </div>
                 </CardHeader>
                 <CardContent className="pt-4">
-                    <UserManagementTable initialUsers={users} />
+                    <Suspense fallback={<div className="p-8 text-center text-xs text-slate-400">Loading user accounts...</div>}>
+                        <UserManagementTable initialUsers={users} />
+                    </Suspense>
                 </CardContent>
             </Card>
         </div>

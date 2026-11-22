@@ -25,7 +25,8 @@ import {
 } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { getDashboardStats, getRecentActivity } from './actions'
+import { getDashboardStats, getRecentActivity, getVerticalDistributionStats } from './actions'
+import { VerticalDistributionSection } from '@/components/admin/VerticalDistributionSection'
 import type { LucideIcon } from 'lucide-react'
 
 function MetricCard({ 
@@ -132,9 +133,10 @@ function HubActionCard({
 }
 
 export default async function SuperAdminDashboard() {
-    const [stats, recentActivity] = await Promise.all([
+    const [stats, recentActivity, verticalStats] = await Promise.all([
         getDashboardStats(),
-        getRecentActivity()
+        getRecentActivity(),
+        getVerticalDistributionStats()
     ])
 
     if (!stats) {
@@ -424,6 +426,11 @@ export default async function SuperAdminDashboard() {
                     </div>
                 </div>
             </div>
+
+            {/* Industry Verticals Intelligence & Adoption */}
+            {verticalStats && (
+                <VerticalDistributionSection data={verticalStats} />
+            )}
 
             {/* Categorized Command Hub */}
             <div className="space-y-4">

@@ -4,6 +4,39 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 
 ---
 
+## [Release v1.5.8 - Implemented] - 2026-11-22
+
+### Super Admin Multi-Vertical Analytics, Tenant Distribution Grid & User Filtering
+
+#### 1. Vertical Distribution Intelligence Engine (`app/(superadmin)/admin/actions.ts`, `lib/types-admin.ts`)
+- **Backend Metric Aggregator (`getVerticalDistributionStats`)**:
+  - Aggregates tenant registrations, active account counts, invoice counts, and total sales across all 11 ERP verticals:
+    - *Salon & Spa*, *Dental Clinics*, *Hospital OP*, *Automobile Garages*, *PMS (Resorts, Farmhouses & Camping)*, *Tours & Travels*, *Jewellery Stores*, *Laundry & Dry Cleaning*, *Real Estate*, *Event Management*, and *Retail/Wholesale*.
+  - Calculates percentage tenant distribution across the platform.
+  - Automatically classifies each vertical by adoption tier:
+    - `🔥 Leader`: High adoption (>25% share or 10+ tenants)
+    - `📈 Growing`: Steady traction (5% - 25% share)
+    - `🌱 Early Stage`: 1 - 4 tenants
+    - `⭕ Untapped`: Exactly 0 registered tenants, highlighting untapped SaaS market opportunities.
+
+#### 2. Smooth Executive Vertical Distribution Component (`components/admin/VerticalDistributionSection.tsx`, `admin/page.tsx`)
+- **Real-Time Visual Grid**:
+  - Interactive multi-card layout displaying each vertical's emoji icon, category, adoption health badge, tenant progress bar, active users, and invoice volume.
+  - Quick-toggle filter pills: `All Verticals (11)`, `Active Verticals`, and `Untapped / Zero Users`.
+  - Integrated search bar allowing rapid filtering by vertical name, category, or industry tagline.
+  - Deep-link action button: `View Users →` pre-filters `/admin/users?vertical=[key]` with 1 click.
+
+#### 3. Super Admin User Table Vertical Badging & Filtering (`admin/users/UserManagementTable.tsx`, `page.tsx`)
+- **Industry Vertical Column**:
+  - Added dedicated *Vertical* badge column to the user management table displaying the tenant's chosen industry icon and title.
+- **Vertical Filter Dropdown**:
+  - Added an interactive dropdown in the user table toolbar to filter users by any specific industry vertical.
+  - Supports URL parameter pre-selection (`?vertical=salon_spa`).
+- **Suspense Boundary**:
+  - Wrapped `UserManagementTable` in React `<Suspense>` to ensure smooth client-side search parameter hydration during production builds.
+
+---
+
 ## [Release v1.5.7 - Implemented] - 2026-11-22
 
 ### Invoice Number Collision Prevention, Auth TypeScript Fix & Super Admin Access Hardening
