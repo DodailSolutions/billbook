@@ -33,26 +33,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     
-    // Dedicated Vertical OS Landing Pages - High SEO Priority
-    {
-      url: `${baseUrl}/for/software-companies`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/for/digital-marketing`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/for/freelancers`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
-      priority: 0.9,
-    },
-    
     // CA Services - Important for SEO
     {
       url: `${baseUrl}/ca-marketplace`,

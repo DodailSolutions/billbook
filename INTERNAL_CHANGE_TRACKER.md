@@ -4,36 +4,6 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 
 ---
 
-## [Release v1.6.0 - Implemented] - 2026-11-22
-
-### Dedicated Industry Landing Pages, Multi-Region Pricing & 100% SEO Architecture
-
-#### 1. Dedicated Industry Landing Pages (`app/(marketing)/for/`)
-- **Software Companies & IT Consultancies (`/for/software-companies`)**:
-  - Purpose-built marketing page highlighting sprint milestone tranches (25/35/40), developer cost-rate gross margins, timesheets to 1-click invoices, 1-click Change Orders (zero scope creep), and zero-rated LUT export invoicing (USD/EUR).
-  - High-converting SaaS comparison table contrasting the fragmented $550/mo stack with BillBook’s unified $49–$99/mo suite.
-  - Injected structured JSON-LD data for `SoftwareApplication` and developer `FAQPage`.
-- **Digital Marketing Agencies (`/for/digital-marketing`)**:
-  - Highlights the lethal "Ad Spend Tax Trap" and demonstrates how BillBook’s Rule 33 Pure Agent engine legally isolates non-taxable media disbursements (0% GST) from taxable agency fees (SAC 998361 @ 18%).
-  - Showcases the 1-click Client Creative Approval Deck, Monthly Retainer Quota & Overage Counter, and Subcontractor TDS 194J/194C ledger.
-- **Freelancers & Indie Solos (`/for/freelancers`)**:
-  - Focuses on the 3-step cash flow protection system: 1-Page Touchscreen Scope Contracts with mobile e-sign, 50% Upfront Deposit Gate (work unlocks on pay), and ₹20 Lakh Indian GST Turnover Warning Radar.
-  - Highlights instant UPI QR code embedding with zero gateway fee deductions.
-
-#### 2. Multi-Region Dynamic Industry Pricing Widget (`app/_components/IndustryPricingWidget.tsx`)
-- **Interactive Currency & Tax Localization**:
-  - **India (🇮🇳)**: INR pricing (`₹499/mo` Solo, `₹1,999/mo` Growth, `₹3,999/mo` Enterprise) with 18% GST + TDS compliance labels.
-  - **UAE (🇦🇪)**: AED pricing (`AED 69/mo`, `AED 179/mo`, `AED 349/mo`) with 5% FTA VAT & TRN compliance.
-  - **USA & Global (🇺🇸)**: USD pricing (`$19/mo`, `$49/mo`, `$99/mo`) with sales tax & 1099 contractor compliance.
-- **Annual Billing Discount**: Live toggle for monthly vs. yearly billing with automated 20% discount calculation.
-
-#### 3. Main Landing Page & SEO Enhancements (`app/page.tsx`, `app/sitemap.ts`)
-- **Industry OS Showcase Grid**: Added dedicated showcase section on `app/page.tsx` linking to software, agency, and freelancer pages.
-- **Interactive Homepage Pricing Switcher**: Embedded industry tabs in `HomePricingSection.tsx` allowing visitors to toggle between Standard Retail, Software, Marketing, and Freelancer plans without page reloads.
-- **Sitemap Indexing**: Registered `/for/software-companies`, `/for/digital-marketing`, and `/for/freelancers` with 0.9 priority in `app/sitemap.ts`.
-
----
-
 ## [Release v1.5.9 - Implemented] - 2026-11-22
 
 ### Software & IT, Digital Marketing, Freelancer Verticals & Universal Team Capacity Radar
