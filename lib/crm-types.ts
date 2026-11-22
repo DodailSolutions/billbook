@@ -1,8 +1,30 @@
 export type LeadStage = 'lead' | 'contacted' | 'proposal_sent' | 'negotiation' | 'won' | 'lost'
 
-export type LeadSource = 'web' | 'referral' | 'whatsapp' | 'campaign' | 'phone' | 'other'
+export type LeadSource = 'web' | 'referral' | 'whatsapp' | 'campaign' | 'phone' | 'excel_import' | 'google_sheets' | 'other'
 
 export type ActivityType = 'call' | 'email' | 'meeting' | 'note' | 'task'
+
+export interface DealItem {
+    id: string
+    name: string
+    quantity: number
+    unit_price: number
+    gst_rate?: number
+    total: number
+}
+
+export interface CRMTeamMember {
+    id: string
+    user_id?: string | null
+    name: string
+    email: string
+    role: string
+    roleSlug: string
+    status: string
+    avatar?: string
+    activeDealsCount?: number
+    wonDealsValue?: number
+}
 
 export interface CRMLead {
     id: string
@@ -22,6 +44,12 @@ export interface CRMLead {
     notes?: string | null
     tags?: string[] | null
     assigned_to?: string | null
+    assigned_member_id?: string | null
+    assigned_member?: CRMTeamMember | null
+    items?: DealItem[] | null
+    converted_invoice_id?: string | null
+    import_source?: string | null
+    external_lead_id?: string | null
     created_at: string
     updated_at: string
 }
@@ -37,6 +65,9 @@ export interface CRMActivity {
     due_date?: string | null
     completed: boolean
     completed_at?: string | null
+    assigned_member_id?: string | null
+    assigned_member?: CRMTeamMember | null
+    priority?: 'low' | 'medium' | 'high' | 'urgent'
     created_at: string
     updated_at: string
 }
@@ -51,6 +82,7 @@ export interface CRMStats {
     staleDealsCount?: number
     stageCounts: Record<LeadStage, number>
     stageValues: Record<LeadStage, number>
+    memberPerformance?: Record<string, { dealsCount: number; wonCount: number; pipelineValue: number; wonValue: number }>
 }
 
 export interface CreateLeadInput {
@@ -68,7 +100,11 @@ export interface CreateLeadInput {
     notes?: string
     tags?: string[]
     assigned_to?: string
+    assigned_member_id?: string
     customer_id?: string
+    items?: DealItem[]
+    import_source?: string
+    external_lead_id?: string
 }
 
 export interface CreateActivityInput {
@@ -78,4 +114,48 @@ export interface CreateActivityInput {
     title: string
     description?: string
     due_date?: string
+    assigned_member_id?: string
+    priority?: 'low' | 'medium' | 'high' | 'urgent'
+}
+
+export interface LeadImportFieldMapping {
+    title: string
+    company_name?: string
+    contact_name?: string
+    email?: string
+    phone?: string
+    value?: string
+    stage?: string
+    source?: string
+    assigned_to?: string
+    notes?: string
+    tags?: string
+}
+
+export interface GoogleSheetSyncConfig {
+    id?: string
+    name: string
+    sheet_url: string
+    sheet_id: string
+    sheet_gid?: string
+    column_mapping: LeadImportFieldMapping
+    duplicate_strategy: 'skip' | 'update' | 'create'
+    default_stage: LeadStage
+    default_assigned_member_id?: string | null
+    auto_sync?: boolean
+    sync_interval_minutes?: number
+    last_synced_at?: string | null
+    last_sync_status?: string
+    last_sync_error?: string | null
+    imported_count?: number
+}
+
+export interface BatchImportResult {
+    success: boolean
+    totalRows: number
+    importedCount: number
+    skippedDuplicatesCount: number
+    failedCount: number
+    errors: string[]
+    leads?: CRMLead[]
 }

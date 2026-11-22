@@ -13,6 +13,7 @@ import {
   Sparkles, Shield, Clock, X, UserPlus, Download, CheckCircle, Mail, Loader2, ExternalLink
 } from 'lucide-react'
 import { createInvoice } from '../actions'
+import { linkLeadToInvoice } from '@/lib/crm-actions'
 import { saveItemFromInvoice, deleteSavedItem as deleteSavedItemAction } from '../../items/actions'
 import type { Customer, InventoryItem as InventoryOption, SavedItem } from '@/lib/types'
 
@@ -38,12 +39,20 @@ interface ImprovedInvoiceFormProps {
   customers: Customer[]
   savedItems?: SavedItem[]
   inventoryItems?: InventoryOption[]
+  initialCustomerId?: string
+  initialAmount?: number
+  initialTitle?: string
+  initialLeadId?: string
 }
 
 export function ImprovedInvoiceForm({ 
   customers: initialCustomers = [], 
   savedItems: rawSavedItems = [], 
-  inventoryItems: rawInventoryItems = [] 
+  inventoryItems: rawInventoryItems = [],
+  initialCustomerId,
+  initialAmount,
+  initialTitle,
+  initialLeadId
 }: ImprovedInvoiceFormProps) {
   const safeInitialCustomers = initialCustomers || []
   const savedItems = rawSavedItems || []
@@ -68,13 +77,13 @@ export function ImprovedInvoiceForm({
 
   // Form state
   const [formData, setFormData] = useState({
-    customer_id: '',
+    customer_id: initialCustomerId || '',
     invoice_date: new Date().toISOString().split('T')[0],
     due_date: '',
     supply_type: 'intra-state' as 'intra-state' | 'inter-state',
     reverse_charge_applicable: false,
     is_recurring: false,
-    notes: '',
+    notes: initialLeadId ? `Generated from CRM Lead` : '',
     // Discount
     discount_type: 'percentage' as 'percentage' | 'flat',
     discount_value: 0,
@@ -90,16 +99,16 @@ export function ImprovedInvoiceForm({
   const [items, setItems] = useState<InvoiceItem[]>([
     {
       id: crypto.randomUUID(),
-      description: '',
-      details: '',
+      description: initialTitle || '',
+      details: initialLeadId ? `Deal: ${initialTitle || ''}` : '',
       hsn_sac_code: '',
       hsn_sac_type: '',
       quantity: 1,
-      unit_price: 0,
+      unit_price: initialAmount || 0,
       gst_rate: 18,
-      amount: 0,
-      cgst: 0,
-      sgst: 0,
+      amount: initialAmount || 0,
+      cgst: initialAmount ? (initialAmount * 0.09) : 0,
+      sgst: initialAmount ? (initialAmount * 0.09) : 0,
       igst: 0
     }
   ])
@@ -354,6 +363,9 @@ export function ImprovedInvoiceForm({
       const result = await createInvoice(invoiceData)
 
       if (result.success && result.invoiceId) {
+        if (initialLeadId) {
+          linkLeadToInvoice(initialLeadId, result.invoiceId).catch(console.error)
+        }
         setCreatedInvoiceId(result.invoiceId)
         setShowSuccessModal(true)
       } else {

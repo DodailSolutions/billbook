@@ -10,7 +10,22 @@ import { checkInvoiceLimit } from '@/lib/plan-utils'
 
 import type { Customer, InventoryItem, SavedItem } from "@/lib/types"
 
-export default async function NewInvoicePage() {
+interface NewInvoicePageProps {
+    searchParams?: Promise<{
+        customerId?: string
+        amount?: string
+        title?: string
+        leadId?: string
+    }>
+}
+
+export default async function NewInvoicePage(props: NewInvoicePageProps) {
+    const searchParams = props.searchParams ? await props.searchParams : undefined
+    const initialCustomerId = searchParams?.customerId || undefined
+    const initialAmount = searchParams?.amount ? parseFloat(searchParams.amount) : undefined
+    const initialTitle = searchParams?.title || undefined
+    const initialLeadId = searchParams?.leadId || undefined
+
     let customers: Customer[] = []
     let savedItems: SavedItem[] = []
     let inventoryItems: InventoryItem[] = []
@@ -97,7 +112,15 @@ export default async function NewInvoicePage() {
 
     return (
         <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50">
-            <ImprovedInvoiceForm customers={customers} savedItems={savedItems} inventoryItems={inventoryItems} />
+            <ImprovedInvoiceForm 
+                customers={customers} 
+                savedItems={savedItems} 
+                inventoryItems={inventoryItems}
+                initialCustomerId={initialCustomerId}
+                initialAmount={initialAmount}
+                initialTitle={initialTitle}
+                initialLeadId={initialLeadId}
+            />
         </div>
     )
 }

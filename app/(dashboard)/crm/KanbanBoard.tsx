@@ -2,18 +2,22 @@
 
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
-import { CRMLead, LeadStage } from "@/lib/crm-types"
-import { updateLeadStage, deleteLead } from "@/lib/crm-actions"
+import { CRMLead, LeadStage, CRMTeamMember } from "@/lib/crm-types"
+import { updateLeadStage, deleteLead, assignLeadToMember, convertLeadToCustomer } from "@/lib/crm-actions"
 import { Button } from "@/components/ui/Button"
 import { 
-    Building2, User, Phone, Mail, DollarSign, Trash2, Edit3, 
-    ArrowRight, Tag, Sparkles, MessageSquare, Receipt, Search, Filter, AlertTriangle, Flame
+    Building2, User, Phone, Mail, Trash2, Edit3, 
+    Search, Flame, AlertTriangle, MessageSquare, Receipt, 
+    UserCheck, Users, CheckCircle, ExternalLink, RefreshCw
 } from "lucide-react"
 
 interface KanbanBoardProps {
     leads: CRMLead[]
+    teamMembers: CRMTeamMember[]
     onEditLead: (lead: CRMLead) => void
     onRefresh: () => void
+    selectedMemberFilter?: string
+    onMemberFilterChange?: (memberId: string) => void
 }
 
 const STAGES: { id: LeadStage; title: string; color: string; bg: string; border: string }[] = [
@@ -25,10 +29,19 @@ const STAGES: { id: LeadStage; title: string; color: string; bg: string; border:
     { id: 'lost', title: 'Lost ❌', color: 'text-rose-700', bg: 'bg-rose-50/50', border: 'border-rose-200' },
 ]
 
-export function KanbanBoard({ leads, onEditLead, onRefresh }: KanbanBoardProps) {
+export function KanbanBoard({ 
+    leads, 
+    teamMembers, 
+    onEditLead, 
+    onRefresh,
+    selectedMemberFilter = 'all',
+    onMemberFilterChange
+}: KanbanBoardProps) {
     const [updatingId, setUpdatingId] = useState<string | null>(null)
     const [searchQuery, setSearchQuery] = useState('')
     const [filterPriority, setFilterPriority] = useState<'all' | 'hot' | 'stale'>('all')
+    const [memberFilter, setMemberFilter] = useState<string>(selectedMemberFilter)
+    const [convertingId, setConvertingId] = useState<string | null>(null)
     const [expandedMobile, setExpandedMobile] = useState<Record<string, boolean>>({
         lead: true
     })
@@ -49,6 +62,7 @@ export function KanbanBoard({ leads, onEditLead, onRefresh }: KanbanBoardProps) 
 
     const filteredLeads = useMemo(() => {
         return leads.filter(lead => {
+            // Text Search
             if (searchQuery.trim()) {
                 const q = searchQuery.toLowerCase()
                 const matches = (
@@ -61,6 +75,7 @@ export function KanbanBoard({ leads, onEditLead, onRefresh }: KanbanBoardProps) 
                 if (!matches) return false
             }
 
+            // Priority Filter
             if (filterPriority === 'hot') {
                 const { isHot } = getLeadScore(lead)
                 if (!isHot) return false
@@ -69,15 +84,41 @@ export function KanbanBoard({ leads, onEditLead, onRefresh }: KanbanBoardProps) 
                 if (!isStale) return false
             }
 
+            // Team Member Filter
+            if (memberFilter === 'unassigned') {
+                if (lead.assigned_member_id || lead.assigned_to) return false
+            } else if (memberFilter !== 'all') {
+                if (lead.assigned_member_id !== memberFilter) return false
+            }
+
             return true
         })
-    }, [leads, searchQuery, filterPriority])
+    }, [leads, searchQuery, filterPriority, memberFilter])
 
     const handleStageChange = async (leadId: string, newStage: LeadStage) => {
         setUpdatingId(leadId)
         await updateLeadStage(leadId, newStage)
         setUpdatingId(null)
         onRefresh()
+    }
+
+    const handleAssignChange = async (leadId: string, memberId: string) => {
+        setUpdatingId(leadId)
+        const selectedMember = teamMembers.find(m => m.id === memberId)
+        await assignLeadToMember(leadId, memberId || null, selectedMember?.name)
+        setUpdatingId(null)
+        onRefresh()
+    }
+
+    const handleConvertToCustomer = async (leadId: string) => {
+        setConvertingId(leadId)
+        const res = await convertLeadToCustomer(leadId)
+        setConvertingId(null)
+        if (res.success) {
+            onRefresh()
+        } else {
+            alert(res.error || 'Failed to convert lead to customer')
+        }
     }
 
     const handleDelete = async (leadId: string) => {
@@ -89,8 +130,9 @@ export function KanbanBoard({ leads, onEditLead, onRefresh }: KanbanBoardProps) 
 
     return (
         <div className="space-y-4">
-            {/* Smart Pipeline Controls: Search & Smart Filters */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-3 rounded-2xl border border-gray-100 shadow-2xs">
+            {/* Smart Pipeline Controls: Search & Team Filters */}
+            <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-gray-100 shadow-2xs">
+                {/* Search Bar */}
                 <div className="relative flex-1 max-w-md">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <input
@@ -102,39 +144,64 @@ export function KanbanBoard({ leads, onEditLead, onRefresh }: KanbanBoardProps) 
                     />
                 </div>
 
-                <div className="flex items-center gap-1.5 overflow-x-auto">
-                    <button
-                        onClick={() => setFilterPriority('all')}
-                        className={`px-3 py-1 text-xs font-semibold rounded-lg transition-colors shrink-0 ${
-                            filterPriority === 'all'
-                                ? 'bg-indigo-600 text-white'
-                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                        }`}
-                    >
-                        All ({leads.length})
-                    </button>
-                    <button
-                        onClick={() => setFilterPriority('hot')}
-                        className={`flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-lg transition-colors shrink-0 ${
-                            filterPriority === 'hot'
-                                ? 'bg-amber-600 text-white'
-                                : 'bg-amber-50 text-amber-700 hover:bg-amber-100'
-                        }`}
-                    >
-                        <Flame className="h-3 w-3" />
-                        Hot Deals
-                    </button>
-                    <button
-                        onClick={() => setFilterPriority('stale')}
-                        className={`flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-lg transition-colors shrink-0 ${
-                            filterPriority === 'stale'
-                                ? 'bg-rose-600 text-white'
-                                : 'bg-rose-50 text-rose-700 hover:bg-rose-100'
-                        }`}
-                    >
-                        <AlertTriangle className="h-3 w-3" />
-                        Needs Action (7d+)
-                    </button>
+                {/* Team Member Filter Selector */}
+                <div className="flex items-center gap-2 flex-wrap">
+                    <div className="flex items-center gap-1.5 bg-slate-50 border border-gray-200/80 rounded-xl px-2.5 py-1">
+                        <Users className="h-3.5 w-3.5 text-indigo-600" />
+                        <span className="text-[11px] font-bold text-gray-600">Assignee:</span>
+                        <select
+                            value={memberFilter}
+                            onChange={(e) => {
+                                setMemberFilter(e.target.value)
+                                onMemberFilterChange?.(e.target.value)
+                            }}
+                            className="text-xs bg-transparent font-medium text-gray-800 focus:outline-hidden"
+                        >
+                            <option value="all">All Members ({leads.length})</option>
+                            <option value="unassigned">Unassigned Pool</option>
+                            {teamMembers.map(m => (
+                                <option key={m.id} value={m.id}>
+                                    {m.name} ({m.role})
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Priority Pills */}
+                    <div className="flex items-center gap-1.5 overflow-x-auto">
+                        <button
+                            onClick={() => setFilterPriority('all')}
+                            className={`px-3 py-1 text-xs font-semibold rounded-lg transition-colors shrink-0 ${
+                                filterPriority === 'all'
+                                    ? 'bg-indigo-600 text-white'
+                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            }`}
+                        >
+                            All
+                        </button>
+                        <button
+                            onClick={() => setFilterPriority('hot')}
+                            className={`flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-lg transition-colors shrink-0 ${
+                                filterPriority === 'hot'
+                                    ? 'bg-amber-600 text-white'
+                                    : 'bg-amber-50 text-amber-700 hover:bg-amber-100'
+                            }`}
+                        >
+                            <Flame className="h-3 w-3" />
+                            Hot Deals
+                        </button>
+                        <button
+                            onClick={() => setFilterPriority('stale')}
+                            className={`flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-lg transition-colors shrink-0 ${
+                                filterPriority === 'stale'
+                                    ? 'bg-rose-600 text-white'
+                                    : 'bg-rose-50 text-rose-700 hover:bg-rose-100'
+                            }`}
+                        >
+                            <AlertTriangle className="h-3 w-3" />
+                            Needs Action (7d+)
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -148,7 +215,7 @@ export function KanbanBoard({ leads, onEditLead, onRefresh }: KanbanBoardProps) 
                     return (
                         <div 
                             key={col.id}
-                            className={`flex flex-col rounded-2xl p-3 border ${col.bg} ${col.border} w-full md:min-w-[240px] shrink-0 md:min-h-[500px]`}
+                            className={`flex flex-col rounded-2xl p-3 border ${col.bg} ${col.border} w-full md:min-w-[250px] shrink-0 md:min-h-[500px]`}
                         >
                             {/* Stage Header */}
                             <div 
@@ -180,6 +247,7 @@ export function KanbanBoard({ leads, onEditLead, onRefresh }: KanbanBoardProps) 
                                     stageLeads.map((lead) => {
                                         const { isHot, isWarm, isStale } = getLeadScore(lead)
                                         const cleanPhone = lead.phone ? lead.phone.replace(/[^0-9]/g, '') : ''
+                                        const assignedMember = lead.assigned_member || teamMembers.find(m => m.id === lead.assigned_member_id)
 
                                         return (
                                             <div 
@@ -188,26 +256,45 @@ export function KanbanBoard({ leads, onEditLead, onRefresh }: KanbanBoardProps) 
                                                     updatingId === lead.id ? 'opacity-50 pointer-events-none' : ''
                                                 }`}
                                             >
-                                                {/* Smart Deal Badges */}
-                                                <div className="flex items-center gap-1 mb-1.5 flex-wrap">
-                                                    {isHot && (
-                                                        <span className="text-[9px] font-bold bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
-                                                            <Flame className="h-2.5 w-2.5 text-amber-600" /> Hot Deal
-                                                        </span>
-                                                    )}
-                                                    {isStale && (
-                                                        <span className="text-[9px] font-bold bg-rose-100 text-rose-800 px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
-                                                            <AlertTriangle className="h-2.5 w-2.5 text-rose-600" /> Stale (7d+)
-                                                        </span>
-                                                    )}
-                                                    {lead.probability !== undefined && (
-                                                        <span className="text-[9px] font-semibold text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded-md">
-                                                            {lead.probability}% prob
-                                                        </span>
-                                                    )}
+                                                {/* Smart Badges & Assignee Pill */}
+                                                <div className="flex items-center justify-between gap-1 mb-2">
+                                                    <div className="flex items-center gap-1 flex-wrap">
+                                                        {isHot && (
+                                                            <span className="text-[9px] font-bold bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
+                                                                <Flame className="h-2.5 w-2.5 text-amber-600" /> Hot Deal
+                                                            </span>
+                                                        )}
+                                                        {isStale && (
+                                                            <span className="text-[9px] font-bold bg-rose-100 text-rose-800 px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
+                                                                <AlertTriangle className="h-2.5 w-2.5 text-rose-600" /> Stale (7d+)
+                                                            </span>
+                                                        )}
+                                                        {lead.probability !== undefined && (
+                                                            <span className="text-[9px] font-semibold text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded-md">
+                                                                {lead.probability}% prob
+                                                            </span>
+                                                        )}
+                                                    </div>
+
+                                                    {/* Quick Assign Avatar & Dropdown */}
+                                                    <div className="relative group/assignee shrink-0">
+                                                        <select
+                                                            value={lead.assigned_member_id || ''}
+                                                            onChange={(e) => handleAssignChange(lead.id, e.target.value)}
+                                                            className="text-[10px] font-semibold bg-slate-50 hover:bg-indigo-50 border border-gray-200 rounded-md px-1.5 py-0.5 text-gray-700 cursor-pointer focus:outline-indigo-500"
+                                                            title="Reassign team member"
+                                                        >
+                                                            <option value="">👤 Unassigned</option>
+                                                            {teamMembers.map(m => (
+                                                                <option key={m.id} value={m.id}>
+                                                                    👤 {m.name}
+                                                                </option>
+                                                            ))}
+                                                        </select>
+                                                    </div>
                                                 </div>
 
-                                                {/* Card Title & Value */}
+                                                {/* Card Title & Deal Value */}
                                                 <div className="flex items-start justify-between gap-2 mb-2">
                                                     <h4 className="text-xs font-bold text-gray-900 line-clamp-2 leading-tight">
                                                         {lead.title}
@@ -239,34 +326,53 @@ export function KanbanBoard({ leads, onEditLead, onRefresh }: KanbanBoardProps) 
                                                     )}
                                                 </div>
 
-                                                {/* Instant Follow-up Quick Action Buttons */}
-                                                <div className="flex items-center gap-1.5 py-1.5 border-t border-dashed border-gray-100 mb-2">
+                                                {/* ERP Interconnectivity Action Bar */}
+                                                <div className="flex items-center gap-1.5 py-1.5 border-t border-dashed border-gray-100 mb-2 flex-wrap">
+                                                    {/* WhatsApp Deep Link */}
                                                     {cleanPhone && (
                                                         <a
-                                                            href={`https://wa.me/${cleanPhone.length === 10 ? '91' + cleanPhone : cleanPhone}?text=${encodeURIComponent(`Hi ${lead.contact_name || ''}, regarding ${lead.title} with BillBooky.`)}`}
+                                                            href={`https://wa.me/${cleanPhone.length === 10 ? '91' + cleanPhone : cleanPhone}?text=${encodeURIComponent(`Hi ${lead.contact_name || ''}, regarding ${lead.title} with BillBook.`)}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
                                                             className="flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded border border-emerald-200 transition-colors"
-                                                            title="Quick WhatsApp message"
+                                                            title="Send WhatsApp Follow-up"
                                                         >
                                                             <MessageSquare className="h-2.5 w-2.5" />
                                                             WhatsApp
                                                         </a>
                                                     )}
-                                                    {lead.email && (
-                                                        <a
-                                                            href={`mailto:${lead.email}?subject=${encodeURIComponent(`Regarding ${lead.title}`)}`}
-                                                            className="flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded border border-blue-200 transition-colors"
-                                                            title="Quick Email"
+
+                                                    {/* Convert to Customer Button */}
+                                                    {!lead.customer_id ? (
+                                                        <button
+                                                            onClick={() => handleConvertToCustomer(lead.id)}
+                                                            disabled={convertingId === lead.id}
+                                                            className="flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-medium text-purple-700 bg-purple-50 hover:bg-purple-100 rounded border border-purple-200 transition-colors"
+                                                            title="Convert prospect to verified Customer master"
                                                         >
-                                                            <Mail className="h-2.5 w-2.5" />
-                                                            Email
-                                                        </a>
+                                                            {convertingId === lead.id ? (
+                                                                <RefreshCw className="h-2.5 w-2.5 animate-spin" />
+                                                            ) : (
+                                                                <UserCheck className="h-2.5 w-2.5" />
+                                                            )}
+                                                            +Customer
+                                                        </button>
+                                                    ) : (
+                                                        <Link
+                                                            href={`/customers/${lead.customer_id}`}
+                                                            className="flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50 rounded border border-emerald-200"
+                                                            title="Customer Record Linked"
+                                                        >
+                                                            <CheckCircle className="h-2.5 w-2.5 text-emerald-600" />
+                                                            Customer
+                                                        </Link>
                                                     )}
+
+                                                    {/* Convert to Tax Invoice Link */}
                                                     <Link
-                                                        href={`/invoices/new`}
+                                                        href={`/invoices/new?leadId=${lead.id}&customerId=${lead.customer_id || ''}&amount=${lead.value}&title=${encodeURIComponent(lead.title)}`}
                                                         className="flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded border border-indigo-200 transition-colors ml-auto"
-                                                        title="Convert deal to Invoice"
+                                                        title="Convert deal to Invoice / Estimate"
                                                     >
                                                         <Receipt className="h-2.5 w-2.5" />
                                                         Invoice
@@ -284,7 +390,7 @@ export function KanbanBoard({ leads, onEditLead, onRefresh }: KanbanBoardProps) 
                                                     </div>
                                                 )}
 
-                                                {/* Move Stage Selector & Actions */}
+                                                {/* Stage Selector & Card Actions */}
                                                 <div className="pt-2 border-t border-gray-100 flex items-center justify-between gap-1">
                                                     <select
                                                         value={lead.stage}
@@ -299,14 +405,14 @@ export function KanbanBoard({ leads, onEditLead, onRefresh }: KanbanBoardProps) 
                                                     <div className="flex items-center gap-1">
                                                         <button
                                                             onClick={() => onEditLead(lead)}
-                                                            className="p-2 md:p-1 text-gray-400 hover:text-indigo-600 rounded-md hover:bg-indigo-50 transition-colors"
+                                                            className="p-1.5 text-gray-400 hover:text-indigo-600 rounded-md hover:bg-indigo-50 transition-colors"
                                                             title="Edit Deal"
                                                         >
                                                             <Edit3 className="h-3.5 w-3.5" />
                                                         </button>
                                                         <button
                                                             onClick={() => handleDelete(lead.id)}
-                                                            className="p-2 md:p-1 text-gray-400 hover:text-rose-600 rounded-md hover:bg-rose-50 transition-colors"
+                                                            className="p-1.5 text-gray-400 hover:text-rose-600 rounded-md hover:bg-rose-50 transition-colors"
                                                             title="Delete Deal"
                                                         >
                                                             <Trash2 className="h-3.5 w-3.5" />
