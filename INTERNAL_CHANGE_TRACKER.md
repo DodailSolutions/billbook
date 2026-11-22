@@ -22,10 +22,17 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
   - GSTR-3B auto-calculation now directly aggregates Input Tax Credit (`tax_amount`) from `expenses` and vendor bills into `itc_cgst` and `itc_sgst`.
   - Seamlessly bridges inward supply expenses with outward sales invoices for complete GST compliance.
 
-#### 3. Universal Barcode Engine & Hardware Printing (`lib/barcode-actions.ts`, `components/barcode/`, `hooks/`)
-- Universal barcode lookup searching both `inventory_items` and `saved_items`.
-- Hardware HID keyboard-wedge scanner listener (`useBarcodeScanner`) with automatic line item addition.
-- Thermal label printing supporting standard retail (50x25mm) and jewelry dumbbell tags (68x12mm).
+#### 3. Universal Barcode Engine, Right Sidebar & Hardware Printing (`components/barcode/BarcodeRightSidebar.tsx`, `components/Sidebar.tsx`, `app/(dashboard)/layout.tsx`)
+- **Quick-Access Slide-Over Right Sidebar (`BarcodeRightSidebar.tsx`)**:
+  - Right-docked floating trigger badge (`[🏷️ Barcode Hub]`) globally accessible across all dashboard pages.
+  - 3-tab slide-over control hub:
+    1. *Scan & Find*: Fast hardware & manual barcode lookup, displaying stock levels, price, and instant "+ Add to Invoice" action.
+    2. *Generator*: Auto-generates Code 128 vector barcodes with custom company prefixes, live SVG preview, SVG download, and 1-click clipboard copy.
+    3. *Thermal Label Printing*: Formats for retail stickers (50x25mm, 38x25mm) and jewelry dumbbell tags (68x12mm).
+- **Navigation & Inventory Barcode Visibility**:
+  - Added dedicated "Barcodes & Labels" link in both desktop and mobile sidebars under "Inventory & Items".
+  - Always-visible "Barcode & Printers" action button and barcode column in the main Inventory dashboard (`/inventory`).
+- **Universal Barcode Lookup**: Instant cross-table resolution across `inventory_items` and `saved_items`.
 
 ---
 
