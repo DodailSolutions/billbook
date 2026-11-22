@@ -16,13 +16,14 @@ import { updateProfile, updateAvatar, changePassword, updateEmail, type UserProf
 import { getPlanStatus } from '@/app/(dashboard)/plan-actions'
 import { SUPPORTED_LANGUAGES } from '@/lib/i18n/languages'
 import type { PlanStatus } from '@/lib/plan-utils'
+import { BusinessProfileSelector } from '@/components/settings/BusinessProfileSelector'
 
 interface SettingsContentProps {
     initialProfile: UserProfile | null
     planStatus?: PlanStatus | null
 }
 
-type TabType = 'profile' | 'business' | 'security' | 'notifications'
+type TabType = 'profile' | 'business' | 'industry' | 'security' | 'notifications'
 
 const TIMEZONE_OPTIONS = [
     { value: 'Asia/Kolkata', label: '🇮🇳 India (IST • GMT+5:30)' },
@@ -294,6 +295,7 @@ export default function SettingsContent({ initialProfile, planStatus: initialPla
     const tabs = [
         { id: 'profile' as TabType, label: 'Profile & Personal', icon: User },
         { id: 'business' as TabType, label: 'Business Details', icon: Building2 },
+        { id: 'industry' as TabType, label: 'Industry & Verticals', icon: Sparkles },
         { id: 'security' as TabType, label: 'Security', icon: Shield },
         { id: 'notifications' as TabType, label: 'Notifications', icon: Bell },
     ]
@@ -889,6 +891,13 @@ export default function SettingsContent({ initialProfile, planStatus: initialPla
                                     </Button>
                                 </Link>
                             </div>
+                        </div>
+                    )}
+
+                    {/* TAB: Industry & Business Verticals */}
+                    {activeTab === 'industry' && (
+                        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-xs">
+                            <BusinessProfileSelector initialType={(initialProfile as any)?.business_type || 'retail'} />
                         </div>
                     )}
 

@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { sendWelcomeEmail } from '@/lib/email'
+import { INDUSTRY_CATALOG_PRESETS } from '@/lib/industry-catalog-presets'
 
 export async function login(formData: FormData) {
     const supabase = await createClient()
@@ -169,6 +170,33 @@ export async function signup(formData: FormData) {
                     console.log('Profile created successfully')
                 }
 
+                // Initialize invoice_settings with the chosen business_type & seed initial catalog
+                try {
+                    await dbClient
+                        .from('invoice_settings')
+                        .upsert({
+                            user_id: data.user.id,
+                            business_type: businessType || 'retail',
+                            updated_at: new Date().toISOString()
+                        }, { onConflict: 'user_id' })
+
+                    const verticalKey = (businessType as any) || 'retail'
+                    const starterItems = INDUSTRY_CATALOG_PRESETS[verticalKey]
+                    if (starterItems && starterItems.length > 0) {
+                        const itemsToInsert = starterItems.map(p => ({
+                            user_id: data.user.id,
+                            name: p.name,
+                            unit_price: p.unit_price,
+                            gst_rate: p.gst_rate,
+                            hsn_sac_code: p.hsn_sac_code || null,
+                            description: p.description || p.name
+                        }))
+                        await dbClient.from('saved_items').insert(itemsToInsert)
+                    }
+                } catch (settingsInitErr) {
+                    console.warn('Could not auto-seed invoice settings and catalog on signup:', settingsInitErr)
+                }
+
                 // If this is a trial or free signup, create subscription record immediately
                 if (selectedPlan && selectedPlan !== 'free' && isTrial) {
                     try {
@@ -201,7 +229,9 @@ export async function signup(formData: FormData) {
                     console.log('📧 Attempting to send welcome email to:', email)
                     const emailResult = await sendWelcomeEmail({
                         to: email,
-                        name: fullName || ownerName || email.split('@')[0]
+                        name: fullName || ownerName || email.split('@')[0],
+                        businessName: businessName || undefined,
+                        businessType: businessType || undefined
                     })
                     
                     if (emailResult.success) {

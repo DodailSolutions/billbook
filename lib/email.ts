@@ -286,9 +286,13 @@ export async function sendInvoiceEmail({
 export async function sendWelcomeEmail({
   to,
   name,
+  businessName,
+  businessType,
 }: {
   to: string
   name: string
+  businessName?: string
+  businessType?: string
 }) {
   console.log('🔍 sendWelcomeEmail called for:', to)
   
@@ -301,10 +305,14 @@ export async function sendWelcomeEmail({
     const transporter = await getEmailTransporter()
     const settings = await getSMTPSettings()
 
+    const formattedIndustry = businessType 
+      ? businessType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+      : 'Business'
+
     await transporter.sendMail({
       from: `"${settings.from_name}" <${settings.from_email}>`,
       to,
-      subject: 'Welcome to BillBooky! 🎉',
+      subject: `Welcome to BillBooky${businessName ? ' - ' + businessName : ''}! 🎉`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -321,18 +329,84 @@ export async function sendWelcomeEmail({
                 padding: 20px;
               }
               .header {
-                background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
                 color: white;
-                padding: 40px;
+                padding: 36px 20px;
                 border-radius: 8px 8px 0 0;
                 text-align: center;
               }
               .content {
                 background: #f9fafb;
-                padding: 40px;
+                padding: 30px;
                 border: 1px solid #e5e7eb;
                 border-radius: 0 0 8px 8px;
               }
+              .button {
+                display: inline-block;
+                background: #4f46e5;
+                color: white !important;
+                padding: 12px 28px;
+                text-decoration: none;
+                border-radius: 6px;
+                margin-top: 20px;
+                font-weight: bold;
+              }
+              .feature-list {
+                background: white;
+                padding: 18px;
+                border-radius: 8px;
+                margin: 20px 0;
+                border: 1px solid #e2e8f0;
+              }
+              .feature-item {
+                padding: 8px 0;
+                border-bottom: 1px solid #f1f5f9;
+                font-size: 14px;
+              }
+              .feature-item:last-child {
+                border-bottom: none;
+              }
+              .footer {
+                text-align: center;
+                margin-top: 30px;
+                color: #6b7280;
+                font-size: 12px;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <div class="header">
+                <h1 style="margin: 0; font-size: 26px;">Welcome to BillBooky! 🎉</h1>
+                <p style="margin: 8px 0 0 0; opacity: 0.9; font-size: 15px;">Your ${formattedIndustry} Invoicing &amp; ERP Workspace</p>
+              </div>
+              <div class="content">
+                <p style="font-size: 16px;">Hello <strong>${name}</strong>,</p>
+                <p>Welcome to <strong>BillBooky</strong>! Your account has been provisioned and configured specifically for your <strong>${formattedIndustry}</strong> operations.</p>
+                
+                <div class="feature-list">
+                  <div class="feature-item">⚡ <strong>30-Second GST Invoicing:</strong> Generate and send compliant tax invoices directly via WhatsApp and PDF.</div>
+                  <div class="feature-item">🏷️ <strong>Universal Barcodes &amp; Hardware:</strong> Connect handheld barcode scanners and thermal label printers effortlessly.</div>
+                  <div class="feature-item">📊 <strong>Automated Bookkeeping &amp; Tax:</strong> Real-time Profit &amp; Loss, balance sheets, and pre-calculated GSTR-1 and GSTR-3B filings.</div>
+                  <div class="feature-item">👥 <strong>Team &amp; Specialist Workflow:</strong> Manage staff, track performance, and handle custom revenue splits.</div>
+                </div>
+
+                <div style="text-align: center; margin-top: 25px;">
+                  <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://billbooky.dodail.com'}/dashboard" class="button">Go to Your Dashboard &rarr;</a>
+                </div>
+
+                <p style="margin-top: 30px; font-size: 13px; color: #64748b;">
+                  Need assistance? Our support team and AI Accountant are available 24/7 directly inside your dashboard.
+                </p>
+              </div>
+              <div class="footer">
+                <p>&copy; ${new Date().getFullYear()} BillBooky. All rights reserved.</p>
+              </div>
+            </div>
+          </body>
+        </html>
+      `,
+    })
               .button {
                 display: inline-block;
                 background: #10b981;

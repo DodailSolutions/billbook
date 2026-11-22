@@ -20,18 +20,20 @@ import {
 } from '@/lib/validation/auth'
 
 const BUSINESS_TYPES = [
-    { value: 'dental', label: 'Dental Clinic' },
-    { value: 'it_company', label: 'IT Company' },
-    { value: 'salon', label: 'Salon/Beauty Parlor' },
-    { value: 'car_detailing', label: 'Car Detailing Shop' },
-    { value: 'car_wash', label: 'Car & Bike Wash' },
-    { value: 'spare_parts', label: 'Spare Parts Shop' },
-    { value: 'clinic', label: 'Medical Clinic' },
-    { value: 'restaurant', label: 'Restaurant/Cafe' },
-    { value: 'retail', label: 'Retail Store' },
-    { value: 'consulting', label: 'Consulting Services' },
-    { value: 'freelancer', label: 'Freelancer' },
-    { value: 'other', label: 'Other' }
+    { value: 'salon_spa', label: '💈 Salon, Spa & Beauty Parlor' },
+    { value: 'dental_clinic', label: '🦷 Dental Clinic' },
+    { value: 'hospital_op', label: '🏥 Medical Clinic & Hospital OP' },
+    { value: 'auto_workshop', label: '🚗 Car & Bike Servicing / Garages' },
+    { value: 'resorts_farmhouses_camping', label: '⛺ Resorts, Farmhouses & Camping (PMS)' },
+    { value: 'tours_and_travels', label: '✈️ Tours & Travels Agency' },
+    { value: 'jewelry_retail', label: '💍 Jewellery Store & Goldsmiths' },
+    { value: 'laundry_drycleaning', label: '🧺 Laundry & Dry Cleaning' },
+    { value: 'real_estate', label: '🏢 Real Estate Agency & Brokerage' },
+    { value: 'event_management', label: '🎪 Corporate & Event Management' },
+    { value: 'retail', label: '🛒 Retail Store / Supermarket' },
+    { value: 'wholesale', label: '📦 Wholesale & FMCG Distribution' },
+    { value: 'services', label: '💼 IT Services & Consulting Agency' },
+    { value: 'other', label: '⚡ Other Business' }
 ]
 
 interface SignupFormProps {

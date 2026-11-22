@@ -36,15 +36,29 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 
 ---
 
-## [Active Development / Next Up]
+## [Release v1.5.6 - Implemented] - 2026-11-22
 
-### 1. Interactive First-Time User Onboarding Walkthrough & Product Tour
-- **Zero-Friction First-Run Tour (`components/onboarding/FirstTimeOnboardingTour.tsx`)**:
-  - Automatically triggers once upon initial dashboard login for any new user.
-  - Interactive multi-step guide with **Next**, **Back**, **Skip**, and **Get Started** buttons.
-  - Showcases industry vertical adaptation, 30-second GST invoicing, Universal Barcode Hub, CRM team workflow, and automated bookkeeping.
-  - Robust persistence in browser `localStorage` (`billbook_onboarding_completed`) and user preferences to ensure it never repeats after completion or skip.
-  - On-demand "Replay Tour" trigger accessible from Settings and User Menu.
+### Multi-Industry Adaptive Architecture, First-Time Onboarding Tour & Industry Welcome Emails
+
+#### 1. Adaptive Multi-Tenant Business Profiles (`lib/business-profile-types.ts`, `lib/business-profile-actions.ts`)
+- **10 Supported Verticals**: Salon & Spa, Dental Clinics, Hospital OP, Automobile Garages, Resorts/Farmhouses/Camping (PMS), Tours & Travels, Jewellery Retail, Laundry & Dry Cleaning, Real Estate, and Corporate Events.
+- **Dynamic Terminology & Field Adapters (`hooks/useBusinessProfile.ts`)**: Custom field mapping (`Client` vs `Patient` vs `Guest`, `UHID` vs `Vehicle Reg #` vs `Rack #`).
+- **Database Schema Migration (`supabase-industry-adaptive-migration.sql`)**: Tables for `staff_revenue_splits`, `pms_units`, `pms_bookings`, `vehicle_job_cards`, `dental_case_sheets`, `laundry_orders`, and `real_estate_listings`.
+
+#### 2. Industry Starter Catalogs & Zero-Config Signup (`lib/industry-catalog-presets.ts`, `app/(auth)/`)
+- **Automated Catalog Seeding**: Pre-populates starter services/items on signup or industry switch (e.g. haircuts for salons, root canals for dental, synthetic oil for garages, tents for camping).
+- **Signup Vertical Picker (`SignupForm.tsx` & `actions.ts`)**: Saves chosen industry directly to `invoice_settings` and `user_profiles`.
+
+#### 3. Interactive First-Time User Walkthrough (`components/onboarding/FirstTimeOnboardingTour.tsx`)
+- **Single-Trigger Onboarding Modal**: Launches once on initial dashboard login with 5 informative steps, Next/Back/Skip controls, and browser storage persistence.
+
+#### 4. Personalized Industry Welcome Email (`lib/email.ts`)
+- **Tailored Email Notification**: Sends HTML welcome email featuring the user's business name and industry vertical upon registration.
+
+#### 5. Settings Industry Switcher (`components/settings/BusinessProfileSelector.tsx`, `SettingsContent.tsx`)
+- Added **Industry & Verticals** tab in Account Settings to let users switch or fine-tune their business profile at any time.
+
+---
 
 ### 2. Comprehensive 10-Vertical Gap Analysis & Unified Implementation Plan
 Deep market research and competitor benchmarking completed across 10 major industry verticals:
