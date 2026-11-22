@@ -103,10 +103,10 @@ export function TeamPerformanceView({
                         <div>
                             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Top Performer</p>
                             <h3 className="text-base sm:text-lg font-bold text-gray-900 mt-1 truncate max-w-[140px]">
-                                {topPerformer?.wonValue > 0 ? topPerformer.member.name : '—'}
+                                {topPerformer && topPerformer.wonValue > 0 ? topPerformer.member.name : '—'}
                             </h3>
                             <p className="text-[11px] text-emerald-600 font-medium mt-0.5">
-                                {topPerformer?.wonValue > 0 ? `₹${topPerformer.wonValue.toLocaleString('en-IN')} closed` : 'No closed deals yet'}
+                                {topPerformer && topPerformer.wonValue > 0 ? `₹${topPerformer.wonValue.toLocaleString('en-IN')} closed` : 'No closed deals yet'}
                             </p>
                         </div>
                         <div className="p-3 bg-amber-50 text-amber-600 rounded-2xl">

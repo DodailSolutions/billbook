@@ -568,11 +568,11 @@ export function LeadImportModal({ isOpen, onClose, teamMembers, onSuccess }: Lea
                                         <tbody className="divide-y divide-gray-100">
                                             {rawRows.slice(0, 3).map((r, i) => (
                                                 <tr key={i} className="hover:bg-slate-50/50">
-                                                    <td className="p-2 font-medium text-gray-900">{r[mapping.title] || '(Fallback Title)'}</td>
-                                                    <td className="p-2 text-gray-600">{r[mapping.company_name] || '—'}</td>
-                                                    <td className="p-2 text-gray-600">{r[mapping.contact_name] || '—'}</td>
-                                                    <td className="p-2 text-gray-600">{r[mapping.email] || '—'}</td>
-                                                    <td className="p-2 font-semibold text-emerald-600">₹{r[mapping.value] || '0'}</td>
+                                                    <td className="p-2 font-medium text-gray-900">{mapping.title ? (r[mapping.title] || '(Fallback Title)') : '(Fallback Title)'}</td>
+                                                    <td className="p-2 text-gray-600">{mapping.company_name ? (r[mapping.company_name] || '—') : '—'}</td>
+                                                    <td className="p-2 text-gray-600">{mapping.contact_name ? (r[mapping.contact_name] || '—') : '—'}</td>
+                                                    <td className="p-2 text-gray-600">{mapping.email ? (r[mapping.email] || '—') : '—'}</td>
+                                                    <td className="p-2 font-semibold text-emerald-600">₹{mapping.value ? (r[mapping.value] || '0') : '0'}</td>
                                                 </tr>
                                             ))}
                                         </tbody>
