@@ -6,7 +6,8 @@ import type {
   Proposal, 
   RfpEvaluationInput, 
   ProposalSignature,
-  ProposalStatus 
+  ProposalStatus,
+  ProposalBrandingSettings
 } from '@/lib/proposal-types'
 import { evaluateRfpScope } from '@/lib/proposal-engine'
 
@@ -88,6 +89,21 @@ export async function getProposalsAction(): Promise<Proposal[]> {
       signature: row.signature || undefined,
       convertedInvoiceId: row.converted_invoice_id,
       convertedProjectId: row.converted_project_id,
+      // Assignment & Follow-up
+      assignedToEmployeeId: row.assigned_to_employee_id,
+      assignedToName: row.assigned_to_name,
+      assignedToType: row.assigned_to_type,
+      nextFollowUpDate: row.next_follow_up_date,
+      followUpNotes: row.follow_up_notes,
+      // Commission
+      commissionType: row.commission_type,
+      commissionPercentage: Number(row.commission_percentage) || 0,
+      commissionAmount: Number(row.commission_amount) || 0,
+      commissionPayFrequency: row.commission_pay_frequency,
+      commissionBasis: row.commission_basis,
+      commissionStatus: row.commission_status,
+      // Branding
+      brandingSettings: row.branding_settings || undefined,
       createdAt: row.created_at,
       updatedAt: row.updated_at
     }))
@@ -147,6 +163,21 @@ export async function getProposalByIdAction(id: string): Promise<Proposal | null
       signature: row.signature || undefined,
       convertedInvoiceId: row.converted_invoice_id,
       convertedProjectId: row.converted_project_id,
+      // Assignment & Follow-up
+      assignedToEmployeeId: row.assigned_to_employee_id,
+      assignedToName: row.assigned_to_name,
+      assignedToType: row.assigned_to_type,
+      nextFollowUpDate: row.next_follow_up_date,
+      followUpNotes: row.follow_up_notes,
+      // Commission
+      commissionType: row.commission_type,
+      commissionPercentage: Number(row.commission_percentage) || 0,
+      commissionAmount: Number(row.commission_amount) || 0,
+      commissionPayFrequency: row.commission_pay_frequency,
+      commissionBasis: row.commission_basis,
+      commissionStatus: row.commission_status,
+      // Branding
+      brandingSettings: row.branding_settings || undefined,
       createdAt: row.created_at,
       updatedAt: row.updated_at
     }
@@ -329,5 +360,166 @@ export async function signProposalAction(proposalId: string, signature: Proposal
   } catch (error: any) {
     console.error('Error signing proposal:', error)
     return { success: false, error: error.message || 'Failed to sign proposal' }
+  }
+}
+
+/**
+ * Updates stage/status and follow-up notes for a proposal
+ */
+export async function updateProposalStageAction(
+  proposalId: string, 
+  status: ProposalStatus, 
+  followUpNotes?: string, 
+  nextFollowUpDate?: string
+) {
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { success: false, error: 'Unauthorized' }
+
+    const updatePayload: any = {
+      status,
+      updated_at: new Date().toISOString()
+    }
+    if (followUpNotes !== undefined) updatePayload.follow_up_notes = followUpNotes
+    if (nextFollowUpDate !== undefined) updatePayload.next_follow_up_date = nextFollowUpDate
+
+    const { error } = await supabase
+      .from('proposals')
+      .update(updatePayload)
+      .eq('id', proposalId)
+
+    if (error) throw error
+
+    revalidatePath('/proposals')
+    revalidatePath(`/proposal/${proposalId}`)
+    return { success: true }
+  } catch (error: any) {
+    console.error('Error updating proposal stage:', error)
+    return { success: false, error: error.message || 'Failed to update stage' }
+  }
+}
+
+/**
+ * Assign proposal to a sales employee or client partner
+ */
+export async function assignProposalAction(
+  proposalId: string,
+  assignedToEmployeeId: string,
+  assignedToName: string,
+  assignedToType: 'employee' | 'client_partner',
+  commission?: {
+    commissionType?: 'salary_only' | 'percentage_only' | 'hybrid'
+    commissionPercentage?: number
+    commissionAmount?: number
+    commissionPayFrequency?: 'monthly' | 'weekly'
+    commissionBasis?: 'per_project' | 'monthly_retainer' | 'deal_total'
+  }
+) {
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { success: false, error: 'Unauthorized' }
+
+    const updatePayload: any = {
+      assigned_to_employee_id: assignedToEmployeeId,
+      assigned_to_name: assignedToName,
+      assigned_to_type: assignedToType,
+      updated_at: new Date().toISOString()
+    }
+
+    if (commission) {
+      if (commission.commissionType) updatePayload.commission_type = commission.commissionType
+      if (commission.commissionPercentage !== undefined) updatePayload.commission_percentage = commission.commissionPercentage
+      if (commission.commissionAmount !== undefined) updatePayload.commission_amount = commission.commissionAmount
+      if (commission.commissionPayFrequency) updatePayload.commission_pay_frequency = commission.commissionPayFrequency
+      if (commission.commissionBasis) updatePayload.commission_basis = commission.commissionBasis
+      updatePayload.commission_status = 'pending'
+    }
+
+    const { error } = await supabase
+      .from('proposals')
+      .update(updatePayload)
+      .eq('id', proposalId)
+
+    if (error) throw error
+
+    revalidatePath('/proposals')
+    return { success: true }
+  } catch (error: any) {
+    console.error('Error assigning proposal:', error)
+    return { success: false, error: error.message || 'Failed to assign proposal' }
+  }
+}
+
+/**
+ * Update proposal branding settings (Header, Footer, Page Numbering, Watermark, Accent Color)
+ */
+export async function updateProposalBrandingAction(proposalId: string, branding: ProposalBrandingSettings) {
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { success: false, error: 'Unauthorized' }
+
+    const { error } = await supabase
+      .from('proposals')
+      .update({
+        branding_settings: branding,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', proposalId)
+
+    if (error) throw error
+
+    revalidatePath('/proposals')
+    revalidatePath(`/proposal/${proposalId}`)
+    return { success: true }
+  } catch (error: any) {
+    console.error('Error updating proposal branding:', error)
+    return { success: false, error: error.message || 'Failed to update branding' }
+  }
+}
+
+/**
+ * AI Proposal Writer: generates a complete customized draft from rough brief or requirements
+ */
+export async function generateAiProposalDraftAction(input: {
+  clientName: string
+  projectTitle: string
+  industryVertical?: string
+  rawBrief: string
+  targetBudget?: number
+  timelineWeeks?: number
+}) {
+  try {
+    const { clientName, projectTitle, rawBrief, targetBudget = 150000, timelineWeeks = 4, industryVertical = 'software' } = input
+
+    // Build intelligent AI proposal draft
+    const evaluation = evaluateRfpScope({
+      title: projectTitle,
+      clientName,
+      scopeText: rawBrief,
+      clientBudget: targetBudget,
+      timelineWeeks,
+      industryVertical
+    })
+
+    const executiveSummary = `This formal Statement of Work (SOW) represents a strategic partnership proposal between our agency and ${clientName || 'the client'} for "${projectTitle}". Addressing core business objectives across a planned ${timelineWeeks}-week cadence, the project establishes scalable milestones, rigorous QA acceptance benchmarks, and agile sprint deliveries designed to maximize ROI.`
+
+    return {
+      success: true,
+      data: {
+        title: projectTitle,
+        clientName,
+        executiveSummary,
+        deliverables: evaluation.parsedDeliverables,
+        tranches: evaluation.recommendedTranches,
+        complianceMatrix: evaluation.complianceMatrix,
+        feasibilityScore: evaluation.feasibilityScore
+      }
+    }
+  } catch (error: any) {
+    console.error('Error generating AI proposal draft:', error)
+    return { success: false, error: error.message || 'Failed to generate proposal' }
   }
 }

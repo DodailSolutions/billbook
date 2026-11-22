@@ -9,7 +9,9 @@ import type {
   ScopeDeliverable,
   MilestoneTranche,
   Proposal,
-  FeasibilityRecommendation
+  FeasibilityRecommendation,
+  CommissionCalculationInput,
+  CommissionCalculationResult
 } from './proposal-types'
 
 /**
@@ -223,4 +225,209 @@ export function evaluateRfpScope(input: RfpEvaluationInput): {
     parsedDeliverables,
     recommendedTranches
   }
+}
+
+/**
+ * Calculates sales representative or client partner commission
+ */
+export function calculatePartnerCommission(input: CommissionCalculationInput): CommissionCalculationResult {
+  const {
+    baseSalary = 0,
+    commissionType,
+    commissionPercentage,
+    dealOrProjectAmount,
+    frequency,
+    basis
+  } = input
+
+  let commissionEarned = 0
+  let baseSalaryPayable = 0
+
+  // 1. Base salary calculation according to frequency
+  if (commissionType === 'salary_only' || commissionType === 'hybrid') {
+    baseSalaryPayable = frequency === 'weekly' ? Math.round(baseSalary / 4.33) : baseSalary
+  }
+
+  // 2. Commission calculation
+  if (commissionType === 'percentage_only' || commissionType === 'hybrid') {
+    commissionEarned = Math.round(dealOrProjectAmount * (commissionPercentage / 100))
+  }
+
+  const totalGrossPayout = baseSalaryPayable + commissionEarned
+  const effectiveRate = dealOrProjectAmount > 0 ? (totalGrossPayout / dealOrProjectAmount) * 100 : 0
+
+  let breakdown = ''
+  if (commissionType === 'salary_only') {
+    breakdown = `Fixed Salary: ₹${baseSalaryPayable.toLocaleString('en-IN')} (${frequency})`
+  } else if (commissionType === 'percentage_only') {
+    breakdown = `${commissionPercentage}% on ₹${dealOrProjectAmount.toLocaleString('en-IN')} (${basis.replace('_', ' ')}) = ₹${commissionEarned.toLocaleString('en-IN')}`
+  } else {
+    breakdown = `Base Salary: ₹${baseSalaryPayable.toLocaleString('en-IN')} + ${commissionPercentage}% Commission (₹${commissionEarned.toLocaleString('en-IN')}) = ₹${totalGrossPayout.toLocaleString('en-IN')}`
+  }
+
+  return {
+    baseSalaryPayable,
+    commissionEarned,
+    totalGrossPayout,
+    effectiveRate: Number(effectiveRate.toFixed(1)),
+    breakdown
+  }
+}
+
+/**
+ * Generates an editable Microsoft Word (.doc) formatted document from a Proposal
+ */
+export function generateProposalWordHtml(proposal: Proposal, isDraft: boolean = false): string {
+  const branding = proposal.brandingSettings || {}
+  const accentColor = branding.accentColor || '#1e3a8a'
+  const watermarkText = isDraft ? 'DRAFT' : branding.watermarkType === 'confidential' ? 'CONFIDENTIAL' : branding.watermarkCustomText || ''
+  const companyName = branding.companyName || 'BillBook Client Partner'
+  const headerText = branding.headerText || `${companyName} • Confidential Statement of Work`
+  const footerText = branding.footerText || `Generated via BillBook AI Proposal Engine • All rights reserved`
+
+  const deliverablesRows = proposal.scopeDeliverables.map((d, i) => `
+    <tr>
+      <td style="padding: 10px; border: 1px solid #d1d5db; font-size: 11pt;">${i + 1}. <b>${d.title}</b><br><span style="color: #6b7280; font-size: 9.5pt;">${d.description}</span></td>
+      <td style="padding: 10px; border: 1px solid #d1d5db; text-align: center; font-size: 11pt;">${d.estimatedHours || '-'} hrs</td>
+      <td style="padding: 10px; border: 1px solid #d1d5db; text-align: right; font-weight: bold; font-size: 11pt;">₹${(d.amount || 0).toLocaleString('en-IN')}</td>
+    </tr>
+  `).join('')
+
+  const tranchesRows = proposal.milestoneTranches.map((t, i) => `
+    <tr>
+      <td style="padding: 10px; border: 1px solid #d1d5db; font-size: 11pt;"><b>${t.title}</b><br><span style="color: #6b7280; font-size: 9.5pt;">Trigger: ${t.dueTrigger}</span></td>
+      <td style="padding: 10px; border: 1px solid #d1d5db; text-align: center; font-size: 11pt;">${t.percentage}%</td>
+      <td style="padding: 10px; border: 1px solid #d1d5db; text-align: right; font-weight: bold; font-size: 11pt;">₹${(t.amount || 0).toLocaleString('en-IN')}</td>
+    </tr>
+  `).join('')
+
+  return `
+    <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+    <head>
+      <meta charset='utf-8'>
+      <title>${proposal.projectTitle} - Proposal</title>
+      <style>
+        body {
+          font-family: 'Calibri', 'Arial', sans-serif;
+          color: #1f2937;
+          line-height: 1.5;
+          margin: 40px;
+        }
+        h1 { color: ${accentColor}; font-size: 24pt; margin-bottom: 4pt; }
+        h2 { color: ${accentColor}; font-size: 16pt; border-bottom: 2px solid ${accentColor}; padding-bottom: 4px; margin-top: 24pt; }
+        h3 { color: #374151; font-size: 13pt; margin-top: 14pt; }
+        p { font-size: 11pt; color: #374151; }
+        table { width: 100%; border-collapse: collapse; margin-top: 12pt; margin-bottom: 16pt; }
+        th { background-color: #f3f4f6; color: #111827; padding: 10px; border: 1px solid #d1d5db; font-size: 11pt; text-align: left; }
+        .watermark {
+          color: #e5e7eb;
+          font-size: 72pt;
+          font-weight: bold;
+          text-align: center;
+          text-transform: uppercase;
+          margin: 20px 0;
+        }
+        .header-box { border-bottom: 1px solid #9ca3af; padding-bottom: 8px; margin-bottom: 20px; font-size: 9pt; color: #6b7280; }
+        .footer-box { border-top: 1px solid #9ca3af; padding-top: 8px; margin-top: 40px; font-size: 9pt; color: #6b7280; text-align: center; }
+        .callout { background-color: #f0fdf4; border-left: 4px solid #16a34a; padding: 12px; margin: 16pt 0; font-size: 11pt; }
+      </style>
+    </head>
+    <body>
+      <div class="header-box">
+        <table style="border: none; margin: 0;">
+          <tr>
+            <td style="border: none; text-align: left; font-size: 9pt; color: #6b7280;">${headerText}</td>
+            <td style="border: none; text-align: right; font-size: 9pt; color: #6b7280;">Ref: PROPOSAL-${proposal.id.substring(0, 8).toUpperCase()}</td>
+          </tr>
+        </table>
+      </div>
+
+      ${watermarkText ? `<div class="watermark">${watermarkText}</div>` : ''}
+
+      <h1>${proposal.projectTitle}</h1>
+      <p style="font-size: 13pt; color: #4b5563; margin-top: 0;">Statement of Work & Commercial Agreement</p>
+
+      <table style="background-color: #f9fafb; border: 1px solid #e5e7eb; margin-top: 16pt;">
+        <tr>
+          <td style="padding: 12px; border: none; width: 50%;">
+            <b>PREPARED FOR:</b><br>
+            ${proposal.clientName}<br>
+            ${proposal.clientCompany ? `${proposal.clientCompany}<br>` : ''}
+            ${proposal.clientEmail} • ${proposal.clientPhone || ''}
+          </td>
+          <td style="padding: 12px; border: none; width: 50%;">
+            <b>PROPOSAL DETAILS:</b><br>
+            <b>Status:</b> ${isDraft ? 'DRAFT DOCUMENT' : proposal.status.toUpperCase()}<br>
+            <b>Total Valuation:</b> ₹${proposal.totalAmount.toLocaleString('en-IN')}<br>
+            <b>Advance Required:</b> ${proposal.advancePercentage}% (₹${proposal.advanceAmount.toLocaleString('en-IN')})<br>
+            <b>Validity Date:</b> ${proposal.validUntil}
+          </td>
+        </tr>
+      </table>
+
+      <h2>1. Executive Summary</h2>
+      <p>${proposal.executiveSummary}</p>
+
+      <h2>2. Deliverables & Technical Scope</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Deliverable & Scope Specifications</th>
+            <th style="width: 15%; text-align: center;">Hours</th>
+            <th style="width: 25%; text-align: right;">Amount (${proposal.currency})</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${deliverablesRows}
+        </tbody>
+      </table>
+
+      <h2>3. Milestone & Payment Tranches</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Tranche Milestone & Acceptance Criteria</th>
+            <th style="width: 15%; text-align: center;">Split %</th>
+            <th style="width: 25%; text-align: right;">Payable (${proposal.currency})</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${tranchesRows}
+        </tbody>
+      </table>
+
+      <div class="callout">
+        <b>Commercial Settlement Terms:</b><br>
+        Mobilization advance of ₹${proposal.advanceAmount.toLocaleString('en-IN')} (${proposal.advancePercentage}%) is due upon contract execution prior to project kickoff.
+      </div>
+
+      <h2>4. Standard Terms & Governance</h2>
+      <ol style="font-size: 10pt; color: #4b5563; padding-left: 20px;">
+        ${proposal.termsAndConditions.map(t => `<li style="margin-bottom: 6px;">${t}</li>`).join('')}
+      </ol>
+
+      <h2>5. Formal Acceptance & Sign-off</h2>
+      <table style="margin-top: 30px; border: none;">
+        <tr>
+          <td style="width: 50%; border: none; padding: 20px; vertical-align: top;">
+            <b>Service Provider / Client Partner:</b><br><br><br>
+            _______________________________<br>
+            Authorized Signatory<br>
+            Date: ________________________
+          </td>
+          <td style="width: 50%; border: none; padding: 20px; vertical-align: top;">
+            <b>Client Acceptance:</b><br><br><br>
+            _______________________________<br>
+            ${proposal.clientName}<br>
+            Date: ________________________
+          </td>
+        </tr>
+      </table>
+
+      <div class="footer-box">
+        ${footerText}
+      </div>
+    </body>
+    </html>
+  `
 }

@@ -15,11 +15,14 @@ import {
   Download,
   Calendar,
   DollarSign,
-  ArrowRight
+  ArrowRight,
+  Printer,
+  FileText as FileTextIcon
 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { getProposalByIdAction, signProposalAction } from '@/app/(dashboard)/proposals/actions'
+import { generateProposalWordHtml } from '@/lib/proposal-engine'
 import type { Proposal } from '@/lib/proposal-types'
 import Link from 'next/link'
 
@@ -164,21 +167,63 @@ export default function PublicProposalPage() {
 
   const isAlreadySigned = proposal.status === 'signed' || proposal.status === 'converted' || signingSuccess
 
+  const handleDownloadWord = (isDraft: boolean) => {
+    if (!proposal) return
+    const html = generateProposalWordHtml(proposal, isDraft)
+    const blob = new Blob(['\ufeff', html], { type: 'application/msword;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${proposal.projectTitle.replace(/[^a-zA-Z0-9]/g, '_')}_${isDraft ? 'DRAFT' : 'FINAL'}.doc`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
+  const branding = proposal.brandingSettings || {}
+  const watermarkText = proposal.status === 'draft' ? 'DRAFT' : branding.watermarkType === 'confidential' ? 'CONFIDENTIAL' : branding.watermarkCustomText || ''
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Top Branding Bar */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800 gap-3">
           <div className="flex items-center gap-2.5">
-            <div className="h-9 w-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-md">
+            <div 
+              className="h-9 w-9 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-md"
+              style={{ backgroundColor: branding.accentColor || '#2563eb' }}
+            >
               BB
             </div>
             <div>
-              <span className="font-bold text-slate-900 dark:text-white text-sm block">BillBook Client Portal</span>
-              <span className="text-[11px] text-slate-400">Statement of Work & Master Services Agreement</span>
+              <span className="font-bold text-slate-900 dark:text-white text-sm block">
+                {branding.companyName || 'BillBook Client Portal'}
+              </span>
+              <span className="text-[11px] text-slate-400">
+                {branding.headerText || 'Statement of Work & Master Services Agreement'}
+              </span>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleDownloadWord(proposal.status === 'draft')}
+              className="text-xs h-8 border-slate-300 dark:border-slate-700 font-semibold"
+            >
+              <Download className="w-3.5 h-3.5 mr-1" />
+              Word ({proposal.status === 'draft' ? 'Draft' : 'Final'})
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => window.print()}
+              className="text-xs h-8 border-slate-300 dark:border-slate-700"
+            >
+              <Printer className="w-3.5 h-3.5 mr-1" />
+              Print / PDF
+            </Button>
             <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
               isAlreadySigned 
                 ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300' 
@@ -218,7 +263,15 @@ export default function PublicProposalPage() {
         )}
 
         {/* Proposal Document Body */}
-        <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-10 shadow-xl border border-slate-200/80 dark:border-slate-800 space-y-8">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-10 shadow-xl border border-slate-200/80 dark:border-slate-800 space-y-8 relative overflow-hidden">
+          {/* Watermark if Draft or Confidential */}
+          {watermarkText && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-0">
+              <span className="text-slate-100 dark:text-slate-800/40 font-black text-7xl sm:text-9xl rotate-[-25deg] tracking-widest uppercase">
+                {watermarkText}
+              </span>
+            </div>
+          )}
           {/* Document Header */}
           <div className="space-y-4 border-b border-slate-100 dark:border-slate-800 pb-6">
             <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400 font-medium">
@@ -451,6 +504,11 @@ export default function PublicProposalPage() {
                 </div>
               </div>
             )}
+          </div>
+
+          {/* Running Custom Brand Footer */}
+          <div className="pt-6 border-t border-slate-100 dark:border-slate-800 text-center text-xs text-slate-400">
+            {branding.footerText || `Confidential Statement of Work • Generated via BillBook Enterprise AI Engine`}
           </div>
         </div>
       </div>

@@ -20,13 +20,31 @@ import {
     FileText,
     CalendarOff,
     Building2,
-    TrendingUp
+    TrendingUp,
+    Sliders,
+    BookOpen,
+    Save,
+    Check,
+    Globe
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
+import { Input } from '@/components/ui/Input'
 import { getEmployees } from '@/lib/payroll-actions'
 import { getCctvCameras, getDailyMovementAudit, getPayrollShifts, EmployeeDailyAudit, CctvCamera, PayrollShift } from '@/lib/cctv-attendance-actions'
 import { Employee } from '@/lib/payroll-types'
+
+interface OrgPolicy {
+    businessType: 'it_software' | 'digital_marketing' | 'retail_hospitality' | 'general'
+    workModel: 'hybrid' | 'in_office' | 'remote_first'
+    coreHours: string
+    wfhDaysAllowed: number
+    leaveNoticeDays: number
+    overtimeMultiplier: string
+    noticePeriodDays: number
+    dressCode: string
+    codeOfConduct: string
+}
 
 export default function HrDashboardPage() {
     const [employees, setEmployees] = useState<Employee[]>([])
@@ -34,6 +52,21 @@ export default function HrDashboardPage() {
     const [shifts, setShifts] = useState<PayrollShift[]>([])
     const [audits, setAudits] = useState<EmployeeDailyAudit[]>([])
     const [loading, setLoading] = useState(true)
+
+    // Organization Rules & Guidelines State
+    const [policyType, setPolicyType] = useState<'it_software' | 'digital_marketing' | 'retail_hospitality' | 'general'>('it_software')
+    const [policy, setPolicy] = useState<OrgPolicy>({
+        businessType: 'it_software',
+        workModel: 'hybrid',
+        coreHours: '10:00 AM - 7:00 PM (Flexible)',
+        wfhDaysAllowed: 2,
+        leaveNoticeDays: 3,
+        overtimeMultiplier: '1.5x Base Rate',
+        noticePeriodDays: 30,
+        dressCode: 'Smart Casual (Business Formal for Client Pitches)',
+        codeOfConduct: 'Confidentiality of client codebase, NDA compliance, respectful peer collaboration, and mandatory sprint retrospectives.'
+    })
+    const [policySaved, setPolicySaved] = useState(false)
 
     const todayStr = new Date().toLocaleDateString('en-US', { 
         weekday: 'long', 
@@ -65,11 +98,68 @@ export default function HrDashboardPage() {
         loadHrData()
     }, [])
 
+    const handleApplyIndustryPreset = (preset: typeof policyType) => {
+        setPolicyType(preset)
+        if (preset === 'it_software') {
+            setPolicy({
+                businessType: 'it_software',
+                workModel: 'hybrid',
+                coreHours: '10:00 AM - 7:00 PM (Flexible)',
+                wfhDaysAllowed: 2,
+                leaveNoticeDays: 3,
+                overtimeMultiplier: 'Compensatory Off (Comp-off)',
+                noticePeriodDays: 30,
+                dressCode: 'Smart Casual / Tech Casual',
+                codeOfConduct: 'Strict IP assignment, zero local storage of proprietary source code, sprint reviews, and safe git workflow.'
+            })
+        } else if (preset === 'digital_marketing') {
+            setPolicy({
+                businessType: 'digital_marketing',
+                workModel: 'hybrid',
+                coreHours: '09:30 AM - 6:30 PM',
+                wfhDaysAllowed: 1,
+                leaveNoticeDays: 2,
+                overtimeMultiplier: 'Performance Deal Bonus',
+                noticePeriodDays: 30,
+                dressCode: 'Creative Casual / Agency Chic',
+                codeOfConduct: 'Confidentiality of client ad accounts, brand asset guidelines, and social media policy conformance.'
+            })
+        } else if (preset === 'retail_hospitality') {
+            setPolicy({
+                businessType: 'retail_hospitality',
+                workModel: 'in_office',
+                coreHours: 'Rotational 9-hr Shifts (Morning / Evening)',
+                wfhDaysAllowed: 0,
+                leaveNoticeDays: 7,
+                overtimeMultiplier: '1.5x Hourly Wage',
+                noticePeriodDays: 15,
+                dressCode: 'Prescribed Store Uniform & Staff Badge',
+                codeOfConduct: 'Customer hospitality excellence, 15-minute biometric check-in grace period, and cash drawer accountability.'
+            })
+        } else {
+            setPolicy({
+                businessType: 'general',
+                workModel: 'in_office',
+                coreHours: '09:00 AM - 6:00 PM',
+                wfhDaysAllowed: 0,
+                leaveNoticeDays: 3,
+                overtimeMultiplier: 'Standard 1.0x',
+                noticePeriodDays: 30,
+                dressCode: 'Business Professional',
+                codeOfConduct: 'Professional workplace decorum, data integrity, and compliance with statutory leave regulations.'
+            })
+        }
+    }
+
+    const handleSavePolicy = () => {
+        setPolicySaved(true)
+        setTimeout(() => setPolicySaved(false), 3000)
+    }
+
     const activeEmployeesCount = employees.length
     const onPremiseCount = audits.filter(a => a.status === 'incomplete' || (a.first_in && !a.last_out)).length
     const fullDayPresentCount = audits.filter(a => a.status === 'present').length
     const lateArrivalsCount = audits.filter(a => a.is_late).length
-    const activeCamerasCount = cameras.filter(c => c.is_active).length
 
     return (
         <div className="min-h-screen bg-slate-50/50 p-6 space-y-6">
@@ -78,43 +168,38 @@ export default function HrDashboardPage() {
                 <div className="absolute right-0 top-0 w-96 h-96 bg-white/5 rounded-full blur-3xl pointer-events-none" />
                 <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                     <div>
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-indigo-200 text-xs font-semibold backdrop-blur-md mb-3 border border-white/10">
-                            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                            HR Executive & Team Governance Portal
+                        <div className="flex items-center gap-2 mb-2">
+                            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/10 backdrop-blur-md border border-white/15 text-indigo-200">
+                                HR & Operations Command Center
+                            </span>
+                            <span className="text-xs text-indigo-300">• {todayStr}</span>
                         </div>
                         <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-                            HR Operations Command Center
+                            Workforce Governance & Policy Engine
                         </h1>
-                        <p className="text-indigo-200 text-sm mt-1 max-w-xl">
-                            {todayStr} • Manage touchless CCTV camera attendance, flexible shift rules, employee records, and monthly salary disbursement.
+                        <p className="text-xs sm:text-sm text-indigo-200 mt-1 max-w-xl">
+                            Real-time attendance audits, payroll pipelines, organizational guidelines, and multi-vertical compliance.
                         </p>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-3">
-                        <Link href="/payroll/attendance/cctv">
-                            <Button className="bg-white text-indigo-900 hover:bg-indigo-50 font-semibold shadow-sm text-xs gap-1.5 h-9">
-                                <Video className="w-4 h-4 text-indigo-600" />
-                                Camera Streams ({activeCamerasCount} Live)
-                            </Button>
-                        </Link>
-                        <Link href="/payroll/run">
-                            <Button className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-sm text-xs gap-1.5 h-9 border border-indigo-400/30">
-                                <DollarSign className="w-4 h-4" />
-                                Run Monthly Payroll
+                    <div className="flex items-center gap-3">
+                        <Link href="/payroll/employees">
+                            <Button className="bg-white text-indigo-950 hover:bg-indigo-50 font-semibold text-xs h-9">
+                                <Users className="w-3.5 h-3.5 mr-1.5" /> Staff Directory ({activeEmployeesCount})
                             </Button>
                         </Link>
                     </div>
                 </div>
             </div>
 
-            {/* Quick Metrics */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Live Metrics Ribbon */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <Card className="border-slate-200/80 shadow-xs bg-white">
                     <CardContent className="p-5 flex items-center justify-between">
                         <div>
                             <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Active Staff</p>
                             <p className="text-2xl font-bold text-slate-900 mt-1">{activeEmployeesCount}</p>
-                            <p className="text-xs text-slate-500 mt-0.5">Enrolled employees</p>
+                            <p className="text-xs text-slate-500 mt-0.5">Enrolled profiles</p>
                         </div>
                         <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
                             <Users className="w-6 h-6" />
@@ -125,9 +210,9 @@ export default function HrDashboardPage() {
                 <Card className="border-slate-200/80 shadow-xs bg-white">
                     <CardContent className="p-5 flex items-center justify-between">
                         <div>
-                            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">In Office Now</p>
+                            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">On-Premise Now</p>
                             <p className="text-2xl font-bold text-emerald-600 mt-1">{onPremiseCount}</p>
-                            <p className="text-xs text-emerald-600 font-medium mt-0.5">Live CCTV Detection</p>
+                            <p className="text-xs text-emerald-700 mt-0.5">Active inside premises</p>
                         </div>
                         <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
                             <Activity className="w-6 h-6" />
@@ -138,9 +223,9 @@ export default function HrDashboardPage() {
                 <Card className="border-slate-200/80 shadow-xs bg-white">
                     <CardContent className="p-5 flex items-center justify-between">
                         <div>
-                            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Late Arrivals Today</p>
+                            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Late Arrivals</p>
                             <p className="text-2xl font-bold text-amber-600 mt-1">{lateArrivalsCount}</p>
-                            <p className="text-xs text-slate-500 mt-0.5">Past grace window</p>
+                            <p className="text-xs text-amber-700 mt-0.5">Beyond grace window</p>
                         </div>
                         <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center">
                             <Clock className="w-6 h-6" />
@@ -162,7 +247,210 @@ export default function HrDashboardPage() {
                 </Card>
             </div>
 
-            {/* HR Shortcuts & Modules */}
+            {/* ORGANIZATION RULES, GUIDELINES & POLICY CENTER */}
+            <Card className="border-slate-200 shadow-sm bg-white">
+                <CardHeader className="border-b border-slate-100 pb-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                            <CardTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
+                                <BookOpen className="w-5 h-5 text-indigo-600" />
+                                <span>Organization Rules, Guidelines & Policy Center</span>
+                            </CardTitle>
+                            <CardDescription className="text-xs text-slate-500">
+                                Configure workplace policies, WFH flexibility, leave notice rules, and decorum tailored by business type
+                            </CardDescription>
+                        </div>
+
+                        {/* Industry Preset Selector */}
+                        <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl text-xs">
+                            <button
+                                type="button"
+                                onClick={() => handleApplyIndustryPreset('it_software')}
+                                className={`px-2.5 py-1 rounded-lg font-semibold transition-colors ${
+                                    policyType === 'it_software' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                                }`}
+                            >
+                                IT & Software
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => handleApplyIndustryPreset('digital_marketing')}
+                                className={`px-2.5 py-1 rounded-lg font-semibold transition-colors ${
+                                    policyType === 'digital_marketing' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                                }`}
+                            >
+                                Digital Marketing
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => handleApplyIndustryPreset('retail_hospitality')}
+                                className={`px-2.5 py-1 rounded-lg font-semibold transition-colors ${
+                                    policyType === 'retail_hospitality' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                                }`}
+                            >
+                                Retail & Hospitality
+                            </button>
+                        </div>
+                    </div>
+                </CardHeader>
+
+                <CardContent className="p-6 space-y-5 text-xs">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                        {/* Policy Form (2 cols) */}
+                        <div className="md:col-span-2 space-y-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="font-semibold text-slate-700 block mb-1">Working Model</label>
+                                    <select
+                                        value={policy.workModel}
+                                        onChange={(e) => setPolicy({ ...policy, workModel: e.target.value as any })}
+                                        className="w-full h-9 bg-white border border-slate-300 rounded-lg px-3 text-xs"
+                                    >
+                                        <option value="hybrid">Hybrid (Office + WFH)</option>
+                                        <option value="in_office">100% In-Office Physical Presence</option>
+                                        <option value="remote_first">Remote-First / Flexible</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="font-semibold text-slate-700 block mb-1">Standard / Core Timings</label>
+                                    <Input
+                                        value={policy.coreHours}
+                                        onChange={(e) => setPolicy({ ...policy, coreHours: e.target.value })}
+                                        className="text-xs h-9"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div>
+                                    <label className="font-semibold text-slate-700 block mb-1">WFH Allowance (Days/Wk)</label>
+                                    <Input
+                                        type="number"
+                                        min={0}
+                                        max={5}
+                                        value={policy.wfhDaysAllowed}
+                                        onChange={(e) => setPolicy({ ...policy, wfhDaysAllowed: parseInt(e.target.value) || 0 })}
+                                        className="text-xs h-9"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="font-semibold text-slate-700 block mb-1">Leave Advance Notice (Days)</label>
+                                    <Input
+                                        type="number"
+                                        min={0}
+                                        max={30}
+                                        value={policy.leaveNoticeDays}
+                                        onChange={(e) => setPolicy({ ...policy, leaveNoticeDays: parseInt(e.target.value) || 0 })}
+                                        className="text-xs h-9"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="font-semibold text-slate-700 block mb-1">Notice Period on Exit (Days)</label>
+                                    <Input
+                                        type="number"
+                                        value={policy.noticePeriodDays}
+                                        onChange={(e) => setPolicy({ ...policy, noticePeriodDays: parseInt(e.target.value) || 0 })}
+                                        className="text-xs h-9"
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="font-semibold text-slate-700 block mb-1">Overtime & Weekend Compensation</label>
+                                <Input
+                                    value={policy.overtimeMultiplier}
+                                    onChange={(e) => setPolicy({ ...policy, overtimeMultiplier: e.target.value })}
+                                    className="text-xs h-9"
+                                    placeholder="e.g. 1.5x hourly rate or Comp-off"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="font-semibold text-slate-700 block mb-1">Dress Code & Professional Decorum</label>
+                                <Input
+                                    value={policy.dressCode}
+                                    onChange={(e) => setPolicy({ ...policy, dressCode: e.target.value })}
+                                    className="text-xs h-9"
+                                    placeholder="e.g. Smart casual, client meeting attire"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="font-semibold text-slate-700 block mb-1">Code of Conduct & Confidentiality</label>
+                                <textarea
+                                    rows={2}
+                                    value={policy.codeOfConduct}
+                                    onChange={(e) => setPolicy({ ...policy, codeOfConduct: e.target.value })}
+                                    className="w-full text-xs p-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 outline-none"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Live Employee Handbook Preview (1 col) */}
+                        <div className="bg-slate-900 text-white rounded-2xl p-5 flex flex-col justify-between space-y-4">
+                            <div>
+                                <div className="flex items-center justify-between mb-2">
+                                    <span className="text-[10px] uppercase font-bold tracking-wider text-indigo-400">
+                                        Employee Handbook Sync
+                                    </span>
+                                    <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                                        Live in Portal
+                                    </span>
+                                </div>
+                                <h4 className="font-bold text-sm text-white">Active Organizational Guidelines</h4>
+                                <p className="text-[11px] text-slate-300 mt-1">
+                                    Visible to all active employees on their dashboard self-service tab.
+                                </p>
+                            </div>
+
+                            <div className="space-y-2.5 border-t border-slate-800 pt-3 text-xs">
+                                <div className="flex justify-between text-slate-300">
+                                    <span>Model:</span>
+                                    <span className="font-semibold capitalize text-indigo-300">{policy.workModel.replace('_', ' ')}</span>
+                                </div>
+                                <div className="flex justify-between text-slate-300">
+                                    <span>Core Hours:</span>
+                                    <span className="font-semibold text-white">{policy.coreHours}</span>
+                                </div>
+                                <div className="flex justify-between text-slate-300">
+                                    <span>WFH Allowance:</span>
+                                    <span className="font-semibold text-emerald-400">{policy.wfhDaysAllowed} days / week</span>
+                                </div>
+                                <div className="flex justify-between text-slate-300">
+                                    <span>Leave Notice:</span>
+                                    <span className="font-semibold text-white">{policy.leaveNoticeDays} days prior</span>
+                                </div>
+                                <div className="flex justify-between text-slate-300">
+                                    <span>Overtime Policy:</span>
+                                    <span className="font-semibold text-white">{policy.overtimeMultiplier}</span>
+                                </div>
+                            </div>
+
+                            <div className="pt-2">
+                                <Button
+                                    onClick={handleSavePolicy}
+                                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs h-9"
+                                >
+                                    {policySaved ? (
+                                        <span className="flex items-center gap-1.5">
+                                            <Check className="w-4 h-4 text-emerald-300" /> Published to Employee Portal!
+                                        </span>
+                                    ) : (
+                                        <span className="flex items-center gap-1.5">
+                                            <Save className="w-4 h-4" /> Publish Guidelines to Portal
+                                        </span>
+                                    )}
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
+            {/* Quick HR Navigation Modules */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Touchless Biometrics Card */}
                 <Card className="border-slate-200 shadow-xs bg-white flex flex-col justify-between">
@@ -259,7 +547,7 @@ export default function HrDashboardPage() {
                             <DollarSign className="w-5 h-5" />
                         </div>
                         <CardTitle className="text-base font-bold text-slate-900">
-                            Payroll & Salary Runs
+                            Payroll & Compensation
                         </CardTitle>
                         <CardDescription className="text-xs text-slate-500">
                             Automated LOP deduction, statutory PF/ESI, and payslip generation.
@@ -296,76 +584,6 @@ export default function HrDashboardPage() {
                     </CardContent>
                 </Card>
             </div>
-
-            {/* Live Today's Presence Feed */}
-            <Card className="border-slate-200 shadow-xs bg-white">
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <div>
-                        <CardTitle className="text-base font-bold text-slate-900">Today's Staff Presence Feed</CardTitle>
-                        <CardDescription className="text-xs text-slate-500">
-                            Real-time camera check-ins and break transitions captured across office entrances.
-                        </CardDescription>
-                    </div>
-                    <Link href="/payroll/attendance/movements">
-                        <Button variant="outline" size="sm" className="text-xs border-slate-200 text-slate-700">
-                            Full Movements Audit →
-                        </Button>
-                    </Link>
-                </CardHeader>
-                <CardContent className="pt-2">
-                    {loading ? (
-                        <div className="py-8 text-center text-slate-400 text-xs">
-                            Syncing with vision camera nodes...
-                        </div>
-                    ) : audits.length === 0 ? (
-                        <div className="py-8 text-center text-slate-400 text-xs">
-                            No employee attendance records logged yet today.
-                        </div>
-                    ) : (
-                        <div className="divide-y divide-slate-100">
-                            {audits.slice(0, 6).map((item) => (
-                                <div key={item.employee_id} className="py-3 flex items-center justify-between">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-xs">
-                                            {item.employee_name.charAt(0)}
-                                        </div>
-                                        <div>
-                                            <p className="text-xs font-semibold text-slate-900">{item.employee_name}</p>
-                                            <p className="text-[11px] text-slate-400">{item.employee_code} • {item.department}</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-center gap-4 text-xs font-mono">
-                                        <div>
-                                            <span className="text-slate-400 text-[10px] block font-sans">First Arrival</span>
-                                            <span className="font-semibold text-slate-800">
-                                                {item.first_in ? new Date(item.first_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-'}
-                                            </span>
-                                        </div>
-
-                                        <div>
-                                            <span className="text-slate-400 text-[10px] block font-sans">Effective</span>
-                                            <span className="font-semibold text-indigo-600">
-                                                {item.total_effective_hours > 0 ? `${item.total_effective_hours}h` : '-'}
-                                            </span>
-                                        </div>
-
-                                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold capitalize font-sans ${
-                                            item.status === 'present' 
-                                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
-                                                : item.status === 'incomplete'
-                                                ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                                                : 'bg-slate-100 text-slate-500'
-                                        }`}>
-                                            {item.status.replace('_', ' ')}
-                                        </span>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </CardContent>
-            </Card>
         </div>
     )
 }

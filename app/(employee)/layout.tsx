@@ -66,6 +66,7 @@ export default function EmployeePortalLayout({
         { name: 'Dashboard', href: '/employee/dashboard', icon: Home },
         { name: 'My Leaves', href: '/employee/leaves', icon: Plane },
         { name: 'My Payslips', href: '/employee/payslips', icon: FileText },
+        { name: 'Commissions & Deals', href: '/employee/commissions', icon: DollarSign },
     ]
 
     if (loading) {

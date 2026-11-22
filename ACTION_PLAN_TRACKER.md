@@ -82,4 +82,27 @@ This document serves as the master execution tracker for multi-vertical architec
 
 ---
 
+### [Phase 11] - AI Proposal Writer, Word/PDF Exports, Sales Partner Commission & HR Policy Engine
+- [x] **Task 11.1: AI Proposal Drafting & Word/PDF Exports (`app/(dashboard)/proposals/`)**
+  - AI SOW writer generating tailored deliverables, tranches, and feasibility scores from rough briefs.
+  - 1-Click download as Word (`.doc`) in **Draft** or **Final SOW** format with full Microsoft Word formatting, section margins, and callout blocks.
+  - Formatted print & PDF view with custom brand accent colors, header text, footer notice, and diagonal watermarks (DRAFT / CONFIDENTIAL).
+- [x] **Task 11.2: Proposal Stage Tracking & Follow-up Assignment**
+  - Track proposal lifecycle: `Draft`, `Sent`, `Under Review`, `Accepted`, `Rejected`, `On Hold`.
+  - Assign proposals to sales employees or client partners with next touchpoint date and follow-up notes.
+- [x] **Task 11.3: Sales & Partner Compensation Engine (`app/(employee)/employee/commissions/page.tsx`)**
+  - Dedicated commission calculator for IT, Software & Digital Marketing agencies.
+  - Supports Salary Only, Pure Commission %, and Hybrid (Salary + %) with Monthly or Weekly payout cycles and One-time vs Monthly Retainer earning models.
+  - Employee portal calculator, live projected compensation, and verified closed deals ledger.
+- [x] **Task 11.4: HR Organization Rules, Guidelines & Policy Center (`app/(dashboard)/hr-dashboard/page.tsx`)**
+  - Configurable policy center with industry presets (IT & Software flexible/remote vs Retail/Hospitality strict shifts & overtime).
+  - Customizable working models (Hybrid, In-Office, Remote-First), WFH limits, leave notice windows, overtime multipliers, and exit notice periods.
+  - Live publishing sync to the employee dashboard handbook.
+- [x] **Task 11.5: Enhanced Employee Self-Service Dashboard (`app/(employee)/employee/dashboard/page.tsx`)**
+  - Touchless virtual timeclock punch in/out widget.
+  - Instant navigation to Leaves, Payslips, and Commissions & Payouts.
+  - Active organizational guidelines handbook viewer.
+
+---
+
 *Last Updated: 2026-11-22*

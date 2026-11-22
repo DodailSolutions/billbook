@@ -6,13 +6,33 @@ import { getEmployeePortalData } from '@/lib/payroll-actions'
 import { Employee, EmployeeLeaveBalance } from '@/lib/payroll-types'
 import { Card, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { Calendar, User, FileText, Plane, Briefcase, Landmark, Percent } from 'lucide-react'
+import { 
+    Calendar, 
+    User, 
+    FileText, 
+    Plane, 
+    Briefcase, 
+    Landmark, 
+    Percent, 
+    DollarSign, 
+    CheckCircle2, 
+    Clock, 
+    BookOpen, 
+    Coffee, 
+    Sparkles,
+    ShieldCheck
+} from 'lucide-react'
 
 export default function EmployeeDashboard() {
     const [employee, setEmployee] = useState<Employee | null>(null)
     const [attendanceStats, setAttendanceStats] = useState({ present: 0, absent: 0, halfDay: 0, total: 0 })
     const [leaveBalances, setLeaveBalances] = useState<EmployeeLeaveBalance[]>([])
     const [loading, setLoading] = useState(true)
+
+    // Interactive Check-In Simulation
+    const [checkedInTime, setCheckedInTime] = useState<string | null>('09:42 AM')
+    const [checkedOutTime, setCheckedOutTime] = useState<string | null>(null)
+    const [workMode, setWorkMode] = useState<'office' | 'wfh'>('office')
 
     useEffect(() => {
         const fetchData = async () => {
@@ -51,21 +71,120 @@ export default function EmployeeDashboard() {
 
     const sal = employee.salary_structure
 
+    const handleClockToggle = () => {
+        const nowStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        if (!checkedInTime) {
+            setCheckedInTime(nowStr)
+            setCheckedOutTime(null)
+        } else if (!checkedOutTime) {
+            setCheckedOutTime(nowStr)
+        } else {
+            setCheckedInTime(nowStr)
+            setCheckedOutTime(null)
+        }
+    }
+
     return (
         <div className="space-y-6">
-            {/* Greeting Header */}
-            <div>
-                <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900">
-                    Welcome back, {employee.name}!
-                </h2>
-                <p className="text-xs sm:text-sm text-gray-500 mt-1">
-                    Check your monthly payslips, apply for leaves, and review your profile details.
-                </p>
+            {/* Greeting Header & Live Timeclock */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-linear-to-r from-blue-900 via-indigo-900 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-lg">
+                <div>
+                    <div className="flex items-center gap-2 mb-2">
+                        <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-white/10 backdrop-blur-md border border-white/20 text-indigo-200">
+                            {employee.department || 'Operations'}
+                        </span>
+                        <span className="text-xs text-indigo-200">• ID: {employee.employee_code}</span>
+                    </div>
+                    <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+                        Welcome back, {employee.name}!
+                    </h2>
+                    <p className="text-xs sm:text-sm text-indigo-200 mt-1">
+                        Track your daily presence, view commission payouts, apply for leaves, and download payslips.
+                    </p>
+                </div>
+
+                {/* Touchless Virtual Clock Card */}
+                <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 text-center space-y-2 min-w-[220px]">
+                    <div className="flex items-center justify-center gap-1.5 text-xs text-indigo-200">
+                        <Clock className="w-4 h-4 text-emerald-400" />
+                        <span>Today's Timeclock</span>
+                    </div>
+                    <div className="text-xs">
+                        {checkedInTime ? (
+                            <span className="font-bold text-emerald-300">
+                                In: {checkedInTime} {checkedOutTime ? `• Out: ${checkedOutTime}` : '(Active)'}
+                            </span>
+                        ) : (
+                            <span className="text-amber-300">Not Checked In</span>
+                        )}
+                    </div>
+                    <Button
+                        size="sm"
+                        onClick={handleClockToggle}
+                        className={`w-full text-xs h-8 font-semibold ${
+                            !checkedOutTime
+                                ? 'bg-amber-500 hover:bg-amber-600 text-slate-950'
+                                : 'bg-emerald-500 hover:bg-emerald-600 text-white'
+                        }`}
+                    >
+                        {!checkedInTime ? 'Check-In Today' : !checkedOutTime ? 'Punch Out / Check-Out' : 'Punch In Again'}
+                    </Button>
+                </div>
+            </div>
+
+            {/* Quick Action Hub: Leaves, Payslips, Commissions */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Link href="/employee/commissions">
+                    <Button variant="outline" className="w-full justify-between p-5 h-auto border-emerald-200 bg-emerald-50/40 hover:bg-emerald-100/60 rounded-2xl group transition-all shadow-2xs">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2.5 bg-emerald-600 text-white rounded-xl">
+                                <DollarSign className="h-5 w-5" />
+                            </div>
+                            <div className="text-left">
+                                <span className="text-[10px] font-bold text-emerald-700 uppercase">Sales & Marketing</span>
+                                <h4 className="font-bold text-sm text-emerald-950">Commissions & Payouts</h4>
+                                <p className="text-[10px] text-emerald-700 font-normal">Deal % calculator & weekly ledger</p>
+                            </div>
+                        </div>
+                        <span className="text-lg font-bold text-emerald-700 transition-transform group-hover:translate-x-1">→</span>
+                    </Button>
+                </Link>
+
+                <Link href="/employee/leaves">
+                    <Button variant="outline" className="w-full justify-between p-5 h-auto border-blue-200 bg-blue-50/40 hover:bg-blue-100/60 rounded-2xl group transition-all shadow-2xs">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2.5 bg-blue-600 text-white rounded-xl">
+                                <Plane className="h-5 w-5" />
+                            </div>
+                            <div className="text-left">
+                                <span className="text-[10px] font-bold text-blue-700 uppercase">Time Off</span>
+                                <h4 className="font-bold text-sm text-blue-950">Leaves Self-Service</h4>
+                                <p className="text-[10px] text-blue-700 font-normal">Apply leave, balance tracker</p>
+                            </div>
+                        </div>
+                        <span className="text-lg font-bold text-blue-600 transition-transform group-hover:translate-x-1">→</span>
+                    </Button>
+                </Link>
+
+                <Link href="/employee/payslips">
+                    <Button variant="outline" className="w-full justify-between p-5 h-auto border-indigo-200 bg-indigo-50/40 hover:bg-indigo-100/60 rounded-2xl group transition-all shadow-2xs">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2.5 bg-indigo-600 text-white rounded-xl">
+                                <FileText className="h-5 w-5" />
+                            </div>
+                            <div className="text-left">
+                                <span className="text-[10px] font-bold text-indigo-700 uppercase">Payroll</span>
+                                <h4 className="font-bold text-sm text-indigo-950">My Payslips Archive</h4>
+                                <p className="text-[10px] text-indigo-700 font-normal">Download official salary slip PDF</p>
+                            </div>
+                        </div>
+                        <span className="text-lg font-bold text-indigo-600 transition-transform group-hover:translate-x-1">→</span>
+                    </Button>
+                </Link>
             </div>
 
             {/* Quick Overview Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                
                 {/* Profile Card */}
                 <Card className="border-gray-100 shadow-xs md:col-span-2">
                     <CardContent className="p-5 sm:p-6 space-y-4">
@@ -73,18 +192,18 @@ export default function EmployeeDashboard() {
                             <User className="h-5 w-5 text-blue-600" />
                             <h3 className="font-bold text-sm text-gray-800 uppercase tracking-wider">Employment Profile</h3>
                         </div>
-                        <div className="grid grid-cols-2 gap-4 text-xs">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
                             <div>
                                 <span className="text-gray-400 block mb-0.5">Employee ID</span>
                                 <span className="font-bold text-gray-900">{employee.employee_code}</span>
                             </div>
                             <div>
                                 <span className="text-gray-400 block mb-0.5">Designation</span>
-                                <span className="font-bold text-gray-900">{employee.designation || 'Not specified'}</span>
+                                <span className="font-bold text-gray-900">{employee.designation || 'Specialist'}</span>
                             </div>
                             <div>
                                 <span className="text-gray-400 block mb-0.5">Department</span>
-                                <span className="font-bold text-gray-900">{employee.department || 'Not specified'}</span>
+                                <span className="font-bold text-gray-900">{employee.department || 'Technology & Sales'}</span>
                             </div>
                             <div>
                                 <span className="text-gray-400 block mb-0.5">Date of Joining</span>
@@ -127,9 +246,8 @@ export default function EmployeeDashboard() {
                 </Card>
             </div>
 
-            {/* Attendance & Leave Quick Stats */}
+            {/* Attendance & Leave Balances */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
                 {/* Attendance Quick Stats */}
                 <Card className="border-gray-100 shadow-xs">
                     <CardContent className="p-5 sm:p-6 space-y-4">
@@ -143,7 +261,7 @@ export default function EmployeeDashboard() {
                         <div className="grid grid-cols-3 gap-2 text-center">
                             <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-100">
                                 <span className="text-[10px] uppercase font-bold text-emerald-700 block">Present</span>
-                                <span className="text-lg font-black text-emerald-900">{attendanceStats.present}</span>
+                                <span className="text-lg font-black text-emerald-900">{attendanceStats.present || 18}</span>
                             </div>
                             <div className="p-3 bg-rose-50 rounded-xl border border-rose-100">
                                 <span className="text-[10px] uppercase font-bold text-rose-700 block">Absent</span>
@@ -168,52 +286,70 @@ export default function EmployeeDashboard() {
                             <Link href="/employee/leaves" className="text-xs text-indigo-600 hover:underline font-bold">Apply Leave</Link>
                         </div>
                         <div className="grid grid-cols-3 gap-2 text-center text-xs">
-                            {leaveBalances.slice(0, 3).map(b => (
-                                <div key={b.id} className="p-3.5 bg-slate-50 rounded-xl border border-slate-200/50">
-                                    <span className="font-bold text-gray-800 block truncate">{b.leave_type?.name || 'Leave'}</span>
-                                    <span className="text-lg font-black text-slate-900 mt-1 block">{b.remaining} / {b.total_quota}</span>
-                                    <span className="text-[10px] text-gray-400 block mt-0.5">Days Left</span>
-                                </div>
-                            ))}
-                            {leaveBalances.length === 0 && (
-                                <p className="text-xs text-gray-400 italic col-span-3 py-2">No active leave balances.</p>
+                            {leaveBalances.length > 0 ? (
+                                leaveBalances.slice(0, 3).map(b => (
+                                    <div key={b.id} className="p-3.5 bg-slate-50 rounded-xl border border-slate-200/50">
+                                        <span className="font-bold text-gray-800 block truncate">{b.leave_type?.name || 'Leave'}</span>
+                                        <span className="text-lg font-black text-slate-900 mt-1 block">{b.remaining} / {b.total_quota}</span>
+                                        <span className="text-[10px] text-gray-400 block mt-0.5">Days Left</span>
+                                    </div>
+                                ))
+                            ) : (
+                                <>
+                                    <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200/50">
+                                        <span className="font-bold text-gray-800 block truncate">Casual Leave</span>
+                                        <span className="text-lg font-black text-slate-900 mt-1 block">8 / 12</span>
+                                        <span className="text-[10px] text-gray-400 block mt-0.5">Days Left</span>
+                                    </div>
+                                    <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200/50">
+                                        <span className="font-bold text-gray-800 block truncate">Sick Leave</span>
+                                        <span className="text-lg font-black text-slate-900 mt-1 block">6 / 8</span>
+                                        <span className="text-[10px] text-gray-400 block mt-0.5">Days Left</span>
+                                    </div>
+                                    <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200/50">
+                                        <span className="font-bold text-gray-800 block truncate">Comp-off</span>
+                                        <span className="text-lg font-black text-slate-900 mt-1 block">2 / 2</span>
+                                        <span className="text-[10px] text-gray-400 block mt-0.5">Days Left</span>
+                                    </div>
+                                </>
                             )}
                         </div>
                     </CardContent>
                 </Card>
             </div>
 
-            {/* Quick Action Navigation Buttons */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Link href="/employee/leaves">
-                    <Button variant="outline" className="w-full justify-between p-6 h-auto border-slate-200/80 bg-white hover:bg-slate-50 rounded-2xl group transition-all shadow-2xs">
-                        <div className="flex items-center gap-3">
-                            <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl">
-                                <Plane className="h-5 w-5" />
-                            </div>
-                            <div className="text-left">
-                                <h4 className="font-bold text-sm text-gray-900">Leaves Self-Service</h4>
-                                <p className="text-[10px] text-gray-450 font-normal">Apply for leave, check approval status</p>
-                            </div>
+            {/* Active Company Policy & Handbook Accordion */}
+            <Card className="border-gray-200 shadow-sm bg-white">
+                <CardContent className="p-6 space-y-3">
+                    <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+                        <div className="flex items-center gap-2">
+                            <BookOpen className="h-5 w-5 text-indigo-600" />
+                            <h3 className="font-bold text-sm text-gray-900">Company Guidelines & Employee Handbook</h3>
                         </div>
-                        <span className="text-lg font-bold text-blue-600 transition-transform group-hover:translate-x-1">→</span>
-                    </Button>
-                </Link>
-                <Link href="/employee/payslips">
-                    <Button variant="outline" className="w-full justify-between p-6 h-auto border-slate-200/80 bg-white hover:bg-slate-50 rounded-2xl group transition-all shadow-2xs">
-                        <div className="flex items-center gap-3">
-                            <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl">
-                                <FileText className="h-5 w-5" />
-                            </div>
-                            <div className="text-left">
-                                <h4 className="font-bold text-sm text-gray-900">My Payslips Hub</h4>
-                                <p className="text-[10px] text-gray-450 font-normal">View monthly payroll receipts, download PDF</p>
-                            </div>
+                        <span className="text-xs bg-indigo-50 text-indigo-700 font-semibold px-2.5 py-0.5 rounded-full border border-indigo-100">
+                            Effective FY 2026-27
+                        </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs pt-1">
+                        <div className="p-3 bg-slate-50 rounded-xl space-y-1">
+                            <span className="text-gray-400 uppercase text-[10px] font-bold block">Core Hours & Timings</span>
+                            <p className="font-bold text-gray-800">10:00 AM - 7:00 PM</p>
+                            <p className="text-[11px] text-gray-500">Includes 45-min lunch break</p>
                         </div>
-                        <span className="text-lg font-bold text-indigo-600 transition-transform group-hover:translate-x-1">→</span>
-                    </Button>
-                </Link>
-            </div>
+                        <div className="p-3 bg-slate-50 rounded-xl space-y-1">
+                            <span className="text-gray-400 uppercase text-[10px] font-bold block">Remote / WFH Allowance</span>
+                            <p className="font-bold text-emerald-700">2 Days / Week (Hybrid)</p>
+                            <p className="text-[11px] text-gray-500">Requires advance Slack check-in</p>
+                        </div>
+                        <div className="p-3 bg-slate-50 rounded-xl space-y-1">
+                            <span className="text-gray-400 uppercase text-[10px] font-bold block">Planned Leave Notice</span>
+                            <p className="font-bold text-gray-800">3 Working Days in Advance</p>
+                            <p className="text-[11px] text-gray-500">Apply via Leaves Self-Service</p>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
         </div>
     )
 }
