@@ -83,17 +83,17 @@ export function ProposalAssignFollowUpModal({ proposal, onClose, onSuccess }: Pr
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-3 sm:p-4">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-lg w-full p-4 sm:p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
         <div className="flex justify-between items-start border-b border-slate-100 dark:border-slate-800 pb-3">
           <div>
-            <h3 className="font-bold text-lg text-slate-900 dark:text-white flex items-center gap-2">
+            <h3 className="font-bold text-base sm:text-lg text-slate-900 dark:text-white flex items-center gap-2">
               <UserCheck className="w-5 h-5 text-indigo-600" />
               <span>Proposal Pipeline & Partner Commission</span>
             </h3>
             <p className="text-xs text-slate-500">{proposal.projectTitle} • Valuation: ₹{proposal.totalAmount.toLocaleString('en-IN')}</p>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 p-1">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -104,7 +104,7 @@ export function ProposalAssignFollowUpModal({ proposal, onClose, onSuccess }: Pr
             <label className="font-semibold text-slate-700 dark:text-slate-300 block mb-1.5">
               Current Proposal Stage / Status
             </label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 sm:gap-2">
               {(['draft', 'sent', 'under_review', 'accepted', 'rejected', 'on_hold'] as ProposalStatus[]).map((st) => (
                 <button
                   key={st}

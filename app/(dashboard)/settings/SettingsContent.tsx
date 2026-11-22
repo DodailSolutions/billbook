@@ -297,7 +297,7 @@ export default function SettingsContent({ initialProfile, planStatus: initialPla
     const tabs = [
         { id: 'profile' as TabType, label: 'Profile & Personal', icon: User },
         { id: 'business' as TabType, label: 'Business Details', icon: Building2 },
-        ...(isSuperAdmin ? [{ id: 'industry' as TabType, label: 'Industry & Verticals (Admin)', icon: Sparkles }] : []),
+        { id: 'industry' as TabType, label: 'Industry & Verticals', icon: Sparkles },
         { id: 'security' as TabType, label: 'Security', icon: Shield },
         { id: 'notifications' as TabType, label: 'Notifications', icon: Bell },
     ]
@@ -896,10 +896,10 @@ export default function SettingsContent({ initialProfile, planStatus: initialPla
                         </div>
                     )}
 
-                    {/* TAB: Industry & Business Verticals (Super Admin Only) */}
-                    {activeTab === 'industry' && isSuperAdmin && (
+                    {/* TAB: Industry & Business Verticals */}
+                    {activeTab === 'industry' && (
                         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-xs">
-                            <BusinessProfileSelector initialType={(initialProfile as any)?.business_type || 'retail'} />
+                            <BusinessProfileSelector initialType={(initialProfile as any)?.business_type || 'services'} />
                         </div>
                     )}
 

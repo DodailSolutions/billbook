@@ -48,10 +48,7 @@ export function BarcodeRightSidebar() {
     const [settings, setSettings] = useState<BarcodeSettings | null>(null)
 
     useEffect(() => {
-        getBusinessProfile().then(b => {
-            const isNonBarcode = ['software_it', 'digital_marketing', 'freelancer', 'services', 'ca_accounting', 'tours_and_travels'].includes(b.businessType) || b.config?.features?.hasBarcodes === false
-            setIsVisibleForVertical(!isNonBarcode)
-        }).catch(() => {})
+        setIsVisibleForVertical(true)
         getBarcodeSettings().then(setSettings).catch(() => {})
     }, [])
 

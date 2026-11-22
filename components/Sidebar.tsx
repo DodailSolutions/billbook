@@ -11,6 +11,7 @@ import { PlanBanner } from "./PlanBanner"
 import { getMyCAProfile } from "@/lib/ca-profile-actions"
 import { getBusinessProfile } from "@/lib/business-profile-actions"
 import type { BusinessType } from "@/lib/business-profile-types"
+import { isPosSupported } from "@/lib/business-profile-types"
 
 export function Sidebar() {
     const pathname = usePathname()
@@ -20,7 +21,7 @@ export function Sidebar() {
         businessType: BusinessType;
         features: Record<string, boolean>;
     }>({
-        businessType: 'standard',
+        businessType: 'services',
         features: {}
     })
 
@@ -43,6 +44,14 @@ export function Sidebar() {
             }
         }
         loadProfile()
+
+        const handleVerticalChanged = (e: any) => {
+            if (e?.detail) {
+                loadProfile()
+            }
+        }
+        window.addEventListener('billbook:vertical-changed', handleVerticalChanged)
+        return () => window.removeEventListener('billbook:vertical-changed', handleVerticalChanged)
     }, [])
 
     const isServiceOrSoftware = ['software_it', 'digital_marketing', 'freelancer', 'services', 'ca_accounting', 'tours_and_travels'].includes(businessProfile.businessType)
@@ -107,7 +116,7 @@ export function Sidebar() {
                     color: "text-purple-600",
                     badge: 'AI'
                 },
-                ...(!isServiceOrSoftware && (businessProfile.features?.hasPOS || ['retail', 'salon_spa', 'laundry_drycleaning', 'art_crafts', 'resorts_farmhouses', 'camping_outdoors', 'jewelry_retail'].includes(businessProfile.businessType)) ? [{
+                ...(isPosSupported(businessProfile.businessType) ? [{
                     label: 'Counter POS',
                     icon: Zap,
                     href: '/pos',
@@ -168,13 +177,13 @@ export function Sidebar() {
                     href: '/inventory',
                     color: "text-slate-900"
                 },
-                ...(!isServiceOrSoftware && businessProfile.features?.hasBarcodes !== false ? [{
+                {
                     label: 'Barcodes & Labels',
                     icon: Barcode,
                     href: '/settings/barcode',
                     color: "text-indigo-600",
                     badge: 'NEW'
-                }] : [])
+                }
             ]
         },
         {

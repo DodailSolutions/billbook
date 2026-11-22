@@ -11,6 +11,7 @@ import { PlanBanner } from "./PlanBanner"
 import { getMyCAProfile } from "@/lib/ca-profile-actions"
 import { getBusinessProfile } from "@/lib/business-profile-actions"
 import type { BusinessType } from "@/lib/business-profile-types"
+import { isPosSupported } from "@/lib/business-profile-types"
 
 const mobileTabs = [
     {
@@ -42,7 +43,7 @@ export function MobileSidebar() {
         businessType: BusinessType;
         features: Record<string, boolean>;
     }>({
-        businessType: 'standard',
+        businessType: 'services',
         features: {}
     })
     const pathname = usePathname()
@@ -66,6 +67,14 @@ export function MobileSidebar() {
             }
         }
         loadProfile()
+
+        const handleVerticalChanged = (e: any) => {
+            if (e?.detail) {
+                loadProfile()
+            }
+        }
+        window.addEventListener('billbook:vertical-changed', handleVerticalChanged)
+        return () => window.removeEventListener('billbook:vertical-changed', handleVerticalChanged)
     }, [])
 
     const closeSidebar = () => setIsOpen(false)
@@ -114,7 +123,14 @@ export function MobileSidebar() {
                     color: "text-blue-600",
                     badge: 'NEW'
                 },
-                ...(!isServiceOrSoftware && (businessProfile.features?.hasPOS || ['retail', 'salon_spa', 'laundry_drycleaning', 'art_crafts', 'resorts_farmhouses', 'camping_outdoors', 'jewelry_retail'].includes(businessProfile.businessType)) ? [{
+                {
+                    label: 'Proposals & RFPs',
+                    icon: FileText,
+                    href: '/proposals',
+                    color: "text-purple-600",
+                    badge: 'AI'
+                },
+                ...(isPosSupported(businessProfile.businessType) ? [{
                     label: 'Counter POS',
                     icon: Zap,
                     href: '/pos',
@@ -175,13 +191,13 @@ export function MobileSidebar() {
                     href: '/inventory',
                     color: "text-slate-900"
                 },
-                ...(!isServiceOrSoftware && businessProfile.features?.hasBarcodes !== false ? [{
+                {
                     label: 'Barcodes & Labels',
                     icon: Barcode,
                     href: '/settings/barcode',
                     color: "text-indigo-600",
                     badge: 'NEW'
-                }] : [])
+                }
             ]
         },
         {

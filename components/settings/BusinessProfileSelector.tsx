@@ -34,6 +34,9 @@ export function BusinessProfileSelector({ initialType = 'retail', onUpdated }: B
                     type: 'success',
                     text: `Successfully switched workspace to ${BUSINESS_VERTICALS[selectedType].name}! All terminology and workflows have adapted.`
                 })
+                if (typeof window !== 'undefined') {
+                    window.dispatchEvent(new CustomEvent('billbook:vertical-changed', { detail: selectedType }))
+                }
                 if (onUpdated) onUpdated(selectedType)
             } else {
                 setStatusMessage({ type: 'error', text: res.error || 'Failed to switch industry' })

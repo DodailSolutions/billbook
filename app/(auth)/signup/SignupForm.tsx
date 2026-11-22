@@ -20,11 +20,17 @@ import {
 } from '@/lib/validation/auth'
 
 const BUSINESS_TYPES = [
+    { value: 'software_it', label: '💻 Software Development & IT Services' },
+    { value: 'digital_marketing', label: '📢 Digital Marketing & Creative Agency' },
+    { value: 'freelancer', label: '🚀 Freelancer & Independent Contractor' },
+    { value: 'services', label: '💼 Professional Consulting & Services' },
+    { value: 'art_crafts', label: '🎨 Art Studio, Handcrafted Goods & Crafts' },
+    { value: 'resorts_farmhouses', label: '🏡 Resorts & Luxury Farmhouses (PMS)' },
+    { value: 'camping_outdoors', label: '⛺ Campsites, Glamping & Outdoor Stays' },
     { value: 'salon_spa', label: '💈 Salon, Spa & Beauty Parlor' },
     { value: 'dental_clinic', label: '🦷 Dental Clinic' },
     { value: 'hospital_op', label: '🏥 Medical Clinic & Hospital OP' },
     { value: 'auto_workshop', label: '🚗 Car & Bike Servicing / Garages' },
-    { value: 'resorts_farmhouses_camping', label: '⛺ Resorts, Farmhouses & Camping (PMS)' },
     { value: 'tours_and_travels', label: '✈️ Tours & Travels Agency' },
     { value: 'jewelry_retail', label: '💍 Jewellery Store & Goldsmiths' },
     { value: 'laundry_drycleaning', label: '🧺 Laundry & Dry Cleaning' },
@@ -32,7 +38,6 @@ const BUSINESS_TYPES = [
     { value: 'event_management', label: '🎪 Corporate & Event Management' },
     { value: 'retail', label: '🛒 Retail Store / Supermarket' },
     { value: 'wholesale', label: '📦 Wholesale & FMCG Distribution' },
-    { value: 'services', label: '💼 IT Services & Consulting Agency' },
     { value: 'other', label: '⚡ Other Business' }
 ]
 

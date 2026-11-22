@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import type { BusinessType } from './business-profile-types'
-import { BUSINESS_VERTICALS } from './business-profile-types'
+import { BUSINESS_VERTICALS, normalizeBusinessType } from './business-profile-types'
 import { INDUSTRY_CATALOG_PRESETS } from './industry-catalog-presets'
 
 /**
@@ -20,31 +20,39 @@ export async function getBusinessProfile(): Promise<{
 
         if (!user) {
             return {
-                businessType: 'standard',
+                businessType: 'services',
                 metadata: {},
-                config: BUSINESS_VERTICALS.standard
+                config: BUSINESS_VERTICALS.services
             }
         }
 
-        const { data } = await supabase
-            .from('invoice_settings')
-            .select('business_type, business_metadata')
-            .eq('user_id', user.id)
-            .maybeSingle()
+        const [settingsRes, profileRes] = await Promise.all([
+            supabase
+                .from('invoice_settings')
+                .select('business_type, business_metadata')
+                .eq('user_id', user.id)
+                .maybeSingle(),
+            supabase
+                .from('user_profiles')
+                .select('business_type, role')
+                .eq('id', user.id)
+                .maybeSingle()
+        ])
 
-        const rawType = (data?.business_type as BusinessType) || 'standard'
-        const validProfile = BUSINESS_VERTICALS[rawType] ? rawType : 'standard'
+        const metadata = settingsRes.data?.business_metadata || {}
+        const rawCandidate = metadata?.industry || metadata?.vertical || settingsRes.data?.business_type || profileRes.data?.business_type
+        const validProfile = normalizeBusinessType(rawCandidate)
 
         return {
             businessType: validProfile,
-            metadata: data?.business_metadata || {},
-            config: BUSINESS_VERTICALS[validProfile]
+            metadata,
+            config: BUSINESS_VERTICALS[validProfile] || BUSINESS_VERTICALS.services
         }
     } catch {
         return {
-            businessType: 'standard',
+            businessType: 'services',
             metadata: {},
-            config: BUSINESS_VERTICALS.standard
+            config: BUSINESS_VERTICALS.services
         }
     }
 }
@@ -62,27 +70,19 @@ export async function updateBusinessProfile(
         const { data: { user }, error: authError } = await supabase.auth.getUser()
         if (authError || !user) return { success: false, error: 'Unauthorized' }
 
-        // Security check: Switching industry vertical is strictly restricted to Super Admin
-        const { data: profile } = await supabase
-            .from('user_profiles')
-            .select('role')
-            .eq('id', user.id)
-            .maybeSingle()
-
-        if (profile?.role !== 'superadmin') {
-            return { 
-                success: false, 
-                error: 'Interactive industry switching is restricted to Super Administrators. Users select their vertical during registration.' 
-            }
-        }
+        const normalizedType = normalizeBusinessType(businessType)
 
         // Update invoice_settings
         const { error: settingsError } = await supabase
             .from('invoice_settings')
             .upsert({
                 user_id: user.id,
-                business_type: businessType,
-                business_metadata: metadata || {},
+                business_type: normalizedType,
+                business_metadata: {
+                    ...(metadata || {}),
+                    industry: normalizedType,
+                    vertical: normalizedType
+                },
                 updated_at: new Date().toISOString()
             }, { onConflict: 'user_id' })
 
@@ -96,7 +96,7 @@ export async function updateBusinessProfile(
             await supabase
                 .from('user_profiles')
                 .update({
-                    business_type: businessType,
+                    business_type: normalizedType,
                     updated_at: new Date().toISOString()
                 })
                 .eq('id', user.id)
