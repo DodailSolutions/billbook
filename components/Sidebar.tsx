@@ -75,6 +75,13 @@ export function Sidebar() {
                     href: '/crm',
                     color: "text-blue-600",
                     badge: 'NEW'
+                },
+                {
+                    label: 'Proposals & RFPs',
+                    icon: FileText,
+                    href: '/proposals',
+                    color: "text-purple-600",
+                    badge: 'AI'
                 }
             ]
         },

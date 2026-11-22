@@ -4,6 +4,7 @@ import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { checkSuperAdminAccess, createAuditLog } from '@/lib/admin-auth'
 import { revalidatePath } from 'next/cache'
 import type { UserWithDetails, UserSubscription } from '@/lib/types-admin'
+import type { BusinessType } from '@/lib/business-profile-types'
 
 export async function getAllUsers(): Promise<UserWithDetails[]> {
     try {
@@ -249,6 +250,44 @@ export async function updateUserRole(userId: string, role: 'user' | 'admin' | 's
         return { success: true }
     } catch (error) {
         console.error('Error updating user role:', error)
+        throw error
+    }
+}
+
+export async function updateUserBusinessType(userId: string, businessType: BusinessType) {
+    try {
+        const isSuperAdmin = await checkSuperAdminAccess()
+        if (!isSuperAdmin) {
+            throw new Error('Unauthorized: only super administrators can reassign business verticals')
+        }
+
+        let dataClient = await createClient()
+        try {
+            if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+                dataClient = await createAdminClient()
+            }
+        } catch (e) {
+            console.warn('[updateUserBusinessType] Admin client fallback:', e)
+        }
+
+        const { error } = await dataClient
+            .from('user_profiles')
+            .update({ 
+                business_type: businessType, 
+                updated_at: new Date().toISOString() 
+            })
+            .eq('id', userId)
+
+        if (error) throw error
+
+        await createAuditLog('user_business_type_updated', 'user', userId, { business_type: businessType })
+        
+        revalidatePath('/admin/users')
+        revalidatePath('/admin/businesses')
+        revalidatePath('/admin')
+        return { success: true }
+    } catch (error) {
+        console.error('Error updating user business type:', error)
         throw error
     }
 }

@@ -29,6 +29,7 @@ import type { UserWithDetails } from '@/lib/types-admin'
 import { BUSINESS_VERTICALS, type BusinessType } from '@/lib/business-profile-types'
 import { updateUserStatus, updateUserRole, deleteUser } from './actions'
 import { UpgradePlanModal } from './UpgradePlanModal'
+import { ChangeVerticalModal } from './ChangeVerticalModal'
 
 interface UserManagementTableProps {
     users?: UserWithDetails[]
@@ -89,6 +90,7 @@ export default function UserManagementTable({
     const [copiedId, setCopiedId] = useState<string | null>(null)
     const [toastMessage, setToastMessage] = useState<string | null>(null)
     const [upgradeModalUser, setUpgradeModalUser] = useState<{ id: string; email: string; currentPlan?: string } | null>(null)
+    const [verticalModalUser, setVerticalModalUser] = useState<{ id: string; name: string; email: string; currentVertical?: BusinessType | string } | null>(null)
     const [plans, setPlans] = useState<Plan[]>([])
 
     // Update internal userList when props change
@@ -541,10 +543,23 @@ export default function UserManagementTable({
                                                 const rawType = (user.business_type as BusinessType) || 'retail'
                                                 const vert = BUSINESS_VERTICALS[rawType]
                                                 return (
-                                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setVerticalModalUser({
+                                                                id: user.id,
+                                                                name: user.business_name || user.owner_name || 'Business',
+                                                                email: user.email || '',
+                                                                currentVertical: rawType
+                                                            })
+                                                        }}
+                                                        title="Click to switch business category/vertical"
+                                                        className="group inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:border-purple-400 dark:hover:border-purple-600 hover:bg-purple-50/50 dark:hover:bg-purple-950/20 transition-all cursor-pointer text-left"
+                                                    >
                                                         <span className="text-sm">{vert?.icon || '🏢'}</span>
                                                         <span>{vert?.name || rawType}</span>
-                                                    </span>
+                                                        <Edit className="h-3 w-3 text-slate-400 group-hover:text-purple-600 transition-colors ml-0.5 opacity-60 group-hover:opacity-100" />
+                                                    </button>
                                                 )
                                             })()}
                                         </td>
@@ -675,6 +690,23 @@ export default function UserManagementTable({
                                                             <span>Upgrade / Change Plan</span>
                                                         </button>
 
+                                                        {/* Switch Business Category / Vertical */}
+                                                        <button
+                                                            onClick={() => {
+                                                                setVerticalModalUser({
+                                                                    id: user.id,
+                                                                    name: user.business_name || user.owner_name || 'Business',
+                                                                    email: user.email || '',
+                                                                    currentVertical: (user.business_type as BusinessType) || 'retail'
+                                                                })
+                                                                setSelectedUserMenu(null)
+                                                            }}
+                                                            className="w-full px-3 py-2 text-xs text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-950/40 flex items-center gap-2 transition-colors font-medium"
+                                                        >
+                                                            <Building2 className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />
+                                                            <span>Switch Industry Vertical</span>
+                                                        </button>
+
                                                         <div className="my-1 border-t border-slate-100 dark:border-slate-800" />
 
                                                         {/* Deactivate User */}
@@ -803,6 +835,31 @@ export default function UserManagementTable({
                             }
                             return u
                         }))
+                    }}
+                />
+            )}
+
+            {/* Change Business Category / Vertical Modal */}
+            {verticalModalUser && (
+                <ChangeVerticalModal
+                    userId={verticalModalUser.id}
+                    userName={verticalModalUser.name}
+                    userEmail={verticalModalUser.email}
+                    currentVertical={verticalModalUser.currentVertical}
+                    onClose={() => setVerticalModalUser(null)}
+                    onSuccess={(newVertical) => {
+                        const vertName = BUSINESS_VERTICALS[newVertical]?.name || newVertical
+                        showToast(`Business vertical switched to ${vertName}`)
+                        setUserList(prev => prev.map(u => {
+                            if (u.id === verticalModalUser.id) {
+                                return {
+                                    ...u,
+                                    business_type: newVertical
+                                }
+                            }
+                            return u
+                        }))
+                        setVerticalModalUser(null)
                     }}
                 />
             )}

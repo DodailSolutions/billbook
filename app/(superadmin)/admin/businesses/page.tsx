@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import Link from 'next/link'
 import { getAllBusinesses } from './actions'
+import { BusinessesClientTable } from './BusinessesClientTable'
 
 export default async function BusinessesManagementPage() {
     const businesses = await getAllBusinesses()
@@ -89,57 +90,7 @@ export default async function BusinessesManagementPage() {
                         </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="space-y-4">
-                            {businesses.length === 0 ? (
-                                <p className="text-center py-8 text-gray-500">No businesses found</p>
-                            ) : (
-                                <div className="overflow-x-auto">
-                                    <table className="w-full">
-                                        <thead>
-                                            <tr className="border-b border-gray-200 dark:border-gray-700">
-                                                <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400">Business Name</th>
-                                                <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400">Owner</th>
-                                                <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400">GSTIN</th>
-                                                <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400">Status</th>
-                                                <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-400">Created</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {businesses.map((business) => (
-                                                <tr key={business.id} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                                                    <td className="py-3 px-4">
-                                                        <div className="font-medium text-gray-900 dark:text-white">
-                                                            {business.business_name || 'Unnamed'}
-                                                        </div>
-                                                        {business.business_email && (
-                                                            <div className="text-sm text-gray-500">{business.business_email}</div>
-                                                        )}
-                                                    </td>
-                                                    <td className="py-3 px-4 text-gray-700 dark:text-gray-300">
-                                                        {business.owner_name || 'N/A'}
-                                                    </td>
-                                                    <td className="py-3 px-4 text-gray-700 dark:text-gray-300">
-                                                        {business.gstin || 'Not provided'}
-                                                    </td>
-                                                    <td className="py-3 px-4">
-                                                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                                            business.status === 'active' 
-                                                                ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'
-                                                                : 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'
-                                                        }`}>
-                                                            {business.status}
-                                                        </span>
-                                                    </td>
-                                                    <td className="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">
-                                                        {new Date(business.created_at).toLocaleDateString()}
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            )}
-                        </div>
+                        <BusinessesClientTable initialBusinesses={businesses} />
                     </CardContent>
                 </Card>
             </div>

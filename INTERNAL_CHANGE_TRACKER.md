@@ -4,7 +4,34 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 
 ---
 
-## [Release v1.5.9 - Implemented] - 2026-11-22
+## [Release v1.6.0 - Implemented] - 2026-11-22
+
+### Super Admin Business Category / Vertical Management & Phase 5: AI Proposal Writing & RFP / RFQ Engine
+
+#### 1. Super Admin Business Category / Vertical Management (`app/(superadmin)/admin/users/`, `app/(superadmin)/admin/businesses/`)
+- **Backend Reassignment API (`updateUserBusinessType`, `updateBusinessCategory`)**:
+  - Super administrators can now dynamically reassign any existing tenant or customer to any of the 14 business verticals (`software_it`, `digital_marketing`, `freelancer`, `salon_spa`, `dental_clinic`, `hospital_op`, `auto_workshop`, `resorts_farmhouses_camping`, `tours_and_travels`, `jewelry_retail`, `laundry_drycleaning`, `real_estate`, `event_management`, `retail`).
+  - Strict authorization check via `checkSuperAdminAccess()` with service role execution.
+  - Automatically writes structured audit logs (`user_business_type_updated`) and revalidates dashboard cache.
+- **Interactive UI Modal (`ChangeVerticalModal.tsx`)**:
+  - Modern modal featuring search filter, category tabs (Commerce, Services, Healthcare, Hospitality, Automotive), and instant switching.
+  - Industry badges in the Super Admin User Table and Businesses Management table are directly interactive with 1-click edit triggers.
+
+#### 2. Phase 5: AI Proposal Writing & RFP / RFQ Evaluation Engine (`lib/proposal-types.ts`, `lib/proposal-engine.ts`, `app/(dashboard)/proposals/`, `app/(public)/proposal/[id]/`)
+- **AI Bid Feasibility & Compliance Scoring**:
+  - Ingests raw RFP scope text, tender requirements, budget targets, and timeline constraints.
+  - Analyzes scope against engineering delivery rates and produces composite win feasibility score (0-100%).
+  - Outputs an automated 4-point AI Compliance Matrix with risk levels (Low, Medium, High) and suggested contractual mitigations.
+- **Milestone Progress Tranches**:
+  - Automatically parses deliverables into structured progress tranches (e.g. 40% Mobilization Advance, 40% Beta Staging, 20% Handover).
+- **Interactive Web Proposal & Mobile Touchscreen E-Sign**:
+  - Generates responsive, public client proposal pages (`/proposal/[id]`) with HTML5 canvas touchscreen/mouse signature pad.
+- **Closed-Loop ERP Contract Triggers**:
+  - Upon digital e-signature submission, the engine:
+    1. Digitally signs and locks the proposal with signer timestamp and IP audit log.
+    2. Automatically converts the linked CRM deal to `Won` with 100% win probability.
+    3. Automatically generates an Advance Tax Invoice in the invoices table ready for instant settlement.
+- **Database Schema Migration**: Added `supabase-proposals-and-rfp-migration.sql` with non-breaking RLS policies.
 
 ### Software & IT, Digital Marketing, Freelancer Verticals & Universal Team Capacity Radar
 
