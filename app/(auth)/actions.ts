@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { sendWelcomeEmail } from '@/lib/email'
 import { INDUSTRY_CATALOG_PRESETS } from '@/lib/industry-catalog-presets'
+import type { BusinessType } from '@/lib/business-profile-types'
 
 export async function login(formData: FormData) {
     const supabase = await createClient()
@@ -180,7 +181,9 @@ export async function signup(formData: FormData) {
                             updated_at: new Date().toISOString()
                         }, { onConflict: 'user_id' })
 
-                    const verticalKey = (businessType as any) || 'retail'
+                    const verticalKey: BusinessType = (businessType && businessType in INDUSTRY_CATALOG_PRESETS) 
+                        ? (businessType as BusinessType) 
+                        : 'retail'
                     const starterItems = INDUSTRY_CATALOG_PRESETS[verticalKey]
                     if (starterItems && starterItems.length > 0) {
                         const itemsToInsert = starterItems.map(p => ({

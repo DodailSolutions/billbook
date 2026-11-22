@@ -4,6 +4,28 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 
 ---
 
+## [Release v1.5.7 - Implemented] - 2026-11-22
+
+### Invoice Number Collision Prevention, Auth TypeScript Fix & Super Admin Access Hardening
+
+#### 1. Invoice Number Uniqueness & Collision Protection (`app/(dashboard)/invoices/actions.ts`)
+- **Uniqueness Check in `generateInvoiceNumber()`**:
+  - Before returning any invoice number generated via RPC (`get_next_invoice_number_with_series` or `get_next_invoice_number`), queries the `invoices` table to verify whether the candidate number already exists.
+  - Automatically increments numeric suffixes or appends entropy to guarantee a collision-free number, resolving `duplicate key value violates unique constraint "invoices_invoice_number_key"`.
+- **Automatic Collision Retry in `createInvoice()`**:
+  - Wrapped tiered invoice insertions in a retry loop. If a unique constraint violation (`code: 23505` or `invoices_invoice_number_key`) occurs under concurrency, automatically regenerates a guaranteed unique candidate and retries up to 3 times before returning an error.
+
+#### 2. Auth Actions Type Safety Fix (`app/(auth)/actions.ts`)
+- **Resolved Vercel Turbopack Build Error**:
+  - Typed `verticalKey: BusinessType` safely against `INDUSTRY_CATALOG_PRESETS` keys to eliminate TypeScript indexing `any` error during Vercel production builds.
+
+#### 3. Strict Super Admin Gating for Industry Switcher (`SettingsContent.tsx`, `lib/business-profile-actions.ts`)
+- **UI & Server-Level Isolation**:
+  - Confirmed and fortified that interactive vertical switching is exclusively visible to and executable by users with `role === 'superadmin'`.
+  - Normal users select their business vertical during signup and cannot switch it post-registration.
+
+---
+
 ## [Release v1.5.5 - Implemented] - 2026-11-22
 
 ### Dynamic Plan Feature Gating, Unified ERP Pipeline & Universal Barcode Engine

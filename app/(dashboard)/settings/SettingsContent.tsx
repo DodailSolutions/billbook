@@ -896,8 +896,8 @@ export default function SettingsContent({ initialProfile, planStatus: initialPla
                         </div>
                     )}
 
-                    {/* TAB: Industry & Business Verticals */}
-                    {activeTab === 'industry' && (
+                    {/* TAB: Industry & Business Verticals (Super Admin Only) */}
+                    {activeTab === 'industry' && isSuperAdmin && (
                         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-xs">
                             <BusinessProfileSelector initialType={(initialProfile as any)?.business_type || 'retail'} />
                         </div>

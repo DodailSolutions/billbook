@@ -271,24 +271,53 @@ export async function generateInvoiceNumber(seriesId?: string): Promise<string> 
         p_series_id: seriesId || null
     })
 
+    let candidateNumber: string | null = null
     if (!advError && advancedNumber) {
-        return advancedNumber as string
+        candidateNumber = advancedNumber as string
+    } else {
+        // Fallback to original function for backward compatibility
+        const { data, error } = await supabase.rpc('get_next_invoice_number', {
+            p_user_id: user.id
+        })
+
+        if (!error && data) {
+            candidateNumber = data as string
+        } else {
+            console.error('Error generating invoice number from RPC:', error || advError)
+            const fy = getCurrentFinancialYear()
+            const entropy = `${Date.now().toString().slice(-6)}${Math.floor(100 + Math.random() * 900)}`
+            candidateNumber = `INV-${fy}-${entropy}`
+        }
     }
 
-    // Fallback to original function for backward compatibility
-    const { data, error } = await supabase.rpc('get_next_invoice_number', {
-        p_user_id: user.id
-    })
+    // Verify uniqueness in invoices table to prevent "invoices_invoice_number_key" unique constraint collisions
+    let finalNumber = candidateNumber
+    let counter = 0
+    while (counter < 50) {
+        const { data: existing } = await supabase
+            .from('invoices')
+            .select('id')
+            .eq('invoice_number', finalNumber)
+            .maybeSingle()
 
-    if (error) {
-        console.error('Error generating invoice number from RPC:', error)
-        // Resilient fallback with high-entropy timestamp and random component to prevent UNIQUE collision
-        const fy = getCurrentFinancialYear()
-        const entropy = `${Date.now().toString().slice(-6)}${Math.floor(100 + Math.random() * 900)}`
-        return `INV-${fy}-${entropy}`
+        if (!existing) {
+            return finalNumber
+        }
+
+        counter++
+        const match = candidateNumber.match(/^(.*?)(\d+)$/)
+        if (match) {
+            const prefix = match[1]
+            const numStr = match[2]
+            const nextNum = parseInt(numStr, 10) + counter
+            finalNumber = `${prefix}${String(nextNum).padStart(numStr.length, '0')}`
+        } else {
+            finalNumber = `${candidateNumber}-${counter}`
+        }
     }
 
-    return data as string
+    const fy = getCurrentFinancialYear()
+    return `INV-${fy}-${Date.now().toString().slice(-6)}${Math.floor(100 + Math.random() * 900)}`
 }
 
 interface CreateInvoiceData {
@@ -393,51 +422,68 @@ export async function createInvoice(data: CreateInvoiceData) {
         // Generate invoice number
         const invoice_number = await generateInvoiceNumber(data.invoice_series_id)
 
-        // Create invoice with GST breakdown (tiered fallback for full schema compatibility)
+        // Create invoice with GST breakdown (tiered fallback with collision retry)
         let invoice: { id: string; total: number; [key: string]: unknown } | null = null
-        
-        // 1. Try full payload with discounts, breakdown, and partial payment fields
-        const fullPayload = {
-            user_id: user.id,
-            customer_id: data.customer_id,
-            invoice_number,
-            invoice_date: data.invoice_date,
-            due_date: data.due_date || null,
-            subtotal: rawSubtotal,
-            gst_percentage: data.gst_percentage,
-            gst_amount: gstComponents.totalTax,
-            cgst_amount: gstComponents.cgst,
-            sgst_amount: gstComponents.sgst,
-            igst_amount: gstComponents.igst,
-            supply_type: supplyType,
-            reverse_charge_applicable: reverseChargeApplicable,
-            total: roundOff.roundedAmount,
-            notes: data.notes || null,
-            status: 'draft',
-            amount_paid: 0,
-            amount_remaining: roundOff.roundedAmount,
-            is_partial_payment: false,
-            discount_amount: discountAmount > 0 ? discountAmount : null,
-            discount_type: discountAmount > 0 ? (data.discount_type || null) : null,
-            discount_value: discountAmount > 0 ? (data.discount_value || null) : null,
-            ...(data.show_bank_details_when_paid !== undefined ? { show_bank_details_when_paid: data.show_bank_details_when_paid } : {}),
-        }
+        let workingInvoiceNumber = invoice_number
+        let insertAttempts = 0
+        const maxInsertAttempts = 3
 
-        const { data: invFull, error: errFull } = await supabase
-            .from('invoices')
-            .insert([fullPayload])
-            .select()
-            .single()
+        while (!invoice && insertAttempts < maxInsertAttempts) {
+            insertAttempts++
 
-        if (invFull) {
-            invoice = invFull
-        } else {
+            // 1. Try full payload with discounts, breakdown, and partial payment fields
+            const fullPayload = {
+                user_id: user.id,
+                customer_id: data.customer_id,
+                invoice_number: workingInvoiceNumber,
+                invoice_date: data.invoice_date,
+                due_date: data.due_date || null,
+                subtotal: rawSubtotal,
+                gst_percentage: data.gst_percentage,
+                gst_amount: gstComponents.totalTax,
+                cgst_amount: gstComponents.cgst,
+                sgst_amount: gstComponents.sgst,
+                igst_amount: gstComponents.igst,
+                supply_type: supplyType,
+                reverse_charge_applicable: reverseChargeApplicable,
+                total: roundOff.roundedAmount,
+                notes: data.notes || null,
+                status: 'draft',
+                amount_paid: 0,
+                amount_remaining: roundOff.roundedAmount,
+                is_partial_payment: false,
+                discount_amount: discountAmount > 0 ? discountAmount : null,
+                discount_type: discountAmount > 0 ? (data.discount_type || null) : null,
+                discount_value: discountAmount > 0 ? (data.discount_value || null) : null,
+                ...(data.show_bank_details_when_paid !== undefined ? { show_bank_details_when_paid: data.show_bank_details_when_paid } : {}),
+            }
+
+            const { data: invFull, error: errFull } = await supabase
+                .from('invoices')
+                .insert([fullPayload])
+                .select()
+                .single()
+
+            if (invFull) {
+                invoice = invFull
+                break
+            }
+
+            // Check if failure was due to duplicate invoice_number collision
+            const isDuplicate = errFull?.code === '23505' || errFull?.message?.includes('invoices_invoice_number_key') || errFull?.message?.includes('duplicate key')
+            if (isDuplicate) {
+                console.warn(`Invoice number ${workingInvoiceNumber} collided, regenerating unique number (attempt ${insertAttempts})...`)
+                const fy = getCurrentFinancialYear()
+                workingInvoiceNumber = `INV-${fy}-${Date.now().toString().slice(-6)}${Math.floor(100 + Math.random() * 900)}`
+                continue
+            }
+
             console.warn('Full invoice insert failed, falling back to base GST payload:', errFull?.message)
             // 2. Try standard payload without discount / partial payment columns
             const baseGstPayload = {
                 user_id: user.id,
                 customer_id: data.customer_id,
-                invoice_number,
+                invoice_number: workingInvoiceNumber,
                 invoice_date: data.invoice_date,
                 due_date: data.due_date || null,
                 subtotal: rawSubtotal,
@@ -456,34 +502,50 @@ export async function createInvoice(data: CreateInvoiceData) {
 
             if (invBaseGst) {
                 invoice = invBaseGst
-            } else {
-                console.warn('Base GST insert failed, falling back to minimal payload:', errBaseGst?.message)
-                // 3. Absolute minimum columns guaranteed by original supabase-schema.sql
-                const minimalPayload = {
-                    user_id: user.id,
-                    customer_id: data.customer_id,
-                    invoice_number,
-                    invoice_date: data.invoice_date,
-                    subtotal: rawSubtotal,
-                    total: roundOff.roundedAmount,
-                    status: 'draft'
-                }
+                break
+            }
 
-                const { data: invMin, error: errMin } = await supabase
-                    .from('invoices')
-                    .insert([minimalPayload])
-                    .select()
-                    .single()
+            const isDuplicateBase = errBaseGst?.code === '23505' || errBaseGst?.message?.includes('invoices_invoice_number_key') || errBaseGst?.message?.includes('duplicate key')
+            if (isDuplicateBase) {
+                const fy = getCurrentFinancialYear()
+                workingInvoiceNumber = `INV-${fy}-${Date.now().toString().slice(-6)}${Math.floor(100 + Math.random() * 900)}`
+                continue
+            }
 
-                if (invMin) {
-                    invoice = invMin
-                } else {
-                    console.error('All invoice insert tiers failed:', errMin)
-                    return { 
-                        success: false, 
-                        error: errMin?.message || errBaseGst?.message || errFull?.message || 'Failed to create invoice' 
-                    }
-                }
+            console.warn('Base GST insert failed, falling back to minimal payload:', errBaseGst?.message)
+            // 3. Absolute minimum columns guaranteed by original supabase-schema.sql
+            const minimalPayload = {
+                user_id: user.id,
+                customer_id: data.customer_id,
+                invoice_number: workingInvoiceNumber,
+                invoice_date: data.invoice_date,
+                subtotal: rawSubtotal,
+                total: roundOff.roundedAmount,
+                status: 'draft'
+            }
+
+            const { data: invMin, error: errMin } = await supabase
+                .from('invoices')
+                .insert([minimalPayload])
+                .select()
+                .single()
+
+            if (invMin) {
+                invoice = invMin
+                break
+            }
+
+            const isDuplicateMin = errMin?.code === '23505' || errMin?.message?.includes('invoices_invoice_number_key') || errMin?.message?.includes('duplicate key')
+            if (isDuplicateMin) {
+                const fy = getCurrentFinancialYear()
+                workingInvoiceNumber = `INV-${fy}-${Date.now().toString().slice(-6)}${Math.floor(100 + Math.random() * 900)}`
+                continue
+            }
+
+            console.error('All invoice insert tiers failed:', errMin)
+            return { 
+                success: false, 
+                error: errMin?.message || errBaseGst?.message || errFull?.message || 'Failed to create invoice' 
             }
         }
 
