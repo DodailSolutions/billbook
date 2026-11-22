@@ -5,7 +5,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { LayoutDashboard, FileText, Users, RefreshCw, Bell, Settings, User, Bot, UserCog, FileBarChart, HelpCircle, Briefcase, UserPlus, ChevronLeft, ChevronRight, Package, Receipt, Sparkles, BookOpen, ShoppingBag, DollarSign, Building2, CalendarDays, CalendarOff, Mail, Video, ShieldCheck, Barcode } from "lucide-react"
+import { LayoutDashboard, FileText, Users, RefreshCw, Bell, Settings, User, Bot, UserCog, FileBarChart, HelpCircle, Briefcase, UserPlus, ChevronLeft, ChevronRight, Package, Receipt, Sparkles, BookOpen, ShoppingBag, DollarSign, Building2, CalendarDays, CalendarOff, Mail, Video, ShieldCheck, Barcode, Zap, Hotel, Palette } from "lucide-react"
 import { SignOutButton } from "./SignOutButton"
 import { PlanBanner } from "./PlanBanner"
 import { getMyCAProfile } from "@/lib/ca-profile-actions"
@@ -89,6 +89,20 @@ export function Sidebar() {
                     href: '/pos',
                     color: "text-amber-600",
                     badge: 'FAST'
+                },
+                {
+                    label: 'Estate & Campsite PMS',
+                    icon: Hotel,
+                    href: '/estate-pms',
+                    color: "text-emerald-700",
+                    badge: 'PMS'
+                },
+                {
+                    label: 'Art Studio & COA',
+                    icon: Palette,
+                    href: '/art-studio',
+                    color: "text-pink-600",
+                    badge: 'STUDIO'
                 }
             ]
         },

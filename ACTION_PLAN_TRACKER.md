@@ -63,19 +63,22 @@ This document serves as the master execution tracker for multi-vertical architec
 ---
 
 ### [Phase 8] - Multi-Property Estate PMS & Campsite Campground Grid
-- [ ] **Task 8.1: Multi-Property Tagging & Estate Hierarchy**
-  - Support owners operating multiple physical estates in one region (e.g. *Green Valley - Estate 1*, *Pine Woods - Villa B*) under one tenant workspace.
-- [ ] **Task 8.2: Camping & Outdoor Stays Grid**
-  - Campground pitch visualizer (Tents, Domes, Treehouses).
-  - Adventure equipment rental add-ons (Kayaks, Sleeping Bags) with liability waiver signoffs.
+- [x] **Task 8.1: Multi-Property Tagging & Estate Hierarchy (`app/(dashboard)/estate-pms/page.tsx`)**
+  - Multi-property estate picker (e.g. *Whispering Palms Estate*, *Pine Woods Campground*, *Heritage Farmhouse*).
+  - Villa buyout management, presidential suites, event lawns, live occupancy rate, caution deposits held, and housekeeping turnover workflow.
+- [x] **Task 8.2: Camping & Outdoor Stays Grid**
+  - Experiential per-head passes, geodesic stargazer dome & alpine safari tent allocations.
+  - Adventure equipment rental station (Kayaks, BBQ kits, sleeping bags, telescopes) with deposit tracking and digital liability waiver verification.
 
 ---
 
 ### [Phase 9] - Art Studio BOM Recipe Costing & Certificate of Authenticity (COA)
-- [ ] **Task 9.1: Bill of Materials (BOM) & Recipe Cost Calculator**
-  - Tracks raw material inputs (canvas, paints, resin, framing) plus crafting hours to compute accurate COGS and net margins.
-- [ ] **Task 9.2: Printable Certificate of Authenticity (COA)**
-  - Generates verified 1-page certificate with piece title, edition number, medium, dimensions, artist signature, and QR verification link.
+- [x] **Task 9.1: Bill of Materials (BOM) & Recipe Cost Calculator (`app/(dashboard)/art-studio/page.tsx`)**
+  - Tracks raw material inputs (linen canvas, pigments, resins, gold leaf, custom framing) plus crafting hours and studio overhead to compute true COGS, suggested MRP, and gallery splits.
+- [x] **Task 9.2: Printable Certificate of Authenticity (COA)**
+  - Museum-grade archival certificate layout with gold ornamental borders, unique provenance ID, QR verification code, and official artist signature block ready for A4 framing.
+- [x] **Task 9.3: Bespoke Commission 50% Advance Settlement**
+  - Milestone contract tracking with 50% advance booking deposit, pre-dispatch WIP preview, and 1-click WhatsApp progress updates.
 
 ---
 
