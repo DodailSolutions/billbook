@@ -25,6 +25,13 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
   - Confirmed and fortified that interactive vertical switching is exclusively visible to and executable by users with `role === 'superadmin'`.
   - Normal users select their business vertical during signup and cannot switch it post-registration.
 
+#### 4. Fix "Invoice not found" on Sending Invoices (`app/api/invoices/[id]/send-email/route.ts`, `app/(dashboard)/invoices/actions.ts`)
+- **Resolved Schema Column Mismatch (`invoice_date` vs `date`)**:
+  - In `/api/invoices/[id]/send-email/route.ts`, the query was requesting a non-existent `date` column instead of `invoice_date`. This caused PostgreSQL/Supabase to fail the query with a column error, resulting in a false-positive `404 Invoice not found`.
+  - Replaced the brittle inline query with the centralized `getInvoice(id)` service action and resilient direct fallback.
+- **Support for Both UUID and Invoice Number Lookups**:
+  - Enhanced `getInvoice(id)` in `invoices/actions.ts` to test for UUID format and transparently fall back to matching on `invoice_number` for routes and clients accessing invoices by number.
+
 ---
 
 ## [Release v1.5.5 - Implemented] - 2026-11-22

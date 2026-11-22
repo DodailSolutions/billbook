@@ -230,19 +230,22 @@ export async function getInvoice(id: string): Promise<InvoiceWithDetails | null>
         return null
     }
 
-    const { data, error } = await supabase
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)
+    const query = supabase
         .from('invoices')
         .select(`
       *,
       customer:customers(*),
       invoice_items(*)
     `)
-        .eq('id', id)
         .eq('user_id', user.id)
-        .single()
 
-    if (error) {
-        console.error('Error fetching invoice:', error)
+    const { data, error } = isUuid
+        ? await query.eq('id', id).maybeSingle()
+        : await query.eq('invoice_number', id).maybeSingle()
+
+    if (error || !data) {
+        if (error) console.error('Error fetching invoice:', error)
         return null
     }
 
