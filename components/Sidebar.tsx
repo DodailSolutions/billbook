@@ -9,18 +9,40 @@ import { LayoutDashboard, FileText, Users, RefreshCw, Bell, Settings, User, Bot,
 import { SignOutButton } from "./SignOutButton"
 import { PlanBanner } from "./PlanBanner"
 import { getMyCAProfile } from "@/lib/ca-profile-actions"
+import { getBusinessProfile } from "@/lib/business-profile-actions"
+import type { BusinessType } from "@/lib/business-profile-types"
 
 export function Sidebar() {
     const pathname = usePathname()
     const [isCA, setIsCA] = useState<boolean | null>(null)
     const [isCollapsed, setIsCollapsed] = useState(false)
+    const [businessProfile, setBusinessProfile] = useState<{
+        businessType: BusinessType;
+        features: Record<string, boolean>;
+    }>({
+        businessType: 'standard',
+        features: {}
+    })
 
     useEffect(() => {
-        async function checkCAStatus() {
-            const profile = await getMyCAProfile()
-            setIsCA(!!profile)
+        async function loadProfile() {
+            try {
+                const [caProfile, bProfile] = await Promise.all([
+                    getMyCAProfile(),
+                    getBusinessProfile()
+                ])
+                setIsCA(!!caProfile)
+                if (bProfile) {
+                    setBusinessProfile({
+                        businessType: bProfile.businessType,
+                        features: (bProfile.config?.features || {}) as Record<string, boolean>
+                    })
+                }
+            } catch (err) {
+                console.error("Error loading sidebar profile:", err)
+            }
         }
-        checkCAStatus()
+        loadProfile()
     }, [])
 
     const sections = [
@@ -83,27 +105,27 @@ export function Sidebar() {
                     color: "text-purple-600",
                     badge: 'AI'
                 },
-                {
+                ...(businessProfile.features?.hasPOS || ['retail', 'salon_spa', 'laundry_drycleaning', 'art_crafts', 'resorts_farmhouses', 'camping_outdoors', 'jewelry_retail'].includes(businessProfile.businessType) ? [{
                     label: 'Counter POS',
                     icon: Zap,
                     href: '/pos',
                     color: "text-amber-600",
                     badge: 'FAST'
-                },
-                {
+                }] : []),
+                ...(businessProfile.features?.hasPmsRoomGrid || ['resorts_farmhouses', 'camping_outdoors', 'resorts_farmhouses_camping'].includes(businessProfile.businessType) ? [{
                     label: 'Estate & Campsite PMS',
                     icon: Hotel,
                     href: '/estate-pms',
                     color: "text-emerald-700",
                     badge: 'PMS'
-                },
-                {
+                }] : []),
+                ...(businessProfile.features?.hasBOMCosting || businessProfile.businessType === 'art_crafts' ? [{
                     label: 'Art Studio & COA',
                     icon: Palette,
                     href: '/art-studio',
                     color: "text-pink-600",
                     badge: 'STUDIO'
-                }
+                }] : [])
             ]
         },
         {
