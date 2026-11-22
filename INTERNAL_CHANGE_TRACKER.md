@@ -38,11 +38,57 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 
 ## [Active Development / Next Up]
 
-### 1. Invoicing Line Item Barcode Quick-Scan Autofocus
-- Quick scan autofocus mode in invoice creation to instantly increment product quantity without manual clicking.
+### 1. Interactive First-Time User Onboarding Walkthrough & Product Tour
+- **Zero-Friction First-Run Tour (`components/onboarding/FirstTimeOnboardingTour.tsx`)**:
+  - Automatically triggers once upon initial dashboard login for any new user.
+  - Interactive multi-step guide with **Next**, **Back**, **Skip**, and **Get Started** buttons.
+  - Showcases industry vertical adaptation, 30-second GST invoicing, Universal Barcode Hub, CRM team workflow, and automated bookkeeping.
+  - Robust persistence in browser `localStorage` (`billbook_onboarding_completed`) and user preferences to ensure it never repeats after completion or skip.
+  - On-demand "Replay Tour" trigger accessible from Settings and User Menu.
 
-### 2. Auto-creation of Vendor Bill Record on Partial PO Receipt
-- Direct auto-generation of vendor bill record in `vendor_bills`/`expenses` with matching tax split on every goods receipt slip.
+### 2. Industry-Adaptive Multi-Tenant Business Profiles Architecture
+Architecting specialized ERP & CRM workflows dynamically tailored per industry with unique market differentiators:
+
+1. **Salon & Spa / Grooming Centers (`salon_spa`)**:
+   - **Owner-Configurable Stylist Commission Engine**: Owner specifies individual agreed commission % per stylist (e.g. 50%, 60%, 40%) plus line-item override.
+   - **Differentiated Service vs Retail Split**: Separate commission for service haircuts (e.g. 50%) vs retail shampoo/gels (e.g. 10%).
+   - **Stylist / Chair Performance Dashboard**: Real-time daily gross earnings, commission tally, retail product upsell incentive (e.g. 10% on grooming products vs 50% on haircuts).
+   - **Prepaid Service Wallets & Memberships**: Bundled sittings, wallet debits, and walk-in chair queue management.
+
+2. **Dental Clinic & Outpatient Hospitals (`dental_clinic`, `hospital_op`)**:
+   - **Patient UHID & Token Queue**: Outpatient registration, doctor token queue, and waiting room board.
+   - **Interactive Visual Odontogram (32-Tooth Chart)**: Click-to-chart tooth conditions (caries, RCT, crowns, implants) and phased treatment estimates.
+   - **Visiting Doctor / Consultant Fee Splits**: Procedure-based revenue share (e.g. 60% consultant, 40% hospital).
+   - **Digital E-Prescription & Care Instructions**: Automatic WhatsApp delivery of Rx and post-treatment guidance.
+   - **Healthcare GST Exemption**: Automated SAC 999312 handling.
+
+3. **Tours & Travels (`tours_and_travels`)**:
+   - **Interactive Day-Wise Itinerary Builder**: Timeline quotes with flight, hotel, and sightseeing inclusions.
+   - **PAX & Passenger Manifest**: Adults, children, infant counts, passport and visa document vault.
+   - **Supplier Payables vs Customer Receivables**: DMC, airline, and hotel voucher reconciliations with Indian GST (SAC 9985) and TCS.
+
+4. **Jewellery Retailing & Manufacturing (`jewelry_retail`)**:
+   - **Live Bullion Board Rate Sync**: 24K, 22K (916), 18K, and Silver daily rates.
+   - **Weight-Based Line Item Calculations**: Net Wt, Gross Wt, Stone Wt, Wastage (VA%), Making Charges, and Old Gold buyback.
+   - **BIS Hallmark HUID & Dumbbell Barcode Printing**: Regulatory compliance and butterfly thermal tag printing.
+
+5. **Corporate & Social Event Management (`event_management`)**:
+   - **Cost Center & Event P&L**: Client budget vs committed vendor POs (venue, catering, AV, staging).
+   - **Milestone Tranche Invoicing**: 25% booking, 35% vendor signoff, 30% execution, 10% settlement.
+   - **Subcontractor TDS Handling**: Automatic TDS 194C / 194J calculation.
+   - **Attendee Pass & QR Check-in**: Integrated with BillBook universal barcode/QR scanner.
+
+6. **Automobile Workshops & Garages (`auto_workshop`)**:
+   - **Digital Job Cards**: Odometer, fuel gauge, scratch diagram, parts vs labor billing, mechanic commission.
+
+7. **Laundry & Dry Cleaning Services (`laundry_drycleaning`)**:
+   - **Garment Piece Inwarding & Tags**: Wash & Fold (kg/piece), Steam Iron, Dry Clean, and waterproof thermal tag printing.
+   - **Rack & Shelf Slot Tracking**: Physical storage slot assignment (Rack/Hanger #) for fast customer handoff.
+   - **Turnaround Stages & WhatsApp Ready Alert**: Automated status alerts when order transitions to "Ready for Pickup".
+   - **Express Surcharge & Partial Delivery**: Same-day delivery premiums and split-pickup reconciliation.
+
+8. **Gyms, Fitness & Dance Studios (`gym_fitness`)**:
+   - **Memberships & PT Revenue Splits**: Personal trainer commission splits and biometric/QR check-in logs.
 
 ---
 

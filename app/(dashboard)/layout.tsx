@@ -3,6 +3,7 @@ import { MobileSidebar } from "@/components/MobileSidebar"
 import { PlanExpiryChecker } from "@/components/PlanExpiryChecker"
 import { SupportChatbot } from "@/components/SupportChatbot"
 import { BarcodeRightSidebar } from "@/components/barcode/BarcodeRightSidebar"
+import { FirstTimeOnboardingTour } from "@/components/onboarding/FirstTimeOnboardingTour"
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 
@@ -53,6 +54,9 @@ export default async function DashboardLayout({
 
             {/* Quick Barcode & Scanner Right Sidebar */}
             <BarcodeRightSidebar />
+
+            {/* Interactive Step-by-Step Onboarding Walkthrough */}
+            <FirstTimeOnboardingTour />
         </div>
     )
 }
