@@ -5,10 +5,15 @@ import { UserSubscription, SubscriptionPlan } from '@/lib/types-admin'
 /**
  * Check if a user can access the AI Accountant feature based on plan slug and billing period
  */
-export function canAccessAIAccountant(planSlug: string, billingPeriod?: string): boolean {
-    return planSlug === 'professional' ||
-           planSlug === 'enterprise' ||
-           billingPeriod === 'lifetime';
+export function canAccessAIAccountant(planSlug: string, billingPeriod?: string, features?: string[]): boolean {
+    if (billingPeriod === 'lifetime' || planSlug === 'enterprise' || planSlug === 'professional') {
+        return true
+    }
+    if (Array.isArray(features)) {
+        const norm = features.map(f => f.toLowerCase().replace(/[^a-z0-9]/g, ''))
+        return norm.some(f => f.includes('ai') || f.includes('accountant'))
+    }
+    return false
 }
 
 export interface PlanStatus {
@@ -19,6 +24,8 @@ export interface PlanStatus {
     expiryDate: string | null
     daysUntilExpiry: number | null
     isLifetime: boolean
+    features: string[]
+    limits: Record<string, number | undefined>
     subscription: UserSubscription | null
 }
 
@@ -57,6 +64,8 @@ export async function getUserPlanStatus(): Promise<PlanStatus | null> {
                 expiryDate: null,
                 daysUntilExpiry: null,
                 isLifetime: false,
+                features: ['50 invoices total', 'Customer management', 'GST compliant invoices', 'PDF downloads', 'Custom branding'],
+                limits: { invoices_per_month: 50, customers: 100, team_members: 1 },
                 subscription: null
             }
         }
@@ -74,6 +83,8 @@ export async function getUserPlanStatus(): Promise<PlanStatus | null> {
                 expiryDate: subscription.end_date || null,
                 daysUntilExpiry: null,
                 isLifetime: false,
+                features: ['invoices', 'customers', 'crm', 'team_members', 'gst_reports'],
+                limits: { invoices_per_month: 999999, customers: 999999, team_members: 5 },
                 subscription: subscription as UserSubscription
             }
         }
@@ -99,11 +110,76 @@ export async function getUserPlanStatus(): Promise<PlanStatus | null> {
             expiryDate: subscription.end_date || null,
             daysUntilExpiry,
             isLifetime,
+            features: (plan as any).features || [],
+            limits: (plan as any).limits || {},
             subscription: subscription as UserSubscription
         }
     } catch (error) {
         console.error('Error getting user plan status:', error)
         return null
+    }
+}
+
+/**
+ * Dynamic feature gate checking if active plan has a specific feature.
+ * Matches feature keys dynamically against the plan's stored features and limits in DB.
+ */
+export async function hasPlanFeature(featureKey: string): Promise<boolean> {
+    const status = await getUserPlanStatus()
+    if (!status || !status.hasActivePlan) {
+        return ['invoices', 'customers', 'pdf', 'custom_branding'].includes(featureKey.toLowerCase())
+    }
+
+    if (status.isLifetime || status.planSlug === 'enterprise') {
+        return true
+    }
+
+    const normalizedKey = featureKey.toLowerCase().replace(/[^a-z0-9]/g, '')
+    const features = (status.features || []).map(f => f.toLowerCase().replace(/[^a-z0-9]/g, ''))
+
+    if (features.some(f => f.includes(normalizedKey) || normalizedKey.includes(f))) {
+        return true
+    }
+
+    if (normalizedKey.includes('team') && (status.limits?.team_members ?? 0) > 0) {
+        return true
+    }
+
+    const paidTiers = ['starter', 'starter-yearly', 'professional', 'professional-yearly', 'enterprise']
+    if (['whatsapp', 'gst_reports', 'reminders', 'crm', 'inventory'].includes(featureKey) && paidTiers.includes(status.planSlug)) {
+        return true
+    }
+
+    return false
+}
+
+/**
+ * Dynamic limit checker for any feature quota.
+ */
+export async function checkFeatureLimit(
+    limitKey: 'invoices_per_month' | 'customers' | 'team_members' | 'leads',
+    currentCount: number
+): Promise<{ allowed: boolean; limit: number; current: number }> {
+    const status = await getUserPlanStatus()
+    if (!status || !status.hasActivePlan) {
+        const freeLimits: Record<string, number> = { invoices_per_month: 50, customers: 100, team_members: 1, leads: 50 }
+        const limit = freeLimits[limitKey] ?? 10
+        return { allowed: currentCount < limit, limit, current: currentCount }
+    }
+
+    if (status.isLifetime || status.planSlug === 'enterprise') {
+        return { allowed: true, limit: -1, current: currentCount }
+    }
+
+    const planLimit = status.limits?.[limitKey] ?? -1
+    if (planLimit === -1) {
+        return { allowed: true, limit: -1, current: currentCount }
+    }
+
+    return {
+        allowed: currentCount < planLimit,
+        limit: planLimit,
+        current: currentCount
     }
 }
 

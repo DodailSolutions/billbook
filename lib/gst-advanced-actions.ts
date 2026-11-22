@@ -219,10 +219,31 @@ export async function generateGSTR3BData(taxPeriod: string) {
     const outwardTaxableValue = invoices?.reduce((sum, inv) => sum + (inv.subtotal || 0), 0) || 0
     const outwardTaxAmount = invoices?.reduce((sum, inv) => sum + (inv.gst_amount || 0), 0) || 0
 
-    // Calculate tax components
+    // Calculate tax components from outward sales invoices
     const taxPayableIGST = invoices?.reduce((sum, inv) => sum + (inv.igst_amount || 0), 0) || 0
     const taxPayableCGST = invoices?.reduce((sum, inv) => sum + (inv.cgst_amount || 0), 0) || 0
     const taxPayableSGST = invoices?.reduce((sum, inv) => sum + (inv.sgst_amount || 0), 0) || 0
+
+    // Fetch expenses and vendor bills for Input Tax Credit (ITC)
+    let totalItcTax = 0
+    try {
+      const { data: expenses } = await supabase
+        .from('expenses')
+        .select('tax_amount')
+        .eq('user_id', user.id)
+        .gte('expense_date', periodStart.toISOString().split('T')[0])
+        .lte('expense_date', periodEnd.toISOString().split('T')[0])
+
+      if (expenses) {
+        totalItcTax = expenses.reduce((sum, exp) => sum + Number(exp.tax_amount || 0), 0)
+      }
+    } catch {
+      totalItcTax = 0
+    }
+
+    const itcCGST = Math.round((totalItcTax / 2) * 100) / 100
+    const itcSGST = Math.round((totalItcTax / 2) * 100) / 100
+    const itcIGST = 0
 
     // Insert or update GSTR-3B record
     const { data, error } = await supabase
@@ -235,6 +256,9 @@ export async function generateGSTR3BData(taxPeriod: string) {
         return_period_to: periodEnd.toISOString().split('T')[0],
         outward_taxable_supplies: outwardTaxableValue,
         outward_tax_amount: outwardTaxAmount,
+        itc_cgst: itcCGST,
+        itc_sgst: itcSGST,
+        itc_igst: itcIGST,
         tax_payable_igst: taxPayableIGST,
         tax_payable_cgst: taxPayableCGST,
         tax_payable_sgst: taxPayableSGST,

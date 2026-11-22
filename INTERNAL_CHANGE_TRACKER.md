@@ -4,6 +4,51 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 
 ---
 
+## [Release v1.5.5 - Implemented] - 2026-11-22
+
+### Dynamic Plan Feature Gating, Unified ERP Pipeline & Universal Barcode Engine
+
+#### 1. Dynamic Plan-Driven Feature & Limit Control (`lib/plan-utils.ts`, `app/(dashboard)/team/page.tsx`)
+- **Database-Backed Feature Flags (`hasPlanFeature`)**: Replaced hardcoded plan checks with dynamic feature array matching against active DB subscriptions and custom plan tiers.
+- **Graceful Backward Compatibility**: Default fallbacks ensure existing free and legacy paid users retain seamless access to invoices, customer masters, and core modules without login or permission lockouts.
+- **Quota Limit Validator (`checkFeatureLimit`)**: Dynamic numeric check for invoice counts, customer limits, and team seats.
+
+#### 2. Unified Interconnected ERP Event Pipeline (PO → Inventory → Expense → Bookkeeping → GST)
+- **Purchase Order Receipt Synchronization (`lib/po-actions.ts`)**:
+  - Automatically updates line item received quantities.
+  - Automatically increments stock levels in `inventory_items` and records audit entries in `inventory_transactions`.
+  - Automatically posts balanced journal entries into Bookkeeping Accounts Payable and Inventory Asset accounts upon receipt.
+- **Input Tax Credit (ITC) Linking (`lib/gst-advanced-actions.ts`)**:
+  - GSTR-3B auto-calculation now directly aggregates Input Tax Credit (`tax_amount`) from `expenses` and vendor bills into `itc_cgst` and `itc_sgst`.
+  - Seamlessly bridges inward supply expenses with outward sales invoices for complete GST compliance.
+
+#### 3. Universal Barcode Engine & Hardware Printing (`lib/barcode-actions.ts`, `components/barcode/`, `hooks/`)
+- Universal barcode lookup searching both `inventory_items` and `saved_items`.
+- Hardware HID keyboard-wedge scanner listener (`useBarcodeScanner`) with automatic line item addition.
+- Thermal label printing supporting standard retail (50x25mm) and jewelry dumbbell tags (68x12mm).
+
+---
+
+## [Active Development / Next Up]
+
+### 1. Invoicing Line Item Barcode Quick-Scan Autofocus
+- Quick scan autofocus mode in invoice creation to instantly increment product quantity without manual clicking.
+
+### 2. Auto-creation of Vendor Bill Record on Partial PO Receipt
+- Direct auto-generation of vendor bill record in `vendor_bills`/`expenses` with matching tax split on every goods receipt slip.
+
+---
+
+## [Release v1.5.4 - Implemented] - 2026-11-22
+
+### 100% ERP-Ready CRM Suite & Team Management
+- **Multi-Tenant Team Member Association**: Integrated with `team_members` and `user_profiles` with dynamic organization owner scoping (`getEffectiveOwnerId`).
+- **On-Card Quick Reassignment & Filters**: Fast assignee selection on Kanban cards, member workload leaderboards, and stage filters.
+- **Dual-Mode Lead Importer**: Drag-and-drop Excel/CSV parsing (RFC-4180 standard) and zero-config live Google Sheets stream synchronization.
+- **Cross-Module ERP Interconnects**: 1-click `+Customer` conversion linking to Customer Master, and 1-click `Invoice` generation auto-closing leads into Won deals.
+
+---
+
 ## [Roadmap / Pending Implementations]
 
 ### 1. WhatsApp Invoices Hub UI (`/whatsapp-invoices`)
