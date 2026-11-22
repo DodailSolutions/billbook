@@ -62,6 +62,20 @@ export async function updateBusinessProfile(
         const { data: { user }, error: authError } = await supabase.auth.getUser()
         if (authError || !user) return { success: false, error: 'Unauthorized' }
 
+        // Security check: Switching industry vertical is strictly restricted to Super Admin
+        const { data: profile } = await supabase
+            .from('user_profiles')
+            .select('role')
+            .eq('id', user.id)
+            .maybeSingle()
+
+        if (profile?.role !== 'superadmin') {
+            return { 
+                success: false, 
+                error: 'Interactive industry switching is restricted to Super Administrators. Users select their vertical during registration.' 
+            }
+        }
+
         // Update invoice_settings
         const { error: settingsError } = await supabase
             .from('invoice_settings')

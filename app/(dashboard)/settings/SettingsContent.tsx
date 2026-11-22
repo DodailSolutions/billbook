@@ -292,10 +292,12 @@ export default function SettingsContent({ initialProfile, planStatus: initialPla
     const isLifetime = planStatus?.isLifetime || planStatus?.planSlug?.includes('lifetime')
     const planLabel = isLifetime ? 'Founder Lifetime Pro' : isPro ? planStatus?.planName : 'Free Plan'
 
+    const isSuperAdmin = initialProfile?.role === 'superadmin'
+
     const tabs = [
         { id: 'profile' as TabType, label: 'Profile & Personal', icon: User },
         { id: 'business' as TabType, label: 'Business Details', icon: Building2 },
-        { id: 'industry' as TabType, label: 'Industry & Verticals', icon: Sparkles },
+        ...(isSuperAdmin ? [{ id: 'industry' as TabType, label: 'Industry & Verticals (Admin)', icon: Sparkles }] : []),
         { id: 'security' as TabType, label: 'Security', icon: Shield },
         { id: 'notifications' as TabType, label: 'Notifications', icon: Bell },
     ]

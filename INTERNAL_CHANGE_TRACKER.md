@@ -55,8 +55,10 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 #### 4. Personalized Industry Welcome Email (`lib/email.ts`)
 - **Tailored Email Notification**: Sends HTML welcome email featuring the user's business name and industry vertical upon registration.
 
-#### 5. Settings Industry Switcher (`components/settings/BusinessProfileSelector.tsx`, `SettingsContent.tsx`)
-- Added **Industry & Verticals** tab in Account Settings to let users switch or fine-tune their business profile at any time.
+#### 5. Super Admin-Only Industry Switcher & Email Syntax Fix (`lib/email.ts`, `SettingsContent.tsx`, `business-profile-actions.ts`)
+- **Super Admin Exclusive Access**: Gated `BusinessProfileSelector` in Account Settings and server action `updateBusinessProfile` so that only accounts with `role === 'superadmin'` can switch an organization's industry vertical.
+- **Fixed Email Syntax Error**: Resolved duplicated CSS styles in `lib/email.ts` that caused Vercel Turbopack build failure.
+- **Signup Vertical Selection**: Normal users select their industry once during registration, provisioning starter catalogs and tailored workflows cleanly.
 
 ---
 
