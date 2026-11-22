@@ -45,6 +45,8 @@ export function Sidebar() {
         loadProfile()
     }, [])
 
+    const isServiceOrSoftware = ['software_it', 'digital_marketing', 'freelancer', 'services', 'ca_accounting', 'tours_and_travels'].includes(businessProfile.businessType)
+
     const sections = [
         {
             title: "Core",
@@ -105,7 +107,7 @@ export function Sidebar() {
                     color: "text-purple-600",
                     badge: 'AI'
                 },
-                ...(businessProfile.features?.hasPOS || ['retail', 'salon_spa', 'laundry_drycleaning', 'art_crafts', 'resorts_farmhouses', 'camping_outdoors', 'jewelry_retail'].includes(businessProfile.businessType) ? [{
+                ...(!isServiceOrSoftware && (businessProfile.features?.hasPOS || ['retail', 'salon_spa', 'laundry_drycleaning', 'art_crafts', 'resorts_farmhouses', 'camping_outdoors', 'jewelry_retail'].includes(businessProfile.businessType)) ? [{
                     label: 'Counter POS',
                     icon: Zap,
                     href: '/pos',
@@ -166,13 +168,13 @@ export function Sidebar() {
                     href: '/inventory',
                     color: "text-slate-900"
                 },
-                {
+                ...(!isServiceOrSoftware && businessProfile.features?.hasBarcodes !== false ? [{
                     label: 'Barcodes & Labels',
                     icon: Barcode,
                     href: '/settings/barcode',
                     color: "text-indigo-600",
                     badge: 'NEW'
-                }
+                }] : [])
             ]
         },
         {

@@ -24,11 +24,13 @@ import { Card, CardContent } from '@/components/ui/Card'
 import { lookupItemByBarcode, getBarcodeSettings } from '@/lib/barcode-actions'
 import { generateBarcodeDataUrl, generateUniqueBarcode } from '@/lib/barcode-utils'
 import { useBarcodeScanner } from '@/hooks/useBarcodeScanner'
+import { getBusinessProfile } from '@/lib/business-profile-actions'
 import type { BarcodeSettings } from '@/lib/barcode-types'
 
 export function BarcodeRightSidebar() {
     const [isOpen, setIsOpen] = useState(false)
     const [activeTab, setActiveTab] = useState<'lookup' | 'generate' | 'print'>('lookup')
+    const [isVisibleForVertical, setIsVisibleForVertical] = useState(false)
     
     // Lookup state
     const [lookupCode, setLookupCode] = useState('')
@@ -46,6 +48,10 @@ export function BarcodeRightSidebar() {
     const [settings, setSettings] = useState<BarcodeSettings | null>(null)
 
     useEffect(() => {
+        getBusinessProfile().then(b => {
+            const isNonBarcode = ['software_it', 'digital_marketing', 'freelancer', 'services', 'ca_accounting', 'tours_and_travels'].includes(b.businessType) || b.config?.features?.hasBarcodes === false
+            setIsVisibleForVertical(!isNonBarcode)
+        }).catch(() => {})
         getBarcodeSettings().then(setSettings).catch(() => {})
     }, [])
 
@@ -105,6 +111,10 @@ export function BarcodeRightSidebar() {
         document.body.appendChild(link)
         link.click()
         document.body.removeChild(link)
+    }
+
+    if (!isVisibleForVertical) {
+        return null
     }
 
     return (
