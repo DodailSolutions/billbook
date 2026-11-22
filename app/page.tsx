@@ -7,7 +7,7 @@ import {
     RefreshCw, Clock, Building2, ArrowRight, Star, Check, BarChart3, 
     Smartphone, Globe, Lock, Sparkles, BookOpen, ShoppingBag, DollarSign, 
     Bot, Layers, ChevronRight, ShieldCheck, Award, LayoutDashboard, PlusCircle,
-    Video, Camera
+    Video, Camera, Code2, Megaphone, User
 } from 'lucide-react'
 import { InteractiveFeaturePreview } from './_components/InteractiveFeaturePreview'
 import { HomePricingSection } from './_components/HomePricingSection'
@@ -29,6 +29,9 @@ const TestimonialCarousel = dynamicImport(() => import('./_components/Testimonia
 })
 
 const ALL_FEATURES = [
+    { icon: Code2, title: 'Sprint Tranche & Dev Profitability', desc: 'Milestone progress billing, developer cost rates vs bill rates for gross margins, and 1-click change orders', color: 'blue' },
+    { icon: Megaphone, title: 'Ad Spend Pass-Through (0% Tax)', desc: 'Rule 33 pure agent billing isolates non-taxable ad budgets from 18% agency fees, plus client creative approval decks', color: 'purple' },
+    { icon: User, title: '1-Page Scope Contracts & 50% Upfront', desc: 'Touchscreen mobile e-sign agreements with automated 50% deposit gate before work unlocks and ₹20L GST radar', color: 'emerald' },
     { icon: Video, title: 'AI CCTV Touchless Attendance', desc: 'Connect office CCTV streams (CP Plus, Dahua, Hikvision, Tapo) for biometric face recognition check-ins with 100% DPDP compliance (zero raw video stored)', color: 'blue' },
     { icon: FileText, title: 'GST Compliant Invoicing', desc: 'Create CGST, SGST, IGST invoices with QR code payment in under 30 seconds', color: 'blue' },
     { icon: RefreshCw, title: 'Tally Prime 1-Click Sync', desc: 'Export full Daybook XML and Master Ledgers directly into Tally with zero manual re-entry', color: 'blue' },
@@ -352,6 +355,109 @@ export default async function Home() {
                                 </div>
                             )
                         })}
+                    </div>
+                </div>
+            </section>
+
+            {/* Dedicated Industry Solutions Showcase */}
+            <section className="py-20 sm:py-28 bg-white border-t border-slate-200/60">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+                    <div className="text-center max-w-3xl mx-auto space-y-4">
+                        <span className="inline-block px-4 py-1.5 rounded-full bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 text-xs font-bold uppercase tracking-wider border border-indigo-200 dark:border-indigo-800">
+                            INDUSTRY OPERATING SYSTEMS
+                        </span>
+                        <h2 className="text-3xl sm:text-5xl font-black text-slate-950 dark:text-white -tracking-tight">
+                            Purpose-Built for Your Exact Business Model
+                        </h2>
+                        <p className="text-slate-500 text-sm sm:text-base font-medium">
+                            No more fitting your agency into rigid accounting templates. Choose your industry workflow.
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {/* Software & IT Card */}
+                        <div className="bg-slate-50/70 dark:bg-slate-900/60 p-8 rounded-3xl border border-slate-200/80 dark:border-slate-800 flex flex-col justify-between hover:border-indigo-400 hover:shadow-xl transition-all group">
+                            <div className="space-y-4">
+                                <div className="w-12 h-12 rounded-2xl bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 flex items-center justify-center font-bold">
+                                    <Code2 className="w-6 h-6" />
+                                </div>
+                                <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                                    Software & IT Companies
+                                </h3>
+                                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                                    Milestone sprint tranches (25/35/40), developer cost-rate gross margins, timesheet to 1-click tax invoices, and 1-click Change Orders to kill scope creep.
+                                </p>
+                                <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-400 pt-2">
+                                    <li className="flex items-center gap-2">✓ Zero-rated LUT export invoicing (USD/EUR)</li>
+                                    <li className="flex items-center gap-2">✓ Developer cost vs bill rate margin tracking</li>
+                                    <li className="flex items-center gap-2">✓ 1-click change order digital sign-offs</li>
+                                </ul>
+                            </div>
+                            <div className="pt-6 mt-6 border-t border-slate-200/80 dark:border-slate-800">
+                                <Link href="/for/software-companies">
+                                    <Button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-5 gap-2">
+                                        <span>Explore Software OS</span>
+                                        <ArrowRight className="w-4 h-4" />
+                                    </Button>
+                                </Link>
+                            </div>
+                        </div>
+
+                        {/* Digital Marketing Card */}
+                        <div className="bg-slate-50/70 dark:bg-slate-900/60 p-8 rounded-3xl border border-slate-200/80 dark:border-slate-800 flex flex-col justify-between hover:border-purple-400 hover:shadow-xl transition-all group">
+                            <div className="space-y-4">
+                                <div className="w-12 h-12 rounded-2xl bg-purple-100 dark:bg-purple-950/60 text-purple-600 flex items-center justify-center font-bold">
+                                    <Megaphone className="w-6 h-6" />
+                                </div>
+                                <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                                    Digital Marketing Agencies
+                                </h3>
+                                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                                    Stop the Ad Spend Tax Trap. Isolate non-taxable ad budgets (0% GST Rule 33) from taxable fees, manage client post approvals, and bill retainer overages.
+                                </p>
+                                <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-400 pt-2">
+                                    <li className="flex items-center gap-2">✓ 0% Ad spend pass-through protection</li>
+                                    <li className="flex items-center gap-2">✓ Client creative approval portal (1-click)</li>
+                                    <li className="flex items-center gap-2">✓ Monthly post retainer quota & overages</li>
+                                </ul>
+                            </div>
+                            <div className="pt-6 mt-6 border-t border-slate-200/80 dark:border-slate-800">
+                                <Link href="/for/digital-marketing">
+                                    <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold py-5 gap-2">
+                                        <span>Explore Agency OS</span>
+                                        <ArrowRight className="w-4 h-4" />
+                                    </Button>
+                                </Link>
+                            </div>
+                        </div>
+
+                        {/* Freelancers & Solos Card */}
+                        <div className="bg-slate-50/70 dark:bg-slate-900/60 p-8 rounded-3xl border border-slate-200/80 dark:border-slate-800 flex flex-col justify-between hover:border-emerald-400 hover:shadow-xl transition-all group">
+                            <div className="space-y-4">
+                                <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center font-bold">
+                                    <User className="w-6 h-6" />
+                                </div>
+                                <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                                    Freelancers & Solo Pros
+                                </h3>
+                                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                                    Never work for free again. Send 1-page mobile scope agreements with touchscreen signatures, collect mandatory 50% deposits, and track GST limits.
+                                </p>
+                                <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-400 pt-2">
+                                    <li className="flex items-center gap-2">✓ 1-Page touchscreen scope contract e-sign</li>
+                                    <li className="flex items-center gap-2">✓ 50% Upfront deposit gate (work unlocks on pay)</li>
+                                    <li className="flex items-center gap-2">✓ ₹20 Lakh GST turnover warning radar</li>
+                                </ul>
+                            </div>
+                            <div className="pt-6 mt-6 border-t border-slate-200/80 dark:border-slate-800">
+                                <Link href="/for/freelancers">
+                                    <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-5 gap-2">
+                                        <span>Explore Freelancer OS</span>
+                                        <ArrowRight className="w-4 h-4" />
+                                    </Button>
+                                </Link>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>

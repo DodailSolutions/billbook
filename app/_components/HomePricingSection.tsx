@@ -4,8 +4,9 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
-import { Check, Zap, ShoppingCart, Loader2 } from 'lucide-react'
+import { Check, Zap, ShoppingCart, Loader2, Code2, Megaphone, User, Building2 } from 'lucide-react'
 import { activatePlanTrial } from '@/app/(marketing)/pricing/actions'
+import { IndustryPricingWidget } from './IndustryPricingWidget'
 
 interface HomePricingSectionProps {
     starterPrice: number
@@ -30,6 +31,7 @@ export function HomePricingSection({
 }: HomePricingSectionProps) {
     const router = useRouter()
     const [activatingSlug, setActivatingSlug] = useState<string | null>(null)
+    const [selectedIndustryTab, setSelectedIndustryTab] = useState<'standard' | 'software_it' | 'digital_marketing' | 'freelancer'>('standard')
 
     const handleTrial = async (slug: string) => {
         if (!isAuthenticated) {
@@ -80,8 +82,62 @@ export function HomePricingSection({
                     </div>
                 </div>
 
-                {/* Pricing Cards Grid */}
-                <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto items-stretch">
+                {/* Industry Switcher Tabs */}
+                <div className="flex flex-wrap items-center justify-center gap-2 max-w-4xl mx-auto">
+                    <button
+                        onClick={() => setSelectedIndustryTab('standard')}
+                        className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 border ${
+                            selectedIndustryTab === 'standard'
+                                ? 'bg-slate-900 text-white border-slate-900 shadow-sm'
+                                : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300'
+                        }`}
+                    >
+                        <Building2 className="w-4 h-4" />
+                        <span>Standard Invoicing & Retail</span>
+                    </button>
+                    <button
+                        onClick={() => setSelectedIndustryTab('software_it')}
+                        className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 border ${
+                            selectedIndustryTab === 'software_it'
+                                ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                                : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300'
+                        }`}
+                    >
+                        <Code2 className="w-4 h-4" />
+                        <span>Software & IT Companies</span>
+                    </button>
+                    <button
+                        onClick={() => setSelectedIndustryTab('digital_marketing')}
+                        className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 border ${
+                            selectedIndustryTab === 'digital_marketing'
+                                ? 'bg-purple-600 text-white border-purple-600 shadow-sm'
+                                : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300'
+                        }`}
+                    >
+                        <Megaphone className="w-4 h-4" />
+                        <span>Digital Marketing Agencies</span>
+                    </button>
+                    <button
+                        onClick={() => setSelectedIndustryTab('freelancer')}
+                        className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 border ${
+                            selectedIndustryTab === 'freelancer'
+                                ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                                : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300'
+                        }`}
+                    >
+                        <User className="w-4 h-4" />
+                        <span>Freelancers & Solos</span>
+                    </button>
+                </div>
+
+                {selectedIndustryTab !== 'standard' ? (
+                    <div className="pt-4">
+                        <IndustryPricingWidget defaultVertical={selectedIndustryTab} showVerticalTabs={false} />
+                    </div>
+                ) : (
+                    <>
+                        {/* Pricing Cards Grid */}
+                        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto items-stretch">
                     {/* Free Plan */}
                     <div className="bg-white p-8 rounded-[28px] border border-slate-200/80 flex flex-col justify-between hover:shadow-xl transition-all shadow-xs">
                         <div className="space-y-4">
@@ -310,7 +366,9 @@ export function HomePricingSection({
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </>
+        )}
+    </div>
+</section>
     )
 }
