@@ -16,8 +16,9 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
   - Wrapped tiered invoice insertions in a retry loop. If a unique constraint violation (`code: 23505` or `invoices_invoice_number_key`) occurs under concurrency, automatically regenerates a guaranteed unique candidate and retries up to 3 times before returning an error.
 
 #### 2. Auth Actions Type Safety Fix (`app/(auth)/actions.ts`)
-- **Resolved Vercel Turbopack Build Error**:
+- **Resolved Vercel Turbopack Build Errors**:
   - Typed `verticalKey: BusinessType` safely against `INDUSTRY_CATALOG_PRESETS` keys to eliminate TypeScript indexing `any` error during Vercel production builds.
+  - Extracted strongly typed `const userId = data.user.id` at top of `if (data?.user)` block to eliminate closure-level `data.user is possibly 'null'` error inside `.map()` array callbacks during production compilation.
 
 #### 3. Strict Super Admin Gating for Industry Switcher (`SettingsContent.tsx`, `lib/business-profile-actions.ts`)
 - **UI & Server-Level Isolation**:
