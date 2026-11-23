@@ -130,23 +130,38 @@ export async function hasPlanFeature(featureKey: string): Promise<boolean> {
         return ['invoices', 'customers', 'pdf', 'custom_branding'].includes(featureKey.toLowerCase())
     }
 
-    if (status.isLifetime || status.planSlug === 'enterprise') {
+    const planSlug = (status.planSlug || '').toLowerCase()
+    const isPro = planSlug.includes('pro') || planSlug.includes('professional')
+    const isEnterprise = planSlug.includes('enterprise')
+    const isLifetime = status.isLifetime || planSlug.includes('lifetime')
+
+    // Enterprise and Lifetime have access to all platform features
+    if (isEnterprise || isLifetime) {
         return true
     }
 
     const normalizedKey = featureKey.toLowerCase().replace(/[^a-z0-9]/g, '')
+
+    // Professional tier includes team members, crm, inventory, reports, reminders, whatsapp
+    if (isPro) {
+        const proIncluded = ['team', 'teammembers', 'crm', 'inventory', 'reports', 'gstreports', 'reminders', 'whatsapp', 'invoices', 'customers']
+        if (proIncluded.includes(normalizedKey)) {
+            return true
+        }
+    }
+
     const features = (status.features || []).map(f => f.toLowerCase().replace(/[^a-z0-9]/g, ''))
 
     if (features.some(f => f.includes(normalizedKey) || normalizedKey.includes(f))) {
         return true
     }
 
-    if (normalizedKey.includes('team') && (status.limits?.team_members ?? 0) > 0) {
+    if (normalizedKey.includes('team') && ((status.limits?.team_members ?? 0) > 0 || isPro)) {
         return true
     }
 
     const paidTiers = ['starter', 'starter-yearly', 'professional', 'professional-yearly', 'enterprise']
-    if (['whatsapp', 'gst_reports', 'reminders', 'crm', 'inventory'].includes(featureKey) && paidTiers.includes(status.planSlug)) {
+    if (['whatsapp', 'gst_reports', 'reminders', 'crm', 'inventory', 'team_members', 'team'].includes(featureKey) && paidTiers.some(t => planSlug.includes(t))) {
         return true
     }
 

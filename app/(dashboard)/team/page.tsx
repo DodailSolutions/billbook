@@ -21,13 +21,25 @@ export default async function TeamMembersPage() {
   // Check plan status and team member limits
   const planStatus = await getUserPlanStatus()
   const isLifetimePlan = planStatus?.isLifetime ?? false
-  const hasTeamAccess = (await hasPlanFeature('team_members')) || (await hasPlanFeature('team')) || isLifetimePlan
+  const planSlug = (planStatus?.planSlug || '').toLowerCase()
+  const isProOrAbove = planSlug.includes('pro') || planSlug.includes('professional') || planSlug.includes('enterprise') || isLifetimePlan
+  const hasTeamAccess = (await hasPlanFeature('team_members')) || (await hasPlanFeature('team')) || isProOrAbove
 
   // Get team member limits
-  let teamLimit = { allowed: 1, current: 0, can_add: false, base_limit: 0, purchased_slots: 0, plan_slug: '' }
+  const defaultAllowed = isProOrAbove ? (planSlug.includes('enterprise') ? 10 : 2) : 1
+  let teamLimit = { allowed: defaultAllowed, current: 0, can_add: true, base_limit: defaultAllowed, purchased_slots: 0, plan_slug: planSlug }
   try {
     const { data: limits } = await supabase.rpc('check_team_member_limit', { p_owner_id: user.id })
-    if (Array.isArray(limits) && limits[0]) teamLimit = limits[0]
+    if (Array.isArray(limits) && limits[0]) {
+      const allowedSlots = Math.max(limits[0].allowed || 0, defaultAllowed)
+      const currentCount = limits[0].current || 0
+      teamLimit = {
+        ...limits[0],
+        allowed: allowedSlots,
+        current: currentCount,
+        can_add: currentCount < allowedSlots
+      }
+    }
   } catch {}
 
   let addons = { active_slots: 0, monthly_slots: 0, yearly_slots: 0 }

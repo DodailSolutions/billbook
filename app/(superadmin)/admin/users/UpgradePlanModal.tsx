@@ -103,6 +103,7 @@ export function UpgradePlanModal({
 
   const calculateEndDate = () => {
     try {
+      if (duration >= 36500) return 'Lifetime (Never Expires)'
       const d = new Date(Date.now() + (Number(duration) || 30) * 24 * 60 * 60 * 1000)
       return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
     } catch {
@@ -183,7 +184,16 @@ export function UpgradePlanModal({
                     <button
                       key={plan.id}
                       type="button"
-                      onClick={() => setSelectedPlan(plan.id)}
+                      onClick={() => {
+                        setSelectedPlan(plan.id)
+                        if (plan.billing_period === 'yearly') {
+                          setDuration(365)
+                        } else if (plan.billing_period === 'lifetime') {
+                          setDuration(36500)
+                        } else {
+                          setDuration(30)
+                        }
+                      }}
                       className={`p-3.5 rounded-2xl text-left border-2 transition-all relative ${
                         isSelected
                           ? 'border-blue-600 bg-blue-50/60 dark:bg-blue-950/40 shadow-xs'
@@ -218,30 +228,37 @@ export function UpgradePlanModal({
           {/* Duration in Days */}
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2.5">
-              Validity Duration (Days)
+              Validity Duration
             </label>
-            <div className="grid grid-cols-4 gap-2 mb-2">
-              {[30, 90, 180, 365].map((days) => (
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5 mb-2">
+              {[
+                { days: 30, label: '1 Mo' },
+                { days: 90, label: '3 Mo' },
+                { days: 180, label: '6 Mo' },
+                { days: 365, label: '1 Year' },
+                { days: 730, label: '2 Years' },
+                { days: 36500, label: 'Lifetime' }
+              ].map(({ days, label }) => (
                 <button
                   key={days}
                   type="button"
                   onClick={() => setDuration(days)}
-                  className={`py-2 px-3 border rounded-xl text-xs font-bold transition-all ${
+                  className={`py-2 px-2 border rounded-xl text-xs font-bold transition-all text-center ${
                     duration === days
                       ? 'border-blue-600 bg-blue-600 text-white shadow-xs'
                       : 'border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
                   }`}
                 >
-                  {days} Days
+                  {label}
                 </button>
               ))}
             </div>
             <Input
               type="number"
-              value={duration}
+              value={duration >= 36500 ? '' : duration}
               onChange={(e) => setDuration(parseInt(e.target.value) || 30)}
               className="text-xs"
-              placeholder="Or enter custom number of days"
+              placeholder={duration >= 36500 ? 'Lifetime (Permanent)' : 'Or enter custom number of days (e.g. 365)'}
               min="1"
             />
           </div>

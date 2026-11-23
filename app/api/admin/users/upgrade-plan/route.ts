@@ -42,24 +42,33 @@ export async function POST(request: NextRequest) {
 
     // Calculate dates
     const startDate = new Date()
-    const endDate = new Date(startDate.getTime() + duration * 24 * 60 * 60 * 1000)
+    // For lifetime plans or very long durations, handle cleanly
+    const isLifetime = plan.billing_period === 'lifetime'
+    const durationDays = isLifetime ? 36500 : (Number(duration) || (plan.billing_period === 'yearly' ? 365 : 30))
+    const endDate = new Date(startDate.getTime() + durationDays * 24 * 60 * 60 * 1000)
 
-    // Check if user already has an active subscription
-    const { data: existingSubscription } = await supabase
+    // Check if user already has an active subscription (avoiding .single() error on 0 or multiple rows)
+    const { data: existingSubs } = await supabase
       .from('user_subscriptions')
       .select('id')
       .eq('user_id', userId)
       .in('status', ['active', 'trial'])
-      .single()
+      .order('created_at', { ascending: false })
+
+    const existingSubscription = existingSubs && existingSubs.length > 0 ? existingSubs[0] : null
 
     if (existingSubscription) {
-      // Update existing subscription
+      // Update primary active subscription
       const { error: updateError } = await supabase
         .from('user_subscriptions')
         .update({
           plan_id: planId,
+          start_date: startDate.toISOString(),
           end_date: endDate.toISOString(),
           status: 'active',
+          amount_paid: plan.price,
+          currency: plan.currency || 'INR',
+          payment_method: 'admin_upgrade',
           updated_at: new Date().toISOString()
         })
         .eq('id', existingSubscription.id)
@@ -70,6 +79,15 @@ export async function POST(request: NextRequest) {
           { error: 'Failed to update subscription' },
           { status: 500 }
         )
+      }
+
+      // If user had duplicate active subscriptions, close the extras
+      if (existingSubs.length > 1) {
+        const extraIds = existingSubs.slice(1).map(s => s.id)
+        await supabase
+          .from('user_subscriptions')
+          .update({ status: 'cancelled', updated_at: new Date().toISOString() })
+          .in('id', extraIds)
       }
     } else {
       // Create new subscription
