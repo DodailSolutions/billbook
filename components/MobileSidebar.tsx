@@ -105,15 +105,22 @@ export function MobileSidebar() {
             title: "Sales & Customers",
             items: [
                 {
-                    label: 'Invoices',
-                    icon: FileText,
-                    href: '/invoices',
+                    label: 'Organizations',
+                    icon: Building2,
+                    href: '/organizations',
+                    color: "text-indigo-600",
+                    badge: 'B2B'
+                },
+                {
+                    label: 'Customers / Contacts',
+                    icon: Users,
+                    href: '/customers',
                     color: "text-slate-900"
                 },
                 {
-                    label: 'Customers',
-                    icon: Users,
-                    href: '/customers',
+                    label: 'Invoices',
+                    icon: FileText,
+                    href: '/invoices',
                     color: "text-slate-900"
                 },
                 {

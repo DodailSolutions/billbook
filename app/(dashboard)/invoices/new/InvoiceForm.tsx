@@ -206,6 +206,8 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     name: formData.get('name'),
+                    organization_name: formData.get('organization_name'),
+                    designation: formData.get('designation'),
                     email: formData.get('email'),
                     phone: formData.get('phone'),
                     address: formData.get('address'),
@@ -762,8 +764,18 @@ export function InvoiceForm({ customers: initialCustomers, invoice, mode = 'crea
                     </div>
                     <form onSubmit={handleAddCustomer} className="p-6 space-y-4">
                         <div className="space-y-1.5">
-                            <label htmlFor="cust-name" className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Name <span className="text-red-500">*</span></label>
-                            <Input id="cust-name" name="name" required placeholder="Customer or company name" className="rounded-lg" />
+                            <label htmlFor="cust-org" className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Organization / Company (B2B)</label>
+                            <Input id="cust-org" name="organization_name" placeholder="Company or business name (optional)" className="rounded-lg" />
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-1.5">
+                                <label htmlFor="cust-name" className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Contact Name <span className="text-red-500">*</span></label>
+                                <Input id="cust-name" name="name" required placeholder="Person name" className="rounded-lg" />
+                            </div>
+                            <div className="space-y-1.5">
+                                <label htmlFor="cust-designation" className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Designation</label>
+                                <Input id="cust-designation" name="designation" placeholder="e.g. Director, Manager" className="rounded-lg" />
+                            </div>
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                             <div className="space-y-1.5">

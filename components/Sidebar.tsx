@@ -85,6 +85,19 @@ export function Sidebar() {
             title: "Sales & Customers",
             items: [
                 {
+                    label: 'Organizations',
+                    icon: Building2,
+                    href: '/organizations',
+                    color: "text-indigo-600",
+                    badge: 'B2B'
+                },
+                {
+                    label: 'Customers / Contacts',
+                    icon: Users,
+                    href: '/customers',
+                    color: "text-slate-900"
+                },
+                {
                     label: 'Invoices',
                     icon: FileText,
                     href: '/invoices',
@@ -95,12 +108,6 @@ export function Sidebar() {
                     icon: RefreshCw,
                     href: '/invoices/recurring',
                     color: "text-slate-700"
-                },
-                {
-                    label: 'Customers',
-                    icon: Users,
-                    href: '/customers',
-                    color: "text-slate-900"
                 },
                 {
                     label: 'CRM & Pipeline',

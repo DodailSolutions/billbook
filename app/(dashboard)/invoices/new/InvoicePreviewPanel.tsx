@@ -230,8 +230,17 @@ export function InvoicePreviewPanel({
                         Bill To:
                     </div>
                     {selectedCustomer ? (
-                        <div className="text-xs text-gray-700">
-                            <div className="font-semibold">{selectedCustomer.name}</div>
+                        <div className="text-xs text-gray-700 space-y-0.5">
+                            {selectedCustomer.organization_name && (
+                                <div className="font-bold text-gray-900 flex items-center gap-1.5">
+                                    <span className="text-[9px] bg-blue-100 text-blue-700 px-1 py-0.5 rounded font-semibold uppercase tracking-wider">B2B</span>
+                                    <span>{selectedCustomer.organization_name}</span>
+                                </div>
+                            )}
+                            <div className="font-semibold text-gray-800">
+                                {selectedCustomer.name}
+                                {selectedCustomer.designation && <span className="font-normal text-gray-500"> ({selectedCustomer.designation})</span>}
+                            </div>
                             {selectedCustomer.email && <div>{selectedCustomer.email}</div>}
                             {selectedCustomer.phone && <div>{selectedCustomer.phone}</div>}
                             {selectedCustomer.address && <div className="text-gray-500">{selectedCustomer.address}</div>}

@@ -325,6 +325,8 @@ export async function generateInvoiceNumber(seriesId?: string): Promise<string> 
 
 interface CreateInvoiceData {
     customer_id: string
+    organization_id?: string
+    organization_name?: string
     invoice_date: string
     due_date?: string
     gst_percentage: number
@@ -379,7 +381,7 @@ export async function createInvoice(data: CreateInvoiceData) {
         // Get customer for auto GST classification
         const { data: customer } = await supabase
             .from('customers')
-            .select('state_code, gstin')
+            .select('state_code, gstin, organization_id, organization_name')
             .eq('id', data.customer_id)
             .single()
 
@@ -434,10 +436,15 @@ export async function createInvoice(data: CreateInvoiceData) {
         while (!invoice && insertAttempts < maxInsertAttempts) {
             insertAttempts++
 
+            const resolvedOrgId = data.organization_id || customer?.organization_id || null
+            const resolvedOrgName = data.organization_name || customer?.organization_name || null
+
             // 1. Try full payload with discounts, breakdown, and partial payment fields
             const fullPayload = {
                 user_id: user.id,
                 customer_id: data.customer_id,
+                ...(resolvedOrgId ? { organization_id: resolvedOrgId } : {}),
+                ...(resolvedOrgName ? { organization_name: resolvedOrgName } : {}),
                 invoice_number: workingInvoiceNumber,
                 invoice_date: data.invoice_date,
                 due_date: data.due_date || null,
@@ -728,6 +735,8 @@ export async function createInvoice(data: CreateInvoiceData) {
 
 interface UpdateInvoiceData {
     customer_id: string
+    organization_id?: string
+    organization_name?: string
     invoice_date: string
     due_date?: string
     gst_percentage: number
@@ -799,6 +808,8 @@ export async function updateInvoice(id: string, data: UpdateInvoiceData) {
             .from('invoices')
             .update({
                 customer_id: data.customer_id,
+                ...(data.organization_id !== undefined ? { organization_id: data.organization_id || null } : {}),
+                ...(data.organization_name !== undefined ? { organization_name: data.organization_name || null } : {}),
                 invoice_date: data.invoice_date,
                 due_date: data.due_date || null,
                 subtotal: rawSubtotal,

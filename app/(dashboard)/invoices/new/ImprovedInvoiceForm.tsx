@@ -10,12 +10,14 @@ import {
   ArrowLeft, Plus, Trash2, Send, 
   User, Receipt, FileText, 
   AlertCircle, CheckCircle2, ChevronDown, ChevronUp,
-  Sparkles, Shield, Clock, X, UserPlus, Download, CheckCircle, Mail, Loader2, ExternalLink
+  Sparkles, Shield, Clock, X, UserPlus, Download, CheckCircle, Mail, Loader2, ExternalLink,
+  Building2, Briefcase
 } from 'lucide-react'
 import { createInvoice } from '../actions'
 import { linkLeadToInvoice } from '@/lib/crm-actions'
 import { saveItemFromInvoice, deleteSavedItem as deleteSavedItemAction } from '../../items/actions'
-import type { Customer, InventoryItem as InventoryOption, SavedItem } from '@/lib/types'
+import { createOrganizationAction } from '@/app/(dashboard)/organizations/actions'
+import type { Customer, InventoryItem as InventoryOption, Organization, SavedItem } from '@/lib/types'
 
 interface InvoiceItem {
   id: string
@@ -37,9 +39,11 @@ interface InvoiceItem {
 
 interface ImprovedInvoiceFormProps {
   customers: Customer[]
+  organizations?: Organization[]
   savedItems?: SavedItem[]
   inventoryItems?: InventoryOption[]
   initialCustomerId?: string
+  initialOrganizationId?: string
   initialAmount?: number
   initialTitle?: string
   initialLeadId?: string
@@ -47,9 +51,11 @@ interface ImprovedInvoiceFormProps {
 
 export function ImprovedInvoiceForm({ 
   customers: initialCustomers = [], 
+  organizations: initialOrganizations = [],
   savedItems: rawSavedItems = [], 
   inventoryItems: rawInventoryItems = [],
   initialCustomerId,
+  initialOrganizationId,
   initialAmount,
   initialTitle,
   initialLeadId
@@ -66,6 +72,19 @@ export function ImprovedInvoiceForm({
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [showAddCustomerModal, setShowAddCustomerModal] = useState(false)
   const [customers, setCustomers] = useState<Customer[]>(safeInitialCustomers)
+  const [organizations, setOrganizations] = useState<Organization[]>(initialOrganizations || [])
+  const [selectedOrganizationId, setSelectedOrganizationId] = useState<string>(initialOrganizationId || '')
+  const [showOrgFilterAll, setShowOrgFilterAll] = useState(false)
+  const [showQuickOrgModal, setShowQuickOrgModal] = useState(false)
+  const [isCreatingOrg, setIsCreatingOrg] = useState(false)
+  const [quickOrgName, setQuickOrgName] = useState('')
+  const [quickOrgGstin, setQuickOrgGstin] = useState('')
+  const [quickOrgCity, setQuickOrgCity] = useState('')
+
+  // Customer modal organization controls
+  const [modalOrgMode, setModalOrgMode] = useState<'existing' | 'new' | 'none'>(initialOrganizationId ? 'existing' : 'existing')
+  const [modalSelectedOrgId, setModalSelectedOrgId] = useState<string>(initialOrganizationId || '')
+  const [modalNewOrgName, setModalNewOrgName] = useState<string>('')
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [createdInvoiceId, setCreatedInvoiceId] = useState<string | null>(null)
   const [isDownloading, setIsDownloading] = useState(false)
@@ -330,8 +349,14 @@ export function ImprovedInvoiceForm({
     setIsSubmitting(true)
 
     try {
+      const selectedCust = customers.find(c => c.id === formData.customer_id)
+      const selectedOrg = organizations.find(o => o.id === selectedOrganizationId) ||
+                          organizations.find(o => o.id === selectedCust?.organization_id)
+
       const invoiceData = {
         customer_id: formData.customer_id,
+        organization_id: selectedOrg?.id || selectedCust?.organization_id || undefined,
+        organization_name: selectedOrg?.name || selectedCust?.organization_name || undefined,
         invoice_date: formData.invoice_date,
         due_date: formData.due_date || undefined,
         gst_percentage: gstPercentage,
@@ -408,6 +433,13 @@ export function ImprovedInvoiceForm({
     e.preventDefault()
     const formElement = e.currentTarget  // save ref before async (React nullifies currentTarget after dispatch)
     const form = new FormData(formElement)
+
+    const targetOrgId = modalOrgMode === 'existing' ? (modalSelectedOrgId || undefined) : undefined
+    const targetOrgName = modalOrgMode === 'new'
+      ? (modalNewOrgName.trim() || undefined)
+      : (modalOrgMode === 'existing' && modalSelectedOrgId
+          ? organizations.find(o => o.id === modalSelectedOrgId)?.name
+          : undefined)
     
     try {
       const response = await fetch('/api/customers/create', {
@@ -419,15 +451,30 @@ export function ImprovedInvoiceForm({
           phone: form.get('phone'),
           address: form.get('address'),
           gstin: form.get('gstin'),
+          organization_id: targetOrgId,
+          organization_name: targetOrgName,
+          designation: form.get('designation'),
         })
       })
 
       const data = await response.json()
       
       if (response.ok && data.customer) {
-        setCustomers([...customers, data.customer])
-        setFormData({...formData, customer_id: data.customer.id})
+        setCustomers(prev => [...prev, data.customer])
+        setFormData(prev => ({ ...prev, customer_id: data.customer.id }))
+        
+        if (data.organization) {
+          setOrganizations(prev => {
+            if (prev.some(o => o.id === data.organization.id)) return prev
+            return [{ id: data.organization.id, name: data.organization.name, created_at: new Date().toISOString() } as Organization, ...prev]
+          })
+          setSelectedOrganizationId(data.organization.id)
+        } else if (targetOrgId) {
+          setSelectedOrganizationId(targetOrgId)
+        }
+
         setShowAddCustomerModal(false)
+        setModalNewOrgName('')
         formElement.reset()
       } else {
         alert(data.error || 'Failed to create customer')
@@ -435,6 +482,38 @@ export function ImprovedInvoiceForm({
     } catch (error) {
       console.error('Error:', error)
       alert('Failed to create customer')
+    }
+  }
+
+  // Quick Add Organization handler
+  const handleQuickCreateOrg = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!quickOrgName.trim()) {
+      alert('Please enter an organization name')
+      return
+    }
+    setIsCreatingOrg(true)
+    try {
+      const res = await createOrganizationAction({
+        name: quickOrgName.trim(),
+        gstin: quickOrgGstin.trim() || undefined,
+        city: quickOrgCity.trim() || undefined
+      })
+      if (res.success && res.organization) {
+        setOrganizations(prev => [res.organization!, ...prev])
+        setSelectedOrganizationId(res.organization.id)
+        setShowQuickOrgModal(false)
+        setQuickOrgName('')
+        setQuickOrgGstin('')
+        setQuickOrgCity('')
+      } else {
+        alert(res.error || 'Failed to create organization')
+      }
+    } catch (err) {
+      console.error('Failed to create organization:', err)
+      alert('Error creating organization')
+    } finally {
+      setIsCreatingOrg(false)
     }
   }
 
@@ -699,47 +778,204 @@ export function ImprovedInvoiceForm({
                 </CardHeader>
                 <CardContent className="p-6 space-y-6">
                   
-                  {/* Customer Selection */}
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <label className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-                        Customer <span className="text-red-500">*</span>
-                      </label>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setShowAddCustomerModal(true)}
-                        className="gap-1 text-xs h-7"
-                      >
-                        <UserPlus className="w-3 h-3" />
-                        Add New
-                      </Button>
+                  {/* B2B Organization & Customer Section */}
+                  <div className="bg-slate-50 border border-slate-200/90 rounded-xl p-4 space-y-4">
+                    {/* Organization Row */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="text-sm font-semibold text-gray-900 flex items-center gap-1.5">
+                          <Building2 className="w-4 h-4 text-blue-600" />
+                          <span>Organization / Company</span>
+                          <span className="text-[10px] font-semibold text-blue-700 bg-blue-100 px-1.5 py-0.5 rounded">B2B</span>
+                          <span className="text-xs text-gray-500 font-normal">(Optional)</span>
+                        </label>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setShowQuickOrgModal(true)}
+                          className="h-7 text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-100/50 gap-1 px-2"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                          New Company
+                        </Button>
+                      </div>
+                      <div className="flex gap-2">
+                        <select
+                          value={selectedOrganizationId}
+                          onChange={(e) => {
+                            const newOrgId = e.target.value
+                            setSelectedOrganizationId(newOrgId)
+                            setShowOrgFilterAll(false)
+                            if (newOrgId) {
+                              const matchingCusts = customers.filter(c => c.organization_id === newOrgId)
+                              if (matchingCusts.length > 0 && !matchingCusts.some(c => c.id === formData.customer_id)) {
+                                const primary = matchingCusts.find(c => c.is_primary_contact) || matchingCusts[0]
+                                setFormData(prev => ({ ...prev, customer_id: primary.id }))
+                              }
+                            }
+                          }}
+                          className="flex-1 px-3 py-2.5 border border-gray-300 rounded-md text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
+                        >
+                          <option value="">No Organization (Individual / B2C Customer)</option>
+                          {organizations.map(org => (
+                            <option key={org.id} value={org.id}>
+                              {org.name} {org.city ? `(${org.city})` : ''} {org.gstin ? `• GST: ${org.gstin}` : ''}
+                            </option>
+                          ))}
+                        </select>
+                        {selectedOrganizationId && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedOrganizationId('')
+                              setShowOrgFilterAll(true)
+                            }}
+                            className="text-xs text-gray-600 hover:text-red-600"
+                            title="Clear organization filter"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </Button>
+                        )}
+                      </div>
+
+                      {/* Selected Org Info Badge */}
+                      {(() => {
+                        const org = organizations.find(o => o.id === selectedOrganizationId)
+                        if (!org) return null
+                        const linkedContacts = customers.filter(c => c.organization_id === org.id)
+                        return (
+                          <div className="mt-2 text-xs bg-white border border-blue-200 rounded-lg p-2.5 flex flex-wrap items-center justify-between gap-2 shadow-xs">
+                            <div className="space-y-0.5">
+                              <div className="font-semibold text-blue-950 flex items-center gap-1.5">
+                                <Building2 className="w-3.5 h-3.5 text-blue-600" />
+                                {org.name}
+                                {org.legal_name && <span className="text-gray-500 font-normal">({org.legal_name})</span>}
+                              </div>
+                              <div className="text-gray-600 flex flex-wrap gap-x-3 gap-y-0.5">
+                                {org.gstin && <span>GSTIN: <strong className="text-gray-900">{org.gstin}</strong></span>}
+                                {org.city && <span>Location: {org.city}{org.state ? `, ${org.state}` : ''}</span>}
+                                {org.email && <span>Email: {org.email}</span>}
+                              </div>
+                            </div>
+                            <div className="text-[11px] text-blue-700 bg-blue-50 px-2 py-1 rounded border border-blue-200 font-medium">
+                              {linkedContacts.length} contact person(s) linked
+                            </div>
+                          </div>
+                        )
+                      })()}
                     </div>
-                    <select 
-                      value={formData.customer_id} 
-                      onChange={(e) => setFormData({...formData, customer_id: e.target.value})}
-                      className={`w-full px-3 py-2.5 border rounded-md text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${errors.customer_id ? 'border-red-500' : 'border-gray-300'}`}
-                    >
-                      <option value="" className="text-gray-400">Select a customer</option>
-                      {customers.map(customer => (
-                        <option key={customer.id} value={customer.id}>
-                          {customer.name}
-                        </option>
-                      ))}
-                    </select>
-                    {errors.customer_id && (
-                      <p className="text-sm text-red-500 flex items-center gap-1">
-                        <AlertCircle className="w-3 h-3" />
-                        {errors.customer_id}
-                      </p>
-                    )}
-                    {!errors.customer_id && formData.customer_id && (
-                      <p className="text-sm text-green-600 flex items-center gap-1">
-                        <CheckCircle2 className="w-3 h-3" />
-                        Customer selected
-                      </p>
-                    )}
+
+                    {/* Customer / Contact Person Selection */}
+                    <div className="pt-3 border-t border-slate-200/80 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm font-semibold text-gray-900 flex items-center gap-1.5">
+                          <User className="w-4 h-4 text-blue-600" />
+                          <span>
+                            {selectedOrganizationId
+                              ? `Contact Person at ${organizations.find(o => o.id === selectedOrganizationId)?.name || 'Organization'}`
+                              : 'Customer / Contact Person'}
+                          </span>
+                          <span className="text-red-500">*</span>
+                        </label>
+                        <div className="flex items-center gap-2">
+                          {selectedOrganizationId && (
+                            <button
+                              type="button"
+                              onClick={() => setShowOrgFilterAll(!showOrgFilterAll)}
+                              className="text-xs text-blue-600 hover:underline"
+                            >
+                              {showOrgFilterAll ? 'Filter to org contacts' : 'Show all customers'}
+                            </button>
+                          )}
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              if (selectedOrganizationId) {
+                                setModalOrgMode('existing')
+                                setModalSelectedOrgId(selectedOrganizationId)
+                              }
+                              setShowAddCustomerModal(true)
+                            }}
+                            className="gap-1 text-xs h-7"
+                          >
+                            <UserPlus className="w-3 h-3" />
+                            {selectedOrganizationId ? 'Add Contact Person' : 'Add New Customer'}
+                          </Button>
+                        </div>
+                      </div>
+
+                      {(() => {
+                        const orgContacts = selectedOrganizationId
+                          ? customers.filter(c => c.organization_id === selectedOrganizationId)
+                          : customers
+                        const displayList = (selectedOrganizationId && !showOrgFilterAll) ? orgContacts : customers
+
+                        return (
+                          <>
+                            <select 
+                              value={formData.customer_id} 
+                              onChange={(e) => {
+                                const custId = e.target.value
+                                setFormData({...formData, customer_id: custId})
+                                const cust = customers.find(c => c.id === custId)
+                                if (cust?.organization_id && !selectedOrganizationId) {
+                                  setSelectedOrganizationId(cust.organization_id)
+                                }
+                              }}
+                              className={`w-full px-3 py-2.5 border rounded-md text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm ${errors.customer_id ? 'border-red-500' : 'border-gray-300'}`}
+                            >
+                              <option value="" className="text-gray-400">
+                                {selectedOrganizationId && !showOrgFilterAll
+                                  ? (displayList.length === 0 ? 'No contacts found for this company - click Add Contact Person' : 'Select contact person')
+                                  : 'Select a customer'}
+                              </option>
+                              {displayList.map(customer => (
+                                <option key={customer.id} value={customer.id}>
+                                  {customer.name} {customer.designation ? `(${customer.designation})` : ''} {customer.organization_name ? `• ${customer.organization_name}` : ''} {customer.phone ? `• ${customer.phone}` : ''}
+                                </option>
+                              ))}
+                            </select>
+
+                            {errors.customer_id && (
+                              <p className="text-sm text-red-500 flex items-center gap-1">
+                                <AlertCircle className="w-3 h-3" />
+                                {errors.customer_id}
+                              </p>
+                            )}
+
+                            {/* Selected Customer Details Card */}
+                            {(() => {
+                              const cust = customers.find(c => c.id === formData.customer_id)
+                              if (!cust) return null
+                              return (
+                                <div className="p-3 bg-white border border-gray-200 rounded-lg text-xs space-y-1 shadow-2xs">
+                                  <div className="flex items-center justify-between">
+                                    <span className="font-semibold text-gray-900 flex items-center gap-1.5">
+                                      {cust.name}
+                                      {cust.designation && <span className="font-normal text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded text-[11px] border border-blue-200">{cust.designation}</span>}
+                                    </span>
+                                    <span className="text-green-600 font-medium flex items-center gap-1">
+                                      <CheckCircle2 className="w-3 h-3" /> Customer selected
+                                    </span>
+                                  </div>
+                                  <div className="text-gray-600 flex flex-wrap gap-x-4 gap-y-0.5">
+                                    {cust.email && <span>Email: {cust.email}</span>}
+                                    {cust.phone && <span>Phone: {cust.phone}</span>}
+                                    {cust.gstin && <span>GSTIN: <strong className="text-gray-900">{cust.gstin}</strong></span>}
+                                  </div>
+                                  {cust.address && <div className="text-gray-500">Address: {cust.address}</div>}
+                                </div>
+                              )
+                            })()}
+                          </>
+                        )
+                      })()}
+                    </div>
                   </div>
 
                   {/* Dates */}
@@ -1458,12 +1694,85 @@ export function ImprovedInvoiceForm({
               </button>
             </div>
             <form onSubmit={handleAddCustomer} className="p-6 space-y-4">
+              {/* Organization / Company Section */}
+              <div className="space-y-2 bg-slate-50 p-3 rounded-lg border border-slate-200">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-gray-800 flex items-center gap-1.5">
+                    <Building2 className="w-3.5 h-3.5 text-blue-600" />
+                    Organization / Company
+                  </label>
+                  <div className="flex gap-1 bg-slate-200/80 p-0.5 rounded text-[11px]">
+                    <button
+                      type="button"
+                      onClick={() => setModalOrgMode('existing')}
+                      className={`px-2 py-0.5 rounded transition-all ${modalOrgMode === 'existing' ? 'bg-white font-medium text-blue-700 shadow-xs' : 'text-gray-600'}`}
+                    >
+                      Select
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setModalOrgMode('new')}
+                      className={`px-2 py-0.5 rounded transition-all ${modalOrgMode === 'new' ? 'bg-white font-medium text-blue-700 shadow-xs' : 'text-gray-600'}`}
+                    >
+                      + New
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setModalOrgMode('none')}
+                      className={`px-2 py-0.5 rounded transition-all ${modalOrgMode === 'none' ? 'bg-white font-medium text-blue-700 shadow-xs' : 'text-gray-600'}`}
+                    >
+                      None
+                    </button>
+                  </div>
+                </div>
+
+                {modalOrgMode === 'existing' && (
+                  <select
+                    value={modalSelectedOrgId}
+                    onChange={(e) => setModalSelectedOrgId(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-900 bg-white"
+                  >
+                    <option value="">-- Choose an Organization --</option>
+                    {organizations.map(org => (
+                      <option key={org.id} value={org.id}>
+                        {org.name} {org.city ? `(${org.city})` : ''}
+                      </option>
+                    ))}
+                  </select>
+                )}
+
+                {modalOrgMode === 'new' && (
+                  <Input
+                    placeholder="Enter new company / organization name"
+                    value={modalNewOrgName}
+                    onChange={(e) => setModalNewOrgName(e.target.value)}
+                    className="text-sm bg-white"
+                  />
+                )}
+
+                {modalOrgMode === 'none' && (
+                  <p className="text-[11px] text-gray-500 italic">
+                    Individual B2C customer without organization linking
+                  </p>
+                )}
+              </div>
+
               <div className="space-y-2">
                 <label htmlFor="cust-name" className="text-sm font-semibold text-gray-900">
                   Name <span className="text-red-500">*</span>
                 </label>
-                <Input id="cust-name" name="name" required placeholder="Enter customer name" />
+                <Input id="cust-name" name="name" required placeholder="Enter customer or contact name" />
               </div>
+
+              {/* Designation / Role */}
+              <div className="space-y-2">
+                <label htmlFor="cust-designation" className="text-sm font-semibold text-gray-900 flex items-center gap-1.5">
+                  <Briefcase className="w-3.5 h-3.5 text-gray-500" />
+                  Designation / Role
+                </label>
+                <Input id="cust-designation" name="designation" placeholder="e.g. Accounts Manager, Director, Billing Contact" />
+              </div>
+
               <div className="space-y-2">
                 <label htmlFor="cust-email" className="text-sm font-semibold text-gray-900">Email</label>
                 <Input id="cust-email" name="email" type="email" placeholder="customer@example.com" />
@@ -1495,6 +1804,73 @@ export function ImprovedInvoiceForm({
                   type="button"
                   variant="outline"
                   onClick={() => setShowAddCustomerModal(false)}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Quick Add Organization Modal */}
+      {showQuickOrgModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-white rounded-lg shadow-xl max-w-md w-full">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <Building2 className="w-5 h-5 text-blue-600" />
+                Add New Organization
+              </h2>
+              <button
+                onClick={() => setShowQuickOrgModal(false)}
+                className="text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <form onSubmit={handleQuickCreateOrg} className="p-6 space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-gray-900">
+                  Company Name <span className="text-red-500">*</span>
+                </label>
+                <Input
+                  required
+                  placeholder="e.g. Acme Innovations Pvt Ltd"
+                  value={quickOrgName}
+                  onChange={(e) => setQuickOrgName(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-gray-900">GSTIN</label>
+                <Input
+                  maxLength={15}
+                  placeholder="15-digit GSTIN (e.g. 29AAAAA0000A1Z5)"
+                  value={quickOrgGstin}
+                  onChange={(e) => setQuickOrgGstin(e.target.value.toUpperCase())}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-gray-900">City / Location</label>
+                <Input
+                  placeholder="e.g. Mumbai, Bengaluru"
+                  value={quickOrgCity}
+                  onChange={(e) => setQuickOrgCity(e.target.value)}
+                />
+              </div>
+              <div className="flex gap-2 pt-4">
+                <Button type="submit" disabled={isCreatingOrg} className="flex-1 gap-2 bg-blue-600 hover:bg-blue-700 text-white">
+                  {isCreatingOrg ? (
+                    <><Loader2 className="w-4 h-4 animate-spin" /> Saving...</>
+                  ) : (
+                    <><Building2 className="w-4 h-4" /> Save Organization</>
+                  )}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowQuickOrgModal(false)}
                   className="flex-1"
                 >
                   Cancel

@@ -57,6 +57,32 @@ export interface InventoryTransaction {
     }
 }
 
+export interface Organization {
+    id: string
+    user_id: string
+    name: string
+    legal_name?: string
+    gstin?: string
+    pan?: string
+    website?: string
+    email?: string
+    phone?: string
+    industry?: string
+    billing_address?: string
+    shipping_address?: string
+    city?: string
+    state?: string
+    country?: string
+    pincode?: string
+    currency?: string
+    notes?: string
+    contacts_count?: number
+    invoices_count?: number
+    total_billed?: number
+    created_at: string
+    updated_at: string
+}
+
 export interface Customer {
     id: string
     user_id: string
@@ -65,6 +91,11 @@ export interface Customer {
     phone?: string
     address?: string
     gstin?: string
+    organization_id?: string
+    organization_name?: string
+    designation?: string
+    department?: string
+    is_primary_contact?: boolean
     gstin_validated?: boolean
     gstin_validation_date?: string
     customer_state_code?: string
@@ -76,6 +107,8 @@ export interface Invoice {
     id: string
     user_id: string
     customer_id: string
+    organization_id?: string
+    organization_name?: string
     invoice_number: string
     invoice_date: string
     due_date?: string

@@ -69,6 +69,10 @@ export async function createCustomerAction(formData: FormData): Promise<{ succes
             return { success: false, error: 'Customer name is required' }
         }
 
+        const orgId = (formData.get('organization_id') as string)?.trim() || null
+        const orgName = (formData.get('organization_name') as string)?.trim() || null
+        const designation = (formData.get('designation') as string)?.trim() || null
+
         const customerData = {
             user_id: user.id,
             name,
@@ -76,6 +80,9 @@ export async function createCustomerAction(formData: FormData): Promise<{ succes
             phone: (formData.get('phone') as string)?.trim() || null,
             address: (formData.get('address') as string)?.trim() || null,
             gstin: (formData.get('gstin') as string)?.trim().toUpperCase() || null,
+            organization_id: orgId,
+            organization_name: orgName,
+            designation: designation,
         }
 
         const { data, error } = await supabase
