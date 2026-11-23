@@ -461,6 +461,98 @@ export async function getAllLeaveBalances(year: number): Promise<EmployeeLeaveBa
     return (data || []) as EmployeeLeaveBalance[]
 }
 
+export async function updateEmployeeLeaveBalance(
+    balanceId: string, 
+    allocatedDays: number, 
+    usedDays: number
+): Promise<{ success: boolean; error?: string }> {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { success: false, error: 'Unauthorized' }
+
+    const { error } = await supabase
+        .from('employee_leave_balances')
+        .update({
+            allocated_days: allocatedDays,
+            used_days: usedDays,
+            updated_at: new Date().toISOString()
+        })
+        .eq('id', balanceId)
+        .eq('user_id', user.id)
+
+    if (error) {
+        console.error('Error updating leave balance:', error)
+        return { success: false, error: error.message }
+    }
+    revalidatePath('/payroll/leaves')
+    return { success: true }
+}
+
+export interface CompanyHoliday {
+    id: string
+    name: string
+    date: string
+    type: 'national' | 'festival' | 'optional' | 'corporate'
+    is_paid: boolean
+    description?: string
+}
+
+export async function getCompanyHolidays(year: number): Promise<CompanyHoliday[]> {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return []
+
+    const { data } = await supabase
+        .from('invoice_settings')
+        .select('business_metadata')
+        .eq('user_id', user.id)
+        .maybeSingle()
+
+    const holidays = (data?.business_metadata?.holidays || []) as CompanyHoliday[]
+    if (holidays.length === 0) {
+        return [
+            { id: 'h1', name: 'New Year Day', date: `${year}-01-01`, type: 'national', is_paid: true, description: 'Statutory Public Holiday' },
+            { id: 'h2', name: 'Republic Day', date: `${year}-01-26`, type: 'national', is_paid: true, description: 'National Holiday' },
+            { id: 'h3', name: 'Holi / Spring Break', date: `${year}-03-25`, type: 'festival', is_paid: true, description: 'Cultural Festival' },
+            { id: 'h4', name: 'May Day / Labor Day', date: `${year}-05-01`, type: 'national', is_paid: true, description: 'International Workers Day' },
+            { id: 'h5', name: 'Independence Day', date: `${year}-08-15`, type: 'national', is_paid: true, description: 'National Holiday' },
+            { id: 'h6', name: 'Gandhi Jayanti', date: `${year}-10-02`, type: 'national', is_paid: true, description: 'National Holiday' },
+            { id: 'h7', name: 'Dussehra / Vijayadashami', date: `${year}-10-12`, type: 'festival', is_paid: true, description: 'Festival Holiday' },
+            { id: 'h8', name: 'Diwali / Deepavali', date: `${year}-11-01`, type: 'festival', is_paid: true, description: 'Festival of Lights' },
+            { id: 'h9', name: 'Christmas Day', date: `${year}-12-25`, type: 'national', is_paid: true, description: 'Statutory Holiday' }
+        ]
+    }
+    return holidays
+}
+
+export async function saveCompanyHolidays(holidays: CompanyHoliday[]): Promise<{ success: boolean; error?: string }> {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { success: false, error: 'Unauthorized' }
+
+    const { data } = await supabase
+        .from('invoice_settings')
+        .select('business_metadata')
+        .eq('user_id', user.id)
+        .maybeSingle()
+
+    const metadata = data?.business_metadata || {}
+    metadata.holidays = holidays
+
+    const { error } = await supabase
+        .from('invoice_settings')
+        .upsert({
+            user_id: user.id,
+            business_metadata: metadata,
+            updated_at: new Date().toISOString()
+        }, { onConflict: 'user_id' })
+
+    if (error) return { success: false, error: error.message }
+    revalidatePath('/payroll/leaves')
+    return { success: true }
+}
+
+
 export async function recordSalaryRevision(employeeId: string, newStructure: any, reason: string, effectiveDate: string): Promise<{ success: boolean; error?: string }> {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()

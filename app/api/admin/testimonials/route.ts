@@ -18,8 +18,8 @@ export async function GET() {
       .order('display_order', { ascending: true })
 
     if (error) {
-      console.error('Error fetching testimonials:', error)
-      return NextResponse.json({ error: 'Failed to fetch testimonials' }, { status: 500 })
+      console.warn('Testimonials table notice:', error.message)
+      return NextResponse.json([])
     }
 
     return NextResponse.json(testimonials || [])
@@ -47,7 +47,7 @@ export async function POST(request: Request) {
       .select('display_order')
       .order('display_order', { ascending: false })
       .limit(1)
-      .single()
+      .maybeSingle()
 
     const newOrder = (maxOrder?.display_order ?? 0) + 1
 

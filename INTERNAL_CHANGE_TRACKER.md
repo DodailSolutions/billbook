@@ -4,6 +4,30 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 
 ---
 
+## [Release v1.6.5 - In Progress / Implementing] - 2026-11-23
+
+### Navigation Vertical Scoping, Recursive Expenses, Excel Parser & Integrations Hub
+
+#### 1. Adaptive Vertical Scoping & Navigation Refinement
+- **Counter POS Isolation**: Strictly excluded Counter POS for IT, Software Development, Digital Marketing, Freelancers, and Consulting Agencies via `isPosSupported()` while keeping Barcodes & QR standee generators accessible.
+- **AI Proposal & RFP/RFQ Engine Restriction**: Proposals & RFP evaluation restricted exclusively to `software_it`, `digital_marketing`, and `freelancer` workspaces via `isProposalSupported()`.
+- **Dynamic Real-Time Sync**: Dispatches `billbook:vertical-changed` custom events so sidebars update immediately upon vertical selection without requiring hard page refresh.
+
+#### 2. Expense Tracking Engine: Recursive Cycles, Period Views & Excel Importer
+- **Recursive vs. One-Time Expenses**: Added recurring billing support (`one_time`, `daily`, `weekly`, `monthly`, `quarterly`, `yearly`) with auto-calculated run-rates and next cycle dates.
+- **Daily, Monthly & Yearly Expense Breakdowns**: Multi-tab period breakdown filters (`All`, `Daily (Today / This Week)`, `Monthly (This Month)`, `Yearly (Annual / FY)`) with burn-rate and tax-deductible metrics.
+- **Vehicle & Fleet Expenses Category**: Pre-seeded `Vehicle & Fleet Expenses` (Fuel, Servicing, Fastag, Insurance) tailored for workshops, travels, logistics, and field operations.
+- **Excel / CSV Report Bulk Importer**: Client-side spreadsheet parser with column auto-mapping for historic `.xlsx` and `.csv` expense reports, featuring live data preview and bulk insertion into the expense ledger.
+
+#### 3. Integrations Hub: Microsoft Teams, Google Sheets & WhatsApp Architecture
+- **Microsoft Teams Integration**: Incoming Webhook notifications for new paid invoices, overdue payment reminders, SOW acceptances, and daily expense alerts.
+- **Google Sheets Integration**: Automated sync of invoices, expenses, and client ledger to connected Google Spreadsheets with test sync verification.
+- **WhatsApp Role Security & 0-API Click-to-Chat**:
+  - Centralized Meta Cloud API keys strictly restricted to Super Admin Command Center, preventing unauthorized credential tampering.
+  - 0-API Click-to-Chat deep link (`wa.me`) enabled across all business tiers, empowering users to send pre-filled invoice reminders with dynamic UPI payment links directly via personal or business WhatsApp with 0 configuration.
+
+---
+
 ## [Release v1.6.0 - Implemented] - 2026-11-22
 
 ### Super Admin Business Category / Vertical Management & Phase 5: AI Proposal Writing & RFP / RFQ Engine
@@ -761,5 +785,35 @@ Deep market research and competitor benchmarking completed across 10 major indus
 | 2026-11-18 | `app/api/razorpay/create-order` | Enabled guest direct purchase for public subscription plans | ✅ Completed |
 | 2026-11-18 | `app/ae/page.tsx` & `app/us/page.tsx` | Dynamic plan price sync with `subscription_plans` table | ✅ Completed |
 | 2026-11-18 | `app/ae/pricing/page.tsx` | Removed redundant closing tags to resolve JSX parse error | ✅ Completed |
+
+---
+
+## [Release v1.6.6] - 2026-11-23
+
+### 28. Super Admin Production-Readiness Overhaul: Coupons, Testimonials, Refunds, Payments & Support
+- **Issue**:
+  - Coupons module (`admin/coupons`) was read-only and lacked creation, editing, active toggles, and deletion, preventing coupon management.
+  - Testimonials CMS (`admin/testimonials`) was failing with 500 error when saving due to `.single()` query on empty tables.
+  - Payments & Revenue (`admin/payments`) only tracked partial subscriptions without unified view of invoice payments or search/export capabilities.
+  - Refund processing engine crashed if `gateway_payment_id` was absent on manual or test transactions.
+  - Support Tickets (`admin/support`) lacked instant toast confirmations and local state synchronizations upon reply.
+- **Resolution**:
+  - **Coupons (`admin/coupons`)**: Built `actions.ts` with full CRUD (`createCoupon`, `updateCoupon`, `toggleCouponStatus`, `deleteCoupon`) and interactive `CouponsClientView.tsx` with modal, percentage/flat discounts, usage caps, and active status switches.
+  - **Testimonials CMS (`admin/testimonials`)**: Fixed `app/api/admin/testimonials/route.ts` with `.maybeSingle()` and added status banners for save feedback.
+  - **Payments & Revenue (`admin/payments`)**: Built `UnifiedPayment` merging subscriptions and invoice gateway collections into `PaymentsClientView.tsx` with live KPIs, CSV exporter, and type/status filters.
+  - **Refund Engine (`admin/refunds`)**: Updated `baseProcessRefund` to handle both live Razorpay (`pay_*`) and offline ledger settlements.
+  - **Support Helpdesk (`admin/support`)**: Enhanced `SupportTicketsClientTable.tsx` with toast feedback and ticket status updates.
+
+---
+
+| Date | Component / Route | Change Description | Status |
+| :--- | :--- | :--- | :--- |
+| 2026-11-23 | `app/(superadmin)/admin/coupons/` | Full interactive coupon CRUD suite and creation modal | ✅ Completed |
+| 2026-11-23 | `app/api/admin/testimonials/` | Fixed empty table `.single()` query failure & error handling | ✅ Completed |
+| 2026-11-23 | `app/(superadmin)/admin/testimonials/` | Added real-time save/edit status alert banners | ✅ Completed |
+| 2026-11-23 | `app/(superadmin)/admin/payments/` | Unified revenue journal, KPI cards, and CSV export | ✅ Completed |
+| 2026-11-23 | `app/(dashboard)/invoices/payment-actions.ts` | Resilient refund processing for live and offline transactions | ✅ Completed |
+| 2026-11-23 | `app/(superadmin)/admin/support/` | Upgraded ticket resolution, toast feedback, and reply handling | ✅ Completed |
+
 
 

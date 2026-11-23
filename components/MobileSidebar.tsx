@@ -11,7 +11,7 @@ import { PlanBanner } from "./PlanBanner"
 import { getMyCAProfile } from "@/lib/ca-profile-actions"
 import { getBusinessProfile } from "@/lib/business-profile-actions"
 import type { BusinessType } from "@/lib/business-profile-types"
-import { isPosSupported } from "@/lib/business-profile-types"
+import { isPosSupported, isProposalSupported } from "@/lib/business-profile-types"
 
 const mobileTabs = [
     {

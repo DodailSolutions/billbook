@@ -18,6 +18,8 @@ This document serves as the master execution tracker for multi-vertical architec
 | **Phase 8** | Multi-Property Estate PMS & Campsite Campground Grid | `resorts_farmhouses`, `camping_outdoors` | **COMPLETED & IMPLEMENTED** |
 | **Phase 9** | Studio BOM Recipe Costing & Certificate of Authenticity (COA) | `art_crafts` | **COMPLETED & IMPLEMENTED** |
 | **Phase 10** | Automated WhatsApp Reminders & 1-Click Dynamic UPI Pay | All 16 Verticals | **COMPLETED & IMPLEMENTED** |
+| **Phase 11** | SOW Commission Splits, HR Handbook & Mobile RFP Engine | Universal B2B / Services | **COMPLETED & IMPLEMENTED** |
+| **Phase 12** | Recursive Expenses, Period Breakdowns, Excel Importer & Integrations Hub | All Verticals | **IN PROGRESS / IMPLEMENTING** |
 
 ---
 

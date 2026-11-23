@@ -29,21 +29,83 @@ export default function EmployeeDashboard() {
     const [leaveBalances, setLeaveBalances] = useState<EmployeeLeaveBalance[]>([])
     const [loading, setLoading] = useState(true)
 
-    // Interactive Check-In Simulation
-    const [checkedInTime, setCheckedInTime] = useState<string | null>('09:42 AM')
+    // Interactive Check-In & Timeclock State
+    const [currentTime, setCurrentTime] = useState('')
+    const [checkedInTime, setCheckedInTime] = useState<string | null>(null)
+    const [breakStartTime, setBreakStartTime] = useState<string | null>(null)
     const [checkedOutTime, setCheckedOutTime] = useState<string | null>(null)
     const [workMode, setWorkMode] = useState<'office' | 'wfh'>('office')
 
     useEffect(() => {
         const fetchData = async () => {
-            const data = await getEmployeePortalData()
-            setEmployee(data.employee)
-            setAttendanceStats(data.attendanceStats)
-            setLeaveBalances(data.leaveBalances)
-            setLoading(false)
+            try {
+                const data = await getEmployeePortalData()
+                setEmployee(data.employee)
+                setAttendanceStats(data.attendanceStats)
+                setLeaveBalances(data.leaveBalances)
+            } catch (err) {
+                console.error(err)
+            } finally {
+                setLoading(false)
+            }
         }
         fetchData()
+
+        // Hydrate from localStorage if present for today
+        const todayKey = `billbook:timeclock:${new Date().toISOString().slice(0, 10)}`
+        try {
+            const saved = localStorage.getItem(todayKey)
+            if (saved) {
+                const parsed = JSON.parse(saved)
+                setCheckedInTime(parsed.in || null)
+                setBreakStartTime(parsed.break || null)
+                setCheckedOutTime(parsed.out || null)
+                setWorkMode(parsed.mode || 'office')
+            } else {
+                setCheckedInTime('09:30 AM')
+            }
+        } catch {
+            setCheckedInTime('09:30 AM')
+        }
+
+        const timer = setInterval(() => {
+            setCurrentTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }))
+        }, 1000)
+        return () => clearInterval(timer)
     }, [])
+
+    const persistTimeclock = (inT: string | null, brkT: string | null, outT: string | null, mode: 'office' | 'wfh') => {
+        const todayKey = `billbook:timeclock:${new Date().toISOString().slice(0, 10)}`
+        try {
+            localStorage.setItem(todayKey, JSON.stringify({ in: inT, break: brkT, out: outT, mode }))
+        } catch {}
+    }
+
+    const handlePunchIn = () => {
+        const nowStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        setCheckedInTime(nowStr)
+        setCheckedOutTime(null)
+        setBreakStartTime(null)
+        persistTimeclock(nowStr, null, null, workMode)
+    }
+
+    const handlePunchOut = () => {
+        const nowStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        setCheckedOutTime(nowStr)
+        setBreakStartTime(null)
+        persistTimeclock(checkedInTime, null, nowStr, workMode)
+    }
+
+    const handleToggleBreak = () => {
+        const nowStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        if (!breakStartTime) {
+            setBreakStartTime(nowStr)
+            persistTimeclock(checkedInTime, nowStr, checkedOutTime, workMode)
+        } else {
+            setBreakStartTime(null)
+            persistTimeclock(checkedInTime, null, checkedOutTime, workMode)
+        }
+    }
 
     if (loading) {
         return (
@@ -71,19 +133,6 @@ export default function EmployeeDashboard() {
 
     const sal = employee.salary_structure
 
-    const handleClockToggle = () => {
-        const nowStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        if (!checkedInTime) {
-            setCheckedInTime(nowStr)
-            setCheckedOutTime(null)
-        } else if (!checkedOutTime) {
-            setCheckedOutTime(nowStr)
-        } else {
-            setCheckedInTime(nowStr)
-            setCheckedOutTime(null)
-        }
-    }
-
     return (
         <div className="space-y-6">
             {/* Greeting Header & Live Timeclock */}
@@ -104,31 +153,77 @@ export default function EmployeeDashboard() {
                 </div>
 
                 {/* Touchless Virtual Clock Card */}
-                <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 text-center space-y-2 min-w-[220px]">
-                    <div className="flex items-center justify-center gap-1.5 text-xs text-indigo-200">
-                        <Clock className="w-4 h-4 text-emerald-400" />
-                        <span>Today's Timeclock</span>
+                <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 sm:p-5 text-center space-y-3 min-w-[260px]">
+                    <div className="flex items-center justify-between text-xs text-indigo-200 border-b border-white/10 pb-2">
+                        <span className="flex items-center gap-1.5 font-semibold">
+                            <Clock className="w-3.5 h-3.5 text-emerald-400" />
+                            {currentTime || '09:30 AM'}
+                        </span>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/20 text-white">
+                            {workMode === 'office' ? '🏢 Office' : '🏠 WFH'}
+                        </span>
                     </div>
-                    <div className="text-xs">
+
+                    <div className="text-xs space-y-1">
                         {checkedInTime ? (
-                            <span className="font-bold text-emerald-300">
-                                In: {checkedInTime} {checkedOutTime ? `• Out: ${checkedOutTime}` : '(Active)'}
-                            </span>
+                            <div className="space-y-0.5">
+                                <p className="font-bold text-emerald-300">
+                                    Punch In: {checkedInTime}
+                                </p>
+                                {breakStartTime && (
+                                    <p className="text-amber-300 font-semibold text-[11px]">
+                                        ☕ On Break since {breakStartTime}
+                                    </p>
+                                )}
+                                {checkedOutTime && (
+                                    <p className="text-indigo-200 font-semibold text-[11px]">
+                                        Punch Out: {checkedOutTime}
+                                    </p>
+                                )}
+                            </div>
                         ) : (
-                            <span className="text-amber-300">Not Checked In</span>
+                            <p className="text-amber-300 font-semibold">Not Checked In Today</p>
                         )}
                     </div>
-                    <Button
-                        size="sm"
-                        onClick={handleClockToggle}
-                        className={`w-full text-xs h-8 font-semibold ${
-                            !checkedOutTime
-                                ? 'bg-amber-500 hover:bg-amber-600 text-slate-950'
-                                : 'bg-emerald-500 hover:bg-emerald-600 text-white'
-                        }`}
-                    >
-                        {!checkedInTime ? 'Check-In Today' : !checkedOutTime ? 'Punch Out / Check-Out' : 'Punch In Again'}
-                    </Button>
+
+                    {/* Clock Actions */}
+                    <div className="flex flex-col gap-1.5 pt-1">
+                        {!checkedInTime ? (
+                            <Button
+                                size="sm"
+                                onClick={handlePunchIn}
+                                className="w-full text-xs h-8 font-semibold bg-emerald-500 hover:bg-emerald-600 text-white"
+                            >
+                                <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> Punch In (Check-In)
+                            </Button>
+                        ) : !checkedOutTime ? (
+                            <div className="grid grid-cols-2 gap-1.5">
+                                <Button
+                                    size="sm"
+                                    onClick={handleToggleBreak}
+                                    variant="outline"
+                                    className="text-xs h-8 font-semibold border-white/30 text-white hover:bg-white/10"
+                                >
+                                    <Coffee className="w-3.5 h-3.5 mr-1" /> {breakStartTime ? 'End Break' : 'Take Break'}
+                                </Button>
+                                <Button
+                                    size="sm"
+                                    onClick={handlePunchOut}
+                                    className="text-xs h-8 font-semibold bg-amber-500 hover:bg-amber-600 text-slate-950"
+                                >
+                                    Punch Out
+                                </Button>
+                            </div>
+                        ) : (
+                            <Button
+                                size="sm"
+                                onClick={handlePunchIn}
+                                className="w-full text-xs h-8 font-semibold bg-indigo-500 hover:bg-indigo-600 text-white"
+                            >
+                                Re-Punch / Overtime In
+                            </Button>
+                        )}
+                    </div>
                 </div>
             </div>
 

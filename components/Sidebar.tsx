@@ -5,13 +5,13 @@ import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { LayoutDashboard, FileText, Users, RefreshCw, Bell, Settings, User, Bot, UserCog, FileBarChart, HelpCircle, Briefcase, UserPlus, ChevronLeft, ChevronRight, Package, Receipt, Sparkles, BookOpen, ShoppingBag, DollarSign, Building2, CalendarDays, CalendarOff, Mail, Video, ShieldCheck, Barcode, Zap, Hotel, Palette } from "lucide-react"
+import { LayoutDashboard, FileText, Users, RefreshCw, Bell, Settings, User, Bot, UserCog, FileBarChart, HelpCircle, Briefcase, UserPlus, ChevronLeft, ChevronRight, Package, Receipt, Sparkles, BookOpen, ShoppingBag, DollarSign, Building2, CalendarDays, CalendarOff, Mail, Video, ShieldCheck, Barcode, Zap, Hotel, Palette, Plug } from "lucide-react"
 import { SignOutButton } from "./SignOutButton"
 import { PlanBanner } from "./PlanBanner"
 import { getMyCAProfile } from "@/lib/ca-profile-actions"
 import { getBusinessProfile } from "@/lib/business-profile-actions"
 import type { BusinessType } from "@/lib/business-profile-types"
-import { isPosSupported } from "@/lib/business-profile-types"
+import { isPosSupported, isProposalSupported } from "@/lib/business-profile-types"
 
 export function Sidebar() {
     const pathname = usePathname()
@@ -109,13 +109,13 @@ export function Sidebar() {
                     color: "text-blue-600",
                     badge: 'NEW'
                 },
-                {
+                ...(isProposalSupported(businessProfile.businessType) || businessProfile.features?.hasProposals ? [{
                     label: 'Proposals & RFPs',
                     icon: FileText,
                     href: '/proposals',
                     color: "text-purple-600",
                     badge: 'AI'
-                },
+                }] : []),
                 ...(isPosSupported(businessProfile.businessType) ? [{
                     label: 'Counter POS',
                     icon: Zap,
@@ -280,6 +280,13 @@ export function Sidebar() {
                     icon: Mail,
                     href: '/settings/email',
                     color: "text-blue-600",
+                    badge: 'NEW'
+                },
+                {
+                    label: 'Integrations',
+                    icon: Plug,
+                    href: '/integrations',
+                    color: "text-indigo-600",
                     badge: 'NEW'
                 },
                 {

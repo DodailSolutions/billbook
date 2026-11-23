@@ -2,20 +2,38 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { getLeaveRequests, getLeaveTypes, applyLeave, getEmployees, approveLeave, rejectLeave, getAllLeaveBalances } from '@/lib/payroll-actions'
+import { 
+    getLeaveRequests, 
+    getLeaveTypes, 
+    applyLeave, 
+    getEmployees, 
+    approveLeave, 
+    rejectLeave, 
+    getAllLeaveBalances,
+    getCompanyHolidays,
+    saveCompanyHolidays,
+    type CompanyHoliday
+} from '@/lib/payroll-actions'
 import { LeaveRequest, LeaveType, Employee, EmployeeLeaveBalance } from '@/lib/payroll-types'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent } from '@/components/ui/Card'
-import { ArrowLeft, Check, X, Plane, Calendar } from 'lucide-react'
+import { ArrowLeft, Check, X, Plane, Calendar, Plus, Edit3, Trash2, ShieldCheck, Sparkles } from 'lucide-react'
 import { MigrationBanner } from '@/components/MigrationBanner'
+import { EditLeaveBalanceModal } from './EditLeaveBalanceModal'
+import { HolidayCalendarModal } from './HolidayCalendarModal'
 
 export default function LeavesPage() {
-    const [tab, setTab] = useState<'requests' | 'balances' | 'apply'>('requests')
+    const [tab, setTab] = useState<'requests' | 'balances' | 'holidays' | 'apply'>('requests')
     const [requests, setRequests] = useState<LeaveRequest[]>([])
     const [types, setTypes] = useState<LeaveType[]>([])
     const [employees, setEmployees] = useState<Employee[]>([])
     const [balances, setBalances] = useState<EmployeeLeaveBalance[]>([])
+    const [holidays, setHolidays] = useState<CompanyHoliday[]>([])
     const [loading, setLoading] = useState(true)
+
+    // Modals
+    const [editingBalance, setEditingBalance] = useState<{ balance: EmployeeLeaveBalance; employeeName: string } | null>(null)
+    const [isAddHolidayOpen, setIsAddHolidayOpen] = useState(false)
 
     const [empId, setEmpId] = useState('')
     const [leaveTypeId, setLeaveTypeId] = useState('')
@@ -27,16 +45,18 @@ export default function LeavesPage() {
 
     const fetchData = async () => {
         setLoading(true)
-        const [reqs, typs, emps, bals] = await Promise.all([
+        const [reqs, typs, emps, bals, hols] = await Promise.all([
             getLeaveRequests(),
             getLeaveTypes(),
             getEmployees(),
-            getAllLeaveBalances(currentYear)
+            getAllLeaveBalances(currentYear),
+            getCompanyHolidays(currentYear)
         ])
         setRequests(reqs)
         setTypes(typs)
         setEmployees(emps.filter(e => e.status === 'active'))
         setBalances(bals)
+        setHolidays(hols)
         setLoading(false)
     }
 
@@ -78,30 +98,74 @@ export default function LeavesPage() {
         }
     }
 
+    const handleHolidayAdded = async (holiday: CompanyHoliday) => {
+        const updated = [...holidays, holiday].sort((a, b) => a.date.localeCompare(b.date))
+        setHolidays(updated)
+        await saveCompanyHolidays(updated)
+    }
+
+    const handleDeleteHoliday = async (id: string) => {
+        if (!confirm('Are you sure you want to remove this company holiday?')) return
+        const updated = holidays.filter(h => h.id !== id)
+        setHolidays(updated)
+        await saveCompanyHolidays(updated)
+    }
+
     return (
         <div className="space-y-6 max-w-5xl mx-auto pb-12">
             <MigrationBanner />
-            <div className="flex items-center gap-3">
-                <Link href="/payroll">
-                    <Button variant="outline" size="sm" className="h-10 w-10 p-0 rounded-xl">
-                        <ArrowLeft className="h-4 w-4" />
-                    </Button>
-                </Link>
-                <div>
-                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
-                        <Plane className="h-5 w-5 text-blue-600" />
-                        Leave Management
-                    </h2>
-                    <p className="text-xs text-gray-500 mt-0.5">
-                        Track requests, approve leaves, and view balances.
-                    </p>
+
+            {/* Modals */}
+            {editingBalance && (
+                <EditLeaveBalanceModal
+                    balance={editingBalance.balance}
+                    employeeName={editingBalance.employeeName}
+                    onClose={() => setEditingBalance(null)}
+                    onSuccess={() => fetchData()}
+                />
+            )}
+
+            {isAddHolidayOpen && (
+                <HolidayCalendarModal
+                    onClose={() => setIsAddHolidayOpen(false)}
+                    onHolidayAdded={handleHolidayAdded}
+                />
+            )}
+
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                    <Link href="/payroll">
+                        <Button variant="outline" size="sm" className="h-10 w-10 p-0 rounded-xl">
+                            <ArrowLeft className="h-4 w-4" />
+                        </Button>
+                    </Link>
+                    <div>
+                        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
+                            <Plane className="h-5 w-5 text-blue-600" />
+                            Leave & Holiday Management
+                        </h2>
+                        <p className="text-xs text-gray-500 mt-0.5">
+                            Track leave requests, customize employee quotas, and manage company holidays.
+                        </p>
+                    </div>
                 </div>
+
+                {tab === 'holidays' && (
+                    <Button
+                        size="sm"
+                        onClick={() => setIsAddHolidayOpen(true)}
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs h-9 gap-1.5"
+                    >
+                        <Plus className="h-4 w-4" /> Add Company Holiday
+                    </Button>
+                )}
             </div>
 
-            <div className="flex bg-slate-100 p-1 rounded-xl w-fit">
-                <button onClick={() => setTab('requests')} className={`px-4 py-2 text-xs font-bold rounded-lg transition-colors ${tab === 'requests' ? 'bg-white shadow-xs text-blue-700' : 'text-gray-500 hover:text-gray-900'}`}>Leave Requests</button>
-                <button onClick={() => setTab('balances')} className={`px-4 py-2 text-xs font-bold rounded-lg transition-colors ${tab === 'balances' ? 'bg-white shadow-xs text-blue-700' : 'text-gray-500 hover:text-gray-900'}`}>Leave Balances</button>
-                <button onClick={() => setTab('apply')} className={`px-4 py-2 text-xs font-bold rounded-lg transition-colors ${tab === 'apply' ? 'bg-white shadow-xs text-blue-700' : 'text-gray-500 hover:text-gray-900'}`}>Apply Leave</button>
+            <div className="flex flex-wrap bg-slate-100 dark:bg-slate-800 p-1 rounded-xl w-fit gap-1">
+                <button onClick={() => setTab('requests')} className={`px-3 sm:px-4 py-2 text-xs font-bold rounded-lg transition-colors ${tab === 'requests' ? 'bg-white dark:bg-slate-900 shadow-xs text-blue-700 dark:text-blue-400' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'}`}>Leave Requests</button>
+                <button onClick={() => setTab('balances')} className={`px-3 sm:px-4 py-2 text-xs font-bold rounded-lg transition-colors ${tab === 'balances' ? 'bg-white dark:bg-slate-900 shadow-xs text-blue-700 dark:text-blue-400' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'}`}>Leave Balances</button>
+                <button onClick={() => setTab('holidays')} className={`px-3 sm:px-4 py-2 text-xs font-bold rounded-lg transition-colors ${tab === 'holidays' ? 'bg-white dark:bg-slate-900 shadow-xs text-indigo-700 dark:text-indigo-400' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'}`}>Holiday Calendar ({holidays.length})</button>
+                <button onClick={() => setTab('apply')} className={`px-3 sm:px-4 py-2 text-xs font-bold rounded-lg transition-colors ${tab === 'apply' ? 'bg-white dark:bg-slate-900 shadow-xs text-blue-700 dark:text-blue-400' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'}`}>Apply Leave</button>
             </div>
 
             {loading ? (
@@ -151,35 +215,159 @@ export default function LeavesPage() {
                     )}
 
                     {tab === 'balances' && (
-                        <Card className="border-gray-100 shadow-2xs">
-                            <CardContent className="p-0">
-                                <table className="w-full text-left text-xs">
-                                    <thead className="bg-slate-50 text-gray-500 uppercase font-semibold border-b border-gray-200">
+                        <Card className="border-gray-100 shadow-2xs overflow-hidden">
+                            <CardContent className="p-0 overflow-x-auto">
+                                <table className="w-full text-left text-xs min-w-[500px]">
+                                    <thead className="bg-slate-50 dark:bg-slate-800 text-gray-500 uppercase font-semibold border-b border-gray-200 dark:border-gray-700">
                                         <tr>
                                             <th className="p-4">Employee</th>
                                             <th className="p-4">Leave Type</th>
-                                            <th className="p-4">Quota</th>
+                                            <th className="p-4">Annual Quota</th>
                                             <th className="p-4">Used</th>
                                             <th className="p-4">Remaining</th>
+                                            <th className="p-4 text-right">Actions</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-gray-100">
-                                        {balances.map(bal => {
-                                            const emp = employees.find(e => e.id === bal.employee_id)
-                                            return (
-                                                <tr key={bal.id}>
-                                                    <td className="p-4 font-bold text-gray-900">{emp?.name}</td>
-                                                    <td className="p-4">{bal.leave_type?.name}</td>
-                                                    <td className="p-4 font-mono">{bal.total_quota}</td>
-                                                    <td className="p-4 font-mono text-rose-600">{bal.used}</td>
-                                                    <td className="p-4 font-mono font-bold text-emerald-600">{bal.remaining}</td>
-                                                </tr>
-                                            )
-                                        })}
+                                    <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                                        {balances.length === 0 ? (
+                                            <tr>
+                                                <td colSpan={6} className="p-8 text-center text-slate-400">
+                                                    No leave balances recorded.
+                                                </td>
+                                            </tr>
+                                        ) : (
+                                            balances.map(bal => {
+                                                const emp = employees.find(e => e.id === bal.employee_id)
+                                                return (
+                                                    <tr key={bal.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
+                                                        <td className="p-4 font-bold text-gray-900 dark:text-white">{emp?.name || 'Employee'}</td>
+                                                        <td className="p-4">{bal.leave_type?.name}</td>
+                                                        <td className="p-4 font-mono font-semibold">{bal.total_quota} days</td>
+                                                        <td className="p-4 font-mono text-rose-600">{bal.used} days</td>
+                                                        <td className="p-4 font-mono font-bold text-emerald-600">{bal.remaining} days</td>
+                                                        <td className="p-4 text-right">
+                                                            <Button
+                                                                size="sm"
+                                                                variant="outline"
+                                                                onClick={() => setEditingBalance({ balance: bal, employeeName: emp?.name || 'Employee' })}
+                                                                className="text-xs h-7 px-2.5 gap-1 border-indigo-200 text-indigo-700 hover:bg-indigo-50"
+                                                            >
+                                                                <Edit3 className="w-3.5 h-3.5" /> Edit Quota
+                                                            </Button>
+                                                        </td>
+                                                    </tr>
+                                                )
+                                            })
+                                        )}
                                     </tbody>
                                 </table>
                             </CardContent>
                         </Card>
+                    )}
+
+                    {tab === 'holidays' && (
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <Card className="p-4 border-slate-200 dark:border-slate-800">
+                                    <div className="text-xs text-slate-500 font-medium">Total Holidays in {currentYear}</div>
+                                    <div className="text-2xl font-bold text-slate-900 dark:text-white mt-1">{holidays.length} Days</div>
+                                    <p className="text-[11px] text-slate-400 mt-0.5">Corporate & statutory holidays</p>
+                                </Card>
+                                <Card className="p-4 border-slate-200 dark:border-slate-800">
+                                    <div className="text-xs text-slate-500 font-medium">Paid Holidays</div>
+                                    <div className="text-2xl font-bold text-emerald-600 mt-1">
+                                        {holidays.filter(h => h.is_paid).length} Days
+                                    </div>
+                                    <p className="text-[11px] text-emerald-600 mt-0.5">100% wage protected</p>
+                                </Card>
+                                <Card className="p-4 border-slate-200 dark:border-slate-800">
+                                    <div className="text-xs text-slate-500 font-medium">Payroll Integration</div>
+                                    <div className="text-sm font-bold text-indigo-600 mt-1 flex items-center gap-1">
+                                        <ShieldCheck className="w-4 h-4" /> Auto-Synced
+                                    </div>
+                                    <p className="text-[11px] text-slate-400 mt-0.5">Zero Loss-of-Pay deductions on holidays</p>
+                                </Card>
+                            </div>
+
+                            <Card className="border-gray-100 shadow-2xs overflow-hidden">
+                                <CardContent className="p-0 overflow-x-auto">
+                                    <table className="w-full text-left text-xs min-w-[550px]">
+                                        <thead className="bg-slate-50 dark:bg-slate-800 text-gray-500 uppercase font-semibold border-b border-gray-200 dark:border-gray-700">
+                                            <tr>
+                                                <th className="p-4">Holiday Name</th>
+                                                <th className="p-4">Date</th>
+                                                <th className="p-4">Classification</th>
+                                                <th className="p-4">Wage Status</th>
+                                                <th className="p-4">Description</th>
+                                                <th className="p-4 text-right">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                                            {holidays.length === 0 ? (
+                                                <tr>
+                                                    <td colSpan={6} className="p-8 text-center text-slate-400">
+                                                        No holidays scheduled. Click "Add Company Holiday" above to declare one.
+                                                    </td>
+                                                </tr>
+                                            ) : (
+                                                holidays.map(hol => {
+                                                    const dateObj = new Date(hol.date)
+                                                    const formatted = dateObj.toLocaleDateString('en-IN', {
+                                                        weekday: 'short',
+                                                        month: 'short',
+                                                        day: 'numeric',
+                                                        year: 'numeric'
+                                                    })
+
+                                                    return (
+                                                        <tr key={hol.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
+                                                            <td className="p-4 font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                                                <Calendar className="w-4 h-4 text-indigo-600 shrink-0" />
+                                                                <span>{hol.name}</span>
+                                                            </td>
+                                                            <td className="p-4 font-semibold text-slate-700 dark:text-slate-300 font-mono">
+                                                                {formatted}
+                                                            </td>
+                                                            <td className="p-4">
+                                                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                                                                    hol.type === 'national' ? 'bg-blue-100 text-blue-700' :
+                                                                    hol.type === 'festival' ? 'bg-purple-100 text-purple-700' :
+                                                                    hol.type === 'corporate' ? 'bg-amber-100 text-amber-700' :
+                                                                    'bg-slate-100 text-slate-700'
+                                                                }`}>
+                                                                    {hol.type}
+                                                                </span>
+                                                            </td>
+                                                            <td className="p-4">
+                                                                {hol.is_paid ? (
+                                                                    <span className="text-emerald-700 dark:text-emerald-400 font-semibold flex items-center gap-1">
+                                                                        <Check className="w-3.5 h-3.5" /> Paid Holiday
+                                                                    </span>
+                                                                ) : (
+                                                                    <span className="text-slate-500">Unpaid / Optional</span>
+                                                                )}
+                                                            </td>
+                                                            <td className="p-4 text-slate-500 text-[11px]">
+                                                                {hol.description || '—'}
+                                                            </td>
+                                                            <td className="p-4 text-right">
+                                                                <button
+                                                                    onClick={() => handleDeleteHoliday(hol.id)}
+                                                                    className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950 transition-colors"
+                                                                    title="Remove Holiday"
+                                                                >
+                                                                    <Trash2 className="w-4 h-4" />
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    )
+                                                })
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </CardContent>
+                            </Card>
+                        </div>
                     )}
 
                     {tab === 'apply' && (
@@ -219,6 +407,12 @@ export default function LeavesPage() {
                             </CardContent>
                         </Card>
                     )}
+                </>
+            )}
+        </div>
+    )
+}
+
                 </>
             )}
         </div>

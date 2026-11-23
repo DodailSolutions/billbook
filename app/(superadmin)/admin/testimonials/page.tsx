@@ -48,8 +48,11 @@ export default function TestimonialsAdmin() {
     }
   }
 
+  const [saveStatus, setSaveStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setSaveStatus(null)
     
     try {
       const url = editingId
@@ -63,11 +66,17 @@ export default function TestimonialsAdmin() {
       })
 
       if (response.ok) {
+        setSaveStatus({ type: 'success', message: editingId ? 'Testimonial updated successfully!' : 'Testimonial created successfully!' })
         fetchTestimonials()
         resetForm()
+        setTimeout(() => setSaveStatus(null), 3000)
+      } else {
+        const errData = await response.json().catch(() => ({}))
+        setSaveStatus({ type: 'error', message: errData.error || 'Failed to save testimonial.' })
       }
     } catch (error) {
       console.error('Failed to save testimonial:', error)
+      setSaveStatus({ type: 'error', message: 'Network or server error occurred.' })
     }
   }
 
@@ -147,6 +156,15 @@ export default function TestimonialsAdmin() {
         <h2 className="text-xl font-semibold mb-4">
           {editingId ? 'Edit Testimonial' : 'Add New Testimonial'}
         </h2>
+        {saveStatus && (
+          <div className={`p-3 rounded-lg text-sm mb-4 ${
+            saveStatus.type === 'success' 
+              ? 'bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+              : 'bg-red-50 text-red-800 dark:bg-red-950/40 dark:text-red-300 border border-red-200 dark:border-red-800'
+          }`}>
+            {saveStatus.message}
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid md:grid-cols-2 gap-4">
             <div>

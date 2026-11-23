@@ -53,6 +53,7 @@ export async function getExpenseCategoriesWithSeed() {
             { category_name: 'Meals & Entertainment', category_type: 'travel', is_tax_deductible: true, user_id: user.id },
             { category_name: 'Salaries & Wages', category_type: 'staff', is_tax_deductible: true, user_id: user.id },
             { category_name: 'Software & SaaS', category_type: 'operational', is_tax_deductible: true, user_id: user.id },
+            { category_name: 'Vehicle & Fleet Expenses', category_type: 'travel', is_tax_deductible: true, user_id: user.id },
             { category_name: 'Hardware & Equipment', category_type: 'capital', is_tax_deductible: true, user_id: user.id },
             { category_name: 'Other Expenses', category_type: 'other', is_tax_deductible: true, user_id: user.id }
         ]
@@ -186,4 +187,83 @@ export async function deleteExpenseAction(id: string) {
     revalidatePath('/expenses')
     revalidatePath('/dashboard')
     return { success: true }
+}
+
+export async function bulkImportExpensesAction(records: Array<{
+    date: string
+    payeeName: string
+    categoryName?: string
+    amount: number
+    taxAmount?: number
+    paymentMethod?: string
+    recurrence?: string
+}>): Promise<{ success: boolean; importedCount: number; error?: string }> {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { success: false, importedCount: 0, error: 'Unauthorized' }
+
+    if (!records || records.length === 0) {
+        return { success: true, importedCount: 0 }
+    }
+
+    // Fetch existing categories to map names to category IDs
+    const { data: categories } = await supabase
+        .from('expense_categories')
+        .select('id, category_name')
+        .eq('user_id', user.id)
+
+    const catMap = new Map<string, string>()
+    ;(categories || []).forEach(c => catMap.set(c.category_name.toLowerCase(), c.id))
+
+    // Fallback category
+    let defaultCatId = categories?.[0]?.id
+    if (!defaultCatId) {
+        const { data: newCat } = await supabase
+            .from('expense_categories')
+            .insert([{ category_name: 'General Expenses', category_type: 'operational', user_id: user.id }])
+            .select('id')
+            .single()
+        defaultCatId = newCat?.id
+    }
+
+    const rowsToInsert = records.map((r, idx) => {
+        const amt = Number(r.amount) || 0
+        const tax = Number(r.taxAmount) || 0
+        const total = amt + tax
+        const catId = (r.categoryName && catMap.get(r.categoryName.toLowerCase())) || defaultCatId
+        const dateStr = r.date || new Date().toISOString().slice(0, 10)
+        const expNum = `EXP-IMP-${Date.now().toString().slice(-6)}-${idx + 1}`
+        const rec = r.recurrence || 'one_time'
+
+        return {
+            user_id: user.id,
+            expense_number: expNum,
+            expense_date: dateStr,
+            expense_category_id: catId,
+            expense_type: rec !== 'one_time' ? `recurring_${rec}` : 'cash',
+            payee_name: r.payeeName || 'Expense Payee',
+            amount: amt,
+            tax_amount: tax,
+            total_amount: total,
+            currency: 'INR',
+            payment_method: r.paymentMethod || 'bank_transfer',
+            payment_reference: rec !== 'one_time' ? `Cycle: ${rec}` : 'Imported via Excel',
+            payment_date: dateStr,
+            submitted_by: user.id
+        }
+    })
+
+    const { error } = await supabase
+        .from('expenses')
+        .insert(rowsToInsert)
+
+    if (error) {
+        console.error('Error bulk importing expenses:', error.message)
+        return { success: false, importedCount: 0, error: error.message }
+    }
+
+    revalidatePath('/expenses')
+    revalidatePath('/dashboard')
+    revalidatePath('/bookkeeping')
+    return { success: true, importedCount: rowsToInsert.length }
 }

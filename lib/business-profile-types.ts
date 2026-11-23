@@ -53,6 +53,7 @@ export interface BusinessVerticalConfig {
         hasCertificateOfAuthenticity?: boolean
         hasGearRentals?: boolean
         hasMultiPropertyGrid?: boolean
+        hasProposals?: boolean
     }
     customFieldLabels: {
         customer: string     // e.g. "Customer", "Patient", "Guest", "Client"
@@ -236,7 +237,7 @@ export const BUSINESS_VERTICALS: Record<BusinessType, BusinessVerticalConfig> = 
         description: 'Milestone progress billing, developer cost rates vs bill rates for gross margins, timesheet invoicing, scope creep change orders, and zero-rated LUT export invoices.',
         icon: '💻',
         primaryColor: 'text-blue-600',
-        features: { hasSprintMilestones: true, hasStaffSplits: true, hasChangeOrders: true, hasClientPortal: true, hasBarcodes: false },
+        features: { hasSprintMilestones: true, hasStaffSplits: true, hasChangeOrders: true, hasClientPortal: true, hasBarcodes: false, hasProposals: true },
         customFieldLabels: { customer: 'Enterprise Client', items: 'Sprints & Deliverables', unit: 'sprints/hrs', identifier: 'Sprint / Milestone #' }
     },
     digital_marketing: {
@@ -247,7 +248,7 @@ export const BUSINESS_VERTICALS: Record<BusinessType, BusinessVerticalConfig> = 
         description: 'Separates 0% tax pass-through media disbursements from 18% agency fees, client creative approval deck, monthly post retainer quota overage billing, and subcontractor TDS.',
         icon: '📢',
         primaryColor: 'text-purple-600',
-        features: { hasAdSpendDisbursements: true, hasStaffSplits: true, hasClientPortal: true, hasBarcodes: false },
+        features: { hasAdSpendDisbursements: true, hasStaffSplits: true, hasClientPortal: true, hasBarcodes: false, hasProposals: true },
         customFieldLabels: { customer: 'Agency Client', items: 'Campaigns & Creatives', unit: 'campaigns/hrs', identifier: 'Campaign / Retainer' }
     },
     freelancer: {
@@ -258,7 +259,7 @@ export const BUSINESS_VERTICALS: Record<BusinessType, BusinessVerticalConfig> = 
         description: 'Mobile e-sign scope agreements, automated 50% upfront deposit unlock workflows, ₹20L GST threshold warning radar, and client deliverable vaults.',
         icon: '🚀',
         primaryColor: 'text-emerald-600',
-        features: { hasFreelanceScopeContracts: true, hasClientPortal: true, hasBarcodes: false },
+        features: { hasFreelanceScopeContracts: true, hasClientPortal: true, hasBarcodes: false, hasProposals: true },
         customFieldLabels: { customer: 'Direct Client', items: 'Milestones & Tasks', unit: 'deliverables', identifier: 'Scope Order #' }
     },
     services: {
@@ -283,6 +284,12 @@ export const BUSINESS_VERTICALS: Record<BusinessType, BusinessVerticalConfig> = 
         features: { hasBarcodes: true },
         customFieldLabels: { customer: 'Customer', items: 'Items', unit: 'pcs', identifier: 'SKU / Code' }
     }
+}
+
+export function isProposalSupported(businessType?: string | null): boolean {
+    if (!businessType) return false
+    const bt = businessType.toLowerCase().trim()
+    return ['software_it', 'digital_marketing', 'freelancer'].includes(bt)
 }
 
 export function isPosSupported(businessType?: string | null): boolean {

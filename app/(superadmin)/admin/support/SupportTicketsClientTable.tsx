@@ -46,6 +46,12 @@ export function SupportTicketsClientTable({ initialTickets }: SupportTicketsClie
     const [replyText, setReplyText] = useState('')
     const [isReplying, setIsReplying] = useState(false)
     const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null)
+    const [toastMessage, setToastMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null)
+
+    const showToast = (text: string, type: 'success' | 'error' = 'success') => {
+        setToastMessage({ text, type })
+        setTimeout(() => setToastMessage(null), 3500)
+    }
 
     const filteredTickets = tickets.filter(t => {
         const matchesStatus = statusFilter === 'all' || t.status === statusFilter
@@ -66,6 +72,9 @@ export function SupportTicketsClientTable({ initialTickets }: SupportTicketsClie
                 if (selectedTicket?.id === ticketId) {
                     setSelectedTicket(prev => prev ? { ...prev, status: newStatus } : null)
                 }
+                showToast(`Ticket status updated to ${newStatus.replace('_', ' ')}`)
+            } else {
+                showToast(res.error || 'Failed to update ticket status', 'error')
             }
         } finally {
             setUpdatingStatusId(null)
@@ -78,11 +87,17 @@ export function SupportTicketsClientTable({ initialTickets }: SupportTicketsClie
         try {
             const res = await addTicketReply(selectedTicket.id, replyText.trim(), false)
             if (res.success) {
+                const updatedId = selectedTicket.id
                 setReplyText('')
-                alert('Reply sent to customer successfully!')
+                setSelectedTicket(null)
+                setTickets(prev => prev.map(t => t.id === updatedId ? { ...t, status: 'in_progress' } : t))
+                showToast('Official response logged and sent to customer!')
+            } else {
+                showToast(res.error || 'Failed to send reply', 'error')
             }
-        } catch (e) {
+        } catch (e: any) {
             console.error('Error sending reply:', e)
+            showToast(e?.message || 'Failed to send reply', 'error')
         } finally {
             setIsReplying(false)
         }
@@ -90,6 +105,16 @@ export function SupportTicketsClientTable({ initialTickets }: SupportTicketsClie
 
     return (
         <div className="space-y-4">
+            {/* Toast Notification */}
+            {toastMessage && (
+                <div className={`p-3 rounded-xl text-xs font-semibold text-white flex items-center justify-between shadow-md ${
+                    toastMessage.type === 'success' ? 'bg-emerald-600' : 'bg-rose-600'
+                }`}>
+                    <span>{toastMessage.text}</span>
+                    <button onClick={() => setToastMessage(null)} className="opacity-80 hover:opacity-100 text-sm">✕</button>
+                </div>
+            )}
+
             {/* Filter and Search Bar */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-gray-900 p-3 sm:p-4 rounded-xl border border-gray-200 dark:border-gray-800 shadow-2xs">
                 <div className="relative flex-1 max-w-md">
