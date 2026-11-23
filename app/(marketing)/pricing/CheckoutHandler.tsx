@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
-import { Loader2, CheckCircle, CreditCard } from 'lucide-react'
+import { Loader2, CheckCircle, CreditCard, X } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
 interface RazorpayOptions {
@@ -202,11 +202,28 @@ export function CheckoutHandler({ basePath = '/pricing' }: CheckoutHandlerProps)
                 throw new Error('Failed to create order')
             }
 
-            const { order } = await response.json()
+            const { order, keyId: serverKeyId } = await response.json()
+            const keyToUse = serverKeyId || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID
+
+            if (!keyToUse) {
+                throw new Error('Payment gateway key is missing. Please contact support.')
+            }
+
+            // Ensure Razorpay SDK is loaded
+            if (typeof (window as any).Razorpay === 'undefined') {
+                await new Promise<void>((resolve, reject) => {
+                    const script = document.createElement('script')
+                    script.src = 'https://checkout.razorpay.com/v1/checkout.js'
+                    script.async = true
+                    script.onload = () => resolve()
+                    script.onerror = () => reject(new Error('Failed to load Razorpay payment gateway'))
+                    document.body.appendChild(script)
+                })
+            }
 
             // Load Razorpay checkout
             const options: RazorpayOptions = {
-                key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+                key: keyToUse,
                 amount: order.amount,
                 currency: order.currency,
                 name: 'BillBooky',
@@ -283,8 +300,21 @@ export function CheckoutHandler({ basePath = '/pricing' }: CheckoutHandlerProps)
     // Direct purchase modal for unauthenticated users
     if (isAuthenticated === false) {
         return (
-            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                <Card className="max-w-md w-full shadow-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+            <div 
+                className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200"
+                onClick={() => router.push(basePath)}
+            >
+                <Card 
+                    className="max-w-md w-full shadow-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 relative"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <button
+                        onClick={() => router.push(basePath)}
+                        className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-lg"
+                        aria-label="Close"
+                    >
+                        <X className="h-5 w-5" />
+                    </button>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2 text-xl font-bold text-slate-900 dark:text-white">
                             <CreditCard className="h-5 w-5 text-blue-600" />
@@ -385,8 +415,21 @@ export function CheckoutHandler({ basePath = '/pricing' }: CheckoutHandlerProps)
     }
 
     return (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <Card className="max-w-md w-full shadow-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+        <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200"
+            onClick={() => router.push(basePath)}
+        >
+            <Card 
+                className="max-w-md w-full shadow-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 relative"
+                onClick={(e) => e.stopPropagation()}
+            >
+                <button
+                    onClick={() => router.push(basePath)}
+                    className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-lg"
+                    aria-label="Close"
+                >
+                    <X className="h-5 w-5" />
+                </button>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-xl font-bold text-slate-900 dark:text-white">
                         <CreditCard className="h-5 w-5 text-blue-600" />

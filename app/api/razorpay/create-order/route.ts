@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
         
         console.log('Order created successfully:', order.id)
 
-        return NextResponse.json({ order }, { status: 200 })
+        return NextResponse.json({ order, keyId }, { status: 200 })
     } catch (error) {
         console.error('Error creating Razorpay order:', error)
         

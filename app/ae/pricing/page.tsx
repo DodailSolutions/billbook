@@ -346,7 +346,7 @@ export default async function UAEPricingPage() {
 
       {/* Direct Payment Checkout Handler & Razorpay SDK */}
       <CheckoutHandler basePath="/ae/pricing" />
-      <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
+      <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="afterInteractive" />
     </div>
   )
 }

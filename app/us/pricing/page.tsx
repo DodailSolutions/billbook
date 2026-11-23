@@ -493,7 +493,7 @@ export default async function USPricingPage() {
 
       {/* Direct Payment Checkout Handler & Razorpay SDK */}
       <CheckoutHandler basePath="/us/pricing" />
-      <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
+      <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="afterInteractive" />
     </div>
   )
 }
