@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
       }
 
       // If user had duplicate active subscriptions, close the extras
-      if (existingSubs.length > 1) {
+      if (existingSubs && existingSubs.length > 1) {
         const extraIds = existingSubs.slice(1).map(s => s.id)
         await supabase
           .from('user_subscriptions')
