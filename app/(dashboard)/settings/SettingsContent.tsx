@@ -752,7 +752,7 @@ export default function SettingsContent({ initialProfile, planStatus: initialPla
                                     </div>
                                     <div>
                                         <label className="block text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                                            Entity / Business Type
+                                            Legal Entity Structure (Registration Type)
                                         </label>
                                         <select
                                             value={businessType}
@@ -765,6 +765,9 @@ export default function SettingsContent({ initialProfile, planStatus: initialPla
                                                 </option>
                                             ))}
                                         </select>
+                                        <p className="text-[11px] text-slate-500 mt-1">
+                                            Your registered constitutional form. Industry vertical workflows are managed under the Industry Verticals tab.
+                                        </p>
                                     </div>
                                 </div>
 
@@ -899,7 +902,10 @@ export default function SettingsContent({ initialProfile, planStatus: initialPla
                     {/* TAB: Industry & Business Verticals */}
                     {activeTab === 'industry' && (
                         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-xs">
-                            <BusinessProfileSelector initialType={(initialProfile as any)?.business_type || 'services'} />
+                            <BusinessProfileSelector 
+                                initialType={(initialProfile as any)?.business_type || 'services'} 
+                                isSuperAdmin={initialProfile?.role === 'super_admin'}
+                            />
                         </div>
                     )}
 

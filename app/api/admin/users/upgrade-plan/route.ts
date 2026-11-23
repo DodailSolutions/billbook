@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     // Calculate dates
     const startDate = new Date()
     // For lifetime plans or very long durations, handle cleanly
-    const isLifetime = plan.billing_period === 'lifetime'
+    const isLifetime = plan.billing_period === 'lifetime' || Number(duration) >= 36500 || (plan.slug || '').toLowerCase().includes('lifetime')
     const durationDays = isLifetime ? 36500 : (Number(duration) || (plan.billing_period === 'yearly' ? 365 : 30))
     const endDate = new Date(startDate.getTime() + durationDays * 24 * 60 * 60 * 1000)
 

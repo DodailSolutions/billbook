@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { getUserPlanStatus } from '@/lib/plan-utils'
 import { NextResponse } from 'next/server'
 
 export const runtime = 'nodejs'
@@ -37,14 +38,46 @@ export async function POST(request: Request) {
     }
 
     // Check team member limits
-    const { data: limits } = await supabase.rpc('check_team_member_limit', {
-      p_owner_id: user.id
-    })
+    const planStatus = await getUserPlanStatus()
+    const isLifetimePlan = planStatus?.isLifetime ?? false
+    const planSlug = (planStatus?.planSlug || '').toLowerCase()
+    const isProOrAbove = planSlug.includes('pro') || planSlug.includes('professional') || planSlug.includes('enterprise') || isLifetimePlan
+    const defaultAllowed = isProOrAbove ? (planSlug.includes('enterprise') ? 10 : 2) : 0
 
-    const teamLimit = limits?.[0]
-    if (teamLimit && !teamLimit?.can_add) {
+    let allowed = defaultAllowed
+    let current = 0
+    let canAdd = isProOrAbove ? true : false
+
+    try {
+      const { data: limits } = await supabase.rpc('check_team_member_limit', {
+        p_owner_id: user.id
+      })
+      if (Array.isArray(limits) && limits[0]) {
+        allowed = Math.max(limits[0].allowed || 0, defaultAllowed)
+        current = limits[0].current || 0
+        canAdd = isProOrAbove ? (current < allowed) : (limits[0].can_add ?? false)
+      }
+    } catch (e) {
+      console.warn('RPC check_team_member_limit fallback in invite route:', e)
+    }
+
+    // Direct count of active/pending team members to ensure 100% accuracy
+    try {
+      const { count } = await supabase
+        .from('team_members')
+        .select('*', { count: 'exact', head: true })
+        .eq('owner_id', user.id)
+        .in('status', ['active', 'pending'])
+
+      if (typeof count === 'number') {
+        current = count
+        canAdd = isProOrAbove ? (current < allowed) : canAdd
+      }
+    } catch {}
+
+    if (!canAdd) {
       return NextResponse.json(
-        { error: `Team member limit reached. Your plan allows ${teamLimit?.allowed} member(s).` },
+        { error: `Team member limit reached (${current}/${allowed} used). Your plan allows ${allowed} member(s).` },
         { status: 403 }
       )
     }

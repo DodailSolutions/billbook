@@ -105,7 +105,16 @@ export async function updateProfile(data: UpdateProfileInput) {
         }
         if (data.full_name !== undefined) profilePayload.owner_name = data.full_name
         if (data.business_name !== undefined) profilePayload.business_name = data.business_name
-        if (data.business_type !== undefined) profilePayload.business_type = data.business_type
+        if (data.business_type !== undefined) {
+            // Guard: do not overwrite industry vertical with legal entity structure like 'Sole Proprietorship' or 'Pvt Ltd'
+            const isLegalEntityOption = [
+                'sole proprietorship', 'partnership', 'llp', 'pvt ltd', 'private limited', 'limited', 'opc', 'trust', 'society', 'ngo'
+            ].some(opt => data.business_type?.toLowerCase().includes(opt))
+
+            if (!isLegalEntityOption) {
+                profilePayload.business_type = data.business_type
+            }
+        }
         if (data.business_address !== undefined) profilePayload.business_address = data.business_address
         if (data.business_phone !== undefined) {
             profilePayload.business_phone = data.business_phone

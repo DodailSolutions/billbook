@@ -27,15 +27,15 @@ export function PlanBanner() {
     if (loading || !planStatus) return null
 
     // Lifetime plans - show special badge
-    if (planStatus.isLifetime) {
+    if (planStatus.isLifetime || (planStatus.daysUntilExpiry !== null && planStatus.daysUntilExpiry > 30000)) {
         return (
             <div>
                 <div className="bg-linear-to-r from-amber-500 to-orange-500 rounded-lg p-3 shadow-md hover:shadow-lg transition-shadow">
                     <div className="flex items-center gap-2 mb-1">
                         <Crown className="h-4 w-4 text-white" />
-                        <p className="text-xs font-bold text-white">LIFETIME PRO</p>
+                        <p className="text-xs font-bold text-white uppercase">{planStatus.planName.includes('Lifetime') ? planStatus.planName : `${planStatus.planName} (Lifetime)`}</p>
                     </div>
-                    <p className="text-xs text-white/90">Unlimited invoices forever</p>
+                    <p className="text-xs text-white/90">Unlimited lifetime access</p>
                 </div>
             </div>
         )

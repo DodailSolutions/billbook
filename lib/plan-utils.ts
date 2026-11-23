@@ -90,16 +90,24 @@ export async function getUserPlanStatus(): Promise<PlanStatus | null> {
         }
 
         const plan = rawPlan as SubscriptionPlan
-        const isLifetime = plan.billing_period === 'lifetime'
         const endDate = subscription.end_date ? new Date(subscription.end_date) : null
         const now = new Date()
 
+        let rawDaysUntilExpiry = null
+        if (endDate) {
+            rawDaysUntilExpiry = Math.ceil((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+        }
+
+        const isLifetime = 
+            plan.billing_period === 'lifetime' || 
+            (plan.slug || '').toLowerCase().includes('lifetime') ||
+            (endDate !== null && (endDate.getFullYear() >= 2090 || (rawDaysUntilExpiry !== null && rawDaysUntilExpiry >= 30000)))
+
         let isExpired = false
-        let daysUntilExpiry = null
+        let daysUntilExpiry = isLifetime ? null : rawDaysUntilExpiry
 
         if (endDate && !isLifetime) {
             isExpired = endDate < now
-            daysUntilExpiry = Math.ceil((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
         }
 
         return {

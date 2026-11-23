@@ -280,6 +280,23 @@ export async function updateUserBusinessType(userId: string, businessType: Busin
 
         if (error) throw error
 
+        // Also synchronize invoice_settings so getBusinessProfile() immediately reflects the new vertical
+        try {
+            await dataClient
+                .from('invoice_settings')
+                .upsert({
+                    user_id: userId,
+                    business_type: businessType,
+                    business_metadata: {
+                        industry: businessType,
+                        vertical: businessType
+                    },
+                    updated_at: new Date().toISOString()
+                }, { onConflict: 'user_id' })
+        } catch (setErr) {
+            console.warn('[updateUserBusinessType] invoice_settings sync warning:', setErr)
+        }
+
         await createAuditLog('user_business_type_updated', 'user', userId, { business_type: businessType })
         
         revalidatePath('/admin/users')

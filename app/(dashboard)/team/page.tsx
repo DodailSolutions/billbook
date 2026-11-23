@@ -42,6 +42,19 @@ export default async function TeamMembersPage() {
     }
   } catch {}
 
+  // Ensure current count matches actual team_members in DB
+  try {
+    const { count } = await supabase
+      .from('team_members')
+      .select('*', { count: 'exact', head: true })
+      .eq('owner_id', user.id)
+      .in('status', ['active', 'pending'])
+    if (typeof count === 'number') {
+      teamLimit.current = count
+      teamLimit.can_add = count < teamLimit.allowed
+    }
+  } catch {}
+
   let addons = { active_slots: 0, monthly_slots: 0, yearly_slots: 0 }
   if (isLifetimePlan) {
     try {
