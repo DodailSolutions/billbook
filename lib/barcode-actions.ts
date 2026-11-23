@@ -86,9 +86,7 @@ export async function updateBarcodeSettings(
         if (settings.enable_barcode_system !== undefined) {
             payload.enable_barcode_system = settings.enable_barcode_system
         }
-        if (settings.business_type !== undefined) {
-            payload.business_type = settings.business_type
-        }
+        // Do not overwrite user_profiles or invoice_settings business_type from barcode settings
         if (settings.printer_settings) {
             payload.printer_settings = settings.printer_settings
         }

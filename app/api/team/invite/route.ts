@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { getUserPlanStatus } from '@/lib/plan-utils'
 import { NextResponse } from 'next/server'
 
@@ -98,20 +98,39 @@ export async function POST(request: Request) {
       }
     }
 
-    // Resolve role_id if a slug was provided
-    let finalRoleId = role_id
-    let roleSlug = role_id
+    // Use admin client to reliably query/create roles bypassing RLS
+    let adminSupabase: any = null
+    try {
+      adminSupabase = await createAdminClient()
+    } catch {
+      adminSupabase = supabase
+    }
+
+    // Resolve role_id if a slug or UUID was provided
+    let finalRoleId: string | null = null
+    let roleSlug = typeof role_id === 'string' ? role_id.toLowerCase().trim() : 'employee'
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
-    if (!uuidRegex.test(role_id)) {
-      // Find or create role by slug
-      const { data: roleRow } = await supabase
+    if (uuidRegex.test(role_id)) {
+      finalRoleId = role_id
+      const { data: roleRow } = await adminSupabase
+        .from('team_roles')
+        .select('slug')
+        .eq('id', role_id)
+        .maybeSingle()
+      if (roleRow?.slug) roleSlug = roleRow.slug
+    } else {
+      // Find or create role by slug or name
+      const { data: roleRow } = await adminSupabase
         .from('team_roles')
         .select('id, slug')
-        .eq('slug', role_id)
+        .or(`slug.eq.${roleSlug},name.ilike.${roleSlug}`)
         .maybeSingle()
 
-      if (!roleRow) {
+      if (roleRow?.id && uuidRegex.test(roleRow.id)) {
+        finalRoleId = roleRow.id
+        roleSlug = roleRow.slug || roleSlug
+      } else {
         const roleDefinitions: Record<string, { name: string; desc: string; perms: string[] }> = {
           manager: {
             name: 'Manager',
@@ -134,35 +153,41 @@ export async function POST(request: Request) {
             perms: ['invoices.*', 'customers.*', 'team.*', 'settings.*', 'payroll.*']
           }
         }
-        const def = roleDefinitions[role_id] || { name: role_id, desc: `${role_id} role`, perms: [] }
-        const { data: newRole } = await supabase
-          .from('team_roles')
-          .insert({
-            name: def.name,
-            slug: role_id,
-            description: def.desc,
-            permissions: def.perms,
-            is_system: true
-          })
-          .select('id, slug')
-          .single()
+        const def = roleDefinitions[roleSlug] || { name: roleSlug, desc: `${roleSlug} role`, perms: [] }
+        try {
+          const { data: newRole } = await adminSupabase
+            .from('team_roles')
+            .insert({
+              name: def.name,
+              slug: roleSlug,
+              description: def.desc,
+              permissions: def.perms,
+              is_system: true
+            })
+            .select('id, slug')
+            .maybeSingle()
 
-        if (newRole) {
-          finalRoleId = newRole.id
-          roleSlug = newRole.slug
+          if (newRole?.id && uuidRegex.test(newRole.id)) {
+            finalRoleId = newRole.id
+            roleSlug = newRole.slug
+          }
+        } catch (insertErr) {
+          console.error('Failed to insert missing team_role:', insertErr)
         }
-      } else {
-        finalRoleId = roleRow.id
-        roleSlug = roleRow.slug
       }
-    } else {
-      // Get slug for the UUID
-      const { data: roleRow } = await supabase
+    }
+
+    // Safety fallback: If finalRoleId is still not a valid UUID, find any existing role in team_roles
+    if (!finalRoleId || !uuidRegex.test(finalRoleId)) {
+      const { data: fallbackRoles } = await adminSupabase
         .from('team_roles')
-        .select('slug')
-        .eq('id', role_id)
-        .maybeSingle()
-      if (roleRow) roleSlug = roleRow.slug
+        .select('id, slug')
+        .limit(1)
+
+      if (fallbackRoles && fallbackRoles.length > 0 && uuidRegex.test(fallbackRoles[0].id)) {
+        finalRoleId = fallbackRoles[0].id
+        roleSlug = fallbackRoles[0].slug || 'employee'
+      }
     }
 
     // Generate invite token
@@ -182,14 +207,17 @@ export async function POST(request: Request) {
       invite_token: inviteToken,
       invite_expires_at: inviteExpiry.toISOString()
     }
-    if (finalRoleId) insertPayload.role_id = finalRoleId
+    // Only pass role_id if it is a strictly verified valid UUID to prevent Postgres errors
+    if (finalRoleId && uuidRegex.test(finalRoleId)) {
+      insertPayload.role_id = finalRoleId
+    }
     if (roleSlug) insertPayload.role = roleSlug
     if (designation) insertPayload.designation = designation
     if (allocated_hours !== undefined) insertPayload.allocated_hours = Number(allocated_hours) || 40
     if (hourly_cost_rate !== undefined) insertPayload.hourly_cost_rate = Number(hourly_cost_rate) || 0
     if (hourly_billing_rate !== undefined) insertPayload.hourly_billing_rate = Number(hourly_billing_rate) || 0
 
-    const { data: member, error: insertError } = await supabase
+    const { data: member, error: insertError } = await adminSupabase
       .from('team_members')
       .insert(insertPayload)
       .select()

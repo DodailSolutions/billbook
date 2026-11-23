@@ -359,12 +359,16 @@ export function Sidebar() {
                         <div className="flex items-center gap-1.5 truncate">
                             <Building2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
                             <span className="truncate font-semibold capitalize">
-                                {businessProfile.businessType.replace('_', ' ')}
+                                {businessProfile.businessType.replace(/_/g, ' ')}
                             </span>
                         </div>
-                        <Link href="/settings" className="text-[10px] text-blue-600 hover:text-blue-700 font-bold shrink-0">
-                            Change
-                        </Link>
+                        <span 
+                            title="Industry vertical is locked to preserve accounting and tax consistency. Contact Super Admin to change."
+                            className="text-[10px] text-slate-400 flex items-center gap-0.5 bg-slate-100 px-1.5 py-0.5 rounded-md font-medium shrink-0 cursor-default"
+                        >
+                            <ShieldCheck className="w-2.5 h-2.5 text-emerald-600" />
+                            Locked
+                        </span>
                     </div>
                 )}
 

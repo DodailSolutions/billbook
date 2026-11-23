@@ -40,7 +40,8 @@ export async function getBusinessProfile(): Promise<{
         ])
 
         const metadata = settingsRes.data?.business_metadata || {}
-        const rawCandidate = metadata?.industry || metadata?.vertical || settingsRes.data?.business_type || profileRes.data?.business_type
+        // Ground truth priority: user_profiles.business_type is authoritative, set by Super Admin
+        const rawCandidate = profileRes.data?.business_type || metadata?.industry || metadata?.vertical || settingsRes.data?.business_type
         const validProfile = normalizeBusinessType(rawCandidate)
 
         return {
@@ -69,6 +70,21 @@ export async function updateBusinessProfile(
         const supabase = await createClient()
         const { data: { user }, error: authError } = await supabase.auth.getUser()
         if (authError || !user) return { success: false, error: 'Unauthorized' }
+
+        // Only allow Super Admin or System Admin to change business vertical
+        const { data: userProfile } = await supabase
+            .from('user_profiles')
+            .select('role')
+            .eq('id', user.id)
+            .maybeSingle()
+
+        const isSuperAdmin = userProfile?.role === 'superadmin' || userProfile?.role === 'admin'
+        if (!isSuperAdmin) {
+            return { 
+                success: false, 
+                error: 'Business vertical is permanently locked. Only Super Admin can modify business types.' 
+            }
+        }
 
         const normalizedType = normalizeBusinessType(businessType)
 
