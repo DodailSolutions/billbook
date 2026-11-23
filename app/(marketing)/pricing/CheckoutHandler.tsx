@@ -276,6 +276,10 @@ export function CheckoutHandler({ basePath = '/pricing' }: CheckoutHandlerProps)
         currency: 'INR'
     }
 
+    const currencySymbol = planDetails.currency === 'AED' ? 'AED ' : planDetails.currency === 'USD' ? '$' : '₹'
+    const localeCode = planDetails.currency === 'AED' ? 'en-AE' : planDetails.currency === 'USD' ? 'en-US' : 'en-IN'
+    const formattedAmount = `${currencySymbol}${planDetails.amount.toLocaleString(localeCode)}`
+
     // Direct purchase modal for unauthenticated users
     if (isAuthenticated === false) {
         return (
@@ -299,7 +303,7 @@ export function CheckoutHandler({ basePath = '/pricing' }: CheckoutHandlerProps)
                             <div className="flex justify-between items-baseline">
                                 <span className="text-sm text-slate-600 dark:text-slate-400">Amount Due</span>
                                 <span className="text-2xl font-black text-blue-600 dark:text-blue-400">
-                                    {planDetails.currency === 'AED' ? 'AED ' : planDetails.currency === 'USD' ? '$' : '₹'}{planDetails.amount.toLocaleString(planDetails.currency === 'AED' ? 'en-AE' : planDetails.currency === 'USD' ? 'en-US' : 'en-IN')}
+                                    {formattedAmount}
                                 </span>
                             </div>
                         </div>
@@ -349,7 +353,7 @@ export function CheckoutHandler({ basePath = '/pricing' }: CheckoutHandlerProps)
                                         Initiating Secure Payment...
                                     </>
                                 ) : (
-                                    `Pay ${planDetails.currency === 'AED' ? 'AED ' : planDetails.currency === 'USD' ? '$' : '₹'}{planDetails.amount.toLocaleString(planDetails.currency === 'AED' ? 'en-AE' : planDetails.currency === 'USD' ? 'en-US' : 'en-IN')} Now`
+                                    `Pay ${formattedAmount} Now`
                                 )}
                             </Button>
 
@@ -401,7 +405,7 @@ export function CheckoutHandler({ basePath = '/pricing' }: CheckoutHandlerProps)
                         <div className="flex justify-between items-baseline">
                             <span className="text-sm text-slate-600 dark:text-slate-400">Amount Due</span>
                             <span className="text-2xl font-black text-blue-600 dark:text-blue-400">
-                                {planDetails.currency === 'AED' ? 'AED ' : planDetails.currency === 'USD' ? '$' : '₹'}{planDetails.amount.toLocaleString(planDetails.currency === 'AED' ? 'en-AE' : planDetails.currency === 'USD' ? 'en-US' : 'en-IN')}
+                                {formattedAmount}
                             </span>
                         </div>
                     </div>
@@ -424,7 +428,7 @@ export function CheckoutHandler({ basePath = '/pricing' }: CheckoutHandlerProps)
                                     Opening Payment Window...
                                 </>
                             ) : (
-                                `Pay ${planDetails.currency === 'AED' ? 'AED ' : planDetails.currency === 'USD' ? '$' : '₹'}{planDetails.amount.toLocaleString(planDetails.currency === 'AED' ? 'en-AE' : planDetails.currency === 'USD' ? 'en-US' : 'en-IN')} with Razorpay`
+                                `Pay ${formattedAmount} with Razorpay`
                             )}
                         </Button>
                         <Button
