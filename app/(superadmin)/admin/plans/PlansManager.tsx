@@ -19,7 +19,10 @@ import {
     X, 
     SlidersHorizontal,
     TrendingUp,
-    Shield
+    Shield,
+    Users,
+    CheckSquare,
+    XCircle
 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -37,6 +40,20 @@ import {
 interface PlansManagerProps {
     initialPlans: SubscriptionPlan[]
 }
+
+export const SYSTEM_APP_FEATURES = [
+    { id: 'crm', label: 'CRM & Sales Pipeline', category: 'Sales & Growth', desc: 'Manage leads, deal stages, and win/loss analytics' },
+    { id: 'organizations', label: 'B2B Organizations & Multi-Contacts', category: 'Sales & Growth', desc: 'Link multiple client stakeholders per company' },
+    { id: 'proposals', label: 'Proposals, RFPs & Scope Orders', category: 'Sales & Growth', desc: 'Interactive client proposals with 50% deposit triggers' },
+    { id: 'ai_accountant', label: 'AI Accountant Assistant (PRO)', category: 'Intelligence', desc: 'Automated tax analysis, margin audit, and categorization' },
+    { id: 'pos', label: 'Counter POS & Thermal Checkout', category: 'Commerce', desc: 'High-speed barcode scanner checkout for physical counters' },
+    { id: 'barcodes', label: 'Barcodes & Thermal Label Printing', category: 'Commerce', desc: 'Batch barcode generation and thermal printer templates' },
+    { id: 'payroll', label: 'HR, Payroll & Leaves Management', category: 'Team & HR', desc: 'Employee master, salary slips, and attendance punches' },
+    { id: 'cctv', label: 'CCTV Vision & Streams (AI Attendance)', category: 'Team & HR', desc: 'Live RTSP stream facial and presence verification' },
+    { id: 'bookkeeping', label: 'Double-Entry Bookkeeping & Ledger', category: 'Finance', desc: 'General ledger, journal entries, and trial balance' },
+    { id: 'templates', label: 'Custom WhatsApp & Email Branding', category: 'Customization', desc: 'White-label PDF invoices, payment links, and templates' },
+    { id: 'zatca', label: 'Multi-Currency & ZATCA e-Invoicing', category: 'Tax & Compliance', desc: 'UAE FTA VAT 5% and KSA ZATCA Phase 2 QR codes' }
+]
 
 const REGION_OPTIONS = [
     { id: 'all', label: 'All Regions', flag: '🌍', currency: 'ALL' },
@@ -69,12 +86,27 @@ export default function PlansManager({ initialPlans }: PlansManagerProps) {
         currency: 'INR',
         billing_period: 'monthly',
         features: [],
-        limits: { invoices_per_month: 999999, customers: 999999 },
+        limits: { invoices_per_month: 999999, customers: 999999, team_members: 2 },
         is_active: true,
         is_popular: false,
         sort_order: 1
     })
     const [featuresInput, setFeaturesInput] = useState('')
+    const [excludedFeaturesInput, setExcludedFeaturesInput] = useState('')
+    const [teamMembersLimit, setTeamMembersLimit] = useState<number>(2)
+    const [featureFlags, setFeatureFlags] = useState<Record<string, boolean>>({
+        crm: true,
+        organizations: true,
+        pos: false,
+        ai_accountant: true,
+        proposals: true,
+        payroll: true,
+        cctv: false,
+        barcodes: false,
+        bookkeeping: true,
+        templates: true,
+        zatca: false
+    })
 
     const showToast = (msg: string) => {
         setToastMessage(msg)
@@ -146,17 +178,63 @@ export default function PlansManager({ initialPlans }: PlansManagerProps) {
             currency: defaultCurrency,
             billing_period: 'monthly',
             features: [],
-            limits: { invoices_per_month: 999999, customers: 999999 },
+            limits: { invoices_per_month: 999999, customers: 999999, team_members: 2 },
             is_active: true,
             is_popular: false,
             sort_order: (plans.length + 1)
         })
         setFeaturesInput('Unlimited invoices\nGST compliance\nPDF downloads\nCustomer management\nWhatsApp sharing')
+        setExcludedFeaturesInput('CCTV Vision & Streams AI\nHigh-speed Counter POS\nThermal Barcode Printing')
+        setTeamMembersLimit(2)
+        setFeatureFlags({
+            crm: true,
+            organizations: true,
+            pos: false,
+            ai_accountant: false,
+            proposals: true,
+            payroll: false,
+            cctv: false,
+            barcodes: false,
+            bookkeeping: true,
+            templates: true,
+            zatca: defaultCurrency === 'AED'
+        })
         setIsAddModalOpen(true)
     }
 
     const openEditModal = (plan: SubscriptionPlan) => {
         setEditingPlan(plan)
+        const rawLimits = plan.limits || {}
+        const teamLimit = typeof rawLimits.team_members === 'number' 
+            ? rawLimits.team_members 
+            : (plan.slug.includes('enterprise') ? 10 : plan.slug.includes('pro') ? 2 : 0)
+        setTeamMembersLimit(teamLimit)
+
+        const existingFlags = rawLimits.feature_flags || {}
+        setFeatureFlags({
+            crm: existingFlags.crm ?? (plan.features?.some(f => /crm|pipeline/i.test(f)) ?? true),
+            organizations: existingFlags.organizations ?? true,
+            pos: existingFlags.pos ?? (plan.features?.some(f => /pos|counter/i.test(f)) ?? false),
+            ai_accountant: existingFlags.ai_accountant ?? (plan.features?.some(f => /ai accountant|ai/i.test(f)) ?? false),
+            proposals: existingFlags.proposals ?? (plan.features?.some(f => /proposal/i.test(f)) ?? true),
+            payroll: existingFlags.payroll ?? (plan.features?.some(f => /payroll/i.test(f)) ?? false),
+            cctv: existingFlags.cctv ?? (plan.features?.some(f => /cctv/i.test(f)) ?? false),
+            barcodes: existingFlags.barcodes ?? (plan.features?.some(f => /barcode/i.test(f)) ?? false),
+            bookkeeping: existingFlags.bookkeeping ?? true,
+            templates: existingFlags.templates ?? true,
+            zatca: existingFlags.zatca ?? (plan.currency === 'AED')
+        })
+
+        const excludedFromLimits = Array.isArray(rawLimits.excluded_features) ? rawLimits.excluded_features : []
+        const excludedFromFeatures = (plan.features || [])
+            .filter(f => f.startsWith('✕') || f.startsWith('[x]') || f.startsWith('No ') || f.startsWith('❌'))
+            .map(f => f.replace(/^(\[x\]|✕|❌|No )\s*/, ''))
+        const allExcluded = Array.from(new Set([...excludedFromLimits, ...excludedFromFeatures]))
+        setExcludedFeaturesInput(allExcluded.join('\n'))
+
+        const includedFeatures = (plan.features || []).filter(f => !f.startsWith('✕') && !f.startsWith('[x]') && !f.startsWith('No ') && !f.startsWith('❌'))
+        setFeaturesInput(includedFeatures.join('\n'))
+
         setFormData({
             name: plan.name,
             slug: plan.slug,
@@ -165,12 +243,11 @@ export default function PlansManager({ initialPlans }: PlansManagerProps) {
             currency: plan.currency || 'INR',
             billing_period: plan.billing_period,
             features: plan.features || [],
-            limits: plan.limits || { invoices_per_month: 999999, customers: 999999 },
+            limits: { ...rawLimits, team_members: teamLimit },
             is_active: plan.is_active,
             is_popular: plan.is_popular,
             sort_order: plan.sort_order || 1
         })
-        setFeaturesInput(Array.isArray(plan.features) ? plan.features.join('\n') : '')
     }
 
     const handleSavePlan = async (e: React.FormEvent) => {
@@ -184,9 +261,27 @@ export default function PlansManager({ initialPlans }: PlansManagerProps) {
             .map(s => s.trim())
             .filter(Boolean)
 
+        const excludedArray = excludedFeaturesInput
+            .split('\n')
+            .map(s => s.trim())
+            .filter(Boolean)
+
+        // Combine included and excluded features (with red cross prefix ✕)
+        const combinedFeatures = [
+            ...featuresArray,
+            ...excludedArray.map(ex => `✕ ${ex}`)
+        ]
+
         const payload: PlanInput = {
             ...formData,
-            features: featuresArray,
+            features: combinedFeatures,
+            excluded_features: excludedArray,
+            limits: {
+                ...formData.limits,
+                team_members: teamMembersLimit,
+                feature_flags: featureFlags,
+                excluded_features: excludedArray
+            },
             slug: formData.slug || formData.name.toLowerCase().replace(/[^a-z0-9]/g, '-')
         }
 
@@ -696,16 +791,134 @@ export default function PlansManager({ initialPlans }: PlansManagerProps) {
                                     />
                                 </div>
 
+                                {/* ── Team Member Quota & Seats ── */}
+                                <div className="p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700/80 space-y-2">
+                                    <div className="flex items-center justify-between">
+                                        <label className="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                                            <Users className="w-3.5 h-3.5 text-blue-600" />
+                                            Team Member Seats Allowed
+                                        </label>
+                                        <span className="text-[11px] font-bold text-blue-600 bg-blue-50 dark:bg-blue-950 px-2 py-0.5 rounded-full border border-blue-200 dark:border-blue-800">
+                                            {teamMembersLimit >= 999999 ? 'Unlimited' : `${teamMembersLimit} seats`}
+                                        </span>
+                                    </div>
+                                    <div className="flex flex-wrap gap-1.5">
+                                        {[
+                                            { label: '0 (Solo)', val: 0 },
+                                            { label: '2 Seats (Pro)', val: 2 },
+                                            { label: '5 Seats (Growth)', val: 5 },
+                                            { label: '10 Seats (Enterprise)', val: 10 },
+                                            { label: 'Unlimited (∞)', val: 999999 }
+                                        ].map(preset => (
+                                            <button
+                                                key={preset.val}
+                                                type="button"
+                                                onClick={() => setTeamMembersLimit(preset.val)}
+                                                className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all border ${
+                                                    teamMembersLimit === preset.val
+                                                        ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                                                        : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100'
+                                                }`}
+                                            >
+                                                {preset.label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <div className="flex items-center gap-2 pt-1">
+                                        <span className="text-[10px] text-slate-400">Custom seats:</span>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            value={teamMembersLimit >= 999999 ? '' : teamMembersLimit}
+                                            placeholder="Enter number..."
+                                            onChange={(e) => setTeamMembersLimit(e.target.value === '' ? 0 : Number(e.target.value))}
+                                            className="w-24 px-2 py-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-semibold"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* ── App Feature Matrix Checkboxes ── */}
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between">
+                                        <label className="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                                            <CheckSquare className="w-3.5 h-3.5 text-indigo-600" />
+                                            Modular Feature Entitlements
+                                        </label>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                // Sync unchecked features into excluded list
+                                                const unselected = SYSTEM_APP_FEATURES
+                                                    .filter(f => !featureFlags[f.id])
+                                                    .map(f => f.label)
+                                                setExcludedFeaturesInput(unselected.join('\n'))
+                                            }}
+                                            className="text-[10px] text-indigo-600 hover:text-indigo-700 font-semibold"
+                                        >
+                                            Auto-populate Excluded List
+                                        </button>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-2 p-3 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-200 dark:border-slate-700 max-h-44 overflow-y-auto custom-scrollbar">
+                                        {SYSTEM_APP_FEATURES.map(feat => {
+                                            const isChecked = !!featureFlags[feat.id]
+                                            return (
+                                                <label 
+                                                    key={feat.id} 
+                                                    className={`flex items-start gap-2 p-2 rounded-xl border text-[11px] cursor-pointer transition-all ${
+                                                        isChecked 
+                                                            ? 'bg-indigo-50/70 dark:bg-indigo-950/40 border-indigo-200 dark:border-indigo-800/80 text-indigo-950 dark:text-indigo-200' 
+                                                            : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500'
+                                                    }`}
+                                                >
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={isChecked}
+                                                        onChange={(e) => {
+                                                            const checked = e.target.checked
+                                                            setFeatureFlags(prev => ({ ...prev, [feat.id]: checked }))
+                                                        }}
+                                                        className="mt-0.5 rounded text-indigo-600 focus:ring-indigo-500"
+                                                    />
+                                                    <div className="min-w-0">
+                                                        <span className="font-bold block truncate">{feat.label}</span>
+                                                        <span className="text-[9px] text-slate-400 block line-clamp-1">{feat.desc}</span>
+                                                    </div>
+                                                </label>
+                                            )
+                                        })}
+                                    </div>
+                                </div>
+
+                                {/* ── Included Features List (Shown with Checkmark ✓) ── */}
                                 <div>
-                                    <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                                        Features (one per line)
+                                    <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center justify-between">
+                                        <span>Included Features (One per line • Shown with <strong className="text-emerald-600">✓</strong>)</span>
+                                        <span className="text-[10px] text-slate-400 font-normal">Pricing display bullets</span>
                                     </label>
                                     <textarea
-                                        rows={4}
+                                        rows={3}
                                         value={featuresInput}
                                         onChange={(e) => setFeaturesInput(e.target.value)}
-                                        placeholder="Unlimited invoices&#10;WhatsApp Sharing&#10;PDF downloads&#10;Custom branding"
+                                        placeholder="Unlimited tax invoices&#10;WhatsApp Sharing&#10;Custom company branding&#10;PDF downloads"
                                         className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-900 dark:text-white"
+                                    />
+                                </div>
+
+                                {/* ── Excluded Features List (Shown with Red Crossmark ✕) ── */}
+                                <div>
+                                    <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center justify-between">
+                                        <span className="text-rose-600 dark:text-rose-400 flex items-center gap-1">
+                                            <XCircle className="w-3.5 h-3.5" />
+                                            Excluded / Not Included Features (Shown with <strong>✕</strong>)
+                                        </span>
+                                        <span className="text-[10px] text-slate-400 font-normal">Displayed crossed-out on pricing table</span>
+                                    </label>
+                                    <textarea
+                                        rows={2}
+                                        value={excludedFeaturesInput}
+                                        onChange={(e) => setExcludedFeaturesInput(e.target.value)}
+                                        placeholder="CCTV Vision & Streams AI&#10;Counter POS Checkout&#10;Thermal Barcode Printing"
+                                        className="w-full bg-rose-50/40 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/60 rounded-xl p-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-rose-500/20 text-slate-900 dark:text-white"
                                     />
                                 </div>
 

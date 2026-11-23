@@ -55,7 +55,11 @@ export function PricingToggleSection({ isAuthenticated, currentPlan, plans = [] 
                   "Customer management",
                   "GST compliant invoices",
                   "PDF downloads",
-                  "Custom branding"
+                  "Custom branding",
+                  "✕ Team collaboration (Solo only)",
+                  "✕ Recurring invoicing & retainers",
+                  "✕ AI Accountant Assistant",
+                  "✕ CCTV Vision & Streams"
                 ]
           }
           planId="free"
@@ -105,7 +109,10 @@ export function PricingToggleSection({ isAuthenticated, currentPlan, plans = [] 
                   "Automated payment reminders",
                   "WhatsApp sharing",
                   "GST reports & e-Way bill",
-                  "Standard support"
+                  "Standard support",
+                  "✕ CCTV Vision & Streams",
+                  "✕ Counter POS checkout",
+                  "✕ Certified CA Marketplace"
                 ]
           }
           planId={isYearly ? "starter-yearly" : "starter"}

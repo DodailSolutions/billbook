@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
-import { CheckCircle, Zap, ShoppingCart, Loader2 } from 'lucide-react'
+import { CheckCircle, Zap, ShoppingCart, Loader2, XCircle } from 'lucide-react'
 import { ReactNode } from 'react'
 import { activatePlanTrial } from './actions'
 
@@ -13,6 +13,7 @@ export interface PricingCardProps {
     price: ReactNode
     description: string
     features: (string | ReactNode)[]
+    excludedFeatures?: string[]
     planId: string
     isPopular?: boolean
     isDeal?: boolean
@@ -30,6 +31,7 @@ export function PricingCard({
     price,
     description,
     features,
+    excludedFeatures = [],
     planId,
     isPopular = false,
     isDeal = false,
@@ -124,13 +126,37 @@ export function PricingCard({
             </div>
 
             <ul className="space-y-3 sm:space-y-4 mb-6 sm:mb-8 grow">
-                {features.map((feature, index) => (
-                    <li key={index} className="flex items-start gap-2 sm:gap-3">
-                        <CheckCircle className={`h-4 w-4 sm:h-5 sm:w-5 shrink-0 mt-0.5 ${
-                            isDeal ? 'text-amber-600' : 'text-blue-600 dark:text-blue-400'
-                        }`} />
-                        <span className={`text-sm sm:text-base ${isDeal ? 'text-gray-800 font-medium' : 'text-gray-700 dark:text-gray-300'}`}>
-                            {feature}
+                {features.map((feature, index) => {
+                    const isStr = typeof feature === 'string'
+                    const isExcluded = isStr && (feature.startsWith('✕') || feature.startsWith('[x]') || feature.startsWith('No ') || feature.startsWith('❌'))
+                    const cleanText = isStr ? feature.replace(/^(\[x\]|✕|❌)\s*/, '') : feature
+
+                    return (
+                        <li key={`inc-${index}`} className="flex items-start gap-2 sm:gap-3">
+                            {isExcluded ? (
+                                <XCircle className="h-4 w-4 sm:h-5 sm:w-5 shrink-0 mt-0.5 text-rose-500/80" />
+                            ) : (
+                                <CheckCircle className={`h-4 w-4 sm:h-5 sm:w-5 shrink-0 mt-0.5 ${
+                                    isDeal ? 'text-amber-600' : 'text-blue-600 dark:text-blue-400'
+                                }`} />
+                            )}
+                            <span className={`text-sm sm:text-base ${
+                                isExcluded 
+                                    ? 'text-slate-400 line-through dark:text-slate-500' 
+                                    : isDeal 
+                                    ? 'text-gray-800 font-medium' 
+                                    : 'text-gray-700 dark:text-gray-300'
+                            }`}>
+                                {cleanText}
+                            </span>
+                        </li>
+                    )
+                })}
+                {excludedFeatures?.map((exFeature, index) => (
+                    <li key={`ex-${index}`} className="flex items-start gap-2 sm:gap-3">
+                        <XCircle className="h-4 w-4 sm:h-5 sm:w-5 shrink-0 mt-0.5 text-rose-500/70" />
+                        <span className="text-sm sm:text-base text-slate-400 line-through dark:text-slate-500">
+                            {exFeature}
                         </span>
                     </li>
                 ))}

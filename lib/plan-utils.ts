@@ -143,7 +143,15 @@ export async function hasPlanFeature(featureKey: string): Promise<boolean> {
     const isEnterprise = planSlug.includes('enterprise')
     const isLifetime = status.isLifetime || planSlug.includes('lifetime')
 
-    // Enterprise and Lifetime have access to all platform features
+    // Enterprise and Lifetime have access to all platform features unless explicitly disabled
+    const rawLimits = (status.limits as any) || {}
+    const featureFlags = rawLimits.feature_flags || {}
+
+    // Direct feature flag check if defined in the plan package
+    if (featureFlags[featureKey] !== undefined) {
+        return !!featureFlags[featureKey]
+    }
+
     if (isEnterprise || isLifetime) {
         return true
     }
