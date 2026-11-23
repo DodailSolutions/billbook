@@ -412,9 +412,3 @@ export default function LeavesPage() {
         </div>
     )
 }
-
-                </>
-            )}
-        </div>
-    )
-}
