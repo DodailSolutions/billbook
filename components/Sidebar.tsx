@@ -306,7 +306,9 @@ export function Sidebar() {
     ]
 
     return (
-        <div className={cn(
+        <div 
+            data-tour="sidebar"
+            className={cn(
             "space-y-4 py-4 flex flex-col h-full bg-white border-r border-slate-200/80 text-slate-955 transition-all duration-300 shadow-xs select-none",
             isCollapsed ? "w-20" : "w-64"
         )}>
@@ -344,6 +346,21 @@ export function Sidebar() {
                     )}
                 </Link>
 
+                {/* Active Industry Vertical Badge */}
+                {!isCollapsed && (
+                    <div data-tour="vertical-selector" className="mx-1 mb-4 px-2.5 py-1.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between text-xs text-slate-600">
+                        <div className="flex items-center gap-1.5 truncate">
+                            <Building2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                            <span className="truncate font-semibold capitalize">
+                                {businessProfile.businessType.replace('_', ' ')}
+                            </span>
+                        </div>
+                        <Link href="/settings" className="text-[10px] text-blue-600 hover:text-blue-700 font-bold shrink-0">
+                            Change
+                        </Link>
+                    </div>
+                )}
+
                 {/* Nested Categorized Routes */}
                 <div className="space-y-4">
                     {sections.map((section, idx) => {
@@ -361,10 +378,17 @@ export function Sidebar() {
                                 
                                 {section.items.map((route) => {
                                     const isActive = pathname === route.href
+                                    const tourAttr = route.href === '/invoices' 
+                                        ? 'quick-invoice' 
+                                        : route.href === '/integrations' 
+                                        ? 'integrations' 
+                                        : undefined
+
                                     return (
                                         <Link
                                             key={route.href}
                                             href={route.href}
+                                            data-tour={tourAttr}
                                             className={cn(
                                                 "text-xs group flex p-2.5 w-full justify-start font-bold cursor-pointer rounded-xl transition-all duration-200 relative overflow-hidden",
                                                 isActive 
@@ -405,6 +429,19 @@ export function Sidebar() {
             
             {/* Collapse / Sidebar footer */}
             <div className="px-3 pb-4 space-y-2 shrink-0 border-t border-slate-100 pt-4">
+                <button
+                    type="button"
+                    onClick={() => {
+                        if (typeof window !== 'undefined') {
+                            window.dispatchEvent(new CustomEvent('billbook:restart-tour'))
+                        }
+                    }}
+                    className="w-full flex items-center justify-center gap-2 p-2 rounded-xl text-xs font-semibold text-slate-500 hover:text-purple-600 hover:bg-purple-50 transition-colors cursor-pointer"
+                    title="Take Product Tour"
+                >
+                    <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+                    {!isCollapsed && <span>Take Tour</span>}
+                </button>
                 {!isCollapsed && <PlanBanner />}
                 <SignOutButton />
             </div>

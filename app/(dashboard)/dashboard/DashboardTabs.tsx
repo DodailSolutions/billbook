@@ -2,11 +2,13 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card"
 import {
     IndianRupee, FileText, TrendingUp, TrendingDown,
     BarChart2, PieChart as PieIcon, Activity,
     ArrowUpRight, ArrowDownRight, Users, AlertCircle,
+    Search, Sparkles
 } from "lucide-react"
 import {
     LineChart,
@@ -84,7 +86,9 @@ function ChartTooltip({
 }
 
 export function DashboardTabs({ stats }: DashboardTabsProps) {
+    const router = useRouter()
     const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'clients' | 'recent'>('overview')
+    const [searchQuery, setSearchQuery] = useState('')
 
     const prevM = stats.monthlyData[stats.monthlyData.length - 2]
     const thisM = stats.monthlyData[stats.monthlyData.length - 1]
@@ -132,6 +136,45 @@ export function DashboardTabs({ stats }: DashboardTabsProps) {
 
     return (
         <div className="space-y-5">
+            {/* Top Bar with Global Search & Tour Trigger */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-3 sm:px-4 sm:py-2.5 rounded-2xl border border-gray-100 shadow-xs">
+                <form 
+                    onSubmit={(e) => {
+                        e.preventDefault()
+                        if (searchQuery.trim()) {
+                            router.push(`/invoices?search=${encodeURIComponent(searchQuery.trim())}`)
+                        }
+                    }}
+                    data-tour="global-search" 
+                    className="relative flex-1 max-w-lg"
+                >
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search invoices, customers, items or reports... (Press Enter)"
+                        className="w-full pl-10 pr-4 py-2 text-xs bg-slate-50 border border-slate-200/80 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-800 placeholder:text-slate-400"
+                    />
+                </form>
+
+                <div className="flex items-center gap-2 shrink-0">
+                    <button
+                        type="button"
+                        onClick={() => {
+                            if (typeof window !== 'undefined') {
+                                window.dispatchEvent(new CustomEvent('billbook:restart-tour'))
+                            }
+                        }}
+                        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-purple-700 bg-purple-50 hover:bg-purple-100 border border-purple-200/60 transition-colors cursor-pointer"
+                        title="Interactive Product Walkthrough"
+                    >
+                        <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+                        <span>Interactive Tour</span>
+                    </button>
+                </div>
+            </div>
+
             {/* Header */}
             <div className="bg-white rounded-2xl px-4 sm:px-6 pt-5 sm:pt-6 pb-0 shadow-sm border border-gray-100">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between mb-5">
@@ -168,7 +211,7 @@ export function DashboardTabs({ stats }: DashboardTabsProps) {
             {/* OVERVIEW TAB */}
             {activeTab === 'overview' && (
                 <>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div data-tour="stats-overview" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <Card className="bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
                             <CardContent className="p-5">
                                 <div className="flex items-center justify-between mb-3">

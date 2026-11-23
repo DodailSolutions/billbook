@@ -162,7 +162,7 @@ export function SupportChatbot() {
     }
 
     return (
-        <div className="fixed bottom-20 sm:bottom-6 right-4 sm:right-6 z-40 md:z-90 font-sans">
+        <div data-tour="support-chatbot" className="fixed bottom-20 sm:bottom-6 right-4 sm:right-6 z-40 md:z-90 font-sans">
             {/* Floating Trigger Button */}
             {!isOpen && (
                 <button

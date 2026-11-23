@@ -1,131 +1,266 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { 
+    Home, 
+    Search, 
+    Receipt, 
+    TrendingUp, 
+    Building2, 
+    Plug, 
     Sparkles, 
-    LayoutDashboard, 
-    FileText, 
-    Barcode, 
-    FileBarChart, 
-    ArrowRight, 
-    ArrowLeft, 
-    X, 
-    CheckCircle2, 
-    Zap,
-    PlayCircle,
-    Building2,
-    ShieldCheck,
-    Receipt,
-    Plus,
-    Check,
-    RefreshCw
+    ChevronLeft, 
+    ChevronRight, 
+    X,
+    Check
 } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
-import { Input } from '@/components/ui/Input'
 
 interface TourStep {
     id: string
     title: string
-    subtitle: string
     description: string
+    targetSelector: string
+    position: 'right' | 'bottom' | 'top' | 'left' | 'center'
     icon: React.ComponentType<{ className?: string }>
-    badge: string
-    badgeColor: string
-    tips: string[]
+    iconBg: string
+    iconColor: string
 }
 
 const TOUR_STEPS: TourStep[] = [
     {
-        id: 'welcome',
-        title: 'Welcome to BillBook ERP',
-        subtitle: 'Intelligent, Industry-Adaptive Business Platform',
-        description: 'BillBook adapts to your exact business vertical—whether you manage Software & IT, Salons, Hospitality & Campsites, Retail, or Art & Craft studios.',
+        id: 'navigation',
+        title: 'Navigation',
+        description: 'Your command center. Browse invoices, quotations, inventory, payroll, and settings from the sidebar. It collapses on mobile for a clean workspace.',
+        targetSelector: '[data-tour="sidebar"]',
+        position: 'right',
+        icon: Home,
+        iconBg: 'bg-pink-50 dark:bg-pink-950/50 border-pink-100 dark:border-pink-900/40',
+        iconColor: 'text-pink-600 dark:text-pink-400'
+    },
+    {
+        id: 'invoicing',
+        title: 'Quick Invoicing',
+        description: 'Generate GST and VAT compliant tax invoices with automated line calculations, custom notes, and payment QR codes in seconds.',
+        targetSelector: '[data-tour="quick-invoice"]',
+        position: 'right',
+        icon: Receipt,
+        iconBg: 'bg-blue-50 dark:bg-blue-950/50 border-blue-100 dark:border-blue-900/40',
+        iconColor: 'text-blue-600 dark:text-blue-400'
+    },
+    {
+        id: 'revenue_radar',
+        title: 'Real-Time Financial Radar',
+        description: 'Monitor gross receivables, collected revenue, pending client balances, and live business cashflow at a glance with zero manual bookkeeping.',
+        targetSelector: '[data-tour="stats-overview"]',
+        position: 'bottom',
+        icon: TrendingUp,
+        iconBg: 'bg-emerald-50 dark:bg-emerald-950/50 border-emerald-100 dark:border-emerald-900/40',
+        iconColor: 'text-emerald-600 dark:text-emerald-400'
+    },
+    {
+        id: 'global_search',
+        title: 'Global Search',
+        description: 'Find invoices, clients, products, and reports instantly. Just start typing — results appear as you go.',
+        targetSelector: '[data-tour="global-search"]',
+        position: 'bottom',
+        icon: Search,
+        iconBg: 'bg-purple-50 dark:bg-purple-950/50 border-purple-100 dark:border-purple-900/40',
+        iconColor: 'text-purple-600 dark:text-purple-400'
+    },
+    {
+        id: 'vertical_adaptation',
+        title: 'Industry Vertical Adaptation',
+        description: 'BillBooky dynamically adapts features, tax codes, and terminology for your vertical — whether Software & IT, Retail, Salon, Hospitality, or Consulting.',
+        targetSelector: '[data-tour="vertical-selector"]',
+        position: 'right',
+        icon: Building2,
+        iconBg: 'bg-amber-50 dark:bg-amber-950/50 border-amber-100 dark:border-amber-900/40',
+        iconColor: 'text-amber-600 dark:text-amber-400'
+    },
+    {
+        id: 'integrations',
+        title: 'Connected Integrations Hub',
+        description: 'Connect real-time Google Sheets sync, incoming Microsoft Teams channel alerts, and automated WhatsApp Click-to-Chat payment reminders.',
+        targetSelector: '[data-tour="integrations"]',
+        position: 'right',
+        icon: Plug,
+        iconBg: 'bg-indigo-50 dark:bg-indigo-950/50 border-indigo-100 dark:border-indigo-900/40',
+        iconColor: 'text-indigo-600 dark:text-indigo-400'
+    },
+    {
+        id: 'support_ai',
+        title: 'AI Assistant & 24/7 Helpdesk',
+        description: 'Have billing questions or need tax filing help? Click here anytime to ask our AI accountant or open a priority support ticket.',
+        targetSelector: '[data-tour="support-chatbot"]',
+        position: 'top',
         icon: Sparkles,
-        badge: 'Step 1 of 4',
-        badgeColor: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/60 dark:text-indigo-300',
-        tips: [
-            'All catalog items, tax codes, and workflows tailor dynamically to your vertical',
-            'Zero technical complexity—ready to issue invoices, manage inventory, and track team margins'
-        ]
-    },
-    {
-        id: 'dashboard',
-        title: 'Real-Time Financial Dashboard',
-        subtitle: 'Instant Cash Flow & Receivables Radar',
-        description: 'Monitor your monthly gross revenue, unbilled timesheets, pending customer balances, and tax liabilities with zero manual bookkeeping.',
-        icon: LayoutDashboard,
-        badge: 'Step 2 of 4',
-        badgeColor: 'bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300',
-        tips: [
-            'Interactive charts for sales trends and overhead expenditure',
-            'Quick action shortcuts to issue invoices, track CRM leads, and configure hardware POS'
-        ]
-    },
-    {
-        id: 'crm_proposals',
-        title: 'CRM Pipeline & AI Proposal Engine',
-        subtitle: 'SOW Contracts & Touchscreen E-Signing',
-        description: 'Evaluate client RFPs with AI feasibility scoring, build milestone sprint tranches, and close deals with built-in digital signature pads.',
-        icon: FileBarChart,
-        badge: 'Step 3 of 4',
-        badgeColor: 'bg-purple-100 text-purple-700 dark:bg-purple-900/60 dark:text-purple-300',
-        tips: [
-            'Automated ERP trigger: signing proposals marks CRM deals as Won and issues advance invoices',
-            'Track client creative approvals and milestone signoffs in a unified portal'
-        ]
-    },
-    {
-        id: 'sandbox_intro',
-        title: 'Interactive Practice Sandbox',
-        subtitle: 'Zero-Impact Guided Invoice Generation Demo',
-        description: 'Experience how fast it is to create a compliant GST invoice. Practice adding items and reviewing taxes in a safe sandbox that leaves your real live books 100% untouched.',
-        icon: FileText,
-        badge: 'Step 4 of 4',
-        badgeColor: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300',
-        tips: [
-            'Practice clicking, selecting items, and reviewing calculations',
-            'Nothing is saved to your real database—purely educational and interactive'
-        ]
+        iconBg: 'bg-linear-to-tr from-pink-50 to-purple-50 dark:from-pink-950/50 dark:to-purple-950/50 border-purple-100 dark:border-purple-900/40',
+        iconColor: 'text-purple-600 dark:text-purple-400'
     }
 ]
 
-const STORAGE_KEY = 'billbook_onboarding_completed_v2'
+const STORAGE_KEY = 'billbook_product_tour_completed_v3'
+
+interface TargetRect {
+    top: number
+    left: number
+    width: number
+    height: number
+    right: number
+    bottom: number
+}
 
 export function FirstTimeOnboardingTour() {
     const [isOpen, setIsOpen] = useState(false)
-    const [viewMode, setViewMode] = useState<'tour' | 'sandbox'>('tour')
     const [currentStepIndex, setCurrentStepIndex] = useState(0)
+    const [targetRect, setTargetRect] = useState<TargetRect | null>(null)
+    const [tooltipStyle, setTooltipStyle] = useState<React.CSSProperties>({})
+    const [activePlacement, setActivePlacement] = useState<'right' | 'bottom' | 'top' | 'left' | 'center'>('center')
+    const tooltipRef = useRef<HTMLDivElement>(null)
 
-    // Interactive Demo Sandbox State (Purely in-memory, zero live database impact)
-    const [demoCustomer, setDemoCustomer] = useState('Acme Corporation (Sample Client)')
-    const [demoItemTitle, setDemoItemTitle] = useState('Standard Service / Professional Deliverable')
-    const [demoQty, setDemoQty] = useState(1)
-    const [demoRate, setDemoRate] = useState(15000)
-    const [demoGstRate, setDemoGstRate] = useState(18)
-    const [isInvoiceGenerated, setIsInvoiceGenerated] = useState(false)
-
+    // Check if tour should auto-open for first-time user
     useEffect(() => {
         const hasCompleted = localStorage.getItem(STORAGE_KEY)
         if (!hasCompleted) {
             const timer = setTimeout(() => {
                 setIsOpen(true)
-            }, 800)
+            }, 1000)
             return () => clearTimeout(timer)
         }
 
         const handleRestart = () => {
             setCurrentStepIndex(0)
-            setViewMode('tour')
-            setIsInvoiceGenerated(false)
             setIsOpen(true)
         }
+
         window.addEventListener('billbook:restart-tour', handleRestart)
         return () => window.removeEventListener('billbook:restart-tour', handleRestart)
     }, [])
 
-    const handleDismiss = () => {
+    const currentStep = TOUR_STEPS[currentStepIndex]
+
+    // Recalculate target element position and tooltip placement
+    const updatePosition = useCallback(() => {
+        if (!isOpen) return
+
+        const el = document.querySelector(currentStep.targetSelector)
+        if (!el) {
+            setTargetRect(null)
+            setActivePlacement('center')
+            setTooltipStyle({
+                position: 'fixed',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                zIndex: 10001
+            })
+            return
+        }
+
+        const rect = el.getBoundingClientRect()
+        setTargetRect({
+            top: rect.top,
+            left: rect.left,
+            width: rect.width,
+            height: rect.height,
+            right: rect.right,
+            bottom: rect.bottom
+        })
+
+        // Ensure target is scrolled into view smoothly
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' })
+
+        const tooltipWidth = 340
+        const tooltipHeight = 220
+        const padding = 16
+
+        let top = 0
+        let left = 0
+        let placement = currentStep.position
+
+        // Mobile fallback: position at bottom or center if screen is small
+        if (window.innerWidth < 768) {
+            if (rect.top > window.innerHeight / 2) {
+                placement = 'top'
+                top = Math.max(padding, rect.top - tooltipHeight - 16)
+                left = Math.max(padding, Math.min(window.innerWidth - tooltipWidth - padding, rect.left))
+            } else {
+                placement = 'bottom'
+                top = Math.min(window.innerHeight - tooltipHeight - padding, rect.bottom + 16)
+                left = Math.max(padding, Math.min(window.innerWidth - tooltipWidth - padding, rect.left))
+            }
+        } else {
+            switch (placement) {
+                case 'right':
+                    top = rect.top + rect.height / 2 - tooltipHeight / 2
+                    left = rect.right + 16
+                    break
+                case 'bottom':
+                    top = rect.bottom + 16
+                    left = rect.left + rect.width / 2 - tooltipWidth / 2
+                    break
+                case 'top':
+                    top = rect.top - tooltipHeight - 16
+                    left = rect.left + rect.width / 2 - tooltipWidth / 2
+                    break
+                case 'left':
+                    top = rect.top + rect.height / 2 - tooltipHeight / 2
+                    left = rect.left - tooltipWidth - 16
+                    break
+                default:
+                    top = window.innerHeight / 2 - tooltipHeight / 2
+                    left = window.innerWidth / 2 - tooltipWidth / 2
+            }
+
+            // Viewport clamping
+            top = Math.max(padding, Math.min(window.innerHeight - tooltipHeight - padding, top))
+            left = Math.max(padding, Math.min(window.innerWidth - tooltipWidth - padding, left))
+        }
+
+        setActivePlacement(placement)
+        setTooltipStyle({
+            position: 'fixed',
+            top: `${top}px`,
+            left: `${left}px`,
+            zIndex: 10001
+        })
+    }, [isOpen, currentStep])
+
+    useEffect(() => {
+        updatePosition()
+
+        const handleResize = () => updatePosition()
+        const handleScroll = () => updatePosition()
+
+        window.addEventListener('resize', handleResize)
+        window.addEventListener('scroll', handleScroll, true)
+
+        return () => {
+            window.removeEventListener('resize', handleResize)
+            window.removeEventListener('scroll', handleScroll, true)
+        }
+    }, [updatePosition])
+
+    // Keyboard navigation (Escape to skip, Left/Right arrow to navigate)
+    useEffect(() => {
+        if (!isOpen) return
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                handleSkip()
+            } else if (e.key === 'ArrowRight' || e.key === 'Enter') {
+                handleNext()
+            } else if (e.key === 'ArrowLeft') {
+                handlePrev()
+            }
+        }
+
+        window.addEventListener('keydown', handleKeyDown)
+        return () => window.removeEventListener('keydown', handleKeyDown)
+    }, [isOpen, currentStepIndex])
+
+    const handleSkip = () => {
         localStorage.setItem(STORAGE_KEY, 'true')
-        localStorage.setItem('billbook_onboarding_completed_at', new Date().toISOString())
         setIsOpen(false)
     }
 
@@ -133,8 +268,7 @@ export function FirstTimeOnboardingTour() {
         if (currentStepIndex < TOUR_STEPS.length - 1) {
             setCurrentStepIndex(prev => prev + 1)
         } else {
-            // Transition smoothly to interactive practice sandbox
-            setViewMode('sandbox')
+            handleSkip()
         }
     }
 
@@ -146,319 +280,132 @@ export function FirstTimeOnboardingTour() {
 
     if (!isOpen) return null
 
-    // Calculations for Demo Sandbox
-    const subtotal = demoQty * demoRate
-    const taxAmount = Math.round(subtotal * (demoGstRate / 100))
-    const totalAmount = subtotal + taxAmount
-
-    const step = TOUR_STEPS[currentStepIndex]
-    const StepIcon = step.icon
+    const StepIcon = currentStep.icon
+    const totalSteps = TOUR_STEPS.length
+    const currentStepNum = currentStepIndex + 1
 
     return (
-        <div className="fixed inset-0 z-999 flex items-center justify-center p-4 sm:p-6 bg-slate-950/75 backdrop-blur-sm animate-in fade-in duration-200">
-            <div 
-                className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col transition-all max-h-[92vh]"
-                role="dialog"
-                aria-modal="true"
-            >
-                {/* Top Banner Accent */}
-                <div className="h-2 w-full bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 shrink-0" />
+        <div className="fixed inset-0 z-10000 pointer-events-auto font-sans select-none animate-in fade-in duration-200">
+            {/* SVG Cutout Spotlight Overlay */}
+            <svg className="absolute inset-0 w-full h-full pointer-events-none transition-all duration-300">
+                <defs>
+                    <mask id="tour-spotlight-mask">
+                        {/* White base fills entire screen (opaque) */}
+                        <rect x="0" y="0" width="100%" height="100%" fill="white" />
+                        {/* Black cutout reveals the active target element */}
+                        {targetRect && (
+                            <rect
+                                x={targetRect.left - 6}
+                                y={targetRect.top - 6}
+                                width={targetRect.width + 12}
+                                height={targetRect.height + 12}
+                                rx="12"
+                                ry="12"
+                                fill="black"
+                            />
+                        )}
+                    </mask>
+                </defs>
+                {/* Dark semi-transparent backdrop using the cutout mask */}
+                <rect
+                    x="0"
+                    y="0"
+                    width="100%"
+                    height="100%"
+                    fill="rgba(15, 23, 42, 0.65)"
+                    mask="url(#tour-spotlight-mask)"
+                />
+            </svg>
 
-                {/* Header */}
-                <div className="p-6 pb-4 flex items-start justify-between border-b border-slate-100 dark:border-slate-800/80 shrink-0">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-800/40">
-                            {viewMode === 'tour' ? <StepIcon className="w-6 h-6" /> : <PlayCircle className="w-6 h-6 text-emerald-600" />}
-                        </div>
-                        <div>
-                            <div className="flex items-center gap-2 mb-0.5">
-                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${
-                                    viewMode === 'tour' ? step.badgeColor : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
-                                }`}>
-                                    {viewMode === 'tour' ? step.badge : 'Interactive Practice Sandbox'}
-                                </span>
-                                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500">
-                                    Zero Live Data Impact
-                                </span>
-                            </div>
-                            <h3 className="text-lg font-extrabold text-slate-900 dark:text-slate-100 leading-snug">
-                                {viewMode === 'tour' ? step.title : 'Interactive Demo: Create a Practice Invoice'}
-                            </h3>
-                        </div>
+            {/* Glowing target border outline */}
+            {targetRect && (
+                <div
+                    className="fixed rounded-xl border-2 border-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.4)] pointer-events-none transition-all duration-300"
+                    style={{
+                        top: `${targetRect.top - 6}px`,
+                        left: `${targetRect.left - 6}px`,
+                        width: `${targetRect.width + 12}px`,
+                        height: `${targetRect.height + 12}px`,
+                        zIndex: 10000
+                    }}
+                />
+            )}
+
+            {/* Floating Tooltip Card */}
+            <div
+                ref={tooltipRef}
+                style={tooltipStyle}
+                className="w-[340px] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200/90 dark:border-slate-800 p-5 transition-all duration-300 animate-in fade-in zoom-in-95 relative"
+            >
+                {/* Pointer Caret / Notch Arrow */}
+                {activePlacement === 'right' && (
+                    <div className="absolute -left-2 top-1/2 -translate-y-1/2 w-4 h-4 bg-white dark:bg-slate-900 border-l border-b border-slate-200/90 dark:border-slate-800 rotate-45" />
+                )}
+                {activePlacement === 'bottom' && (
+                    <div className="absolute -top-2 left-8 w-4 h-4 bg-white dark:bg-slate-900 border-t border-l border-slate-200/90 dark:border-slate-800 rotate-45" />
+                )}
+                {activePlacement === 'top' && (
+                    <div className="absolute -bottom-2 right-8 w-4 h-4 bg-white dark:bg-slate-900 border-b border-r border-slate-200/90 dark:border-slate-800 rotate-45" />
+                )}
+                {activePlacement === 'left' && (
+                    <div className="absolute -right-2 top-1/2 -translate-y-1/2 w-4 h-4 bg-white dark:bg-slate-900 border-t border-r border-slate-200/90 dark:border-slate-800 rotate-45" />
+                )}
+
+                {/* Card Header (Icon & Step Counter) */}
+                <div className="flex items-center justify-between">
+                    <div className={`w-8 h-8 rounded-xl ${currentStep.iconBg} ${currentStep.iconColor} border flex items-center justify-center`}>
+                        <StepIcon className="w-4 h-4" />
                     </div>
+                    <span className="text-xs font-mono font-semibold text-slate-400 dark:text-slate-500">
+                        {currentStepNum} / {totalSteps}
+                    </span>
+                </div>
+
+                {/* Title & Description */}
+                <div className="mt-3">
+                    <h3 className="text-base font-extrabold text-slate-900 dark:text-white leading-snug">
+                        {currentStep.title}
+                    </h3>
+                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mt-1.5">
+                        {currentStep.description}
+                    </p>
+                </div>
+
+                {/* Footer Controls (Skip tour, Back, Next) */}
+                <div className="flex items-center justify-between pt-4 mt-4 border-t border-slate-100 dark:border-slate-800/80">
                     <button
                         type="button"
-                        onClick={handleDismiss}
-                        className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                        title="Skip Walkthrough"
+                        onClick={handleSkip}
+                        className="text-xs font-semibold text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors cursor-pointer"
                     >
-                        <X className="w-5 h-5" />
+                        Skip tour
                     </button>
-                </div>
 
-                {/* Body Content */}
-                <div className="p-6 overflow-y-auto space-y-4 flex-1">
-                    {viewMode === 'tour' ? (
-                        /* Tour Step Content */
-                        <div className="space-y-4 animate-in fade-in">
-                            <p className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                                {step.subtitle}
-                            </p>
-                            <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                                {step.description}
-                            </p>
+                    <div className="flex items-center gap-2">
+                        {currentStepIndex > 0 && (
+                            <button
+                                type="button"
+                                onClick={handlePrev}
+                                className="h-8 w-8 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 transition-colors cursor-pointer"
+                                aria-label="Previous Step"
+                            >
+                                <ChevronLeft className="w-4 h-4" />
+                            </button>
+                        )}
 
-                            {/* Pro Tips / Highlights */}
-                            <div className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4 space-y-2 border border-slate-100 dark:border-slate-800">
-                                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wide flex items-center gap-1.5">
-                                    <Zap className="w-3.5 h-3.5 text-amber-500" />
-                                    Key Platform Capabilities:
-                                </span>
-                                <ul className="space-y-2">
-                                    {step.tips.map((tip, idx) => (
-                                        <li key={idx} className="text-xs text-slate-700 dark:text-slate-300 flex items-start gap-2.5">
-                                            <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                                            <span>{tip}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        </div>
-                    ) : (
-                        /* Interactive Sandbox Practice Invoice Generator */
-                        <div className="space-y-4 animate-in fade-in">
-                            <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-2xl flex items-center gap-2.5 text-xs text-emerald-800 dark:text-emerald-200">
-                                <ShieldCheck className="h-5 w-5 text-emerald-600 shrink-0" />
-                                <span>
-                                    <strong>Sandbox Mode Active:</strong> Try clicking and creating a demo invoice below. This is an interactive simulation that helps you learn where to click without creating any records in your actual account.
-                                </span>
-                            </div>
-
-                            {!isInvoiceGenerated ? (
-                                <div className="space-y-3 text-xs">
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                        <div>
-                                            <label className="font-semibold text-slate-700 dark:text-slate-300 block mb-1">
-                                                Select Sample Customer
-                                            </label>
-                                            <select
-                                                value={demoCustomer}
-                                                onChange={(e) => setDemoCustomer(e.target.value)}
-                                                className="w-full h-9 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-200"
-                                            >
-                                                <option value="Acme Corporation (Sample Client)">🏢 Acme Corporation (Sample Corporate Client)</option>
-                                                <option value="Priya Sharma (Retail / Walk-in)">🛍️ Priya Sharma (Retail / Walk-in Customer)</option>
-                                                <option value="Horizon Media Ltd (Agency Retainer)">📢 Horizon Media Ltd (Agency Retainer)</option>
-                                            </select>
-                                        </div>
-
-                                        <div>
-                                            <label className="font-semibold text-slate-700 dark:text-slate-300 block mb-1">
-                                                Pick Sample Item / Service
-                                            </label>
-                                            <select
-                                                value={demoItemTitle}
-                                                onChange={(e) => {
-                                                    setDemoItemTitle(e.target.value)
-                                                    if (e.target.value.includes('Sprint')) setDemoRate(50000)
-                                                    else if (e.target.value.includes('Ceramic')) setDemoRate(3500)
-                                                    else setDemoRate(15000)
-                                                }}
-                                                className="w-full h-9 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-200"
-                                            >
-                                                <option value="Professional Consulting & Deliverables">💼 Professional Consulting & Deliverables (₹15,000)</option>
-                                                <option value="Software Development Sprint Tranche">💻 Software Development Sprint Tranche (₹50,000)</option>
-                                                <option value="Handmade Ceramic Studio Artwork">🎨 Handmade Ceramic Studio Artwork (₹3,500)</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    {/* Line Item Table Simulation */}
-                                    <div className="p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 space-y-2">
-                                        <div className="flex items-center justify-between font-semibold text-slate-700 dark:text-slate-300">
-                                            <span>Demo Invoice Calculation</span>
-                                            <span className="text-[11px] text-blue-600 font-normal">Interactive Preview</span>
-                                        </div>
-
-                                        <div className="grid grid-cols-3 gap-2">
-                                            <div>
-                                                <span className="text-[10px] text-slate-400 block mb-0.5">Quantity</span>
-                                                <Input
-                                                    type="number"
-                                                    min="1"
-                                                    value={demoQty}
-                                                    onChange={(e) => setDemoQty(Math.max(1, Number(e.target.value) || 1))}
-                                                    className="h-8 text-xs"
-                                                />
-                                            </div>
-                                            <div>
-                                                <span className="text-[10px] text-slate-400 block mb-0.5">Unit Rate (₹)</span>
-                                                <Input
-                                                    type="number"
-                                                    value={demoRate}
-                                                    onChange={(e) => setDemoRate(Math.max(0, Number(e.target.value) || 0))}
-                                                    className="h-8 text-xs"
-                                                />
-                                            </div>
-                                            <div>
-                                                <span className="text-[10px] text-slate-400 block mb-0.5">GST Rate</span>
-                                                <select
-                                                    value={demoGstRate}
-                                                    onChange={(e) => setDemoGstRate(Number(e.target.value))}
-                                                    className="w-full h-8 px-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs"
-                                                >
-                                                    <option value={0}>0% (Exempt / LUT)</option>
-                                                    <option value={5}>5% (Basic)</option>
-                                                    <option value={12}>12% (Art / Hospitality)</option>
-                                                    <option value={18}>18% (Standard GST)</option>
-                                                    <option value={28}>28% (Luxury)</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div className="pt-2 border-t border-slate-200 dark:border-slate-700 flex justify-between text-xs font-mono">
-                                            <span className="text-slate-500">Subtotal: ₹{subtotal.toLocaleString('en-IN')} + GST ({demoGstRate}%): ₹{taxAmount.toLocaleString('en-IN')}</span>
-                                            <span className="font-bold text-slate-900 dark:text-white text-sm">Total: ₹{totalAmount.toLocaleString('en-IN')}</span>
-                                        </div>
-                                    </div>
-
-                                    <Button
-                                        type="button"
-                                        onClick={() => setIsInvoiceGenerated(true)}
-                                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs h-10 rounded-xl shadow-md gap-2"
-                                    >
-                                        <Receipt className="h-4 w-4" />
-                                        <span>Click to Generate Practice Invoice →</span>
-                                    </Button>
-                                </div>
+                        <button
+                            type="button"
+                            onClick={handleNext}
+                            className="bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer flex items-center gap-1 active:scale-95"
+                        >
+                            <span>{currentStepIndex === totalSteps - 1 ? 'Get Started' : 'Next'}</span>
+                            {currentStepIndex === totalSteps - 1 ? (
+                                <Check className="w-3.5 h-3.5 ml-0.5" />
                             ) : (
-                                /* Invoice Generated Success Screen */
-                                <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3 animate-in fade-in">
-                                    <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-2">
-                                        <div className="flex items-center gap-2">
-                                            <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-                                            <div>
-                                                <h4 className="font-bold text-xs text-slate-900 dark:text-white">
-                                                    Practice Invoice #INV-DEMO-001 Generated!
-                                                </h4>
-                                                <span className="text-[10px] text-slate-400">
-                                                    Demo preview • No real data saved
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-mono font-bold text-xs">
-                                            ₹{totalAmount.toLocaleString('en-IN')}
-                                        </span>
-                                    </div>
-
-                                    <div className="text-xs space-y-1 text-slate-600 dark:text-slate-300">
-                                        <div><strong>Customer:</strong> {demoCustomer}</div>
-                                        <div><strong>Deliverable:</strong> {demoItemTitle} (Qty: {demoQty})</div>
-                                        <div><strong>Tax Breakdown:</strong> CGST ({demoGstRate/2}%): ₹{Math.round(taxAmount/2).toLocaleString('en-IN')} | SGST ({demoGstRate/2}%): ₹{Math.round(taxAmount/2).toLocaleString('en-IN')}</div>
-                                    </div>
-
-                                    <div className="p-2.5 bg-indigo-50 dark:bg-indigo-950/40 rounded-xl text-indigo-700 dark:text-indigo-300 text-[11px] flex items-center justify-between">
-                                        <span>Ready for WhatsApp dispatch & UPI QR payment collection!</span>
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => setIsInvoiceGenerated(false)}
-                                            className="h-7 text-[10px] font-semibold"
-                                        >
-                                            <RefreshCw className="h-3 w-3 mr-1" />
-                                            Try Another Sample
-                                        </Button>
-                                    </div>
-                                </div>
+                                <ChevronRight className="w-3.5 h-3.5 ml-0.5" />
                             )}
-                        </div>
-                    )}
-                </div>
-
-                {/* Footer Controls */}
-                <div className="p-4 px-6 bg-slate-50 dark:bg-slate-800/40 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
-                    {viewMode === 'tour' ? (
-                        <>
-                            {/* Stepper Dots */}
-                            <div className="flex items-center gap-1.5">
-                                {TOUR_STEPS.map((_, idx) => (
-                                    <button
-                                        key={idx}
-                                        type="button"
-                                        onClick={() => setCurrentStepIndex(idx)}
-                                        aria-label={`Go to step ${idx + 1}`}
-                                        className={`h-2 rounded-full transition-all ${
-                                            idx === currentStepIndex 
-                                                ? 'w-6 bg-indigo-600 dark:bg-indigo-400' 
-                                                : 'w-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300'
-                                        }`}
-                                    />
-                                ))}
-                            </div>
-
-                            {/* Navigation Buttons */}
-                            <div className="flex items-center gap-2">
-                                <button
-                                    type="button"
-                                    onClick={handleDismiss}
-                                    className="text-xs font-medium text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 px-3 py-1.5 rounded-xl hover:bg-slate-200/60 dark:hover:bg-slate-700 transition-colors"
-                                >
-                                    Skip Walkthrough
-                                </button>
-
-                                {currentStepIndex > 0 && (
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={handlePrev}
-                                        className="text-xs gap-1 rounded-xl"
-                                    >
-                                        <ArrowLeft className="w-3.5 h-3.5" />
-                                        Back
-                                    </Button>
-                                )}
-
-                                <Button
-                                    size="sm"
-                                    onClick={handleNext}
-                                    className="text-xs gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl"
-                                >
-                                    {currentStepIndex === TOUR_STEPS.length - 1 ? (
-                                        <>
-                                            <PlayCircle className="w-3.5 h-3.5" />
-                                            Launch Practice Sandbox
-                                        </>
-                                    ) : (
-                                        <>
-                                            Next
-                                            <ArrowRight className="w-3.5 h-3.5" />
-                                        </>
-                                    )}
-                                </Button>
-                            </div>
-                        </>
-                    ) : (
-                        <>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setViewMode('tour')}
-                                className="text-xs gap-1 rounded-xl"
-                            >
-                                <ArrowLeft className="w-3.5 h-3.5" />
-                                Back to Tour
-                            </Button>
-
-                            <Button
-                                size="sm"
-                                onClick={handleDismiss}
-                                className="text-xs gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md"
-                            >
-                                <Check className="w-3.5 h-3.5" />
-                                Finish Demo & Hand Over Live Workspace
-                            </Button>
-                        </>
-                    )}
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
