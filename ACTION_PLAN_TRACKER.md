@@ -254,3 +254,8 @@ This document serves as the master execution tracker for multi-vertical architec
 - [x] **Task 19.4: Resilient Employee Onboarding & Login Provisioning (`lib/payroll-actions.ts`)**
   - Implemented multi-tier fallback for employee login creation: tries admin auth client if service key exists, falls back to `supabase.auth.signUp()`, and auto-resolves existing registered users.
   - Replaced strict failure with non-blocking auth setup and automatic retry on duplicate `employee_code` collisions, ensuring employee creation never crashes or blocks the user.
+- [x] **Task 19.5: Adaptive Schema Compatibility for Employees (`lib/payroll-actions.ts`, `supabase-superadmin-unrestricted-rls.sql`)**
+  - Resolved `Could not find the 'address' column of 'employees' in the schema cache` error by introducing dual-phase adaptive inserts and updates.
+  - Inserts and updates automatically retry with guaranteed base columns if extended columns (`address`, `bank_name`, `bank_branch`, `employee_user_id`) are missing from the active database schema cache.
+  - Added safe `select('*')` query guard in `updateEmployee` to avoid querying nonexistent columns.
+  - Added idempotent schema migration commands in `supabase-superadmin-unrestricted-rls.sql` for adding `address`, `bank_name`, `bank_branch`, `employee_user_id`, and `employment_type`.

@@ -194,56 +194,53 @@ export async function createEmployee(input: CreateEmployeeInput): Promise<{ succ
     }
 
     let finalEmpCode = input.employee_code
-    let { data: emp, error: empError } = await supabase
-        .from('employees')
-        .insert({
-            user_id: user.id,
-            employee_code: finalEmpCode,
-            name: input.name,
-            email: input.email || null,
-            phone: input.phone || null,
-            designation: input.designation || null,
-            department: input.department || null,
-            date_of_joining: input.date_of_joining,
-            pan_number: input.pan_number || null,
-            bank_account_number: input.bank_account_number || null,
-            ifsc_code: input.ifsc_code || null,
-            bank_name: input.bank_name || null,
-            bank_branch: input.bank_branch || null,
-            address: input.address || null,
-            status: 'active',
-            employee_user_id: employeeUserId
-        })
-        .select()
-        .maybeSingle()
 
-    // Handle duplicate employee_code gracefully
+    // Base payload guaranteed by original employees schema
+    const basePayload: any = {
+        user_id: user.id,
+        employee_code: finalEmpCode,
+        name: input.name,
+        email: input.email || null,
+        phone: input.phone || null,
+        designation: input.designation || null,
+        department: input.department || null,
+        date_of_joining: input.date_of_joining,
+        pan_number: input.pan_number || null,
+        bank_account_number: input.bank_account_number || null,
+        ifsc_code: input.ifsc_code || null,
+        status: 'active'
+    }
+
+    // Extended columns that may be present if full migration was executed
+    const fullPayload: any = { ...basePayload }
+    if (employeeUserId) fullPayload.employee_user_id = employeeUserId
+    if (input.bank_name) fullPayload.bank_name = input.bank_name
+    if (input.bank_branch) fullPayload.bank_branch = input.bank_branch
+    if (input.address) fullPayload.address = input.address
+
+    let emp: any = null
+    let empError: any = null
+
+    // 1. Attempt insert with full payload
+    const res1 = await supabase.from('employees').insert(fullPayload).select().maybeSingle()
+    emp = res1.data
+    empError = res1.error
+
+    // 2. Fallback: If missing columns in schema cache (e.g. 'address' does not exist in DB), retry with base schema
+    if (empError && (empError.message?.includes('schema cache') || empError.message?.includes('column'))) {
+        console.warn('Retrying employee insert with base columns due to schema difference:', empError.message)
+        const res2 = await supabase.from('employees').insert(basePayload).select().maybeSingle()
+        emp = res2.data
+        empError = res2.error
+    }
+
+    // 3. Fallback: Handle duplicate employee_code gracefully
     if (empError && (empError.code === '23505' || empError.message?.includes('duplicate'))) {
         finalEmpCode = `EMP-${Date.now().toString().slice(-6)}${Math.floor(10 + Math.random() * 90)}`
-        const retry = await supabase
-            .from('employees')
-            .insert({
-                user_id: user.id,
-                employee_code: finalEmpCode,
-                name: input.name,
-                email: input.email || null,
-                phone: input.phone || null,
-                designation: input.designation || null,
-                department: input.department || null,
-                date_of_joining: input.date_of_joining,
-                pan_number: input.pan_number || null,
-                bank_account_number: input.bank_account_number || null,
-                ifsc_code: input.ifsc_code || null,
-                bank_name: input.bank_name || null,
-                bank_branch: input.bank_branch || null,
-                address: input.address || null,
-                status: 'active',
-                employee_user_id: employeeUserId
-            })
-            .select()
-            .maybeSingle()
-        emp = retry.data
-        empError = retry.error
+        const retryPayload = { ...basePayload, employee_code: finalEmpCode }
+        const res3 = await supabase.from('employees').insert(retryPayload).select().maybeSingle()
+        emp = res3.data
+        empError = res3.error
     }
 
     if (empError || !emp) {
@@ -289,15 +286,21 @@ export async function updateEmployee(id: string, input: UpdateEmployeeInput): Pr
 
     let employeeUserId: string | null = null
 
-    // Check if employee already has a linked login account
-    const { data: existingEmp } = await supabase
-        .from('employees')
-        .select('employee_user_id')
-        .eq('id', id)
-        .single()
+    // Check if employee already has a linked login account safely without schema error
+    let existingHasAuth = false
+    try {
+        const { data: existingEmp } = await supabase
+            .from('employees')
+            .select('*')
+            .eq('id', id)
+            .maybeSingle()
+        if (existingEmp && (existingEmp as any).employee_user_id) {
+            existingHasAuth = true
+        }
+    } catch {}
 
     if (input.allow_login && input.email && input.password) {
-        if (existingEmp && !existingEmp.employee_user_id) {
+        if (!existingHasAuth) {
             try {
                 const hasServiceKey = !!process.env.SUPABASE_SERVICE_ROLE_KEY
                 let authCreated = false
@@ -375,11 +378,27 @@ export async function updateEmployee(id: string, input: UpdateEmployeeInput): Pr
     if (input.status !== undefined) updateData.status = input.status
     if (employeeUserId) updateData.employee_user_id = employeeUserId
 
-    const { error: empError } = await supabase
+    let { error: empError } = await supabase
         .from('employees')
         .update(updateData)
         .eq('id', id)
         .eq('user_id', user.id)
+
+    // Fallback: If missing columns in schema cache (e.g. 'address' does not exist in DB), strip extended columns and retry
+    if (empError && (empError.message?.includes('schema cache') || empError.message?.includes('column'))) {
+        console.warn('Retrying employee update with base columns due to schema difference:', empError.message)
+        const strippedData = { ...updateData }
+        delete strippedData.bank_name
+        delete strippedData.bank_branch
+        delete strippedData.address
+        delete strippedData.employee_user_id
+        const resRetry = await supabase
+            .from('employees')
+            .update(strippedData)
+            .eq('id', id)
+            .eq('user_id', user.id)
+        empError = resRetry.error
+    }
 
     if (empError) {
         return { success: false, error: empError.message }

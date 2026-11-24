@@ -59,3 +59,10 @@ SET business_type = 'software_it',
 WHERE user_id IN (
     SELECT id FROM user_profiles WHERE role IN ('superadmin', 'super_admin')
 );
+
+-- 5. Ensure employees table has extended columns for addresses, banking and auth linkage
+ALTER TABLE IF EXISTS public.employees ADD COLUMN IF NOT EXISTS address TEXT;
+ALTER TABLE IF EXISTS public.employees ADD COLUMN IF NOT EXISTS bank_name TEXT;
+ALTER TABLE IF EXISTS public.employees ADD COLUMN IF NOT EXISTS bank_branch TEXT;
+ALTER TABLE IF EXISTS public.employees ADD COLUMN IF NOT EXISTS employee_user_id UUID REFERENCES auth.users(id);
+ALTER TABLE IF EXISTS public.employees ADD COLUMN IF NOT EXISTS employment_type VARCHAR(50) DEFAULT 'full_time';
