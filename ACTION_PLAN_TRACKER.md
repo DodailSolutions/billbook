@@ -259,3 +259,21 @@ This document serves as the master execution tracker for multi-vertical architec
   - Inserts and updates automatically retry with guaranteed base columns if extended columns (`address`, `bank_name`, `bank_branch`, `employee_user_id`) are missing from the active database schema cache.
   - Added safe `select('*')` query guard in `updateEmployee` to avoid querying nonexistent columns.
   - Added idempotent schema migration commands in `supabase-superadmin-unrestricted-rls.sql` for adding `address`, `bank_name`, `bank_branch`, `employee_user_id`, and `employment_type`.
+
+---
+
+### [Phase 20] - Event Management & MICE Industry Vertical Suite
+*Specialized workflow, event metadata, milestone-based billing, and CRM team member sync strictly active for event management organizations.*
+
+- [ ] **Task 20.1: Vertical Detection & Industry-Gated Feature Flags**
+  - Configure `business_type === 'event_management'` detection across settings and session contexts so event-specific fields only render when enabled.
+- [x] **Task 20.2: CRM Employee & Team Member Assignee Sync (`lib/crm-actions.ts`)**
+  - Enhanced `getCRMTeamMembers()` to query both invited `team_members` and active employees from the `employees` table.
+  - Automatically merges organization employees (e.g. Event Managers, Operations Leads) with deduplication by email and user ID.
+  - Employees now immediately populate CRM lead assignment dropdowns (`LeadModal.tsx`), Kanban cards (`KanbanBoard.tsx`), and team performance leaderboards (`TeamPerformanceView.tsx`) without requiring redundant manual invites.
+- [ ] **Task 20.3: Event Metadata on Quotes & Invoices**
+  - Support Event Name, Event Dates (Start/End), Venue/Destination, and Pax count in invoices and quotations via JSONB `business_metadata`.
+- [ ] **Task 20.4: Staged Milestone Invoicing Presets**
+  - Enable 1-click milestone payment schedules (e.g. 20% Booking Advance, 50% Pre-Event Vendor Lock, 30% Post-Event Settlement) for event contracts.
+- [ ] **Task 20.5: Build Verification & Deployment**
+  - Run full build verification and deploy Phase 20 to production.

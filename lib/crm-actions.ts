@@ -107,6 +107,50 @@ export async function getCRMTeamMembers(): Promise<CRMTeamMember[]> {
                 })
             }
         }
+
+        // 3. Bi-Directional Sync: Fetch Employees (Payroll & Organization Roster -> CRM Assignees)
+        try {
+            const { data: employees, error: empErr } = await supabase
+                .from('employees')
+                .select('id, name, email, designation, department, status')
+                .eq('user_id', ownerId)
+                .eq('status', 'active')
+                .order('name', { ascending: true })
+
+            if (!empErr && Array.isArray(employees)) {
+                const existingEmails = new Set(membersList.map(m => (m.email || '').toLowerCase().trim()).filter(Boolean))
+
+                for (const emp of employees) {
+                    const empEmail = (emp.email || '').toLowerCase().trim()
+
+                    if (empEmail && existingEmails.has(empEmail)) {
+                        const existing = membersList.find(m => (m.email || '').toLowerCase().trim() === empEmail)
+                        if (existing) {
+                            if (emp.name && (!existing.name || existing.name === empEmail.split('@')[0])) {
+                                existing.name = emp.name
+                            }
+                            if (emp.designation) {
+                                existing.role = emp.designation
+                            }
+                        }
+                        continue
+                    }
+
+                    membersList.push({
+                        id: emp.id,
+                        user_id: null,
+                        name: emp.name || (empEmail ? empEmail.split('@')[0] : 'Employee'),
+                        email: emp.email || '',
+                        role: emp.designation || emp.department || 'Employee',
+                        roleSlug: 'employee',
+                        status: emp.status || 'active'
+                    })
+                    if (empEmail) existingEmails.add(empEmail)
+                }
+            }
+        } catch (empCatch) {
+            console.warn('[getCRMTeamMembers] employees sync warning:', empCatch)
+        }
     } catch (err) {
         console.error('Error fetching CRM team members:', err)
     }
