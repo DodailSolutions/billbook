@@ -20,7 +20,7 @@ This document serves as the master execution tracker for multi-vertical architec
 | **Phase 10** | Automated WhatsApp Reminders & 1-Click Dynamic UPI Pay | All 16 Verticals | **COMPLETED & IMPLEMENTED** |
 | **Phase 11** | SOW Commission Splits, HR Handbook & Mobile RFP Engine | Universal B2B / Services | **COMPLETED & IMPLEMENTED** |
 | **Hotfix (v1.6.6)** | PlansManager Build Error & Dynamic Pro Team Limits | Core Platform & Super Admin | **COMPLETED & IMPLEMENTED** |
-| **Phase 12** | Recursive Expenses, Period Breakdowns, Excel Importer & Integrations Hub | All Verticals | **IN PROGRESS / IMPLEMENTING** |
+| **Phase 12** | Recursive Expenses, Period Breakdowns, Smooth Recurring Invoices & Integrations Hub | All Verticals | **IN PROGRESS / IMPLEMENTING** |
 
 ---
 
@@ -108,4 +108,19 @@ This document serves as the master execution tracker for multi-vertical architec
 
 ---
 
-*Last Updated: 2026-11-22*
+### [Phase 12] - Recursive Expenses, Period Breakdowns, Smooth Recurring Invoices & Integrations Hub
+- [x] **Task 12.1: Expense Tracking Engine: Recursive Cycles, Period Views & Excel Importer**
+  - Added recurring expense cycles (`one_time`, `daily`, `weekly`, `monthly`, `quarterly`, `yearly`) with run-rates.
+  - Multi-tab breakdown filters (Daily, Monthly, Yearly) and client-side `.xlsx` / `.csv` bulk importer.
+- [x] **Task 12.2: Integrations Hub UI & 0-API WhatsApp Simulator**
+  - Microsoft Teams incoming webhook configuration, Google Sheets sync tester, and instant `wa.me` reminder generator.
+- [ ] **Task 12.3: Smooth Recurring Invoice Creation Interaction (`app/(dashboard)/invoices/new/`)**
+  - **Issue**: Selecting "Make this a Recurring Invoice" in `ImprovedInvoiceForm.tsx` does not display frequency/schedule options and fails to pass `recurring_frequency` and `recurring_start_date` to `createInvoice`, causing recurrence creation to fail silently.
+  - **Action**: Build an interactive, smooth Recurrence Configuration drawer/card (Frequency: Weekly/Monthly/Quarterly/Yearly, Start Date, End Date/Never Ends, Auto-send toggle) directly inside invoice creation. Guarantee automatic creation of the linked recurring template in `recurring_invoices` upon invoice submission.
+- [ ] **Task 12.4: Integrations Background Dispatch Workers**
+  - Server-side webhook triggers to post automated Microsoft Teams cards on paid invoices.
+  - Automated bi-directional Google Sheets synchronization.
+
+---
+
+*Last Updated: 2026-11-24*

@@ -44,6 +44,11 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
   - Centralized Meta Cloud API keys strictly restricted to Super Admin Command Center, preventing unauthorized credential tampering.
   - 0-API Click-to-Chat deep link (`wa.me`) enabled across all business tiers, empowering users to send pre-filled invoice reminders with dynamic UPI payment links directly via personal or business WhatsApp with 0 configuration.
 
+#### 4. Smooth Recurring Invoice Creation & Automated Schedule Engine (In Progress)
+- **Interactive Recurrence Drawer in `/invoices/new`**:
+  - Replaces bare, unlinked checkbox with a smooth recurrence schedule picker (Frequency: Weekly, Monthly, Quarterly, Yearly, Custom Interval; Start Date; End Date / Never Ends; Auto-send WhatsApp/Email notifications).
+  - Guarantees `recurring_frequency` and `recurring_start_date` are seamlessly forwarded to `createInvoice` and recorded in `recurring_invoices`.
+
 ---
 
 ## [Release v1.6.0 - Implemented] - 2026-11-22
