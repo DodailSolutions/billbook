@@ -45,19 +45,24 @@ export default function LeavesPage() {
 
     const fetchData = async () => {
         setLoading(true)
-        const [reqs, typs, emps, bals, hols] = await Promise.all([
-            getLeaveRequests(),
-            getLeaveTypes(),
-            getEmployees(),
-            getAllLeaveBalances(currentYear),
-            getCompanyHolidays(currentYear)
-        ])
-        setRequests(reqs)
-        setTypes(typs)
-        setEmployees(emps.filter(e => e.status === 'active'))
-        setBalances(bals)
-        setHolidays(hols)
-        setLoading(false)
+        try {
+            const [reqs, typs, emps, bals, hols] = await Promise.all([
+                getLeaveRequests().catch(() => []),
+                getLeaveTypes().catch(() => []),
+                getEmployees().catch(() => []),
+                getAllLeaveBalances(currentYear).catch(() => []),
+                getCompanyHolidays(currentYear).catch(() => [])
+            ])
+            setRequests(Array.isArray(reqs) ? reqs : [])
+            setTypes(Array.isArray(typs) ? typs : [])
+            setEmployees(Array.isArray(emps) ? emps.filter(e => e?.status === 'active') : [])
+            setBalances(Array.isArray(bals) ? bals : [])
+            setHolidays(Array.isArray(hols) ? hols : [])
+        } catch (err) {
+            console.error('Error fetching leave data:', err)
+        } finally {
+            setLoading(false)
+        }
     }
 
     useEffect(() => {
