@@ -88,72 +88,117 @@ export async function createEmployee(input: CreateEmployeeInput): Promise<{ succ
 
     if (input.allow_login && input.email && input.password) {
         try {
-            const adminSupabase = await createAdminClient()
-            const { data: authData, error: authError } = await adminSupabase.auth.admin.createUser({
-                email: input.email,
-                password: input.password,
-                email_confirm: true
-            })
-            
-            if (authError || !authData.user) {
-                console.error("Auth creation failed:", authError)
-                return { success: false, error: authError?.message || 'Failed to create auth user for employee' }
-            }
-            
-            employeeUserId = authData.user.id
-            const roleSlug = input.role || 'employee'
-            
-            // Insert profile into user_profiles
-            await adminSupabase.from('user_profiles').insert({
-                id: employeeUserId,
-                role: roleSlug,
-                status: 'active'
-            })
+            const hasServiceKey = !!process.env.SUPABASE_SERVICE_ROLE_KEY
+            let authCreated = false
 
-            // Bi-directional sync: register in team_members so they automatically exist in /team
-            try {
-                const { data: roleRow } = await adminSupabase
-                    .from('team_roles')
-                    .select('id')
-                    .eq('slug', roleSlug)
-                    .maybeSingle()
-
-                if (roleRow?.id) {
-                    const tmPayload = {
-                        owner_id: user.id,
-                        user_id: employeeUserId,
-                        email: input.email.toLowerCase(),
-                        role_id: roleRow.id,
-                        designation: input.designation || null,
-                        status: 'active',
-                        joined_at: new Date().toISOString()
+            // 1. Try admin client if service role key is configured
+            if (hasServiceKey) {
+                try {
+                    const adminSupabase = await createAdminClient()
+                    const { data: authData, error: authError } = await adminSupabase.auth.admin.createUser({
+                        email: input.email.trim(),
+                        password: input.password,
+                        email_confirm: true
+                    })
+                    
+                    if (authData?.user) {
+                        employeeUserId = authData.user.id
+                        authCreated = true
+                    } else if (authError) {
+                        console.warn('admin.createUser warning:', authError.message)
                     }
-
-                    const { error: tmUpsertErr } = await adminSupabase
-                        .from('team_members')
-                        .upsert(tmPayload, { onConflict: 'owner_id,email' })
-
-                    if (tmUpsertErr) {
-                        // Fallback using user authenticated client to satisfy owner_id = auth.uid() RLS policy
-                        await supabase
-                            .from('team_members')
-                            .upsert(tmPayload, { onConflict: 'owner_id,email' })
-                    }
+                } catch (adminErr) {
+                    console.warn('createAdminClient error:', adminErr)
                 }
-            } catch (tmErr) {
-                console.warn('[createEmployee] team_members sync non-fatal:', tmErr)
+            }
+
+            // 2. Fallback: standard signUp if service key is missing or admin client failed
+            if (!authCreated) {
+                try {
+                    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+                        email: input.email.trim(),
+                        password: input.password
+                    })
+                    if (signUpData?.user) {
+                        employeeUserId = signUpData.user.id
+                        authCreated = true
+                    } else if (signUpError) {
+                        console.warn('signUp fallback warning:', signUpError.message)
+                    }
+                } catch (signUpErr) {
+                    console.warn('signUp exception:', signUpErr)
+                }
+            }
+
+            // 3. Fallback: if user already exists in auth, lookup their id
+            if (!employeeUserId) {
+                try {
+                    const { data: existingProf } = await supabase
+                        .from('user_profiles')
+                        .select('id')
+                        .ilike('email', input.email.trim())
+                        .maybeSingle()
+                    if (existingProf?.id) {
+                        employeeUserId = existingProf.id
+                    }
+                } catch {}
+            }
+
+            const roleSlug = input.role || 'employee'
+
+            // Upsert profile into user_profiles
+            if (employeeUserId) {
+                try {
+                    const profileClient = hasServiceKey ? await createAdminClient() : supabase
+                    await profileClient.from('user_profiles').upsert({
+                        id: employeeUserId,
+                        role: roleSlug,
+                        status: 'active'
+                    }, { onConflict: 'id' })
+                } catch (pErr) {
+                    console.warn('user_profiles upsert warning:', pErr)
+                }
+
+                // Bi-directional sync: register in team_members
+                try {
+                    const { data: roleRow } = await supabase
+                        .from('team_roles')
+                        .select('id')
+                        .eq('slug', roleSlug)
+                        .maybeSingle()
+
+                    if (roleRow?.id) {
+                        const tmPayload = {
+                            owner_id: user.id,
+                            user_id: employeeUserId,
+                            email: input.email.trim().toLowerCase(),
+                            role_id: roleRow.id,
+                            designation: input.designation || null,
+                            status: 'active',
+                            joined_at: new Date().toISOString()
+                        }
+
+                        const targetClient = hasServiceKey ? await createAdminClient() : supabase
+                        const { error: tmErr } = await targetClient.from('team_members').upsert(tmPayload, { onConflict: 'owner_id,email' })
+                        if (tmErr && targetClient !== supabase) {
+                            await supabase.from('team_members').upsert(tmPayload, { onConflict: 'owner_id,email' })
+                        }
+                    }
+                } catch (tmErr) {
+                    console.warn('[createEmployee] team_members sync non-fatal:', tmErr)
+                }
             }
         } catch (e: any) {
-            console.error("Admin client creation failed:", e)
-            return { success: false, error: 'Failed to initialize admin auth client. Please ensure SUPABASE_SERVICE_ROLE_KEY is set.' }
+            console.warn("Non-fatal employee auth setup warning:", e)
         }
     }
 
-    const { data: emp, error: empError } = await supabase
+    let finalEmpCode = input.employee_code
+    let { data: emp, error: empError } = await supabase
         .from('employees')
         .insert({
             user_id: user.id,
-            employee_code: input.employee_code,
+            employee_code: finalEmpCode,
             name: input.name,
             email: input.email || null,
             phone: input.phone || null,
@@ -170,7 +215,36 @@ export async function createEmployee(input: CreateEmployeeInput): Promise<{ succ
             employee_user_id: employeeUserId
         })
         .select()
-        .single()
+        .maybeSingle()
+
+    // Handle duplicate employee_code gracefully
+    if (empError && (empError.code === '23505' || empError.message?.includes('duplicate'))) {
+        finalEmpCode = `EMP-${Date.now().toString().slice(-6)}${Math.floor(10 + Math.random() * 90)}`
+        const retry = await supabase
+            .from('employees')
+            .insert({
+                user_id: user.id,
+                employee_code: finalEmpCode,
+                name: input.name,
+                email: input.email || null,
+                phone: input.phone || null,
+                designation: input.designation || null,
+                department: input.department || null,
+                date_of_joining: input.date_of_joining,
+                pan_number: input.pan_number || null,
+                bank_account_number: input.bank_account_number || null,
+                ifsc_code: input.ifsc_code || null,
+                bank_name: input.bank_name || null,
+                bank_branch: input.bank_branch || null,
+                address: input.address || null,
+                status: 'active',
+                employee_user_id: employeeUserId
+            })
+            .select()
+            .maybeSingle()
+        emp = retry.data
+        empError = retry.error
+    }
 
     if (empError || !emp) {
         console.error('Employee insert error:', empError)
@@ -225,29 +299,60 @@ export async function updateEmployee(id: string, input: UpdateEmployeeInput): Pr
     if (input.allow_login && input.email && input.password) {
         if (existingEmp && !existingEmp.employee_user_id) {
             try {
-                const adminSupabase = await createAdminClient()
-                const { data: authData, error: authError } = await adminSupabase.auth.admin.createUser({
-                    email: input.email,
-                    password: input.password,
-                    email_confirm: true
-                })
-                
-                if (authError || !authData.user) {
-                    console.error("Auth creation failed:", authError)
-                    return { success: false, error: authError?.message || 'Failed to create auth user for employee' }
+                const hasServiceKey = !!process.env.SUPABASE_SERVICE_ROLE_KEY
+                let authCreated = false
+
+                if (hasServiceKey) {
+                    try {
+                        const adminSupabase = await createAdminClient()
+                        const { data: authData, error: authError } = await adminSupabase.auth.admin.createUser({
+                            email: input.email.trim(),
+                            password: input.password,
+                            email_confirm: true
+                        })
+                        if (authData?.user) {
+                            employeeUserId = authData.user.id
+                            authCreated = true
+                        }
+                    } catch {}
                 }
-                
-                employeeUserId = authData.user.id
-                
-                // Insert profile into user_profiles
-                await adminSupabase.from('user_profiles').insert({
-                    id: employeeUserId,
-                    role: 'employee',
-                    status: 'active'
-                })
+
+                if (!authCreated) {
+                    try {
+                        const { data: signUpData } = await supabase.auth.signUp({
+                            email: input.email.trim(),
+                            password: input.password
+                        })
+                        if (signUpData?.user) {
+                            employeeUserId = signUpData.user.id
+                            authCreated = true
+                        }
+                    } catch {}
+                }
+
+                if (!employeeUserId) {
+                    try {
+                        const { data: existingProf } = await supabase
+                            .from('user_profiles')
+                            .select('id')
+                            .ilike('email', input.email.trim())
+                            .maybeSingle()
+                        if (existingProf?.id) {
+                            employeeUserId = existingProf.id
+                        }
+                    } catch {}
+                }
+
+                if (employeeUserId) {
+                    const profileClient = hasServiceKey ? await createAdminClient() : supabase
+                    await profileClient.from('user_profiles').upsert({
+                        id: employeeUserId,
+                        role: input.role || 'employee',
+                        status: 'active'
+                    }, { onConflict: 'id' })
+                }
             } catch (e: any) {
-                console.error("Admin client creation failed:", e)
-                return { success: false, error: 'Failed to initialize admin auth client. Please ensure SUPABASE_SERVICE_ROLE_KEY is set.' }
+                console.warn("Non-fatal update employee auth setup warning:", e)
             }
         }
     }

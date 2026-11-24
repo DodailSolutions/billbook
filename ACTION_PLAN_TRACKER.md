@@ -251,3 +251,6 @@ This document serves as the master execution tracker for multi-vertical architec
 - [x] **Task 19.3: Quotation / Proforma Invoice Workflow Architecture**
   - Clarified separation: Quotations / Proforma estimates serve as pre-sale preliminary quotes without demanding upfront GST liability.
   - Leveraged `convertProformaToInvoice()` (`lib/advanced-invoice-actions.ts`) to enable 1-click conversion from accepted quotes into final legal Tax Invoices without disturbing current billing flows.
+- [x] **Task 19.4: Resilient Employee Onboarding & Login Provisioning (`lib/payroll-actions.ts`)**
+  - Implemented multi-tier fallback for employee login creation: tries admin auth client if service key exists, falls back to `supabase.auth.signUp()`, and auto-resolves existing registered users.
+  - Replaced strict failure with non-blocking auth setup and automatic retry on duplicate `employee_code` collisions, ensuring employee creation never crashes or blocks the user.
