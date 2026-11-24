@@ -16,6 +16,7 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 #### 2. Dynamic Landing Page & Pricing Sync (`app/_components/HomePricingSection.tsx`, `PricingToggleSection.tsx`, `app/page.tsx`)
 - **Direct Database Hydration**: Replaced hardcoded static `<li>` lists on homepage and pricing pages with dynamic database reads from `subscription_plans`.
 - **Live Sync Guarantee**: Updates to packages in Super Admin immediately reflect on `/` and `/pricing`. Included features show with active checkmarks and excluded features show with crossed-out line-through badges.
+- **Enterprise Plan Dynamic Scope**: Guaranteed strongly typed hydration for `enterprisePlan`, resolving missing variable scope in `HomePricingSection.tsx`.
 
 #### 3. Strict Universal Rule & Quota Enforcement Engine (`lib/plan-utils.ts`)
 - **Universal Feature Gating**: Platform-wide enforcement of active package capabilities across all 16 business verticals via `hasPlanFeature()` and `checkFeatureLimit()`.

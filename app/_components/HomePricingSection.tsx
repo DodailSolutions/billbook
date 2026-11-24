@@ -37,18 +37,22 @@ export function HomePricingSection({
     const freePlan = plans?.find(p => p.slug === 'free')
     const starterPlan = plans?.find(p => p.slug === starterSlug || p.slug === 'starter')
     const proPlan = plans?.find(p => p.slug === proSlug || p.slug === 'professional' || p.slug === 'pro')
+    const enterprisePlan = plans?.find(p => p.slug === enterpriseSlug || p.slug === 'enterprise')
 
     const displayFreePrice = freePlan ? Number(freePlan.price) : freePrice
     const displayStarterPrice = starterPlan ? Number(starterPlan.price) : starterPrice
     const displayProPrice = proPlan ? Number(proPlan.price) : proPrice
+    const displayEnterprisePrice = enterprisePlan ? Number(enterprisePlan.price) : enterprisePrice
 
     const displayFreeTitle = freePlan?.name || 'Free Plan'
     const displayStarterTitle = starterPlan?.name || 'Pro Starter'
     const displayProTitle = proPlan?.name || 'Professional Suite'
+    const displayEnterpriseTitle = enterprisePlan?.name || 'Enterprise Plan'
 
     const displayFreeDesc = freePlan?.description || 'Ideal for freelancers and new startups.'
     const displayStarterDesc = starterPlan?.description || 'Everything growing SMBs need.'
     const displayProDesc = proPlan?.description || 'Complete suite with AI & Payroll.'
+    const displayEnterpriseDesc = enterprisePlan?.description || 'Up to 10 team members & dedicated CA'
 
     const renderFeatures = (plan: any, fallbackFeatures: string[]) => {
         if (plan?.features && Array.isArray(plan.features) && plan.features.length > 0) {
@@ -301,16 +305,16 @@ export function HomePricingSection({
                                 <span className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></span>
                                 FOR LARGE TEAMS &amp; ENTERPRISE
                             </div>
-                            <h4 className="text-2xl font-bold bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">{enterprisePlan?.name || 'Enterprise Plan'}</h4>
+                            <h4 className="text-2xl font-bold bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">{displayEnterpriseTitle}</h4>
                             <p className="text-blue-200 text-sm font-semibold">
-                                ₹{enterprisePrice.toLocaleString('en-IN')}<span className="text-xs text-gray-300">/month</span> • {enterprisePlan?.description || 'Up to 10 team members & dedicated CA'}
+                                ₹{displayEnterprisePrice.toLocaleString('en-IN')}<span className="text-xs text-gray-300">/month</span> • {displayEnterpriseDesc}
                             </p>
                         </div>
                         <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
                             <Link href={`/pricing?checkout=${enterpriseSlug}`} className="w-full sm:w-auto">
                                 <Button className="w-full sm:w-auto bg-white hover:bg-blue-50 text-slate-950 font-bold px-6 py-4 rounded-full flex items-center justify-center gap-2 text-sm shadow-md">
                                     <ShoppingCart className="h-4 w-4" />
-                                    <span>Buy Enterprise • ₹{enterprisePrice.toLocaleString('en-IN')}/mo</span>
+                                    <span>Buy Enterprise • ₹{displayEnterprisePrice.toLocaleString('en-IN')}/mo</span>
                                 </Button>
                             </Link>
                             <Button
