@@ -54,6 +54,7 @@ export default async function Home() {
     let enterpriseSlug = 'enterprise'
     let isAuthenticated = false
     let cms: any = null
+    let allPlans: any[] = []
 
     try {
         const [supabase, cmsData] = await Promise.all([
@@ -71,6 +72,7 @@ export default async function Home() {
             .order('sort_order', { ascending: true })
         
         if (plans && Array.isArray(plans)) {
+            allPlans = plans
             const starter = plans.find(p => p.slug === 'starter')
             const pro = plans.find(p => p.slug === 'professional')
             const enterprise = plans.find(p => p.slug === 'enterprise')
@@ -367,7 +369,7 @@ export default async function Home() {
                 proSlug={proSlug}
                 enterpriseSlug={enterpriseSlug}
                 isAuthenticated={isAuthenticated}
-                plans={plans || []}
+                plans={allPlans}
             />
 
             {/* Testimonials */}
