@@ -17,16 +17,23 @@ export default async function EditCustomerPage({
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
-    const [customer, organizations, teamMembers] = await Promise.all([
+    let teamMembers: any[] = []
+    if (user) {
+        try {
+            const { data } = await supabase
+                .from('team_members')
+                .select('id, email, designation')
+                .eq('owner_id', user.id)
+                .in('status', ['active', 'pending'])
+            if (data) teamMembers = data
+        } catch {
+            teamMembers = []
+        }
+    }
+
+    const [customer, organizations] = await Promise.all([
         getCustomer(id),
-        getOrganizations().catch(() => []),
-        user ? supabase
-            .from('team_members')
-            .select('id, email, designation')
-            .eq('owner_id', user.id)
-            .in('status', ['active', 'pending'])
-            .then(res => res.data || [])
-            .catch(() => []) : Promise.resolve([])
+        getOrganizations().catch(() => [])
     ])
 
     if (!customer) {
