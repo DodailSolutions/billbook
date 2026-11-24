@@ -66,8 +66,9 @@ export default async function Home() {
 
         const { data: plans } = await supabase
             .from('subscription_plans')
-            .select('slug, price')
+            .select('*')
             .eq('is_active', true)
+            .order('sort_order', { ascending: true })
         
         if (plans && Array.isArray(plans)) {
             const starter = plans.find(p => p.slug === 'starter')
@@ -366,6 +367,7 @@ export default async function Home() {
                 proSlug={proSlug}
                 enterpriseSlug={enterpriseSlug}
                 isAuthenticated={isAuthenticated}
+                plans={plans || []}
             />
 
             {/* Testimonials */}

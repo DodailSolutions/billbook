@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
-import { Check, Zap, ShoppingCart, Loader2 } from 'lucide-react'
+import { Check, Zap, ShoppingCart, Loader2, XCircle } from 'lucide-react'
 import { activatePlanTrial } from '@/app/(marketing)/pricing/actions'
 
 interface HomePricingSectionProps {
@@ -16,6 +16,7 @@ interface HomePricingSectionProps {
     proSlug?: string
     enterpriseSlug?: string
     isAuthenticated?: boolean
+    plans?: any[]
 }
 
 export function HomePricingSection({
@@ -26,10 +27,69 @@ export function HomePricingSection({
     starterSlug = 'starter',
     proSlug = 'professional',
     enterpriseSlug = 'enterprise',
-    isAuthenticated = false
+    isAuthenticated = false,
+    plans = []
 }: HomePricingSectionProps) {
     const router = useRouter()
     const [activatingSlug, setActivatingSlug] = useState<string | null>(null)
+
+    // Match dynamic plans if provided
+    const freePlan = plans?.find(p => p.slug === 'free')
+    const starterPlan = plans?.find(p => p.slug === starterSlug || p.slug === 'starter')
+    const proPlan = plans?.find(p => p.slug === proSlug || p.slug === 'professional' || p.slug === 'pro')
+
+    const displayFreePrice = freePlan ? Number(freePlan.price) : freePrice
+    const displayStarterPrice = starterPlan ? Number(starterPlan.price) : starterPrice
+    const displayProPrice = proPlan ? Number(proPlan.price) : proPrice
+
+    const displayFreeTitle = freePlan?.name || 'Free Plan'
+    const displayStarterTitle = starterPlan?.name || 'Pro Starter'
+    const displayProTitle = proPlan?.name || 'Professional Suite'
+
+    const displayFreeDesc = freePlan?.description || 'Ideal for freelancers and new startups.'
+    const displayStarterDesc = starterPlan?.description || 'Everything growing SMBs need.'
+    const displayProDesc = proPlan?.description || 'Complete suite with AI & Payroll.'
+
+    const renderFeatures = (plan: any, fallbackFeatures: string[]) => {
+        if (plan?.features && Array.isArray(plan.features) && plan.features.length > 0) {
+            return (
+                <ul className="space-y-3 pt-4 border-t border-slate-100 text-xs text-slate-700 font-semibold max-h-56 overflow-y-auto pr-1">
+                    {plan.features.map((feature: string, idx: number) => {
+                        const isExcluded = feature.startsWith('✕') || feature.startsWith('[x]') || feature.startsWith('No ') || feature.startsWith('❌')
+                        const cleanText = feature.replace(/^(\[x\]|✕|❌|No )\s*/, '')
+                        return (
+                            <li key={idx} className="flex items-start gap-2.5">
+                                {isExcluded ? (
+                                    <XCircle className="h-4 w-4 text-rose-500/80 shrink-0 mt-0.5" />
+                                ) : (
+                                    <Check className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
+                                )}
+                                <span className={isExcluded ? 'text-slate-400 line-through' : ''}>
+                                    {cleanText}
+                                </span>
+                            </li>
+                        )
+                    })}
+                    {plan.excluded_features?.map((ex: string, idx: number) => (
+                        <li key={`ex-${idx}`} className="flex items-start gap-2.5">
+                            <XCircle className="h-4 w-4 text-rose-500/80 shrink-0 mt-0.5" />
+                            <span className="text-slate-400 line-through">{ex}</span>
+                        </li>
+                    ))}
+                </ul>
+            )
+        }
+
+        return (
+            <ul className="space-y-3 pt-4 border-t border-slate-100 text-xs text-slate-700 font-semibold">
+                {fallbackFeatures.map((feat, idx) => (
+                    <li key={idx} className="flex items-center gap-2.5">
+                        <Check className="h-4 w-4 text-blue-600 shrink-0" /> {feat}
+                    </li>
+                ))}
+            </ul>
+        )
+    }
 
     const handleTrial = async (slug: string) => {
         if (!isAuthenticated) {
@@ -86,27 +146,14 @@ export function HomePricingSection({
                     <div className="bg-white p-8 rounded-[28px] border border-slate-200/80 flex flex-col justify-between hover:shadow-xl transition-all shadow-xs">
                         <div className="space-y-4">
                             <span className="text-sm font-bold text-slate-600 uppercase tracking-wider block">
-                                Free Plan
+                                {freePlan?.name || 'Free Plan'}
                             </span>
                             <div>
                                 <span className="text-4xl font-black text-slate-950">₹{freePrice}</span>
                                 <span className="text-slate-400 text-xs font-semibold"> / forever</span>
                             </div>
-                            <p className="text-xs text-slate-500 font-medium">Ideal for freelancers and new startups.</p>
-                            <ul className="space-y-3 pt-4 border-t border-slate-100 text-xs text-slate-700 font-semibold">
-                                <li className="flex items-center gap-2.5">
-                                    <Check className="h-4 w-4 text-blue-600 shrink-0" /> 50 Invoices / Month
-                                </li>
-                                <li className="flex items-center gap-2.5">
-                                    <Check className="h-4 w-4 text-blue-600 shrink-0" /> GST Tax Compliance
-                                </li>
-                                <li className="flex items-center gap-2.5">
-                                    <Check className="h-4 w-4 text-blue-600 shrink-0" /> Customer &amp; Items Directory
-                                </li>
-                                <li className="flex items-center gap-2.5">
-                                    <Check className="h-4 w-4 text-blue-600 shrink-0" /> Basic Financial Reports
-                                </li>
-                            </ul>
+                            <p className="text-xs text-slate-500 font-medium">{displayFreeDesc}</p>
+                            {renderFeatures(freePlan, ['50 Invoices / Month', 'GST Tax Compliance', 'Customer & Items Directory', 'Basic Financial Reports'])}
                         </div>
 
                         <div className="space-y-2 pt-8">
@@ -140,7 +187,7 @@ export function HomePricingSection({
                         <div className="space-y-4">
                             <div className="flex items-center justify-between">
                                 <span className="text-sm font-bold text-blue-700 uppercase tracking-wider block">
-                                    Pro Starter
+                                    {starterPlan?.name || 'Pro Starter'}
                                 </span>
                                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
                                     Buy or Try
@@ -150,24 +197,8 @@ export function HomePricingSection({
                                 <span className="text-4xl font-black text-slate-950">₹{starterPrice.toLocaleString('en-IN')}</span>
                                 <span className="text-slate-500 text-xs font-semibold"> / month</span>
                             </div>
-                            <p className="text-xs text-slate-500 font-medium">Everything growing SMBs need.</p>
-                            <ul className="space-y-3 pt-4 border-t border-slate-100 text-xs text-slate-700 font-semibold">
-                                <li className="flex items-center gap-2.5">
-                                    <Check className="h-4 w-4 text-blue-600 shrink-0" /> <strong>Unlimited</strong> Invoices &amp; Quotes
-                                </li>
-                                <li className="flex items-center gap-2.5">
-                                    <Check className="h-4 w-4 text-blue-600 shrink-0" /> Full CRM &amp; Deal Pipeline
-                                </li>
-                                <li className="flex items-center gap-2.5">
-                                    <Check className="h-4 w-4 text-blue-600 shrink-0" /> Bookkeeping &amp; General Ledger
-                                </li>
-                                <li className="flex items-center gap-2.5">
-                                    <Check className="h-4 w-4 text-blue-600 shrink-0" /> Vendor Purchase Orders
-                                </li>
-                                <li className="flex items-center gap-2.5">
-                                    <Check className="h-4 w-4 text-blue-600 shrink-0" /> WhatsApp Direct Sharing
-                                </li>
-                            </ul>
+                            <p className="text-xs text-slate-500 font-medium">{displayStarterDesc}</p>
+                            {renderFeatures(starterPlan, ['Unlimited Invoices & Quotes', 'Full CRM & Deal Pipeline', 'Bookkeeping & General Ledger', 'Vendor Purchase Orders', 'WhatsApp Direct Sharing'])}
                         </div>
 
                         {/* BOTH Buy & Try Action Buttons Always Visible */}
@@ -211,7 +242,7 @@ export function HomePricingSection({
                         <div className="space-y-4">
                             <div className="flex items-center justify-between">
                                 <span className="text-sm font-bold text-slate-900 uppercase tracking-wider block">
-                                    Professional Suite
+                                    {proPlan?.name || 'Professional Suite'}
                                 </span>
                                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
                                     Buy or Try
@@ -221,24 +252,8 @@ export function HomePricingSection({
                                 <span className="text-4xl font-black text-slate-950">₹{proPrice.toLocaleString('en-IN')}</span>
                                 <span className="text-slate-500 text-xs font-semibold"> / month</span>
                             </div>
-                            <p className="text-xs text-slate-500 font-medium">Complete suite with AI &amp; Payroll.</p>
-                            <ul className="space-y-3 pt-4 border-t border-slate-100 text-xs text-slate-700 font-semibold">
-                                <li className="flex items-center gap-2.5">
-                                    <Check className="h-4 w-4 text-black shrink-0" /> Everything in Pro Starter
-                                </li>
-                                <li className="flex items-center gap-2.5">
-                                    <Check className="h-4 w-4 text-black shrink-0" /> Full Payroll &amp; Payslip Engine
-                                </li>
-                                <li className="flex items-center gap-2.5">
-                                    <Check className="h-4 w-4 text-black shrink-0" /> AI Accountant Assistant
-                                </li>
-                                <li className="flex items-center gap-2.5">
-                                    <Check className="h-4 w-4 text-black shrink-0" /> Multi-User Team Roles
-                                </li>
-                                <li className="flex items-center gap-2.5">
-                                    <Check className="h-4 w-4 text-black shrink-0" /> Certified CA Marketplace Access
-                                </li>
-                            </ul>
+                            <p className="text-xs text-slate-500 font-medium">{displayProDesc}</p>
+                            {renderFeatures(proPlan, ['Everything in Pro Starter', 'Full Payroll & Payslip Engine', 'AI Accountant Assistant', 'Multi-User Team Roles', 'Certified CA Marketplace Access'])}
                         </div>
 
                         {/* BOTH Buy & Try Action Buttons Always Visible */}
@@ -286,9 +301,9 @@ export function HomePricingSection({
                                 <span className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></span>
                                 FOR LARGE TEAMS &amp; ENTERPRISE
                             </div>
-                            <h4 className="text-2xl font-bold bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">Enterprise Plan</h4>
+                            <h4 className="text-2xl font-bold bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">{enterprisePlan?.name || 'Enterprise Plan'}</h4>
                             <p className="text-blue-200 text-sm font-semibold">
-                                ₹{enterprisePrice.toLocaleString('en-IN')}<span className="text-xs text-gray-300">/month</span> • Up to 10 team members &amp; dedicated CA
+                                ₹{enterprisePrice.toLocaleString('en-IN')}<span className="text-xs text-gray-300">/month</span> • {enterprisePlan?.description || 'Up to 10 team members & dedicated CA'}
                             </p>
                         </div>
                         <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">

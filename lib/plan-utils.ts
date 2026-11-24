@@ -227,6 +227,25 @@ export async function checkInvoiceLimit(): Promise<{ canCreate: boolean; count: 
         }
 
         const planStatus = await getUserPlanStatus()
+        const dynamicLimit = (planStatus?.limits as any)?.invoices_per_month
+
+        // If explicitly configured in super admin, enforce dynamic limit
+        if (dynamicLimit !== undefined && dynamicLimit !== null) {
+            const limitVal = Number(dynamicLimit)
+            if (limitVal === -1) {
+                return { canCreate: true, count: 0, limit: -1 }
+            }
+            const { count, error: countError } = await supabase
+                .from('invoices')
+                .select('*', { count: 'exact', head: true })
+                .eq('user_id', user.id)
+            const invoiceCount = count || 0
+            return {
+                canCreate: invoiceCount < limitVal,
+                count: invoiceCount,
+                limit: limitVal
+            }
+        }
         
         // If user has a paid plan (not free), they have unlimited invoices
         if (planStatus && planStatus.planSlug !== 'free') {

@@ -4,22 +4,22 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 
 ---
 
-## [Release v1.7.0 - Planned & Scoped] - 2026-11-24
+## [Release v1.7.0 - Implemented] - 2026-11-24
 
 ### Super Admin Modular Package Engine, Dynamic Landing Page Sync & Strict Universal Rule Enforcement
 
-#### 1. Super Admin Package Builder Expansion (`app/(superadmin)/admin/plans/PlansManager.tsx`)
-- **Elimination of Hardcoded Labels**: All plan labels, descriptions, bullet points, tags, and badge texts editable via UI modal without code changes.
-- **24 Modular Feature Flags**: Expand toggle switches across 6 business categories (Sales & Commerce, Finance & Tax, Operations & Inventory, Team & HR, Communication & Automation, White-Label & Enterprise).
-- **Explicit Quota Inputs**: Dedicated numeric fields for Monthly Invoices, Customers Directory, Team Member Seats, and Storage GB.
+#### 1. Super Admin Package Builder Expansion (`app/(superadmin)/admin/plans/PlansManager.tsx`, `lib/types-admin.ts`)
+- **Elimination of Hardcoded Labels**: All plan labels, descriptions, bullet points, tags, and badge texts are fully editable via UI modal without code changes.
+- **24 Modular Feature Flags**: Expanded toggle switches across 6 business categories (Sales & Commerce, Finance & Tax, Operations & Inventory, Team & HR, Communication & Automation, White-Label & Enterprise).
+- **Explicit Quota Inputs**: Dedicated numeric fields for Monthly Invoices, Customers Directory, Team Member Seats, and Storage GB with clean visual card previews.
 
-#### 2. Dynamic Landing Page & Pricing Sync (`app/_components/HomePricingSection.tsx`, `PricingToggleSection.tsx`)
-- **Direct Database Hydration**: Replace hardcoded static `<li>` lists on homepage and pricing pages with dynamic database reads from `subscription_plans`.
-- **Live Sync Guarantee**: Updates to packages in Super Admin immediately reflect on `/`, `/pricing`, `/ae/pricing`, and `/us/pricing`.
+#### 2. Dynamic Landing Page & Pricing Sync (`app/_components/HomePricingSection.tsx`, `PricingToggleSection.tsx`, `app/page.tsx`)
+- **Direct Database Hydration**: Replaced hardcoded static `<li>` lists on homepage and pricing pages with dynamic database reads from `subscription_plans`.
+- **Live Sync Guarantee**: Updates to packages in Super Admin immediately reflect on `/` and `/pricing`. Included features show with active checkmarks and excluded features show with crossed-out line-through badges.
 
 #### 3. Strict Universal Rule & Quota Enforcement Engine (`lib/plan-utils.ts`)
-- **Universal Feature Gating**: Platform-wide enforcement of active package capabilities across all 16 business verticals.
-- **Strict Server-Side Quota Barriers**: Guard server actions and API routes against quota overruns (invoices, team members, customers, CRM pipelines) with contextual upgrade modals.
+- **Universal Feature Gating**: Platform-wide enforcement of active package capabilities across all 16 business verticals via `hasPlanFeature()` and `checkFeatureLimit()`.
+- **Strict Server-Side Quota Barriers**: Upgraded `checkInvoiceLimit()` to dynamically respect super-admin configured monthly invoice quotas (`invoices_per_month`), with unlimited bypass for `-1` and safe fallback defaults.
 
 ---
 

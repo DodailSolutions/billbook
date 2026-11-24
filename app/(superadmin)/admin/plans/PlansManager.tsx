@@ -42,17 +42,41 @@ interface PlansManagerProps {
 }
 
 export const SYSTEM_APP_FEATURES = [
+    // 1. Sales & Growth
     { id: 'crm', label: 'CRM & Sales Pipeline', category: 'Sales & Growth', desc: 'Manage leads, deal stages, and win/loss analytics' },
     { id: 'organizations', label: 'B2B Organizations & Multi-Contacts', category: 'Sales & Growth', desc: 'Link multiple client stakeholders per company' },
-    { id: 'proposals', label: 'Proposals, RFPs & Scope Orders', category: 'Sales & Growth', desc: 'Interactive client proposals with 50% deposit triggers' },
-    { id: 'ai_accountant', label: 'AI Accountant Assistant (PRO)', category: 'Intelligence', desc: 'Automated tax analysis, margin audit, and categorization' },
-    { id: 'pos', label: 'Counter POS & Thermal Checkout', category: 'Commerce', desc: 'High-speed barcode scanner checkout for physical counters' },
-    { id: 'barcodes', label: 'Barcodes & Thermal Label Printing', category: 'Commerce', desc: 'Batch barcode generation and thermal printer templates' },
+    { id: 'proposals', label: 'Proposals, RFPs & Interactive SOWs', category: 'Sales & Growth', desc: 'Interactive client proposals with 50% deposit triggers' },
+    { id: 'pos', label: 'Counter POS & Thermal Checkout', category: 'Sales & Growth', desc: 'High-speed barcode scanner checkout for physical counters' },
+    { id: 'barcodes', label: 'Barcodes & Thermal Label Printing', category: 'Sales & Growth', desc: 'Batch barcode generation and thermal printer templates' },
+    { id: 'purchase_orders', label: 'Purchase Orders & Inbound Bills', category: 'Sales & Growth', desc: 'Issue vendor purchase orders and track goods receipts' },
+
+    // 2. Finance & Tax Compliance
+    { id: 'bookkeeping', label: 'Double-Entry Bookkeeping & Ledger', category: 'Finance & Tax', desc: 'General ledger, journal entries, and trial balance' },
+    { id: 'gst_reports', label: 'GSTR-1, GSTR-3B Tax Filing & Excel', category: 'Finance & Tax', desc: 'Official Indian GST tax summaries and export ledgers' },
+    { id: 'zatca', label: 'Multi-Currency & ZATCA e-Invoicing', category: 'Tax & Compliance', desc: 'UAE FTA VAT 5% and KSA ZATCA Phase 2 QR codes' },
+    { id: 'eway_bill', label: 'E-Way Bill Generation & Tracking', category: 'Tax & Compliance', desc: 'NIC e-Way bill compliance and transport documentation' },
+
+    // 3. Operations & Multi-Vertical
+    { id: 'inventory', label: 'Multi-Warehouse Inventory & Alerts', category: 'Operations & Stock', desc: 'Track stock balances, reorder points, and adjustments' },
+    { id: 'art_studio', label: 'Studio BOM Recipe Costing & COA', category: 'Operations & Stock', desc: 'BOM raw materials costing and printable Certificates of Authenticity' },
+    { id: 'estate_pms', label: 'Estate PMS & Campsite Allocation', category: 'Operations & Stock', desc: 'Villa buyouts, stay dates, and guest liability tracking' },
+
+    // 4. Team & Human Resources
+    { id: 'team_capacity', label: 'Team Capacity Radar & Gross Margins', category: 'Team & HR', desc: '40hr workload radar, cost rates vs bill rates, and bench risks' },
     { id: 'payroll', label: 'HR, Payroll & Leaves Management', category: 'Team & HR', desc: 'Employee master, salary slips, and attendance punches' },
+    { id: 'commissions', label: 'Sales Partner Commission Splits', category: 'Team & HR', desc: 'Commission calculators, deal splits, and payout statements' },
     { id: 'cctv', label: 'CCTV Vision & Streams (AI Attendance)', category: 'Team & HR', desc: 'Live RTSP stream facial and presence verification' },
-    { id: 'bookkeeping', label: 'Double-Entry Bookkeeping & Ledger', category: 'Finance', desc: 'General ledger, journal entries, and trial balance' },
-    { id: 'templates', label: 'Custom WhatsApp & Email Branding', category: 'Customization', desc: 'White-label PDF invoices, payment links, and templates' },
-    { id: 'zatca', label: 'Multi-Currency & ZATCA e-Invoicing', category: 'Tax & Compliance', desc: 'UAE FTA VAT 5% and KSA ZATCA Phase 2 QR codes' }
+
+    // 5. Automation & Intelligence
+    { id: 'whatsapp_reminders', label: 'Automated WhatsApp & UPI Pay Links', category: 'Automation & AI', desc: 'Scheduled overdue reminders with instant UPI deep-links' },
+    { id: 'recurring_invoices', label: 'Recurring Invoices & Subscriptions', category: 'Automation & AI', desc: 'Auto-scheduled recurring templates with cadences' },
+    { id: 'integrations', label: 'Integrations Hub (Teams & Sheets)', category: 'Automation & AI', desc: 'Incoming Microsoft Teams webhooks and Google Sheets live sync' },
+    { id: 'ai_accountant', label: 'AI Accountant Assistant (PRO)', category: 'Automation & AI', desc: 'Automated tax analysis, margin audit, and categorization' },
+
+    // 6. White-Label & Enterprise
+    { id: 'templates', label: 'Custom WhatsApp & Email Branding', category: 'White-Label & Support', desc: 'White-label PDF invoices, payment links, and templates' },
+    { id: 'custom_domain', label: 'Custom Domain & Dedicated SSL', category: 'White-Label & Support', desc: 'Host tenant invoices under client own corporate domain' },
+    { id: 'priority_support', label: '24/7 Dedicated CA & Phone Support', category: 'White-Label & Support', desc: 'Direct access to chartered accountants and fast-lane SLAs' }
 ]
 
 const REGION_OPTIONS = [
@@ -186,19 +210,11 @@ export default function PlansManager({ initialPlans }: PlansManagerProps) {
         setFeaturesInput('Unlimited invoices\nGST compliance\nPDF downloads\nCustomer management\nWhatsApp sharing')
         setExcludedFeaturesInput('CCTV Vision & Streams AI\nHigh-speed Counter POS\nThermal Barcode Printing')
         setTeamMembersLimit(2)
-        setFeatureFlags({
-            crm: true,
-            organizations: true,
-            pos: false,
-            ai_accountant: false,
-            proposals: true,
-            payroll: false,
-            cctv: false,
-            barcodes: false,
-            bookkeeping: true,
-            templates: true,
-            zatca: defaultCurrency === 'AED'
+        const initialFlags: Record<string, boolean> = {}
+        SYSTEM_APP_FEATURES.forEach(f => {
+            initialFlags[f.id] = ['crm', 'organizations', 'bookkeeping', 'templates', 'gst_reports', 'whatsapp_reminders'].includes(f.id) || (f.id === 'zatca' && defaultCurrency === 'AED')
         })
+        setFeatureFlags(initialFlags)
         setIsAddModalOpen(true)
     }
 
@@ -211,19 +227,18 @@ export default function PlansManager({ initialPlans }: PlansManagerProps) {
         setTeamMembersLimit(teamLimit)
 
         const existingFlags = (rawLimits.feature_flags || {}) as Record<string, boolean>
-        setFeatureFlags({
-            crm: existingFlags.crm ?? (plan.features?.some(f => /crm|pipeline/i.test(f)) ?? true),
-            organizations: existingFlags.organizations ?? true,
-            pos: existingFlags.pos ?? (plan.features?.some(f => /pos|counter/i.test(f)) ?? false),
-            ai_accountant: existingFlags.ai_accountant ?? (plan.features?.some(f => /ai accountant|ai/i.test(f)) ?? false),
-            proposals: existingFlags.proposals ?? (plan.features?.some(f => /proposal/i.test(f)) ?? true),
-            payroll: existingFlags.payroll ?? (plan.features?.some(f => /payroll/i.test(f)) ?? false),
-            cctv: existingFlags.cctv ?? (plan.features?.some(f => /cctv/i.test(f)) ?? false),
-            barcodes: existingFlags.barcodes ?? (plan.features?.some(f => /barcode/i.test(f)) ?? false),
-            bookkeeping: existingFlags.bookkeeping ?? true,
-            templates: existingFlags.templates ?? true,
-            zatca: existingFlags.zatca ?? (plan.currency === 'AED')
+        const flags: Record<string, boolean> = {}
+        SYSTEM_APP_FEATURES.forEach(feat => {
+            if (existingFlags[feat.id] !== undefined) {
+                flags[feat.id] = !!existingFlags[feat.id]
+            } else {
+                const keyword = feat.id.replace(/_/g, '|')
+                flags[feat.id] = plan.slug.includes('enterprise') || 
+                    (plan.slug.includes('pro') && !['cctv', 'estate_pms', 'custom_domain'].includes(feat.id)) ||
+                    (plan.features?.some(f => new RegExp(keyword, 'i').test(f)) ?? false)
+            }
         })
+        setFeatureFlags(flags)
 
         const excludedFromLimits = Array.isArray(rawLimits.excluded_features) ? rawLimits.excluded_features : []
         const excludedFromFeatures = (plan.features || [])
@@ -243,7 +258,13 @@ export default function PlansManager({ initialPlans }: PlansManagerProps) {
             currency: plan.currency || 'INR',
             billing_period: plan.billing_period,
             features: plan.features || [],
-            limits: { ...rawLimits, team_members: teamLimit },
+            limits: { 
+                invoices_per_month: rawLimits.invoices_per_month ?? 999999,
+                customers: rawLimits.customers ?? 999999,
+                storage_gb: rawLimits.storage_gb ?? 10,
+                ...rawLimits, 
+                team_members: teamLimit 
+            },
             is_active: plan.is_active,
             is_popular: plan.is_popular,
             sort_order: plan.sort_order || 1
@@ -565,33 +586,63 @@ export default function PlansManager({ initialPlans }: PlansManagerProps) {
                                             / {plan.billing_period === 'lifetime' ? 'one-time' : plan.billing_period}
                                         </span>
                                     </div>
-                                    <div className="flex items-center gap-2 mt-1.5 text-[11px] text-slate-400">
+                                    <div className="flex flex-wrap items-center gap-2 mt-1.5 text-[11px] text-slate-400">
                                         <span className="font-mono bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">
                                             slug: {plan.slug}
                                         </span>
-                                        {plan.limits?.invoices_per_month && (
+                                        {plan.limits?.invoices_per_month !== undefined && (
                                             <span>• {plan.limits.invoices_per_month >= 999999 ? 'Unlimited' : plan.limits.invoices_per_month} inv/mo</span>
+                                        )}
+                                        {plan.limits?.customers !== undefined && (
+                                            <span>• {plan.limits.customers >= 999999 ? 'Unlimited' : plan.limits.customers} clients</span>
+                                        )}
+                                        {plan.limits?.team_members !== undefined && (
+                                            <span>• {plan.limits.team_members >= 999999 ? 'Unlimited' : `${plan.limits.team_members} seats`}</span>
                                         )}
                                     </div>
                                 </div>
 
                                 {/* Features List */}
-                                <div className="py-4 space-y-2">
-                                    <p className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">
-                                        Included Features
-                                    </p>
-                                    <div className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
-                                        {Array.isArray(plan.features) && plan.features.length > 0 ? (
-                                            plan.features.map((feature, idx) => (
-                                                <div key={idx} className="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300">
-                                                    <Check className="h-3.5 w-3.5 text-blue-600 shrink-0 mt-0.5" />
-                                                    <span className="leading-tight">{feature}</span>
-                                                </div>
-                                            ))
-                                        ) : (
-                                            <p className="text-xs text-slate-400 italic">No features listed</p>
-                                        )}
+                                <div className="py-4 space-y-3">
+                                    <div>
+                                        <p className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 flex items-center justify-between mb-1.5">
+                                            <span>Included Features</span>
+                                            <span className="text-emerald-600 font-bold">✓</span>
+                                        </p>
+                                        <div className="space-y-1.5 max-h-32 overflow-y-auto pr-1">
+                                            {Array.isArray(plan.features) && plan.features.filter(f => !f.startsWith('✕') && !f.startsWith('[x]')).length > 0 ? (
+                                                plan.features.filter(f => !f.startsWith('✕') && !f.startsWith('[x]')).map((feature, idx) => (
+                                                    <div key={idx} className="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300">
+                                                        <Check className="h-3.5 w-3.5 text-blue-600 shrink-0 mt-0.5" />
+                                                        <span className="leading-tight">{feature}</span>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <p className="text-xs text-slate-400 italic">No features listed</p>
+                                            )}
+                                        </div>
                                     </div>
+
+                                    {/* Excluded Features */}
+                                    {((plan.excluded_features && plan.excluded_features.length > 0) || (plan.features || []).some(f => f.startsWith('✕') || f.startsWith('[x]'))) && (
+                                        <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+                                            <p className="text-[10px] font-extrabold uppercase tracking-wider text-rose-500 mb-1 flex items-center justify-between">
+                                                <span>Excluded Features</span>
+                                                <span>✕</span>
+                                            </p>
+                                            <div className="space-y-1 max-h-24 overflow-y-auto pr-1">
+                                                {Array.from(new Set([
+                                                    ...(plan.excluded_features || []),
+                                                    ...(plan.features || []).filter(f => f.startsWith('✕') || f.startsWith('[x]')).map(f => f.replace(/^(\[x\]|✕)\s*/, ''))
+                                                ])).map((exFeature, idx) => (
+                                                    <div key={`ex-${idx}`} className="flex items-start gap-2 text-xs text-slate-400 dark:text-slate-500">
+                                                        <XCircle className="h-3.5 w-3.5 text-rose-500/70 shrink-0 mt-0.5" />
+                                                        <span className="line-through leading-tight">{exFeature}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 
@@ -922,10 +973,10 @@ export default function PlansManager({ initialPlans }: PlansManagerProps) {
                                     />
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-3">
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                                     <div>
                                         <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                                            Invoices / Month Limit
+                                            Invoices / Month
                                         </label>
                                         <Input
                                             type="number"
@@ -936,7 +987,37 @@ export default function PlansManager({ initialPlans }: PlansManagerProps) {
                                             })}
                                             className="text-xs"
                                         />
-                                        <span className="text-[10px] text-slate-400">Enter 999999 for unlimited</span>
+                                        <span className="text-[10px] text-slate-400">999999 = unlimited</span>
+                                    </div>
+                                    <div>
+                                        <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                                            Customers Limit
+                                        </label>
+                                        <Input
+                                            type="number"
+                                            value={formData.limits?.customers ?? 999999}
+                                            onChange={(e) => setFormData({
+                                                ...formData,
+                                                limits: { ...formData.limits, customers: Number(e.target.value) }
+                                            })}
+                                            className="text-xs"
+                                        />
+                                        <span className="text-[10px] text-slate-400">999999 = unlimited</span>
+                                    </div>
+                                    <div>
+                                        <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                                            Storage (GB)
+                                        </label>
+                                        <Input
+                                            type="number"
+                                            value={formData.limits?.storage_gb ?? 10}
+                                            onChange={(e) => setFormData({
+                                                ...formData,
+                                                limits: { ...formData.limits, storage_gb: Number(e.target.value) }
+                                            })}
+                                            className="text-xs"
+                                        />
+                                        <span className="text-[10px] text-slate-400">GB quota</span>
                                     </div>
                                     <div>
                                         <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
@@ -948,6 +1029,7 @@ export default function PlansManager({ initialPlans }: PlansManagerProps) {
                                             onChange={(e) => setFormData({ ...formData, sort_order: Number(e.target.value) })}
                                             className="text-xs"
                                         />
+                                        <span className="text-[10px] text-slate-400">Card sequence</span>
                                     </div>
                                 </div>
 

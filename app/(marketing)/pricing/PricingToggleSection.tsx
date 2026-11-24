@@ -39,17 +39,17 @@ export function PricingToggleSection({ isAuthenticated, currentPlan, plans = [] 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-7xl mx-auto mb-12">
         {/* Free Plan */}
         <PricingCard
-          title="Free"
+          title={freePlan?.name || "Free"}
           price={
             <div className="flex items-baseline gap-1">
               <span className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white">₹0</span>
               <span className="text-sm sm:text-base text-gray-600 dark:text-gray-400">/month</span>
             </div>
           }
-          description="Perfect for getting started with basic GST invoicing"
+          description={freePlan?.description || "Perfect for getting started with basic GST invoicing"}
           features={
             freePlan?.features && freePlan.features.length > 0
-              ? freePlan.features
+              ? [...freePlan.features, ...(freePlan.excluded_features?.map(e => `✕ ${e}`) || [])]
               : [
                   "50 invoices total",
                   "Customer management",
@@ -69,7 +69,7 @@ export function PricingToggleSection({ isAuthenticated, currentPlan, plans = [] 
 
         {/* Starter Plan */}
         <PricingCard
-          title="Starter"
+          title={starterPlan?.name || "Starter"}
           price={
             isYearly ? (
               <>
@@ -100,10 +100,10 @@ export function PricingToggleSection({ isAuthenticated, currentPlan, plans = [] 
               </div>
             )
           }
-          description="Best for freelancers and small businesses in India"
+          description={starterPlan?.description || "Best for freelancers and small businesses in India"}
           features={
             starterPlan?.features && starterPlan.features.length > 0
-              ? starterPlan.features
+              ? [...starterPlan.features, ...(starterPlan.excluded_features?.map(e => `✕ ${e}`) || [])]
               : [
                   "Unlimited invoices",
                   "Automated payment reminders",
@@ -127,7 +127,7 @@ export function PricingToggleSection({ isAuthenticated, currentPlan, plans = [] 
 
         {/* Professional Plan */}
         <PricingCard
-          title="Professional"
+          title={proPlan?.name || "Professional"}
           price={
             isYearly ? (
               <>
@@ -158,10 +158,10 @@ export function PricingToggleSection({ isAuthenticated, currentPlan, plans = [] 
               </div>
             )
           }
-          description="For growing businesses requiring multi-user access & analytics"
+          description={proPlan?.description || "For growing businesses requiring multi-user access & analytics"}
           features={
             proPlan?.features && proPlan.features.length > 0
-              ? proPlan.features
+              ? [...proPlan.features, ...(proPlan.excluded_features?.map(e => `✕ ${e}`) || [])]
               : [
                   "Everything in Starter",
                   "AI Accountant Assistant",

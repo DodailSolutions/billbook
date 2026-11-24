@@ -21,7 +21,7 @@ This document serves as the master execution tracker for multi-vertical architec
 | **Phase 11** | SOW Commission Splits, HR Handbook & Mobile RFP Engine | Universal B2B / Services | **COMPLETED & IMPLEMENTED** |
 | **Hotfix (v1.6.6)** | PlansManager Build Error & Dynamic Pro Team Limits | Core Platform & Super Admin | **COMPLETED & IMPLEMENTED** |
 | **Phase 12** | Recursive Expenses, Period Breakdowns, Smooth Recurring Invoices & Integrations Hub | All Verticals | **COMPLETED & IMPLEMENTED** |
-| **Phase 13** | Super Admin Modular Package Engine, Dynamic Landing Page Sync & Universal Rule Enforcement | Platform-Wide (Super Admin & All Tenants) | **PLANNED & SCOPED** |
+| **Phase 13** | Super Admin Modular Package Engine, Dynamic Landing Page Sync & Universal Rule Enforcement | Platform-Wide (Super Admin & All Tenants) | **COMPLETED & IMPLEMENTED** |
 
 ---
 
@@ -123,28 +123,27 @@ This document serves as the master execution tracker for multi-vertical architec
 
 ---
 
-### [Phase 13] - Super Admin Modular Package Engine, Dynamic Landing Page Sync & Universal Rule Enforcement
+### [Phase 13 - Implemented] - Super Admin Modular Package Engine, Dynamic Landing Page Sync & Universal Rule Enforcement
 *Comprehensive overhaul to make all subscription text editable, expand package capabilities, dynamically reflect package updates on the landing page, and strictly enforce rules platform-wide.*
 
-- [ ] **Task 13.1: Super Admin Package Builder Expansion & Hardcoded Text Elimination (`PlansManager.tsx`)**
-  - **Eliminate All Hardcoded UI Text**: Remove static labels on plan cards and edit modals (e.g. fixed plan subtitles, hardcoded tags, static currency hints, uneditable bullet points). Every string displayed to the public or tenant must be editable via the Super Admin modal.
-  - **Expand Modular Feature Flags from 11 to 24 Switches** across 6 business categories:
+- [x] **Task 13.1: Super Admin Package Builder Expansion & Hardcoded Text Elimination (`PlansManager.tsx`)**
+  - **Eliminate All Hardcoded UI Text**: Removed static labels on plan cards and edit modals (e.g. fixed plan subtitles, hardcoded tags, static currency hints, uneditable bullet points). Every string displayed to the public or tenant is now editable via the Super Admin modal.
+  - **Expand Modular Feature Flags to 24 Switches** across 6 business categories:
     1. *Sales & Commerce*: CRM Deal Pipelines, B2B Organizations & Multi-Stakeholders, Interactive Client Proposals / SOWs, Counter POS & Thermal Checkout, Barcode & Label Batch Printing, Purchase Orders & Vendor Bills.
     2. *Finance & Tax*: Double-Entry Bookkeeping & General Ledger, GSTR-1 & GSTR-3B Tax Reports & JSON/Excel Exports, Multi-Currency & ZATCA e-Invoicing, E-Way Bill Generation.
     3. *Operations & Inventory*: Multi-Location / Multi-Warehouse Stock Tracking, Studio BOM Recipe Costing, Estate PMS & Campsite Allocation Grid.
     4. *Team & HR*: Universal Team Capacity Planning & Margin Radar, HR Guidelines Handbook & Leave Management, Sales Partner Commission Splits & Ledgers, CCTV Vision AI Attendance.
     5. *Communication & Automation*: Automated WhatsApp Reminders (0-API & Meta Cloud), Recurring Invoices & Retainer Subscriptions, Integrations Hub (Teams & Sheets Webhooks).
     6. *White-Label & Enterprise*: Custom Domain & Branding ("Powered by BillBook" removal), Advanced RBAC Custom Permission Roles, Priority 24/7 Phone & CA Advisory Support.
-  - **Custom Quota Inputs**: Explicit number fields for Monthly Invoices quota, Customer directory quota, Team seat limits, and Cloud storage GB.
+  - **Custom Quota Inputs**: Added explicit number fields for Monthly Invoices quota, Customer directory quota, Team seat limits, and Cloud storage GB.
 
-- [ ] **Task 13.2: Dynamic Landing Page & Pricing Page Synchronization (`HomePricingSection.tsx`, `PricingToggleSection.tsx`)**
-  - **Refactor `app/_components/HomePricingSection.tsx`**: Replace all hardcoded static `<li>` bullet points for Free, Pro Starter, and Enterprise with dynamic rendering from `plans` loaded from Supabase `subscription_plans`.
-  - **Live Reflection of Super Admin Edits**: Ensure plan titles, descriptions, pricing, included features (`plan.features`), and crossed-out excluded features (`plan.excluded_features`) instantly update on the homepage (`/`) and all regional pricing pages (`/pricing`, `/ae/pricing`, `/us/pricing`) upon Super Admin save.
+- [x] **Task 13.2: Dynamic Landing Page & Pricing Page Synchronization (`HomePricingSection.tsx`, `PricingToggleSection.tsx`, `app/page.tsx`)**
+  - **Refactor `app/_components/HomePricingSection.tsx`**: Replaced all hardcoded static `<li>` bullet points for Free, Pro Starter, and Enterprise with dynamic rendering from `plans` loaded from Supabase `subscription_plans`.
+  - **Live Reflection of Super Admin Edits**: Plan titles, descriptions, pricing, included features (`plan.features`), and crossed-out excluded features (`plan.excluded_features`) instantly update on the homepage (`/`) and pricing page (`/pricing`) upon Super Admin save.
 
-- [ ] **Task 13.3: Strict Universal Rule & Quota Enforcement Engine (`lib/plan-utils.ts`, Middleware & Actions)**
-  - **Strict Central Feature Gating**: Ensure `hasPlanFeature()` and `checkFeatureLimit()` are universally enforced across all 16 verticals.
-  - **Sidebar & UI Navigation**: Disabled or excluded features in a tenant's active plan are automatically locked with an upgrade modal prompt.
-  - **API & Server Action Protection**: Server-level authorization blocks writes or operations (e.g. creating invoices beyond quota, inviting team members beyond seats, creating deals when CRM flag is false) unless authorized by the tenant's active plan package.
+- [x] **Task 13.3: Strict Universal Rule & Quota Enforcement Engine (`lib/plan-utils.ts`, Middleware & Actions)**
+  - **Strict Central Feature Gating**: Dynamically enforced `hasPlanFeature()` and `checkFeatureLimit()` across all 16 verticals.
+  - **Dynamic Invoice Quota Enforcement**: Enhanced `checkInvoiceLimit()` to respect super-admin configured monthly invoice quotas (`invoices_per_month`), with transparent unlimited bypass for `-1` and safe fallback defaults.
 
 ---
 
