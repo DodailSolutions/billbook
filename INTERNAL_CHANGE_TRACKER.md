@@ -4,6 +4,25 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 
 ---
 
+## [Release v1.7.1 - Implemented] - 2026-11-24
+
+### Tier-Based Automatic Vertical Bundling, Super Admin Industry Simulator, Contextual Upgrade & Non-GST Onboarding
+
+#### 1. Automatic Vertical Module Entitlement (`lib/plan-utils.ts`, `components/Sidebar.tsx`)
+- Automatic entitlement of industry-specific tools (Estate PMS, Odontogram, Job Cards, Stylist Splits, SOW Proposals) on paid tiers (Pro, Enterprise, Lifetime) without requiring manual package switch toggles.
+- Zero risk of locking out vertical customers who purchase universal standard packages.
+
+#### 2. Super Admin Industry Simulator Preview (`app/(superadmin)/admin/plans/PlansManager.tsx`)
+- Added industry vertical simulation selector to Plans Manager with 12 vertical profiles, allowing admins to preview plan features exactly as seen by tenants in each business vertical.
+
+#### 3. Zero-Loss Contextual Upgrades (`components/InstantTrialButton.tsx`, `app/(dashboard)/invoices/new/page.tsx`)
+- Inline 1-click Pro trial activation button preserving in-progress workflows when free invoice quotas are reached.
+
+#### 4. 60-Second Onboarding Wizard with Non-GST Support (`components/SetupWizard.tsx`)
+- Comprehensive support for unregistered non-GST businesses with compliant B2C billing defaults and reassuring setup guidance.
+
+---
+
 ## [Release v1.7.0 - Implemented] - 2026-11-24
 
 ### Super Admin Modular Package Engine, Dynamic Landing Page Sync & Strict Universal Rule Enforcement

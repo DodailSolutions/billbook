@@ -8,6 +8,7 @@ import { getInventoryItems } from "../../inventory/actions"
 import { getOrganizations } from "../../organizations/actions"
 import { ImprovedInvoiceForm } from "./ImprovedInvoiceForm"
 import { checkInvoiceLimit } from '@/lib/plan-utils'
+import { InstantTrialButton } from '@/components/InstantTrialButton'
 
 import type { Customer, InventoryItem, Organization, SavedItem } from "@/lib/types"
 
@@ -97,10 +98,11 @@ export default async function NewInvoicePage(props: NewInvoicePageProps) {
                             </p>
                         )}
                         
-                        <div className="flex gap-3">
+                        <div className="flex flex-wrap items-center gap-3 pt-2">
+                            <InstantTrialButton planSlug="starter" label="Start 14-Day Free Pro Trial" />
                             <Link href="/pricing">
-                                <Button className="bg-blue-600 hover:bg-blue-700">
-                                    View Plans & Upgrade
+                                <Button variant="outline" className="border-slate-300">
+                                    View All Plans
                                 </Button>
                             </Link>
                         </div>

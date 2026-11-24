@@ -22,6 +22,7 @@ This document serves as the master execution tracker for multi-vertical architec
 | **Hotfix (v1.6.6)** | PlansManager Build Error & Dynamic Pro Team Limits | Core Platform & Super Admin | **COMPLETED & IMPLEMENTED** |
 | **Phase 12** | Recursive Expenses, Period Breakdowns, Smooth Recurring Invoices & Integrations Hub | All Verticals | **COMPLETED & IMPLEMENTED** |
 | **Phase 13** | Super Admin Modular Package Engine, Dynamic Landing Page Sync & Universal Rule Enforcement | Platform-Wide (Super Admin & All Tenants) | **COMPLETED & IMPLEMENTED** |
+| **Phase 14** | Tier-Based Automatic Vertical Bundling, Super Admin Industry Simulator, Contextual Upgrade & Non-GST Onboarding | Platform-Wide (All 16 Verticals & Super Admin) | **COMPLETED & IMPLEMENTED** |
 
 ---
 
@@ -144,6 +145,25 @@ This document serves as the master execution tracker for multi-vertical architec
 - [x] **Task 13.3: Strict Universal Rule & Quota Enforcement Engine (`lib/plan-utils.ts`, Middleware & Actions)**
   - **Strict Central Feature Gating**: Dynamically enforced `hasPlanFeature()` and `checkFeatureLimit()` across all 16 verticals.
   - **Dynamic Invoice Quota Enforcement**: Enhanced `checkInvoiceLimit()` to respect super-admin configured monthly invoice quotas (`invoices_per_month`), with transparent unlimited bypass for `-1` and safe fallback defaults.
+
+---
+
+### [Phase 14 - Implemented] - Tier-Based Automatic Vertical Bundling, Super Admin Industry Simulator, Zero-Loss Contextual Upgrades & Non-GST Onboarding
+*Ensures seamless industry-specific software experience without manual package toggle micromanagement, zero-loss contextual upgrades, and flexible non-GST onboarding.*
+
+- [x] **Task 14.1: Automatic Vertical Module Bundling in Rules Engine (`lib/plan-utils.ts`, `components/Sidebar.tsx`)**
+  - **Auto-Entitle Vertical Modules**: Tied specialized industry tools directly to subscription tiers (Starter, Pro, Enterprise) based on tenant vertical.
+    - Paid tiers (Professional, Enterprise, Lifetime) automatically entitle all specialized modules for the tenant's chosen business type (e.g. `resorts_farmhouses_camping` gets Estate & Campsite PMS, `dental_clinic` gets Odontogram, `auto_workshop` gets Job Cards, `salon_spa` gets Stylist Splits) without requiring manual package switches.
+    - Zero friction for new vertical customers purchasing standard packages.
+    - 100% backward compatibility for existing accounts.
+- [x] **Task 14.2: Super Admin Industry Simulator Preview (`PlansManager.tsx`)**
+  - Added an "Industry Simulator" selector to the Plans Manager UI.
+  - When an admin selects an industry vertical, the card previews dynamically showcase the exact feature set and sidebar tools that a customer in that specific vertical will receive under Free, Starter, Pro, and Enterprise tiers.
+- [x] **Task 14.3: Zero-Loss Contextual Upgrade Experience (`components/InstantTrialButton.tsx`, `app/(dashboard)/invoices/new/page.tsx`)**
+  - 1-click inline trial activation button so tenants hitting invoice quota barriers (50 invoices on Free) can instantly unlock Pro without leaving the page or losing in-progress work.
+- [x] **Task 14.4: 60-Second Onboarding Wizard with Non-GST Business Support (`components/SetupWizard.tsx`)**
+  - Support unregistered / non-GST businesses with dedicated toggle: manual legal name, state, and address with compliant B2C tax handling.
+  - Informative guidance reassuring non-GST businesses of compliant invoicing.
 
 ---
 

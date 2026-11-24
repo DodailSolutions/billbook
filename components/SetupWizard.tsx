@@ -119,15 +119,23 @@ export function SetupWizard({ onComplete, initialStep = 1 }: SetupWizardProps) {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      GSTIN (Optional)
-                    </label>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        GSTIN (Optional)
+                      </label>
+                      <span className="text-xs text-blue-600 font-semibold bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded">
+                        Non-GST supported
+                      </span>
+                    </div>
                     <Input
-                      placeholder="Enter your GSTIN"
+                      placeholder="Enter 15-digit GSTIN (or leave blank if non-GST)"
                       value={formData.gstin}
                       onChange={(e) => setFormData({ ...formData, gstin: e.target.value })}
                       className="w-full"
                     />
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1.5">
+                      No GST? Leave this blank. BillBook automatically configures compliant unregistered B2C billing.
+                    </p>
                   </div>
                 </div>
 

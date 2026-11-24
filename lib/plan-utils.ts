@@ -147,13 +147,31 @@ export async function hasPlanFeature(featureKey: string): Promise<boolean> {
     const rawLimits = (status.limits as any) || {}
     const featureFlags = rawLimits.feature_flags || {}
 
-    // Direct feature flag check if defined in the plan package
+    // Direct feature flag check if explicitly set in the plan package
     if (featureFlags[featureKey] !== undefined) {
         return !!featureFlags[featureKey]
     }
 
     if (isEnterprise || isLifetime) {
         return true
+    }
+
+    // Professional & Enterprise tier automatically bundles all vertical-specific power tools
+    if (isPro) {
+        const verticalModules = [
+            'pms', 'estate_pms', 'campsite_pms', 'gear_rentals',
+            'dental_case_sheets', 'odontogram',
+            'vehicle_job_cards', 'garage_inspections',
+            'salon_splits', 'stylist_commissions',
+            'client_proposals', 'rfp_rfq',
+            'b2b_organizations', 'pos', 'counter_pos', 'barcodes',
+            'pos_checkout', 'barcode_batch', 'studio_bom', 'payroll',
+            'double_entry_bookkeeping', 'gstr1_gstr3b_reports'
+        ]
+        const cleanKey = featureKey.toLowerCase().replace(/[^a-z0-9]/g, '')
+        if (verticalModules.some(m => m.replace(/[^a-z0-9]/g, '') === cleanKey || cleanKey.includes(m.replace(/[^a-z0-9]/g, '')))) {
+            return true
+        }
     }
 
     const normalizedKey = featureKey.toLowerCase().replace(/[^a-z0-9]/g, '')

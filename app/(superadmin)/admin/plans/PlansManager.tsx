@@ -79,6 +79,54 @@ export const SYSTEM_APP_FEATURES = [
     { id: 'priority_support', label: '24/7 Dedicated CA & Phone Support', category: 'White-Label & Support', desc: 'Direct access to chartered accountants and fast-lane SLAs' }
 ]
 
+export const SIMULATION_VERTICALS = [
+    { id: 'all', name: 'Universal View (Default)', icon: '🌐' },
+    { id: 'resorts_farmhouses_camping', name: 'Resorts & Camping (PMS)', icon: '🏕️' },
+    { id: 'salon_spa', name: 'Salon & Spa (Stylist Splits)', icon: '💇' },
+    { id: 'dental_clinic', name: 'Dental Clinic (Odontogram)', icon: '🦷' },
+    { id: 'auto_workshop', name: 'Automobile Garage (Job Cards)', icon: '🚗' },
+    { id: 'retail', name: 'Retail & Supermarket (POS)', icon: '🛒' },
+    { id: 'software_it', name: 'Software & IT (Proposals)', icon: '💻' },
+    { id: 'digital_marketing', name: 'Marketing Agency (SOW)', icon: '📱' },
+    { id: 'real_estate', name: 'Real Estate (Listings)', icon: '🏢' },
+    { id: 'jewelry_retail', name: 'Jewelry (HUID Hallmark)', icon: '💎' },
+    { id: 'art_crafts', name: 'Art Studio (BOM & COA)', icon: '🎨' },
+    { id: 'laundry_drycleaning', name: 'Laundry (Tags)', icon: '👔' }
+]
+
+export const VERTICAL_SIMULATION_MAP: Record<string, { label: string; starterFeatures: string[]; proFeatures: string[] }> = {
+    resorts_farmhouses_camping: {
+        label: 'Resorts & Camping',
+        starterFeatures: ['Basic Room Tariffs', 'Check-In Receipts', 'WhatsApp Reservation Sharing'],
+        proFeatures: ['Estate & Campsite PMS Grid', 'Entire Farmhouse 24-hr Buyouts', 'Caution Deposit Ledger', 'Tent & Adventure Gear Rentals']
+    },
+    salon_spa: {
+        label: 'Salon & Spa',
+        starterFeatures: ['Client Service Invoicing', 'Appointment Reminders', 'Retail Product Sales'],
+        proFeatures: ['Multi-Stylist Revenue Commission Splits', 'Chair Rent & Daily Payouts', 'Prepaid Customer Wallet Packages']
+    },
+    dental_clinic: {
+        label: 'Dental Clinics',
+        starterFeatures: ['Patient Consultation Receipts', 'SAC 999312 Tax Billing', 'Appointment Follow-ups'],
+        proFeatures: ['Interactive 32-Tooth Odontogram', 'Visiting Specialist Fee Splits', 'Multi-Stage Dental Procedure Billing']
+    },
+    auto_workshop: {
+        label: 'Garages & Workshops',
+        starterFeatures: ['Vehicle Service Invoices', 'Spare Parts Billing', 'WhatsApp Estimates'],
+        proFeatures: ['Digital Vehicle Job Cards with Odometer', 'Parts Deduction vs Labor Charges', 'Periodic Service & Oil Alerts']
+    },
+    retail: {
+        label: 'Retail & Supermarkets',
+        starterFeatures: ['GST Invoicing', 'Barcode Scanning', 'Customer Loyalty'],
+        proFeatures: ['Counter POS Checkout', 'Thermal Label Printing (50x25mm)', 'Multi-Warehouse Inventory']
+    },
+    software_it: {
+        label: 'Software, IT & Agencies',
+        starterFeatures: ['Professional Invoices & Quotes', 'Multi-Currency & VAT', 'Double-Entry Bookkeeping'],
+        proFeatures: ['Interactive Client SOW & Proposals', 'Sprint Milestone Tranche Invoicing', 'Universal Team Capacity & Margin Radar']
+    }
+}
+
 const REGION_OPTIONS = [
     { id: 'all', label: 'All Regions', flag: '🌍', currency: 'ALL' },
     { id: 'IN', label: 'India', flag: '🇮🇳', currency: 'INR', symbol: '₹' },
@@ -92,6 +140,7 @@ export default function PlansManager({ initialPlans }: PlansManagerProps) {
     const [selectedPeriod, setSelectedPeriod] = useState<string>('all')
     const [searchQuery, setSearchQuery] = useState('')
     const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive' | 'popular'>('all')
+    const [simulationVertical, setSimulationVertical] = useState<string>('all')
 
     // Modals
     const [isAddModalOpen, setIsAddModalOpen] = useState(false)
@@ -524,6 +573,22 @@ export default function PlansManager({ initialPlans }: PlansManagerProps) {
                             <option value="inactive">Inactive Only</option>
                             <option value="popular">Popular Only</option>
                         </select>
+
+                        {/* Industry Simulator Selector */}
+                        <div className="flex items-center gap-1.5 bg-blue-50/80 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/60 rounded-xl px-2.5 py-1">
+                            <span className="text-[10px] font-black uppercase text-blue-700 dark:text-blue-400">Simulator:</span>
+                            <select
+                                value={simulationVertical}
+                                onChange={(e) => setSimulationVertical(e.target.value)}
+                                className="text-xs font-bold bg-transparent text-blue-900 dark:text-blue-200 focus:outline-none cursor-pointer"
+                            >
+                                {SIMULATION_VERTICALS.map(v => (
+                                    <option key={v.id} value={v.id} className="text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-900">
+                                        {v.icon} {v.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -640,6 +705,36 @@ export default function PlansManager({ initialPlans }: PlansManagerProps) {
                                                         <span className="line-through leading-tight">{exFeature}</span>
                                                     </div>
                                                 ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                    {/* Industry Simulation Preview Banner */}
+                                    {simulationVertical !== 'all' && (
+                                        <div className="pt-2.5 mt-2 border-t border-dashed border-blue-200 dark:border-blue-900/50 bg-blue-50/50 dark:bg-blue-950/20 p-2.5 rounded-xl">
+                                            <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-blue-700 dark:text-blue-400 mb-1.5">
+                                                <span>Auto Vertical Bundle ({VERTICAL_SIMULATION_MAP[simulationVertical]?.label || 'Industry'})</span>
+                                                <span className="text-emerald-600 font-bold">✓ Included</span>
+                                            </div>
+                                            <div className="space-y-1">
+                                                {((plan.slug || '').includes('pro') || (plan.slug || '').includes('enterprise') || (plan.slug || '').includes('lifetime')) ? (
+                                                    (VERTICAL_SIMULATION_MAP[simulationVertical]?.proFeatures || []).map((feat, idx) => (
+                                                        <div key={idx} className="flex items-start gap-1.5 text-[11px] font-semibold text-blue-900 dark:text-blue-200">
+                                                            <Check className="h-3 w-3 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+                                                            <span>{feat}</span>
+                                                        </div>
+                                                    ))
+                                                ) : (plan.slug || '').includes('starter') ? (
+                                                    (VERTICAL_SIMULATION_MAP[simulationVertical]?.starterFeatures || []).map((feat, idx) => (
+                                                        <div key={idx} className="flex items-start gap-1.5 text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                                                            <Check className="h-3 w-3 text-slate-600 shrink-0 mt-0.5" />
+                                                            <span>{feat}</span>
+                                                        </div>
+                                                    ))
+                                                ) : (
+                                                    <div className="text-[11px] italic text-slate-500">
+                                                        Core invoicing & standard catalog
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     )}
