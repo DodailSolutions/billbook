@@ -678,7 +678,7 @@ export async function createInvoice(data: CreateInvoiceData) {
         }
     }
     
-    // If this is a recurring invoice, create the recurring template
+    // If this is a recurring invoice, safely create the recurring template
     if ((data as any).is_recurring) {
         const recurringData = data as CreateInvoiceData & {
             is_recurring: boolean
@@ -687,17 +687,22 @@ export async function createInvoice(data: CreateInvoiceData) {
             recurring_end_date?: string
         }
         
-        if (recurringData.is_recurring && recurringData.recurring_frequency && recurringData.recurring_start_date) {
+        const freq = recurringData.recurring_frequency || 'monthly'
+        const startDate = recurringData.recurring_start_date || data.invoice_date || new Date().toISOString().split('T')[0]
+        
+        try {
             await createRecurringFromInvoice(
                 invoice.id,
                 data.customer_id,
-                recurringData.recurring_frequency,
-                recurringData.recurring_start_date,
+                freq,
+                startDate,
                 recurringData.recurring_end_date,
                 data.gst_percentage,
                 data.notes,
                 data.items
             )
+        } catch (recErr) {
+            console.warn('Non-fatal: could not create recurring invoice template:', recErr)
         }
     }
 
@@ -1161,7 +1166,7 @@ async function createRecurringFromInvoice(
 
     if (recurringError) {
         console.error('Error creating recurring invoice:', recurringError)
-        throw new Error('Failed to create recurring invoice template')
+        return
     }
 
     // Create recurring invoice items
@@ -1178,7 +1183,7 @@ async function createRecurringFromInvoice(
 
     if (itemsError) {
         console.error('Error creating recurring invoice items:', itemsError)
-        throw new Error('Failed to create recurring invoice items')
+        return
     }
 
     // Create reminder for next billing date (7 days before)

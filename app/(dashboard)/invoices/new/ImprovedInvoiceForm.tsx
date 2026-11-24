@@ -11,7 +11,7 @@ import {
   User, Receipt, FileText, 
   AlertCircle, CheckCircle2, ChevronDown, ChevronUp,
   Sparkles, Shield, Clock, X, UserPlus, Download, CheckCircle, Mail, Loader2, ExternalLink,
-  Building2, Briefcase
+  Building2, Briefcase, Repeat
 } from 'lucide-react'
 import { createInvoice } from '../actions'
 import { linkLeadToInvoice } from '@/lib/crm-actions'
@@ -102,6 +102,10 @@ export function ImprovedInvoiceForm({
     supply_type: 'intra-state' as 'intra-state' | 'inter-state',
     reverse_charge_applicable: false,
     is_recurring: false,
+    recurring_frequency: 'monthly' as 'monthly' | 'yearly',
+    recurring_start_date: new Date().toISOString().split('T')[0],
+    recurring_end_date: '',
+    recurring_never_expires: true,
     notes: initialLeadId ? `Generated from CRM Lead` : '',
     // Discount
     discount_type: 'percentage' as 'percentage' | 'flat',
@@ -376,6 +380,9 @@ export function ImprovedInvoiceForm({
           gst_rate: item.gst_rate
         })),
         is_recurring: formData.is_recurring,
+        recurring_frequency: formData.is_recurring ? formData.recurring_frequency : undefined,
+        recurring_start_date: formData.is_recurring ? (formData.recurring_start_date || formData.invoice_date) : undefined,
+        recurring_end_date: (formData.is_recurring && !formData.recurring_never_expires && formData.recurring_end_date) ? formData.recurring_end_date : undefined,
         // Payment collection
         mark_as_paid: formData.mark_as_paid,
         payment_amount: formData.mark_as_paid ? formData.payment_amount : undefined,
@@ -1069,15 +1076,123 @@ export function ImprovedInvoiceForm({
                           <span className="text-sm text-gray-900 font-medium">Reverse Charge Applicable</span>
                         </label>
 
-                        <label className="flex items-center gap-2 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={formData.is_recurring}
-                            onChange={(e) => setFormData({...formData, is_recurring: e.target.checked})}
-                            className="w-4 h-4"
-                          />
-                          <span className="text-sm text-gray-900 font-medium">Make this a Recurring Invoice</span>
-                        </label>
+                        {/* Recurring Invoicing Schedule Drawer */}
+                        <div className="border-t border-gray-200 pt-3">
+                          <label className="flex items-center justify-between cursor-pointer">
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="checkbox"
+                                checked={formData.is_recurring}
+                                onChange={(e) => setFormData({...formData, is_recurring: e.target.checked})}
+                                className="w-4 h-4 text-blue-600 rounded"
+                              />
+                              <span className="text-sm text-gray-900 font-semibold flex items-center gap-1.5">
+                                <Repeat className="w-4 h-4 text-blue-600" />
+                                Make this a Recurring Invoice (Auto-generate schedule)
+                              </span>
+                            </div>
+                            <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${formData.is_recurring ? 'bg-blue-100 text-blue-700' : 'bg-gray-200 text-gray-600'}`}>
+                              {formData.is_recurring ? 'Active' : 'Off'}
+                            </span>
+                          </label>
+
+                          {formData.is_recurring && (
+                            <div className="mt-3 p-4 bg-blue-50/70 border border-blue-200 rounded-xl space-y-3.5">
+                              <div>
+                                <label className="block text-xs font-bold text-gray-700 mb-1.5">
+                                  Billing Cadence / Frequency
+                                </label>
+                                <div className="grid grid-cols-2 gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => setFormData({...formData, recurring_frequency: 'monthly'})}
+                                    className={`py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 border transition-all ${
+                                      formData.recurring_frequency === 'monthly'
+                                        ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+                                        : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
+                                    }`}
+                                  >
+                                    <Clock className="w-3.5 h-3.5" />
+                                    <span>Monthly (Every Month)</span>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => setFormData({...formData, recurring_frequency: 'yearly'})}
+                                    className={`py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 border transition-all ${
+                                      formData.recurring_frequency === 'yearly'
+                                        ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+                                        : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
+                                    }`}
+                                  >
+                                    <Sparkles className="w-3.5 h-3.5" />
+                                    <span>Yearly (Annual Renewal)</span>
+                                  </button>
+                                </div>
+                              </div>
+
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                  <label className="block text-xs font-bold text-gray-700 mb-1">
+                                    Start Date (First Cycle)
+                                  </label>
+                                  <Input
+                                    type="date"
+                                    value={formData.recurring_start_date}
+                                    onChange={(e) => setFormData({...formData, recurring_start_date: e.target.value})}
+                                    className="bg-white text-xs h-9"
+                                  />
+                                </div>
+                                <div>
+                                  <div className="flex items-center justify-between mb-1">
+                                    <label className="text-xs font-bold text-gray-700">
+                                      End Date (Optional)
+                                    </label>
+                                    <label className="text-[11px] text-gray-500 flex items-center gap-1 cursor-pointer">
+                                      <input
+                                        type="checkbox"
+                                        checked={formData.recurring_never_expires}
+                                        onChange={(e) => setFormData({
+                                          ...formData, 
+                                          recurring_never_expires: e.target.checked,
+                                          recurring_end_date: e.target.checked ? '' : formData.recurring_end_date
+                                        })}
+                                        className="w-3 h-3 text-blue-600 rounded"
+                                      />
+                                      <span>Never ends</span>
+                                    </label>
+                                  </div>
+                                  <Input
+                                    type="date"
+                                    disabled={formData.recurring_never_expires}
+                                    value={formData.recurring_end_date}
+                                    onChange={(e) => setFormData({...formData, recurring_end_date: e.target.value})}
+                                    placeholder={formData.recurring_never_expires ? 'Continuous' : ''}
+                                    className={`bg-white text-xs h-9 ${formData.recurring_never_expires ? 'opacity-50 cursor-not-allowed bg-gray-100' : ''}`}
+                                  />
+                                </div>
+                              </div>
+
+                              <div className="pt-1 text-[11px] text-blue-700 flex items-center gap-1.5">
+                                <CheckCircle className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                                <span>
+                                  A recurring schedule template will be created. Next invoice will auto-generate on{' '}
+                                  <strong>
+                                    {(() => {
+                                      const baseDate = formData.recurring_start_date || formData.invoice_date || new Date().toISOString().split('T')[0]
+                                      const d = new Date(baseDate)
+                                      if (formData.recurring_frequency === 'yearly') {
+                                        d.setFullYear(d.getFullYear() + 1)
+                                      } else {
+                                        d.setMonth(d.getMonth() + 1)
+                                      }
+                                      return isNaN(d.getTime()) ? 'next cycle' : d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+                                    })()}
+                                  </strong>.
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     )}
                   </div>
