@@ -231,3 +231,9 @@ This document serves as the master execution tracker for multi-vertical architec
   - Integrated Employment Type selector (*Full-Time, Part-Time, Contract, Intern*) into Employee Onboarding.
   - Added Operational Team Role selector (*General Employee, Operations Manager, HR Executive, Client Relationship Manager, Relationship Agent, Administrator*) when enabling login access.
   - Automated bi-directional synchronization in `createEmployee` (`lib/payroll-actions.ts`) to automatically register auth credentials, assign `user_profiles.role`, and establish membership in `team_members` with designated role ID and designation.
+- [x] **Task 18.6: Super Admin Unrestricted ERP Privileges & Team Members RLS Fix**
+  - Updated `getUserPlanStatus()` (`lib/plan-utils.ts`) to recognize `super_admin` with underscores, permanently unlocking VIP Enterprise status (unlimited invoices, team members, customers, and all modules).
+  - Fixed Row-Level Security policy violation on `team_members` by enforcing authenticated user client session fallback during member invitations and employee synchronization.
+  - Removed team seat limit checks for Super Admin in `/team` and `/api/team/invite` (allowing unlimited team members and employees).
+  - Locked the primary Super Admin workspace vertical to Software Development & IT (`software_it`).
+  - Authored SQL migration script `supabase-superadmin-unrestricted-rls.sql` for database-level RLS policy alignment.

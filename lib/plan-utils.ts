@@ -48,7 +48,7 @@ export async function getUserPlanStatus(): Promise<PlanStatus | null> {
             .eq('id', user.id)
             .maybeSingle()
 
-        if (profile?.role === 'superadmin') {
+        if (profile?.role === 'superadmin' || profile?.role === 'super_admin') {
             return {
                 hasActivePlan: true,
                 isExpired: false,

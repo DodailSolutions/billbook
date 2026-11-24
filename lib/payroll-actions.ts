@@ -119,7 +119,7 @@ export async function createEmployee(input: CreateEmployeeInput): Promise<{ succ
                     .maybeSingle()
 
                 if (roleRow?.id) {
-                    await adminSupabase.from('team_members').upsert({
+                    const tmPayload = {
                         owner_id: user.id,
                         user_id: employeeUserId,
                         email: input.email.toLowerCase(),
@@ -127,7 +127,18 @@ export async function createEmployee(input: CreateEmployeeInput): Promise<{ succ
                         designation: input.designation || null,
                         status: 'active',
                         joined_at: new Date().toISOString()
-                    }, { onConflict: 'owner_id,email' })
+                    }
+
+                    const { error: tmUpsertErr } = await adminSupabase
+                        .from('team_members')
+                        .upsert(tmPayload, { onConflict: 'owner_id,email' })
+
+                    if (tmUpsertErr) {
+                        // Fallback using user authenticated client to satisfy owner_id = auth.uid() RLS policy
+                        await supabase
+                            .from('team_members')
+                            .upsert(tmPayload, { onConflict: 'owner_id,email' })
+                    }
                 }
             } catch (tmErr) {
                 console.warn('[createEmployee] team_members sync non-fatal:', tmErr)

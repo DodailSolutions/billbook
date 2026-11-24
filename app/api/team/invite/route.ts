@@ -39,50 +39,53 @@ export async function POST(request: Request) {
 
     // Check team member limits
     const planStatus = await getUserPlanStatus()
+    const isSuperAdmin = planStatus?.planName?.includes('Super Admin') || (planStatus?.limits as any)?.team_members === -1
     const isLifetimePlan = planStatus?.isLifetime ?? false
     const planSlug = (planStatus?.planSlug || '').toLowerCase()
-    const isProOrAbove = planSlug.includes('pro') || planSlug.includes('professional') || planSlug.includes('enterprise') || isLifetimePlan
+    const isProOrAbove = planSlug.includes('pro') || planSlug.includes('professional') || planSlug.includes('enterprise') || isLifetimePlan || isSuperAdmin
     const planConfiguredSeats = typeof (planStatus?.limits as any)?.team_members === 'number'
       ? (planStatus?.limits as any).team_members
       : (isProOrAbove ? (planSlug.includes('enterprise') ? 10 : 2) : 0)
-    const defaultAllowed = Math.max(planConfiguredSeats, isProOrAbove ? 2 : 0)
+    const defaultAllowed = isSuperAdmin ? 99999 : Math.max(planConfiguredSeats, isProOrAbove ? 2 : 0)
 
     let allowed = defaultAllowed
     let current = 0
-    let canAdd = allowed > 0
+    let canAdd = isSuperAdmin || allowed > 0
 
-    try {
-      const { data: limits } = await supabase.rpc('check_team_member_limit', {
-        p_owner_id: user.id
-      })
-      if (Array.isArray(limits) && limits[0]) {
-        allowed = Math.max(limits[0].allowed || 0, defaultAllowed)
-        current = limits[0].current || 0
-        canAdd = current < allowed
+    if (!isSuperAdmin) {
+      try {
+        const { data: limits } = await supabase.rpc('check_team_member_limit', {
+          p_owner_id: user.id
+        })
+        if (Array.isArray(limits) && limits[0]) {
+          allowed = Math.max(limits[0].allowed || 0, defaultAllowed)
+          current = limits[0].current || 0
+          canAdd = current < allowed
+        }
+      } catch (e) {
+        console.warn('RPC check_team_member_limit fallback in invite route:', e)
       }
-    } catch (e) {
-      console.warn('RPC check_team_member_limit fallback in invite route:', e)
-    }
 
-    // Direct count of active/pending team members to ensure 100% accuracy
-    try {
-      const { count } = await supabase
-        .from('team_members')
-        .select('*', { count: 'exact', head: true })
-        .eq('owner_id', user.id)
-        .in('status', ['active', 'pending'])
+      // Direct count of active/pending team members to ensure 100% accuracy
+      try {
+        const { count } = await supabase
+          .from('team_members')
+          .select('*', { count: 'exact', head: true })
+          .eq('owner_id', user.id)
+          .in('status', ['active', 'pending'])
 
-      if (typeof count === 'number') {
-        current = count
-        canAdd = current < allowed
+        if (typeof count === 'number') {
+          current = count
+          canAdd = current < allowed
+        }
+      } catch {}
+
+      if (!canAdd) {
+        return NextResponse.json(
+          { error: `Team member limit reached (${current}/${allowed} used). Your plan allows ${allowed} member(s).` },
+          { status: 403 }
+        )
       }
-    } catch {}
-
-    if (!canAdd) {
-      return NextResponse.json(
-        { error: `Team member limit reached (${current}/${allowed} used). Your plan allows ${allowed} member(s).` },
-        { status: 403 }
-      )
     }
 
     // Check if email already invited
@@ -230,15 +233,38 @@ export async function POST(request: Request) {
     if (hourly_cost_rate !== undefined) insertPayload.hourly_cost_rate = Number(hourly_cost_rate) || 0
     if (hourly_billing_rate !== undefined) insertPayload.hourly_billing_rate = Number(hourly_billing_rate) || 0
 
-    const { data: member, error: insertError } = await adminSupabase
+    // Primary client: prefer adminSupabase if service key exists, otherwise authenticated supabase
+    const hasServiceKey = !!process.env.SUPABASE_SERVICE_ROLE_KEY
+    const primaryClient = hasServiceKey && adminSupabase ? adminSupabase : supabase
+
+    let member: any = null
+    let insertError: any = null
+
+    const initialRes = await primaryClient
       .from('team_members')
       .insert(insertPayload)
       .select()
-      .single()
+      .maybeSingle()
 
-    if (insertError) {
+    member = initialRes.data
+    insertError = initialRes.error
+
+    // If RLS blocked primaryClient (e.g. anon fallback without service key), retry with authenticated user client
+    if (insertError && primaryClient !== supabase) {
+      console.warn('Retrying team_members insert with authenticated user client due to:', insertError.message)
+      const retryRes = await supabase
+        .from('team_members')
+        .insert(insertPayload)
+        .select()
+        .maybeSingle()
+
+      member = retryRes.data
+      insertError = retryRes.error
+    }
+
+    if (insertError || !member) {
       console.error('Error creating team member:', insertError)
-      return NextResponse.json({ error: insertError.message || 'Failed to create invite' }, { status: 500 })
+      return NextResponse.json({ error: insertError?.message || 'Failed to create invite' }, { status: 500 })
     }
 
     // Log activity
