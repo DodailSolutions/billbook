@@ -4,6 +4,25 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 
 ---
 
+## [Release v1.7.0 - Planned & Scoped] - 2026-11-24
+
+### Super Admin Modular Package Engine, Dynamic Landing Page Sync & Strict Universal Rule Enforcement
+
+#### 1. Super Admin Package Builder Expansion (`app/(superadmin)/admin/plans/PlansManager.tsx`)
+- **Elimination of Hardcoded Labels**: All plan labels, descriptions, bullet points, tags, and badge texts editable via UI modal without code changes.
+- **24 Modular Feature Flags**: Expand toggle switches across 6 business categories (Sales & Commerce, Finance & Tax, Operations & Inventory, Team & HR, Communication & Automation, White-Label & Enterprise).
+- **Explicit Quota Inputs**: Dedicated numeric fields for Monthly Invoices, Customers Directory, Team Member Seats, and Storage GB.
+
+#### 2. Dynamic Landing Page & Pricing Sync (`app/_components/HomePricingSection.tsx`, `PricingToggleSection.tsx`)
+- **Direct Database Hydration**: Replace hardcoded static `<li>` lists on homepage and pricing pages with dynamic database reads from `subscription_plans`.
+- **Live Sync Guarantee**: Updates to packages in Super Admin immediately reflect on `/`, `/pricing`, `/ae/pricing`, and `/us/pricing`.
+
+#### 3. Strict Universal Rule & Quota Enforcement Engine (`lib/plan-utils.ts`)
+- **Universal Feature Gating**: Platform-wide enforcement of active package capabilities across all 16 business verticals.
+- **Strict Server-Side Quota Barriers**: Guard server actions and API routes against quota overruns (invoices, team members, customers, CRM pipelines) with contextual upgrade modals.
+
+---
+
 ## [Release v1.6.6 - Hotfix Implemented] - 2026-11-24
 
 ### Super Admin PlansManager Type Fix, Dynamic Pro Team Limits & RPC Upgrade
