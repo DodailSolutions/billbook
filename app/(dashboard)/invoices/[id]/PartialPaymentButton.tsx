@@ -182,8 +182,6 @@ export function PartialPaymentButton({
                             )}
                         </div>
                     </div>
-                        </p>
-                    </div>
 
                     <div>
                         <label htmlFor="paymentMethod" className="block text-sm font-medium mb-2">
