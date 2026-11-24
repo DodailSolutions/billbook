@@ -10,12 +10,14 @@ import { SignOutButton } from "./SignOutButton"
 import { PlanBanner } from "./PlanBanner"
 import { getMyCAProfile } from "@/lib/ca-profile-actions"
 import { getBusinessProfile } from "@/lib/business-profile-actions"
+import { checkSuperAdminAccess } from "@/lib/admin-auth"
 import type { BusinessType } from "@/lib/business-profile-types"
 import { isPosSupported, isProposalSupported } from "@/lib/business-profile-types"
 
 export function Sidebar() {
     const pathname = usePathname()
     const [isCA, setIsCA] = useState<boolean | null>(null)
+    const [isSuperAdmin, setIsSuperAdmin] = useState(false)
     const [isCollapsed, setIsCollapsed] = useState(false)
     const [businessProfile, setBusinessProfile] = useState<{
         businessType: BusinessType;
@@ -28,11 +30,13 @@ export function Sidebar() {
     useEffect(() => {
         async function loadProfile() {
             try {
-                const [caProfile, bProfile] = await Promise.all([
+                const [caProfile, bProfile, superAdminStatus] = await Promise.all([
                     getMyCAProfile(),
-                    getBusinessProfile()
+                    getBusinessProfile(),
+                    checkSuperAdminAccess().catch(() => false)
                 ])
                 setIsCA(!!caProfile)
+                setIsSuperAdmin(!!superAdminStatus)
                 if (bProfile) {
                     setBusinessProfile({
                         businessType: bProfile.businessType,
@@ -352,6 +356,24 @@ export function Sidebar() {
                         </span>
                     )}
                 </Link>
+
+                {/* Super Admin Console Switcher (Visible strictly to Super Admin) */}
+                {isSuperAdmin && !isCollapsed && (
+                    <div className="mx-1 mb-3">
+                        <Link
+                            href="/admin"
+                            className="flex items-center justify-between px-2.5 py-1.5 rounded-xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 text-xs font-semibold text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/50 transition-colors shadow-2xs"
+                        >
+                            <span className="flex items-center gap-1.5">
+                                <ShieldCheck className="w-3.5 h-3.5 text-purple-600" />
+                                Super Admin Console
+                            </span>
+                            <span className="text-[10px] font-bold bg-purple-200 dark:bg-purple-900 px-1.5 py-0.5 rounded text-purple-800 dark:text-purple-200">
+                                MASTER
+                            </span>
+                        </Link>
+                    </div>
+                )}
 
                 {/* Active Industry Vertical Badge */}
                 {!isCollapsed && (

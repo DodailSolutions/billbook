@@ -135,6 +135,16 @@ export async function POST(request: Request) {
         roleSlug = roleRow.slug || roleSlug
       } else {
         const roleDefinitions: Record<string, { name: string; desc: string; perms: string[] }> = {
+          client_relationship_manager: {
+            name: 'Client Relationship Manager',
+            desc: 'Supervises B2B customer accounts, assigns agents, manages proposals & relationships.',
+            perms: ['customers.*', 'organizations.*', 'invoices.*', 'proposals.*', 'team.agents.view']
+          },
+          relationship_agent: {
+            name: 'Relationship Agent',
+            desc: 'Field agent managing assigned customer accounts, communications, and invoice follow-ups.',
+            perms: ['customers.assigned', 'organizations.assigned', 'invoices.create', 'invoices.view_assigned']
+          },
           manager: {
             name: 'Manager',
             desc: 'Manage invoices, clients, inventory, and approve team attendance.',

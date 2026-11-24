@@ -68,6 +68,7 @@ export interface Organization {
     email?: string
     phone?: string
     industry?: string
+    address?: string
     billing_address?: string
     shipping_address?: string
     city?: string
@@ -76,6 +77,8 @@ export interface Organization {
     pincode?: string
     currency?: string
     notes?: string
+    assigned_rm_id?: string
+    assigned_rm_name?: string
     contacts_count?: number
     invoices_count?: number
     total_billed?: number
@@ -99,6 +102,8 @@ export interface Customer {
     gstin_validated?: boolean
     gstin_validation_date?: string
     customer_state_code?: string
+    assigned_rm_id?: string
+    assigned_rm_name?: string
     created_at: string
     updated_at: string
 }

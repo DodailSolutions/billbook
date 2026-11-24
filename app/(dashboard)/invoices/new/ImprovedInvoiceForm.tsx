@@ -1856,7 +1856,7 @@ export function ImprovedInvoiceForm({
                             gstinInput.value = org.gstin
                           }
                           if (addressInput && !addressInput.value) {
-                            const parts = [org.address, org.city, org.state, org.pincode].filter(Boolean)
+                            const parts = [org.billing_address || (org as any).address, org.city, org.state, org.pincode].filter(Boolean)
                             if (parts.length > 0) {
                               addressInput.value = parts.join(', ')
                             }

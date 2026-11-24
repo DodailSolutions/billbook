@@ -76,6 +76,8 @@ export function calculateGrossMargin(costRate: number = 0, billingRate: number =
 
 export const VERTICAL_TEAM_DESIGNATIONS: Record<string, string[]> = {
     software_it: [
+        'Client Relationship Manager (Senior RM)',
+        'Relationship Agent (Junior RM)',
         'Tech Lead / Architect',
         'Senior Full-Stack Engineer',
         'Frontend Developer (React/Next.js)',
@@ -86,6 +88,8 @@ export const VERTICAL_TEAM_DESIGNATIONS: Record<string, string[]> = {
         'Scrum Master / PM'
     ],
     digital_marketing: [
+        'Client Relationship Manager (Senior RM)',
+        'Relationship Agent (Junior RM)',
         'Account Director',
         'Media Buyer (Meta / Google Ads)',
         'Senior Copywriter',
@@ -95,6 +99,8 @@ export const VERTICAL_TEAM_DESIGNATIONS: Record<string, string[]> = {
         'Social Media Campaign Manager'
     ],
     freelancer: [
+        'Client Relationship Manager (Senior RM)',
+        'Relationship Agent (Junior RM)',
         'Lead Independent Consultant',
         'Subcontractor Specialist',
         'Creative Associate',

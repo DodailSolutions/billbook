@@ -180,8 +180,21 @@ export async function updateCustomer(id: string, formData: FormData) {
     }
 
     const designation = (formData.get('designation') as string)?.trim() || null
+    const assignedRmId = (formData.get('assigned_rm_id') as string)?.trim() || null
+    let assignedRmName = (formData.get('assigned_rm_name') as string)?.trim() || null
 
-    const customerData = {
+    if (assignedRmId && !assignedRmName) {
+        const { data: member } = await supabase
+            .from('team_members')
+            .select('email, designation')
+            .eq('id', assignedRmId)
+            .maybeSingle()
+        if (member) {
+            assignedRmName = member.designation ? `${member.email} (${member.designation})` : member.email
+        }
+    }
+
+    const customerData: Record<string, any> = {
         name: formData.get('name') as string,
         email: formData.get('email') as string || null,
         phone: formData.get('phone') as string || null,
@@ -190,6 +203,11 @@ export async function updateCustomer(id: string, formData: FormData) {
         organization_id: orgId,
         organization_name: orgName,
         designation: designation,
+    }
+
+    if (assignedRmId !== null) {
+        customerData.assigned_rm_id = assignedRmId || null
+        customerData.assigned_rm_name = assignedRmName
     }
 
     const { error } = await supabase

@@ -28,8 +28,22 @@ export function InviteMemberModal({ canAdd, currentCount, maxAllowed, roles }: I
   const [selectedRole, setSelectedRole] = useState('')
   const [designation, setDesignation] = useState('')
 
-  // Built-in 4-tier roles hierarchy
+  // Built-in roles hierarchy including B2B Client Relationship roles
   const defaultRoles = [
+    { 
+      id: 'client_relationship_manager', 
+      name: 'Client Relationship Manager (Senior RM)', 
+      slug: 'client_relationship_manager', 
+      description: 'Supervises client portfolios, assigns accounts to agents, and oversees B2B relationships.',
+      icon: Briefcase
+    },
+    { 
+      id: 'relationship_agent', 
+      name: 'Relationship Agent (Junior RM)', 
+      slug: 'relationship_agent', 
+      description: 'Manages assigned client communications, invoices, follow-ups, and portfolio tasks.',
+      icon: UserCheck
+    },
     { 
       id: 'manager', 
       name: 'Manager', 

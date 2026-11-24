@@ -1,6 +1,7 @@
 import Link from "next/link"
-import { ArrowLeft, Building2 } from "lucide-react"
+import { ArrowLeft, Building2, Users } from "lucide-react"
 import { notFound } from "next/navigation"
+import { createClient } from "@/lib/supabase/server"
 import { Button } from "@/components/ui/Button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card"
 import { Input } from "@/components/ui/Input"
@@ -13,9 +14,19 @@ export default async function EditCustomerPage({
     params: Promise<{ id: string }>
 }) {
     const { id } = await params
-    const [customer, organizations] = await Promise.all([
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    const [customer, organizations, teamMembers] = await Promise.all([
         getCustomer(id),
-        getOrganizations().catch(() => [])
+        getOrganizations().catch(() => []),
+        user ? supabase
+            .from('team_members')
+            .select('id, email, designation')
+            .eq('owner_id', user.id)
+            .in('status', ['active', 'pending'])
+            .then(res => res.data || [])
+            .catch(() => []) : Promise.resolve([])
     ])
 
     if (!customer) {
@@ -58,6 +69,30 @@ export default async function EditCustomerPage({
                                     </option>
                                 ))}
                             </select>
+                        </div>
+
+                        {/* Assigned Relationship Manager Section */}
+                        <div className="space-y-2 p-3 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800">
+                            <label htmlFor="assigned_rm_id" className="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                                <Users className="w-3.5 h-3.5 text-indigo-600" />
+                                Assigned Relationship Manager (RM)
+                            </label>
+                            <select
+                                id="assigned_rm_id"
+                                name="assigned_rm_id"
+                                defaultValue={(customer as any).assigned_rm_id || ""}
+                                className="flex h-10 w-full rounded-lg border border-input bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-900 dark:text-white"
+                            >
+                                <option value="">-- Unassigned (Company Default) --</option>
+                                {teamMembers.map((member: any) => (
+                                    <option key={member.id} value={member.id}>
+                                        {member.email} {member.designation ? `(${member.designation})` : ''}
+                                    </option>
+                                ))}
+                            </select>
+                            <p className="text-[11px] text-muted-foreground">
+                                Assign a dedicated RM or Agent to supervise this client's portfolio and communications.
+                            </p>
                         </div>
 
                         <div className="space-y-2">

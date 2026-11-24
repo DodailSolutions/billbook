@@ -28,7 +28,7 @@ export function NewCustomerForm({ organizations = [] }: NewCustomerFormProps) {
                 if (org.gstin && !gstin) {
                     setGstin(org.gstin)
                 }
-                const parts = [org.address, org.city, org.state, org.pincode].filter(Boolean)
+                const parts = [org.billing_address || org.address, org.city, org.state, org.pincode].filter(Boolean)
                 if (parts.length > 0 && !address) {
                     setAddress(parts.join(', '))
                 }

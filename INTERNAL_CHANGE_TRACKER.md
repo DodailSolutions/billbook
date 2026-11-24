@@ -4,6 +4,27 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 
 ---
 
+## [Release v1.7.3 - Implemented] - 2026-11-24
+
+### B2B Relationship Manager & Agent Hierarchy with Scoped RBAC Security (Phase 16)
+
+#### 1. Two-Tier Relationship Roles (`lib/team-types.ts`, `app/api/team/invite/route.ts`, `InviteMemberModal.tsx`)
+- Added **Client Relationship Manager (Senior RM)** and **Relationship Agent (Junior RM)** roles scoped for B2B verticals (`software_it`, `digital_marketing`, `freelancer`).
+- Added permissions mapping in `route.ts` for client portfolio supervision, proposal workflows, and customer management.
+- Pre-seeded in `supabase-rm-hierarchy-migration.sql` for automated database sync.
+
+#### 2. Client Account Assignment & Manager Ownership (`app/(dashboard)/customers/`)
+- Added `assigned_rm_id` and `assigned_rm_name` fields to customer edit views (`customers/[id]/page.tsx`).
+- Connected dropdown selector to active team members with dynamic designation labels.
+- Displayed `RM: <Name>` badge chips in `CustomersList.tsx`.
+
+#### 3. Strict Portal & Route-Level Isolation (`components/Sidebar.tsx`, `components/AdminSidebar.tsx`)
+- **Super Admin Console Switcher**: Added exclusive `Super Admin Console` link in standard sidebar visible strictly to users with `super_admin` / `superadmin` profile roles.
+- **Return to Business ERP**: Added 1-click return switcher inside `AdminSidebar.tsx` to seamlessly navigate back to business operations without blending administrative tools into employee dashboards.
+- Guaranteed that regular staff, RMs, HR, and external clients cannot view or access super admin routes.
+
+---
+
 ## [Release v1.7.2 - Implemented] - 2026-11-24
 
 ### Customer-Organization Linkage & Invoice Builder Quick-Create Workflow (Phase 15)

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { Trash2, Mail, Phone, Pencil, Building2 } from "lucide-react"
+import { Trash2, Mail, Phone, Pencil, Building2, UserCheck } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card"
 import { Button } from "@/components/ui/Button"
 import { deleteCustomer } from "./actions"
@@ -47,6 +47,12 @@ export function CustomersList({ customers }: CustomersListProps) {
                                     {customer.designation && (
                                         <span className="text-gray-500 dark:text-gray-400 font-normal">· {customer.designation}</span>
                                     )}
+                                </div>
+                            )}
+                            {customer.assigned_rm_name && (
+                                <div className="inline-flex items-center gap-1.5 text-xs font-medium text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 px-2 py-0.5 rounded-md border border-purple-100 dark:border-purple-900">
+                                    <UserCheck className="w-3 h-3 text-purple-600" />
+                                    <span>RM: {customer.assigned_rm_name}</span>
                                 </div>
                             )}
                         </div>

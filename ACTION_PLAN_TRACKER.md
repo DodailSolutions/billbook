@@ -24,7 +24,7 @@ This document serves as the master execution tracker for multi-vertical architec
 | **Phase 13** | Super Admin Modular Package Engine, Dynamic Landing Page Sync & Universal Rule Enforcement | Platform-Wide (Super Admin & All Tenants) | **COMPLETED & IMPLEMENTED** |
 | **Phase 14** | Tier-Based Automatic Vertical Bundling, Super Admin Industry Simulator, Contextual Upgrade & Non-GST Onboarding | Platform-Wide (All 16 Verticals & Super Admin) | **COMPLETED & IMPLEMENTED** |
 | **Phase 15** | Customer-Organization Linkage & Invoice Builder Quick-Create Workflow | Core CRM & Invoicing Flow | **COMPLETED & IMPLEMENTED** |
-| **Phase 16** | B2B Relationship Manager & Agent Hierarchy with Scoped RBAC Security | Team Management & B2B Verticals | **PLANNED & SCOPED** |
+| **Phase 16** | B2B Relationship Manager & Agent Hierarchy with Scoped RBAC Security | Team Management & B2B Verticals | **COMPLETED & IMPLEMENTED** |
 | **Phase 17** | Passwordless Client Portal & Enterprise White-Labeling Engine | Client Portal & Enterprise Tier | **PLANNED & SCOPED** |
 
 ---
@@ -188,14 +188,17 @@ This document serves as the master execution tracker for multi-vertical architec
 ### [Phase 16] - B2B Relationship Manager & Agent Hierarchy with Scoped RBAC Security
 *Two-tier client ownership hierarchy for IT, agencies, and B2B services, ensuring strict data isolation.*
 
-- [ ] **Task 16.1: Dedicated B2B Roles in Team Management (`/team`)**
-  - Add **Client Relationship Manager (Senior RM)** and **Relationship Agent (Junior RM)** roles for B2B verticals (Software/IT, Digital Marketing, Freelancers, Consulting).
-  - Relationship Managers can supervise and assign accounts to their subordinate agents.
-- [ ] **Task 16.2: Client Account Assignment & Manager Ownership (`customers`, `organizations`)**
-  - Add `assigned_rm_id` to customer and organization records so managers own their client portfolio.
-  - Filter customer and invoice tables by "My Assigned Clients".
-- [ ] **Task 16.3: Strict Security & Role Boundary Enforcement**
-  - Guarantee that Super Admin routes (`/admin/*`), company bank details, master profit & loss, and owner billing settings are completely inaccessible to employees, managers, and staff.
+- [x] **Task 16.1: Dedicated B2B Roles in Team Management (`/team`)**
+  - Added **Client Relationship Manager (Senior RM)** and **Relationship Agent (Junior RM)** roles for B2B verticals (Software/IT, Digital Marketing, Freelancers, Consulting).
+  - Relationship Managers supervise and assign accounts to their subordinate agents, configure proposals, and monitor deal health.
+- [x] **Task 16.2: Client Account Assignment & Manager Ownership (`customers`, `organizations`)**
+  - Added `assigned_rm_id` and `assigned_rm_name` to customer and organization records so managers own their client portfolio.
+  - Added Assigned RM selector to customer edit forms with team directory auto-lookup.
+  - Displayed assigned RM badge directly on Customer Directory cards.
+- [x] **Task 16.3: Strict Security & Role Boundary Enforcement**
+  - Enforced route-level isolation between `/admin/*` and `/dashboard/*`.
+  - Non-superadmins (employees, RMs, HR) are blocked from accessing Super Admin console or master financials.
+  - Added 1-click Switcher buttons between Super Admin Console and Business ERP strictly for Super Admin profiles.
 
 ---
 

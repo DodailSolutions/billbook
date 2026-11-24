@@ -195,6 +195,24 @@ export function AdminSidebar() {
                     )}
                 </Link>
 
+                {/* Return to Business Workspace */}
+                {!isCollapsed && (
+                    <div className="mb-4">
+                        <Link
+                            href="/dashboard"
+                            className="flex items-center justify-between px-3 py-2 text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors border border-emerald-200 dark:border-emerald-800"
+                        >
+                            <span className="flex items-center gap-1.5">
+                                <ArrowLeft className="w-3.5 h-3.5 text-emerald-600" />
+                                Return to Business ERP
+                            </span>
+                            <span className="text-[10px] font-bold bg-emerald-200/80 dark:bg-emerald-900/80 px-1.5 py-0.5 rounded text-emerald-900 dark:text-emerald-200">
+                                VIP
+                            </span>
+                        </Link>
+                    </div>
+                )}
+
                 {/* Categorized Admin Routes */}
                 <div className="space-y-4">
                     {adminSections.map((section, idx) => (
