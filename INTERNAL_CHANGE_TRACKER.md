@@ -21,6 +21,9 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 - **Universal Feature Gating**: Platform-wide enforcement of active package capabilities across all 16 business verticals via `hasPlanFeature()` and `checkFeatureLimit()`.
 - **Strict Server-Side Quota Barriers**: Upgraded `checkInvoiceLimit()` to dynamically respect super-admin configured monthly invoice quotas (`invoices_per_month`), with unlimited bypass for `-1` and safe fallback defaults.
 
+#### 4. Type Safety Fix in ImprovedInvoiceForm (`app/(dashboard)/invoices/new/ImprovedInvoiceForm.tsx`)
+- **Resolved Vercel Turbopack Compilation Error on Form Reset**: Added missing recurrence configuration state properties (`recurring_frequency`, `recurring_start_date`, `recurring_end_date`, `recurring_never_expires`) to `setFormData()` in the modal reset handler, ensuring 100% type compatibility with `formData` state.
+
 ---
 
 ## [Release v1.6.6 - Hotfix Implemented] - 2026-11-24
