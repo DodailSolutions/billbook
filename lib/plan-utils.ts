@@ -41,6 +41,28 @@ export async function getUserPlanStatus(): Promise<PlanStatus | null> {
             return null
         }
 
+        // Super Admin accounts (including Dodail business operations) automatically receive permanent Enterprise tier
+        const { data: profile } = await supabase
+            .from('user_profiles')
+            .select('role')
+            .eq('id', user.id)
+            .maybeSingle()
+
+        if (profile?.role === 'superadmin') {
+            return {
+                hasActivePlan: true,
+                isExpired: false,
+                planName: 'Enterprise (Super Admin VIP)',
+                planSlug: 'enterprise',
+                expiryDate: '2099-12-31T23:59:59.999Z',
+                daysUntilExpiry: 30000,
+                isLifetime: true,
+                features: ['all', 'unlimited_invoices', 'crm', 'team_members', 'inventory', 'gst_reports', 'pms', 'payroll', 'cctv', 'white_label'],
+                limits: { invoices_per_month: -1, customers: -1, team_members: -1, storage_gb: 1000 },
+                subscription: null
+            }
+        }
+
         // Get user's active subscription
         const { data: subscription, error: subError } = await supabase
             .from('user_subscriptions')
