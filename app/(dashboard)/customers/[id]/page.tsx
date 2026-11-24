@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ArrowLeft, Building2, Users } from "lucide-react"
+import { ArrowLeft, Building2, Users, ExternalLink } from "lucide-react"
 import { notFound } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { Button } from "@/components/ui/Button"
@@ -37,12 +37,20 @@ export default async function EditCustomerPage({
 
     return (
         <div className="space-y-4 max-w-2xl">
-            <Link href="/customers">
-                <Button variant="ghost" className="gap-2">
-                    <ArrowLeft className="h-4 w-4" />
-                    Back to Customers
-                </Button>
-            </Link>
+            <div className="flex items-center justify-between">
+                <Link href="/customers">
+                    <Button variant="ghost" className="gap-2">
+                        <ArrowLeft className="h-4 w-4" />
+                        Back to Customers
+                    </Button>
+                </Link>
+                <Link href={`/portal/${customer.id}`} target="_blank">
+                    <Button variant="outline" className="gap-2 border-blue-200 text-blue-700 hover:bg-blue-50">
+                        <ExternalLink className="h-4 w-4 text-blue-600" />
+                        Open Client Portal
+                    </Button>
+                </Link>
+            </div>
 
             <Card>
                 <CardHeader>

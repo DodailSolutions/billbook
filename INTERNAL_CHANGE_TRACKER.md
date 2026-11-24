@@ -4,6 +4,21 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 
 ---
 
+## [Release v1.7.4 - Implemented] - 2026-11-24
+
+### Passwordless Client Portal & Enterprise White-Labeling Engine (Phase 17)
+
+#### 1. Dedicated Client Portal (`app/(public)/portal/[customerId]/page.tsx`, `actions.ts`)
+- **Passwordless Statement Ledger**: External customers can view their comprehensive financial statements, total billed, completed settlements, and outstanding balance without requiring complicated login flows.
+- **Assigned Relationship Manager Contact Card**: Displays the assigned Relationship Manager's name, designation, and direct 1-click WhatsApp messaging button.
+- **Invoice Documents & 1-Click Pay**: Lists all invoices issued to the client with live status chips, balance calculation, view links, and WhatsApp payment action.
+
+#### 2. Enterprise White-Labeling Engine
+- Automatically checks workspace subscription status: when the workspace owner is on Enterprise tier, BillBooky vendor branding is eliminated in favor of clean corporate branding ("© Year Company Name. All Rights Reserved. • Enterprise B2B Client Portal").
+- Added 1-click Client Portal access buttons in `CustomersList.tsx` and `customers/[id]/page.tsx`.
+
+---
+
 ## [Release v1.7.3 - Implemented] - 2026-11-24
 
 ### B2B Relationship Manager & Agent Hierarchy with Scoped RBAC Security (Phase 16)

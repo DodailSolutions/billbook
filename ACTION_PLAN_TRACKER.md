@@ -25,7 +25,7 @@ This document serves as the master execution tracker for multi-vertical architec
 | **Phase 14** | Tier-Based Automatic Vertical Bundling, Super Admin Industry Simulator, Contextual Upgrade & Non-GST Onboarding | Platform-Wide (All 16 Verticals & Super Admin) | **COMPLETED & IMPLEMENTED** |
 | **Phase 15** | Customer-Organization Linkage & Invoice Builder Quick-Create Workflow | Core CRM & Invoicing Flow | **COMPLETED & IMPLEMENTED** |
 | **Phase 16** | B2B Relationship Manager & Agent Hierarchy with Scoped RBAC Security | Team Management & B2B Verticals | **COMPLETED & IMPLEMENTED** |
-| **Phase 17** | Passwordless Client Portal & Enterprise White-Labeling Engine | Client Portal & Enterprise Tier | **PLANNED & SCOPED** |
+| **Phase 17** | Passwordless Client Portal & Enterprise White-Labeling Engine | Client Portal & Enterprise Tier | **COMPLETED & IMPLEMENTED** |
 
 ---
 
@@ -205,12 +205,13 @@ This document serves as the master execution tracker for multi-vertical architec
 ### [Phase 17] - Passwordless Client Portal & Enterprise White-Labeling Engine
 *Dedicated external client portal with branded magic links and complete Enterprise white-labeling.*
 
-- [ ] **Task 17.1: Dedicated Client Portal Dashboard (`/portal`)**
-  - Passwordless Magic Link / mobile OTP login for clients to view statement ledgers and pay invoices.
-- [ ] **Task 17.2: Dedicated Relationship Manager Card in Client Portal**
-  - Display the assigned Relationship Manager's contact badge with direct 1-click WhatsApp messaging.
-- [ ] **Task 17.3: Enterprise White-Labeling**
-  - Custom domain support (`portal.youragency.com`) and zero BillBook branding for Enterprise accounts.
+- [x] **Task 17.1: Dedicated Client Portal Dashboard (`/portal/[customerId]`)**
+  - Built passwordless magic link portal for external clients to view statement ledgers, download tax invoices, and track settlement balances.
+- [x] **Task 17.2: Dedicated Relationship Manager Card in Client Portal**
+  - Displayed assigned Relationship Manager badge with verified live contact chip and direct 1-click WhatsApp messaging.
+- [x] **Task 17.3: Enterprise White-Labeling**
+  - Replaced vendor branding with tenant corporate identity and custom Enterprise VIP footer badge when owner is on Enterprise tier.
+  - Added 1-click Portal preview buttons from customer edit forms and directory cards.
 
 ---
 

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { Trash2, Mail, Phone, Pencil, Building2, UserCheck } from "lucide-react"
+import { Trash2, Mail, Phone, Pencil, Building2, UserCheck, ExternalLink } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card"
 import { Button } from "@/components/ui/Button"
 import { deleteCustomer } from "./actions"
@@ -57,6 +57,15 @@ export function CustomersList({ customers }: CustomersListProps) {
                             )}
                         </div>
                         <div className="flex gap-1 shrink-0">
+                            <Link href={`/portal/${customer.id}`} target="_blank" title="Open Client Portal">
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8 hover:bg-indigo-50 dark:hover:bg-indigo-950 hover:text-indigo-600 transition-colors"
+                                >
+                                    <ExternalLink className="h-4 w-4" />
+                                </Button>
+                            </Link>
                             <Link href={`/customers/${customer.id}`}>
                                 <Button
                                     variant="ghost"
