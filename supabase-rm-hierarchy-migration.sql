@@ -23,13 +23,13 @@ VALUES
         'Client Relationship Manager',
         'client_relationship_manager',
         'Senior RM supervising B2B client portfolios, assigning accounts to agents, and managing customer proposals.',
-        ARRAY['customers.*', 'organizations.*', 'invoices.*', 'proposals.*', 'team.agents.view']
+        '["customers.*", "organizations.*", "invoices.*", "proposals.*", "team.agents.view"]'::jsonb
     ),
     (
         'Relationship Agent',
         'relationship_agent',
         'Junior RM managing day-to-day assigned accounts, follow-ups, and portfolio communication.',
-        ARRAY['customers.assigned', 'organizations.assigned', 'invoices.create', 'invoices.view_assigned']
+        '["customers.assigned", "organizations.assigned", "invoices.create", "invoices.view_assigned"]'::jsonb
     )
 ON CONFLICT (slug) DO UPDATE
 SET 
