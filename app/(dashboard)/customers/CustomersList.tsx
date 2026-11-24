@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { Trash2, Mail, Phone, Pencil } from "lucide-react"
+import { Trash2, Mail, Phone, Pencil, Building2 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card"
 import { Button } from "@/components/ui/Button"
 import { deleteCustomer } from "./actions"
@@ -36,9 +36,20 @@ export function CustomersList({ customers }: CustomersListProps) {
             {customers.map((customer) => (
                 <Card key={customer.id} className="hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] border-l-4 border-l-blue-500">
                     <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
-                        <CardTitle className="text-base md:text-lg font-semibold bg-linear-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-400 bg-clip-text text-transparent line-clamp-2">
-                            {customer.name}
-                        </CardTitle>
+                        <div className="space-y-1">
+                            <CardTitle className="text-base md:text-lg font-semibold bg-linear-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-400 bg-clip-text text-transparent line-clamp-2">
+                                {customer.name}
+                            </CardTitle>
+                            {customer.organization_name && (
+                                <div className="inline-flex items-center gap-1.5 text-xs font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-md border border-blue-100 dark:border-blue-900">
+                                    <Building2 className="w-3 h-3 text-blue-600" />
+                                    <span>{customer.organization_name}</span>
+                                    {customer.designation && (
+                                        <span className="text-gray-500 dark:text-gray-400 font-normal">· {customer.designation}</span>
+                                    )}
+                                </div>
+                            )}
+                        </div>
                         <div className="flex gap-1 shrink-0">
                             <Link href={`/customers/${customer.id}`}>
                                 <Button

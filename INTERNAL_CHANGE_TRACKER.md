@@ -4,6 +4,22 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 
 ---
 
+## [Release v1.7.2 - Implemented] - 2026-11-24
+
+### Customer-Organization Linkage & Invoice Builder Quick-Create Workflow (Phase 15)
+
+#### 1. Customer Edit & Creation Form Organization Selector (`app/(dashboard)/customers/`)
+- **Linked Organization Selector**: Added an Organization dropdown selector to `customers/[id]/page.tsx` and `customers/new/NewCustomerForm.tsx`, allowing users to link new and existing customer records to companies.
+- **Designation / Role Input**: Added designation input field (e.g. Accounts Manager, Director, Billing Contact).
+- **Auto-Inheritance of Corporate Tax & Address**: Selecting an organization automatically populates corporate GSTIN and billing address if not already filled.
+- **Server Action Updates (`actions.ts`)**: Updated `createCustomerAction`, `createCustomer`, and `updateCustomer` to handle `organization_id`, `organization_name`, and `designation`, including auto-resolving company name from database when only `organization_id` is supplied.
+- **Customer Directory Pill Badges (`CustomersList.tsx`)**: Displayed company name and designation badge chips directly in the Customer Directory cards.
+
+#### 2. Invoice Builder Quick-Add Auto-Fill (`app/(dashboard)/invoices/new/ImprovedInvoiceForm.tsx`)
+- In the Quick-Add Customer modal within the invoice builder, selecting an existing organization automatically auto-fills corporate GSTIN and registered address into the modal fields.
+
+---
+
 ## [Release v1.7.1 - Implemented] - 2026-11-24
 
 ### Tier-Based Automatic Vertical Bundling, Super Admin Industry Simulator, Contextual Upgrade & Non-GST Onboarding

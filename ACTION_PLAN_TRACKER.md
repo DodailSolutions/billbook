@@ -23,6 +23,9 @@ This document serves as the master execution tracker for multi-vertical architec
 | **Phase 12** | Recursive Expenses, Period Breakdowns, Smooth Recurring Invoices & Integrations Hub | All Verticals | **COMPLETED & IMPLEMENTED** |
 | **Phase 13** | Super Admin Modular Package Engine, Dynamic Landing Page Sync & Universal Rule Enforcement | Platform-Wide (Super Admin & All Tenants) | **COMPLETED & IMPLEMENTED** |
 | **Phase 14** | Tier-Based Automatic Vertical Bundling, Super Admin Industry Simulator, Contextual Upgrade & Non-GST Onboarding | Platform-Wide (All 16 Verticals & Super Admin) | **COMPLETED & IMPLEMENTED** |
+| **Phase 15** | Customer-Organization Linkage & Invoice Builder Quick-Create Workflow | Core CRM & Invoicing Flow | **COMPLETED & IMPLEMENTED** |
+| **Phase 16** | B2B Relationship Manager & Agent Hierarchy with Scoped RBAC Security | Team Management & B2B Verticals | **PLANNED & SCOPED** |
+| **Phase 17** | Passwordless Client Portal & Enterprise White-Labeling Engine | Client Portal & Enterprise Tier | **PLANNED & SCOPED** |
 
 ---
 
@@ -164,6 +167,47 @@ This document serves as the master execution tracker for multi-vertical architec
 - [x] **Task 14.4: 60-Second Onboarding Wizard with Non-GST Business Support (`components/SetupWizard.tsx`)**
   - Support unregistered / non-GST businesses with dedicated toggle: manual legal name, state, and address with compliant B2C tax handling.
   - Informative guidance reassuring non-GST businesses of compliant invoicing.
+
+---
+
+### [Phase 15] - Customer-Organization Linkage & Invoice Builder Quick-Create Workflow
+*Enables seamless linking of new and existing customers to organizations, with auto-inheritance of corporate GSTIN and billing addresses.*
+
+- [x] **Task 15.1: Customer Edit & Creation Form Organization Selector (`NewCustomerForm.tsx`, `customers/[id]`)**
+  - Added an **Organization** dropdown selector in the Customer Edit view and New Customer form.
+  - Enabled linking existing customers to any organization, or reassigning them in 1 click.
+  - Displayed the linked organization name as a blue pill badge with designation in the Customer Directory table (`/customers`).
+- [x] **Task 15.2: Invoice Builder Quick-Add Customer Organization Picker (`ImprovedInvoiceForm.tsx`)**
+  - In the "+ Add Customer" modal inside the invoice generator, added an **Organization** picker with Select, + New, and None modes.
+  - Automatically links the newly created contact to the selected or created organization without leaving the invoice creation flow.
+- [x] **Task 15.3: Auto-Inheritance of Company Tax & Address Details**
+  - Selecting an organization in the customer creation form or invoice quick-add modal automatically auto-populates the organization's GSTIN and corporate billing address onto the client record.
+
+---
+
+### [Phase 16] - B2B Relationship Manager & Agent Hierarchy with Scoped RBAC Security
+*Two-tier client ownership hierarchy for IT, agencies, and B2B services, ensuring strict data isolation.*
+
+- [ ] **Task 16.1: Dedicated B2B Roles in Team Management (`/team`)**
+  - Add **Client Relationship Manager (Senior RM)** and **Relationship Agent (Junior RM)** roles for B2B verticals (Software/IT, Digital Marketing, Freelancers, Consulting).
+  - Relationship Managers can supervise and assign accounts to their subordinate agents.
+- [ ] **Task 16.2: Client Account Assignment & Manager Ownership (`customers`, `organizations`)**
+  - Add `assigned_rm_id` to customer and organization records so managers own their client portfolio.
+  - Filter customer and invoice tables by "My Assigned Clients".
+- [ ] **Task 16.3: Strict Security & Role Boundary Enforcement**
+  - Guarantee that Super Admin routes (`/admin/*`), company bank details, master profit & loss, and owner billing settings are completely inaccessible to employees, managers, and staff.
+
+---
+
+### [Phase 17] - Passwordless Client Portal & Enterprise White-Labeling Engine
+*Dedicated external client portal with branded magic links and complete Enterprise white-labeling.*
+
+- [ ] **Task 17.1: Dedicated Client Portal Dashboard (`/portal`)**
+  - Passwordless Magic Link / mobile OTP login for clients to view statement ledgers and pay invoices.
+- [ ] **Task 17.2: Dedicated Relationship Manager Card in Client Portal**
+  - Display the assigned Relationship Manager's contact badge with direct 1-click WhatsApp messaging.
+- [ ] **Task 17.3: Enterprise White-Labeling**
+  - Custom domain support (`portal.youragency.com`) and zero BillBook branding for Enterprise accounts.
 
 ---
 

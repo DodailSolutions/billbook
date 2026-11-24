@@ -1844,7 +1844,26 @@ export function ImprovedInvoiceForm({
                 {modalOrgMode === 'existing' && (
                   <select
                     value={modalSelectedOrgId}
-                    onChange={(e) => setModalSelectedOrgId(e.target.value)}
+                    onChange={(e) => {
+                      const orgId = e.target.value
+                      setModalSelectedOrgId(orgId)
+                      if (orgId) {
+                        const org = organizations.find(o => o.id === orgId)
+                        if (org) {
+                          const gstinInput = document.getElementById('cust-gstin') as HTMLInputElement | null
+                          const addressInput = document.getElementById('cust-address') as HTMLTextAreaElement | null
+                          if (gstinInput && org.gstin && !gstinInput.value) {
+                            gstinInput.value = org.gstin
+                          }
+                          if (addressInput && !addressInput.value) {
+                            const parts = [org.address, org.city, org.state, org.pincode].filter(Boolean)
+                            if (parts.length > 0) {
+                              addressInput.value = parts.join(', ')
+                            }
+                          }
+                        }
+                      }
+                    }}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-900 bg-white"
                   >
                     <option value="">-- Choose an Organization --</option>

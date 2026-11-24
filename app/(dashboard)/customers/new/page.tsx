@@ -3,8 +3,11 @@ import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/Button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card"
 import { NewCustomerForm } from "./NewCustomerForm"
+import { getOrganizations } from "../../organizations/actions"
 
-export default function NewCustomerPage() {
+export default async function NewCustomerPage() {
+    const organizations = await getOrganizations().catch(() => [])
+
     return (
         <div className="space-y-4 max-w-2xl">
             <Link href="/customers">
@@ -19,7 +22,7 @@ export default function NewCustomerPage() {
                     <CardTitle>Add New Customer</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <NewCustomerForm />
+                    <NewCustomerForm organizations={organizations} />
                 </CardContent>
             </Card>
         </div>

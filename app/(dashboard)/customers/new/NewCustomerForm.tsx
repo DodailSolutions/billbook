@@ -6,12 +6,35 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { createCustomerAction } from '../actions'
-import { Loader2, AlertCircle, CheckCircle2 } from 'lucide-react'
+import { Loader2, AlertCircle, Building2, Briefcase } from 'lucide-react'
 
-export function NewCustomerForm() {
+interface NewCustomerFormProps {
+    organizations?: any[]
+}
+
+export function NewCustomerForm({ organizations = [] }: NewCustomerFormProps) {
     const router = useRouter()
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const [selectedOrgId, setSelectedOrgId] = useState('')
+    const [gstin, setGstin] = useState('')
+    const [address, setAddress] = useState('')
+
+    const handleOrgChange = (orgId: string) => {
+        setSelectedOrgId(orgId)
+        if (orgId) {
+            const org = organizations.find((o: any) => o.id === orgId)
+            if (org) {
+                if (org.gstin && !gstin) {
+                    setGstin(org.gstin)
+                }
+                const parts = [org.address, org.city, org.state, org.pincode].filter(Boolean)
+                if (parts.length > 0 && !address) {
+                    setAddress(parts.join(', '))
+                }
+            }
+        }
+    }
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -44,11 +67,51 @@ export function NewCustomerForm() {
                 </div>
             )}
 
+            {/* Organization / Company Selector */}
+            <div className="space-y-2 p-3 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800">
+                <label htmlFor="organization_id" className="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                    <Building2 className="w-3.5 h-3.5 text-blue-600" />
+                    Linked Organization / Company
+                </label>
+                <select
+                    id="organization_id"
+                    name="organization_id"
+                    value={selectedOrgId}
+                    onChange={(e) => handleOrgChange(e.target.value)}
+                    disabled={loading}
+                    className="flex h-10 w-full rounded-lg border border-input bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-900 dark:text-white"
+                >
+                    <option value="">-- No Organization (Individual B2C) --</option>
+                    {organizations.map((org: any) => (
+                        <option key={org.id} value={org.id}>
+                            {org.name} {org.city ? `(${org.city})` : ''}
+                        </option>
+                    ))}
+                </select>
+                <p className="text-[11px] text-muted-foreground">
+                    Link this customer to a company to inherit corporate GSTIN and invoice billing details.
+                </p>
+            </div>
+
             <div className="space-y-2">
                 <label htmlFor="name" className="text-sm font-medium">
                     Name <span className="text-destructive">*</span>
                 </label>
-                <Input id="name" name="name" placeholder="Customer or Company Name" required disabled={loading} />
+                <Input id="name" name="name" placeholder="Customer or Contact Name" required disabled={loading} />
+            </div>
+
+            {/* Designation / Role */}
+            <div className="space-y-2">
+                <label htmlFor="designation" className="text-sm font-medium flex items-center gap-1.5">
+                    <Briefcase className="w-3.5 h-3.5 text-muted-foreground" />
+                    Designation / Role
+                </label>
+                <Input
+                    id="designation"
+                    name="designation"
+                    placeholder="e.g. Accounts Manager, Director, Billing Contact"
+                    disabled={loading}
+                />
             </div>
 
             <div className="space-y-2">
@@ -72,6 +135,8 @@ export function NewCustomerForm() {
                 <Input
                     id="gstin"
                     name="gstin"
+                    value={gstin}
+                    onChange={(e) => setGstin(e.target.value.toUpperCase())}
                     placeholder="22AAAAA0000A1Z5"
                     maxLength={15}
                     className="uppercase font-mono"
@@ -88,6 +153,8 @@ export function NewCustomerForm() {
                     id="address"
                     name="address"
                     rows={3}
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
                     placeholder="Billing street address, city, state, pincode"
                     disabled={loading}
                     className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
@@ -98,7 +165,7 @@ export function NewCustomerForm() {
                 <Button type="submit" disabled={loading} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white">
                     {loading ? (
                         <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                             Creating Customer...
                         </>
                     ) : (
@@ -106,7 +173,7 @@ export function NewCustomerForm() {
                     )}
                 </Button>
                 <Link href="/customers" className="flex-1">
-                    <Button type="button" variant="outline" disabled={loading} className="w-full">
+                    <Button variant="outline" type="button" className="w-full" disabled={loading}>
                         Cancel
                     </Button>
                 </Link>

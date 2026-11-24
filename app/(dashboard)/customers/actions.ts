@@ -70,8 +70,17 @@ export async function createCustomerAction(formData: FormData): Promise<{ succes
         }
 
         const orgId = (formData.get('organization_id') as string)?.trim() || null
-        const orgName = (formData.get('organization_name') as string)?.trim() || null
+        let orgName = (formData.get('organization_name') as string)?.trim() || null
         const designation = (formData.get('designation') as string)?.trim() || null
+
+        if (orgId && !orgName) {
+            const { data: org } = await supabase
+                .from('organizations')
+                .select('name')
+                .eq('id', orgId)
+                .maybeSingle()
+            if (org) orgName = org.name
+        }
 
         const customerData = {
             user_id: user.id,
@@ -112,6 +121,19 @@ export async function createCustomer(formData: FormData) {
         return redirect('/login')
     }
 
+    const orgId = (formData.get('organization_id') as string)?.trim() || null
+    let orgName = (formData.get('organization_name') as string)?.trim() || null
+    const designation = (formData.get('designation') as string)?.trim() || null
+
+    if (orgId && !orgName) {
+        const { data: org } = await supabase
+            .from('organizations')
+            .select('name')
+            .eq('id', orgId)
+            .maybeSingle()
+        if (org) orgName = org.name
+    }
+
     const customerData = {
         user_id: user.id,
         name: formData.get('name') as string,
@@ -119,6 +141,9 @@ export async function createCustomer(formData: FormData) {
         phone: formData.get('phone') as string || null,
         address: formData.get('address') as string || null,
         gstin: formData.get('gstin') as string || null,
+        organization_id: orgId,
+        organization_name: orgName,
+        designation: designation,
     }
 
     const { error } = await supabase
@@ -142,12 +167,29 @@ export async function updateCustomer(id: string, formData: FormData) {
         return redirect('/login')
     }
 
+    const orgId = (formData.get('organization_id') as string)?.trim() || null
+    let orgName = (formData.get('organization_name') as string)?.trim() || null
+
+    if (orgId && !orgName) {
+        const { data: org } = await supabase
+            .from('organizations')
+            .select('name')
+            .eq('id', orgId)
+            .maybeSingle()
+        if (org) orgName = org.name
+    }
+
+    const designation = (formData.get('designation') as string)?.trim() || null
+
     const customerData = {
         name: formData.get('name') as string,
         email: formData.get('email') as string || null,
         phone: formData.get('phone') as string || null,
         address: formData.get('address') as string || null,
         gstin: formData.get('gstin') as string || null,
+        organization_id: orgId,
+        organization_name: orgName,
+        designation: designation,
     }
 
     const { error } = await supabase
