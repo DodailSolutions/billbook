@@ -78,7 +78,7 @@ export async function updateBusinessProfile(
             .eq('id', user.id)
             .maybeSingle()
 
-        const isSuperAdmin = userProfile?.role === 'superadmin' || userProfile?.role === 'admin'
+        const isSuperAdmin = userProfile?.role === 'superadmin' || userProfile?.role === 'super_admin' || userProfile?.role === 'admin'
         if (!isSuperAdmin) {
             return { 
                 success: false, 

@@ -65,22 +65,24 @@ export default function AttendancePage() {
         setLoading(true)
         try {
             const [empData, attData] = await Promise.all([
-                getEmployees(),
-                getMonthlyAttendance(month, year)
+                getEmployees().catch(() => []),
+                getMonthlyAttendance(month, year).catch(() => [])
             ])
             
-            const activeEmp = empData.filter(e => e.status === 'active')
+            const activeEmp = Array.isArray(empData) ? empData.filter(e => e?.status === 'active') : []
             setEmployees(activeEmp)
             
             const map: Record<string, Record<number, string>> = {}
             activeEmp.forEach(e => { map[e.id] = {} })
             
-            attData.forEach(r => {
-                const date = new Date(r.attendance_date).getDate()
-                if (map[r.employee_id]) {
-                    map[r.employee_id][date] = r.status
-                }
-            })
+            if (Array.isArray(attData)) {
+                attData.forEach(r => {
+                    const date = new Date(r.attendance_date).getDate()
+                    if (map[r.employee_id]) {
+                        map[r.employee_id][date] = r.status
+                    }
+                })
+            }
             
             setAttendanceMap(map)
             // Clone initial state to detect unsaved changes

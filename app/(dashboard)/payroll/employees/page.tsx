@@ -228,7 +228,16 @@ export default function EmployeeDirectoryPage() {
         return matchesSearch && matchesStatus && matchesDept
     })
 
-    const departments = Array.from(new Set(employees.map(e => e.department).filter(Boolean))) as string[]
+    const defaultDepts = [
+        'Engineering & IT',
+        'Sales & Client Relations',
+        'Accounts & Finance',
+        'Human Resources',
+        'Operations',
+        'Marketing & Creative',
+        'Customer Support'
+    ]
+    const departments = Array.from(new Set([...defaultDepts, ...(employees.map(e => e.department).filter(Boolean) as string[])]))
 
     const grossPreview = (Number(basic) || 0) + (Number(hra) || 0) + (Number(conveyance) || 0) + (Number(special) || 0) + (Number(medical) || 0) + (Number(travel) || 0)
     const deductionsPreview = (Number(pf) || 0) + (Number(esi) || 0) + (Number(tds) || 0)
@@ -445,13 +454,23 @@ export default function EmployeeDirectoryPage() {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block font-semibold text-gray-600 mb-1">Department</label>
+                                        <div className="flex items-center justify-between mb-1">
+                                            <label className="block font-semibold text-gray-600">Department</label>
+                                            <span className="text-[10px] text-blue-600 font-medium">Select or type new</span>
+                                        </div>
                                         <input
                                             type="text"
+                                            list="department-suggestions"
+                                            placeholder="e.g. Sales & Client Relations"
                                             value={department}
                                             onChange={(e) => setDepartment(e.target.value)}
-                                            className="w-full p-2 border border-gray-200 rounded-lg"
+                                            className="w-full p-2 border border-gray-200 rounded-lg bg-white"
                                         />
+                                        <datalist id="department-suggestions">
+                                            {departments.map(d => (
+                                                <option key={d} value={d} />
+                                            ))}
+                                        </datalist>
                                     </div>
                                 </div>
                             </div>

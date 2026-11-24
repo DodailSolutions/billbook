@@ -4,6 +4,21 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 
 ---
 
+## [Release v1.7.5 - Implemented] - 2026-11-24
+
+### Unified Workforce Architecture, Dynamic Department Creator & Save Reliability (Phase 18)
+
+#### 1. Business Profile Save Fix (`lib/business-profile-actions.ts`)
+- Fixed role check in `updateBusinessProfile` to include `super_admin` alongside `superadmin` and `admin`, preventing `"Business vertical is permanently locked"` error when saving business settings.
+
+#### 2. Attendance Page Crash Resolution (`app/(dashboard)/payroll/attendance/page.tsx`)
+- Guarded `empData` and `attData` against null/undefined returns with `Array.isArray()` and catch fallbacks, eliminating client-side crashes on network timeouts.
+
+#### 3. Dynamic Department Creator & Datalist (`app/(dashboard)/payroll/employees/page.tsx`)
+- Integrated interactive department datalist with standard presets and inline custom creation, enabling users to create and assign new company departments seamlessly during employee onboarding.
+
+---
+
 ## [Release v1.7.4 - Implemented] - 2026-11-24
 
 ### Passwordless Client Portal & Enterprise White-Labeling Engine (Phase 17)
