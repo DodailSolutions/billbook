@@ -227,3 +227,7 @@ This document serves as the master execution tracker for multi-vertical architec
   - Added interactive Department selector with suggestions datalist (*Engineering, Sales & Client Relations, Accounts, HR, Operations*) and instant custom department typing.
 - [x] **Task 18.4: Unified Workforce Architecture Documentation**
   - Formulated full architectural map unifying Employee payroll records with Team Member login roles (Admin, HR, Manager, Client RM, Staff).
+- [x] **Task 18.5: Bi-Directional Employee-Team Member Sync & Role Assignment**
+  - Integrated Employment Type selector (*Full-Time, Part-Time, Contract, Intern*) into Employee Onboarding.
+  - Added Operational Team Role selector (*General Employee, Operations Manager, HR Executive, Client Relationship Manager, Relationship Agent, Administrator*) when enabling login access.
+  - Automated bi-directional synchronization in `createEmployee` (`lib/payroll-actions.ts`) to automatically register auth credentials, assign `user_profiles.role`, and establish membership in `team_members` with designated role ID and designation.

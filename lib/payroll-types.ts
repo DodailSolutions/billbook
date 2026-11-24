@@ -106,6 +106,8 @@ export interface CreateEmployeeInput {
     status?: 'active' | 'inactive' | 'terminated'
     allow_login?: boolean
     password?: string
+    role?: 'employee' | 'manager' | 'hr' | 'client_relationship_manager' | 'relationship_agent' | 'admin'
+    employment_type?: 'full_time' | 'part_time' | 'contract' | 'intern'
     salary_structure?: {
         basic_salary: number
         hra: number
@@ -137,6 +139,8 @@ export interface UpdateEmployeeInput {
     status?: 'active' | 'inactive' | 'terminated'
     allow_login?: boolean
     password?: string
+    role?: 'employee' | 'manager' | 'hr' | 'client_relationship_manager' | 'relationship_agent' | 'admin'
+    employment_type?: 'full_time' | 'part_time' | 'contract' | 'intern'
     salary_structure?: {
         basic_salary: number
         hra: number

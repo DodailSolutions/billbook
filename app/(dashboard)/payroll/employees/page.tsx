@@ -43,9 +43,11 @@ export default function EmployeeDirectoryPage() {
     const [bankBranch, setBankBranch] = useState('')
     const [status, setStatus] = useState<'active' | 'inactive' | 'terminated'>('active')
 
-    // Login credentials
+    // Login credentials & Role Sync
     const [allowLogin, setAllowLogin] = useState(false)
     const [password, setPassword] = useState('')
+    const [role, setRole] = useState<'employee' | 'client_relationship_manager' | 'relationship_agent' | 'manager' | 'hr' | 'admin'>('employee')
+    const [employmentType, setEmploymentType] = useState<'full_time' | 'part_time' | 'contract' | 'intern'>('full_time')
 
     // Salary fields
     const [basic, setBasic] = useState('')
@@ -102,6 +104,8 @@ export default function EmployeeDirectoryPage() {
         setStatus('active')
         setAllowLogin(false)
         setPassword('')
+        setRole('employee')
+        setEmploymentType('full_time')
         setBasic('')
         setHra('')
         setConveyance('')
@@ -133,6 +137,8 @@ export default function EmployeeDirectoryPage() {
         setStatus(emp.status as any)
         setAllowLogin(!!emp.employee_user_id)
         setPassword('')
+        setRole('employee')
+        setEmploymentType('full_time')
 
         const sal = emp.salary_structure
         if (sal) {
@@ -198,7 +204,9 @@ export default function EmployeeDirectoryPage() {
             bank_branch: bankBranch || undefined,
             salary_structure: salData,
             allow_login: allowLogin,
-            password: allowLogin ? password : undefined
+            password: allowLogin ? password : undefined,
+            role: allowLogin ? role : undefined,
+            employment_type: employmentType
         }
 
         let res;
@@ -472,10 +480,23 @@ export default function EmployeeDirectoryPage() {
                                             ))}
                                         </datalist>
                                     </div>
+                                    <div>
+                                        <label className="block font-semibold text-gray-600 mb-1">Employment Type</label>
+                                        <select
+                                            value={employmentType}
+                                            onChange={(e) => setEmploymentType(e.target.value as any)}
+                                            className="w-full p-2 border border-gray-200 rounded-lg bg-white"
+                                        >
+                                            <option value="full_time">Full-Time (Regular)</option>
+                                            <option value="part_time">Part-Time</option>
+                                            <option value="contract">Contract / Retainer</option>
+                                            <option value="intern">Internship</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
 
-                            {/* Login Credentials */}
+                            {/* Login Credentials & Team Role Sync */}
                             <div className="border-t border-gray-200 pt-4">
                                 <div className="flex items-center gap-2 mb-2">
                                     <input 
@@ -486,14 +507,34 @@ export default function EmployeeDirectoryPage() {
                                         disabled={!!editMode && !!employees.find(e => e.id === editMode)?.employee_user_id}
                                         className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4" 
                                     />
-                                    <label htmlFor="allowLogin" className="text-xs font-bold text-gray-750 uppercase tracking-wider cursor-pointer select-none">
-                                        Enable Employee Login Dashboard
-                                    </label>
+                                    <div>
+                                        <label htmlFor="allowLogin" className="text-xs font-bold text-gray-750 uppercase tracking-wider cursor-pointer select-none">
+                                            Enable Employee Login & Sync as Team Member
+                                        </label>
+                                        <p className="text-[10px] text-gray-500">
+                                            Grants dashboard login credentials and registers them in the organization team directory.
+                                        </p>
+                                    </div>
                                 </div>
                                 {allowLogin && (
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs mt-3 bg-blue-50/40 p-3 rounded-xl border border-blue-100">
+                                        <div className="sm:col-span-2">
+                                            <label className="block font-semibold text-gray-700 mb-1">Operational Team Role *</label>
+                                            <select
+                                                value={role}
+                                                onChange={(e) => setRole(e.target.value as any)}
+                                                className="w-full p-2 border border-gray-200 rounded-lg bg-white font-medium text-gray-800"
+                                            >
+                                                <option value="employee">General Employee (Self-Service Attendance & Payslips)</option>
+                                                <option value="client_relationship_manager">Client Relationship Manager (B2B Accounts & Assigned Customers)</option>
+                                                <option value="relationship_agent">Relationship Agent (Field Rep / Support Agent)</option>
+                                                <option value="manager">Operations Manager (Daily Operations & Approvals)</option>
+                                                <option value="hr">HR Executive (Workforce, Leaves & Employee Directory)</option>
+                                                <option value="admin">Administrator (Full Operations & Staff Oversight)</option>
+                                            </select>
+                                        </div>
                                         <div>
-                                            <label className="block font-semibold text-gray-600 mb-1">Email * (Username)</label>
+                                            <label className="block font-semibold text-gray-600 mb-1">Login Email * (Username)</label>
                                             <input 
                                                 type="email" 
                                                 required={allowLogin}
@@ -501,7 +542,7 @@ export default function EmployeeDirectoryPage() {
                                                 value={email} 
                                                 onChange={(e) => setEmail(e.target.value)} 
                                                 disabled={!!editMode && !!employees.find(e => e.id === editMode)?.employee_user_id}
-                                                className="w-full p-2 border border-gray-200 rounded-lg" 
+                                                className="w-full p-2 border border-gray-200 rounded-lg bg-white" 
                                             />
                                         </div>
                                         {(!editMode || !employees.find(e => e.id === editMode)?.employee_user_id) && (
@@ -513,7 +554,7 @@ export default function EmployeeDirectoryPage() {
                                                     placeholder="Minimum 6 characters" 
                                                     value={password} 
                                                     onChange={(e) => setPassword(e.target.value)} 
-                                                    className="w-full p-2 border border-gray-200 rounded-lg" 
+                                                    className="w-full p-2 border border-gray-200 rounded-lg bg-white" 
                                                 />
                                             </div>
                                         )}

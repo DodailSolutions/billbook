@@ -101,13 +101,37 @@ export async function createEmployee(input: CreateEmployeeInput): Promise<{ succ
             }
             
             employeeUserId = authData.user.id
+            const roleSlug = input.role || 'employee'
             
             // Insert profile into user_profiles
             await adminSupabase.from('user_profiles').insert({
                 id: employeeUserId,
-                role: 'employee',
+                role: roleSlug,
                 status: 'active'
             })
+
+            // Bi-directional sync: register in team_members so they automatically exist in /team
+            try {
+                const { data: roleRow } = await adminSupabase
+                    .from('team_roles')
+                    .select('id')
+                    .eq('slug', roleSlug)
+                    .maybeSingle()
+
+                if (roleRow?.id) {
+                    await adminSupabase.from('team_members').upsert({
+                        owner_id: user.id,
+                        user_id: employeeUserId,
+                        email: input.email.toLowerCase(),
+                        role_id: roleRow.id,
+                        designation: input.designation || null,
+                        status: 'active',
+                        joined_at: new Date().toISOString()
+                    }, { onConflict: 'owner_id,email' })
+                }
+            } catch (tmErr) {
+                console.warn('[createEmployee] team_members sync non-fatal:', tmErr)
+            }
         } catch (e: any) {
             console.error("Admin client creation failed:", e)
             return { success: false, error: 'Failed to initialize admin auth client. Please ensure SUPABASE_SERVICE_ROLE_KEY is set.' }
