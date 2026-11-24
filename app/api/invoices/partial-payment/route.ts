@@ -27,7 +27,7 @@ export async function POST(request: Request) {
         // Get the invoice to verify ownership and check amounts
         const { data: invoice, error: invoiceError } = await supabase
             .from('invoices')
-            .select('id, user_id, total, amount_paid, amount_remaining')
+            .select('id, user_id, total, status, amount_paid, amount_remaining')
             .eq('id', invoiceId)
             .eq('user_id', user.id)
             .single()
@@ -36,9 +36,22 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Invoice not found' }, { status: 404 })
         }
 
-        // Check if payment amount exceeds remaining amount
-        const currentRemaining = invoice.amount_remaining ?? (invoice.total - (invoice.amount_paid ?? 0))
-        if (amount > currentRemaining) {
+        const invTotal = Number(invoice.total || 0)
+        const invPaid = Number(invoice.amount_paid || 0)
+        const storedRemaining = Number(invoice.amount_remaining)
+
+        // Calculate true remaining balance, resolving 0 default legacy DB issues
+        const currentRemaining = invoice.status === 'paid'
+            ? 0
+            : ((storedRemaining > 0 && storedRemaining <= invTotal)
+                ? storedRemaining
+                : Math.max(0, invTotal - invPaid))
+
+        if (currentRemaining <= 0) {
+            return NextResponse.json({ error: 'This invoice is already fully settled.' }, { status: 400 })
+        }
+
+        if (amount > currentRemaining + 0.01) {
             return NextResponse.json({ 
                 error: `Payment amount ₹${amount.toFixed(2)} exceeds remaining balance of ₹${currentRemaining.toFixed(2)}` 
             }, { status: 400 })

@@ -20,6 +20,11 @@ export function PartialPaymentButton({
     amountPaid,
     amountRemaining 
 }: PartialPaymentButtonProps) {
+    const tot = Number(totalAmount || 0)
+    const paid = Number(amountPaid || 0)
+    const storedRem = Number(amountRemaining)
+    const effectiveRemaining = (storedRem > 0 && storedRem <= tot) ? storedRem : Math.max(0, tot - paid)
+
     const router = useRouter()
     const [isOpen, setIsOpen] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
@@ -43,8 +48,8 @@ export function PartialPaymentButton({
             return
         }
 
-        if (amount > amountRemaining) {
-            setError(`Amount cannot exceed remaining balance of ₹${amountRemaining.toFixed(2)}`)
+        if (amount > effectiveRemaining + 0.01) {
+            setError(`Amount cannot exceed remaining balance of ₹${effectiveRemaining.toFixed(2)}`)
             setIsSubmitting(false)
             return
         }
@@ -108,7 +113,7 @@ export function PartialPaymentButton({
                     </div>
                     <div className="flex justify-between text-sm pt-2 border-t border-blue-200 dark:border-blue-800">
                         <span className="text-gray-600 font-medium">Remaining:</span>
-                        <span className="font-bold text-blue-600">₹{amountRemaining.toFixed(2)}</span>
+                        <span className="font-bold text-blue-600">₹{effectiveRemaining.toFixed(2)}</span>
                     </div>
                 </div>
 
@@ -138,7 +143,7 @@ export function PartialPaymentButton({
                                 type="number"
                                 step="0.01"
                                 min="0.01"
-                                max={amountRemaining}
+                                max={effectiveRemaining}
                                 value={paymentAmount}
                                 onChange={(e) => setPaymentAmount(e.target.value)}
                                 placeholder="0.00"
@@ -146,8 +151,37 @@ export function PartialPaymentButton({
                                 className="w-full pl-8 pr-3 py-2 border rounded-md bg-transparent"
                             />
                         </div>
-                        <p className="text-xs text-gray-500 mt-1">
-                            Maximum: ₹{amountRemaining.toFixed(2)}
+                        <div className="flex items-center justify-between mt-1">
+                            <p className="text-xs text-gray-500">
+                                Maximum: ₹{effectiveRemaining.toFixed(2)}
+                            </p>
+                            {effectiveRemaining > 0 && (
+                                <div className="flex gap-1">
+                                    <button
+                                        type="button"
+                                        onClick={() => setPaymentAmount((effectiveRemaining * 0.25).toFixed(2))}
+                                        className="text-[10px] px-1.5 py-0.5 rounded bg-blue-50 text-blue-600 hover:bg-blue-100"
+                                    >
+                                        25%
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setPaymentAmount((effectiveRemaining * 0.5).toFixed(2))}
+                                        className="text-[10px] px-1.5 py-0.5 rounded bg-blue-50 text-blue-600 hover:bg-blue-100"
+                                    >
+                                        50%
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setPaymentAmount(effectiveRemaining.toFixed(2))}
+                                        className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-600 hover:bg-emerald-100 font-semibold"
+                                    >
+                                        Full
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
                         </p>
                     </div>
 

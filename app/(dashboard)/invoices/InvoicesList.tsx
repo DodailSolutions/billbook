@@ -37,9 +37,19 @@ interface QuickPaymentModalProps {
 }
 
 function QuickPaymentModal({ invoice, onClose, onSuccess }: QuickPaymentModalProps) {
-    const amountPaid = invoice.amount_paid ?? 0
-    const amountRemaining = invoice.amount_remaining ?? (invoice.total - amountPaid)
-    const [amount, setAmount] = useState(amountRemaining.toFixed(2))
+    const amountPaid = Number(invoice.amount_paid) || 0
+    const total = Number(invoice.total) || 0
+    const storedRemaining = Number(invoice.amount_remaining)
+    
+    // Robust calculation: If invoice is not marked paid, remaining balance must reflect (total - amountPaid)
+    // even if a legacy DB record had amount_remaining = 0.
+    const amountRemaining = invoice.status === 'paid'
+        ? 0
+        : ((storedRemaining > 0 && storedRemaining <= total)
+            ? storedRemaining
+            : Math.max(0, total - amountPaid))
+
+    const [amount, setAmount] = useState(amountRemaining > 0 ? amountRemaining.toFixed(2) : '')
     const [method, setMethod] = useState('cash')
     const [notes, setNotes] = useState('')
     const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split('T')[0])
@@ -91,12 +101,42 @@ function QuickPaymentModal({ invoice, onClose, onSuccess }: QuickPaymentModalPro
                     </div>
 
                     <div className="space-y-1.5">
-                        <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Amount Received *</label>
+                        <div className="flex items-center justify-between">
+                            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Amount Received *</label>
+                            {amountRemaining > 0 && (
+                                <span className="text-[11px] text-gray-400">Balance: ₹{amountRemaining.toFixed(2)}</span>
+                            )}
+                        </div>
                         <div className="relative">
                             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">₹</span>
                             <input type="number" min="0.01" step="0.01" value={amount} onChange={e => setAmount(e.target.value)} required
                                 className="w-full h-9 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 pl-7 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500" />
                         </div>
+                        {amountRemaining > 0 && (
+                            <div className="flex gap-1.5 pt-1">
+                                <button 
+                                    type="button" 
+                                    onClick={() => setAmount((amountRemaining * 0.25).toFixed(2))}
+                                    className="text-[11px] font-medium px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-300 transition-colors"
+                                >
+                                    25% (₹{(amountRemaining * 0.25).toFixed(0)})
+                                </button>
+                                <button 
+                                    type="button" 
+                                    onClick={() => setAmount((amountRemaining * 0.5).toFixed(2))}
+                                    className="text-[11px] font-medium px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-300 transition-colors"
+                                >
+                                    50% (₹{(amountRemaining * 0.5).toFixed(0)})
+                                </button>
+                                <button 
+                                    type="button" 
+                                    onClick={() => setAmount(amountRemaining.toFixed(2))}
+                                    className="text-[11px] font-medium px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-300 transition-colors"
+                                >
+                                    Full (₹{amountRemaining.toFixed(0)})
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">

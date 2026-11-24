@@ -202,18 +202,27 @@ export async function getInvoices(): Promise<InvoiceWithDetails[]> {
             return []
         }
 
-        // Ensure partial payment fields are present with defaults if not in database
-        const invoicesWithDefaults = (data || []).map(invoice => ({
-            ...invoice,
-            amount_paid: invoice.amount_paid ?? 0,
-            amount_remaining: invoice.amount_remaining ?? invoice.total,
-            is_partial_payment: invoice.is_partial_payment ?? false,
-            recurring_invoices: Array.isArray(invoice.recurring_invoices) 
-                ? invoice.recurring_invoices 
-                : invoice.recurring_invoices 
-                    ? [invoice.recurring_invoices] 
-                    : []
-        }))
+        // Ensure partial payment fields are present with robust defaults
+        const invoicesWithDefaults = (data || []).map(invoice => {
+            const tot = Number(invoice.total || 0)
+            const paid = Number(invoice.amount_paid || 0)
+            const storedRem = Number(invoice.amount_remaining)
+            const remaining = invoice.status === 'paid'
+                ? 0
+                : ((storedRem > 0 && storedRem <= tot) ? storedRem : Math.max(0, tot - paid))
+
+            return {
+                ...invoice,
+                amount_paid: paid,
+                amount_remaining: remaining,
+                is_partial_payment: invoice.is_partial_payment ?? (paid > 0 && paid < tot),
+                recurring_invoices: Array.isArray(invoice.recurring_invoices) 
+                    ? invoice.recurring_invoices 
+                    : invoice.recurring_invoices 
+                        ? [invoice.recurring_invoices] 
+                        : []
+            }
+        })
 
         return invoicesWithDefaults as InvoiceWithDetails[]
     } catch (err) {
@@ -249,12 +258,19 @@ export async function getInvoice(id: string): Promise<InvoiceWithDetails | null>
         return null
     }
 
-    // Ensure partial payment fields are present with defaults if not in database
+    // Ensure partial payment fields are present with robust defaults
+    const tot = Number(data.total || 0)
+    const paid = Number(data.amount_paid || 0)
+    const storedRem = Number(data.amount_remaining)
+    const remaining = data.status === 'paid'
+        ? 0
+        : ((storedRem > 0 && storedRem <= tot) ? storedRem : Math.max(0, tot - paid))
+
     const invoiceData = {
         ...data,
-        amount_paid: data.amount_paid ?? 0,
-        amount_remaining: data.amount_remaining ?? data.total,
-        is_partial_payment: data.is_partial_payment ?? false
+        amount_paid: paid,
+        amount_remaining: remaining,
+        is_partial_payment: data.is_partial_payment ?? (paid > 0 && paid < tot)
     }
 
     return invoiceData as InvoiceWithDetails

@@ -237,3 +237,17 @@ This document serves as the master execution tracker for multi-vertical architec
   - Removed team seat limit checks for Super Admin in `/team` and `/api/team/invite` (allowing unlimited team members and employees).
   - Locked the primary Super Admin workspace vertical to Software Development & IT (`software_it`).
   - Authored SQL migration script `supabase-superadmin-unrestricted-rls.sql` for database-level RLS policy alignment.
+
+---
+
+### [Phase 19] - Partial Payment Engine Fix, Layman-Friendly Quick Actions & Quotation Workflow
+*Fixes the 0-default remaining balance bug, provides 1-click partial payment presets, and aligns the Quotation / Proforma to Tax Invoice pipeline.*
+
+- [x] **Task 19.1: Fix Remaining Balance 0-Default Bug (`InvoicesList.tsx`, `actions.ts`, `partial-payment/route.ts`)**
+  - Resolved `Max ₹0.00` error caused by legacy database column defaults where `amount_remaining` was stored as `0` for unpaid invoices.
+  - Formulated resilient fallback: `amountRemaining = invoice.status === 'paid' ? 0 : ((storedRemaining > 0 && storedRemaining <= total) ? storedRemaining : Math.max(0, total - amountPaid))`.
+- [x] **Task 19.2: Layman-Friendly Quick Payment Presets (`InvoicesList.tsx`, `PartialPaymentButton.tsx`)**
+  - Added 1-click partial payment percentage chips (*25%*, *50%*, *Full Balance*) directly below the amount input so users don't have to calculate sums manually.
+- [x] **Task 19.3: Quotation / Proforma Invoice Workflow Architecture**
+  - Clarified separation: Quotations / Proforma estimates serve as pre-sale preliminary quotes without demanding upfront GST liability.
+  - Leveraged `convertProformaToInvoice()` (`lib/advanced-invoice-actions.ts`) to enable 1-click conversion from accepted quotes into final legal Tax Invoices without disturbing current billing flows.

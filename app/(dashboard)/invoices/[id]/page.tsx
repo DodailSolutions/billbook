@@ -29,12 +29,18 @@ export default async function InvoiceDetailPage({
     }
 
     const isPaid = invoice.status === 'paid'
+    const total = Number(invoice.total || 0)
+    const amountPaid = Number(invoice.amount_paid || 0)
+    const storedRemaining = Number(invoice.amount_remaining)
+    const amountRemaining = isPaid
+        ? 0
+        : ((storedRemaining > 0 && storedRemaining <= total)
+            ? storedRemaining
+            : Math.max(0, total - amountPaid))
+    const hasPartialPayment = (invoice.is_partial_payment ?? false) || (amountPaid > 0 && amountPaid < total)
     const showBankDetailsWhenPaid = invoice.show_bank_details_when_paid !== undefined && invoice.show_bank_details_when_paid !== null
         ? Boolean(invoice.show_bank_details_when_paid)
         : Boolean((invoiceSettings as any)?.show_bank_details_when_paid)
-    const hasPartialPayment = (invoice.is_partial_payment ?? false) || ((invoice.amount_paid ?? 0) > 0 && (invoice.amount_paid ?? 0) < invoice.total)
-    const amountPaid = invoice.amount_paid ?? 0
-    const amountRemaining = invoice.amount_remaining ?? (invoice.total - amountPaid)
 
     const statusConfig = {
         paid: { label: 'Paid', icon: CheckCircle2, bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-700 dark:text-green-300', border: 'border-green-300 dark:border-green-700' },
