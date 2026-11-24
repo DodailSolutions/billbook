@@ -9,6 +9,7 @@ import { getOrganizations } from "../../organizations/actions"
 import { ImprovedInvoiceForm } from "./ImprovedInvoiceForm"
 import { checkInvoiceLimit } from '@/lib/plan-utils'
 import { InstantTrialButton } from '@/components/InstantTrialButton'
+import { getBusinessProfile } from '@/lib/business-profile-actions'
 
 import type { Customer, InventoryItem, Organization, SavedItem } from "@/lib/types"
 
@@ -35,6 +36,7 @@ export default async function NewInvoicePage(props: NewInvoicePageProps) {
     let savedItems: SavedItem[] = []
     let inventoryItems: InventoryItem[] = []
     let limitStatus = { canCreate: true, count: 0, limit: 50 }
+    let businessProfile: any = null
 
     try {
         const timeoutMs = 2500
@@ -44,18 +46,20 @@ export default async function NewInvoicePage(props: NewInvoicePageProps) {
                 new Promise<T>((resolve) => setTimeout(() => resolve(fallback), timeoutMs))
             ])
 
-        const [c, orgs, s, inv, lim] = await Promise.all([
+        const [c, orgs, s, inv, lim, bp] = await Promise.all([
             withTimeout(getCustomers().catch(() => [] as Customer[]), [] as Customer[]),
             withTimeout(getOrganizations().catch(() => [] as Organization[]), [] as Organization[]),
             withTimeout(getSavedItems().catch(() => [] as SavedItem[]), [] as SavedItem[]),
             withTimeout(getInventoryItems().catch(() => [] as InventoryItem[]), [] as InventoryItem[]),
-            withTimeout(checkInvoiceLimit().catch(() => ({ canCreate: true, count: 0, limit: 50 })), { canCreate: true, count: 0, limit: 50 })
+            withTimeout(checkInvoiceLimit().catch(() => ({ canCreate: true, count: 0, limit: 50 })), { canCreate: true, count: 0, limit: 50 }),
+            withTimeout(getBusinessProfile().catch(() => null), null)
         ])
         customers = c || []
         organizations = orgs || []
         savedItems = s || []
         inventoryItems = inv || []
         limitStatus = lim || { canCreate: true, count: 0, limit: 50 }
+        businessProfile = bp
     } catch (err) {
         console.error('Error loading data for NewInvoicePage:', err)
     }
@@ -130,6 +134,7 @@ export default async function NewInvoicePage(props: NewInvoicePageProps) {
                 initialAmount={initialAmount}
                 initialTitle={initialTitle}
                 initialLeadId={initialLeadId}
+                businessProfile={businessProfile}
             />
         </div>
     )

@@ -265,14 +265,19 @@ This document serves as the master execution tracker for multi-vertical architec
 ### [Phase 20] - Event Management & MICE Industry Vertical Suite
 *Specialized workflow, event metadata, milestone-based billing, and CRM team member sync strictly active for event management organizations.*
 
-- [ ] **Task 20.1: Vertical Detection & Industry-Gated Feature Flags**
-  - Configure `business_type === 'event_management'` detection across settings and session contexts so event-specific fields only render when enabled.
+- [x] **Task 20.1: Vertical Detection & Industry-Gated Feature Flags (`lib/business-profile-types.ts`, `lib/business-profile-actions.ts`)**
+  - Resolved vertical flapping between `services` and `event_management` caused by substring matching order in `normalizeBusinessType()`.
+  - Specific industry verticals (such as `event_management` from "Event Management Services") now take strict priority over generic fallback strings like `service` or legal entity titles (`Sole Proprietorship`, `Pvt Ltd`).
+  - Added robust fallback in `getBusinessProfile()` so explicit workspace vertical metadata cannot be unintentionally overwritten by generic profile strings.
 - [x] **Task 20.2: CRM Employee & Team Member Assignee Sync (`lib/crm-actions.ts`)**
   - Enhanced `getCRMTeamMembers()` to query both invited `team_members` and active employees from the `employees` table.
   - Automatically merges organization employees (e.g. Event Managers, Operations Leads) with deduplication by email and user ID.
   - Employees now immediately populate CRM lead assignment dropdowns (`LeadModal.tsx`), Kanban cards (`KanbanBoard.tsx`), and team performance leaderboards (`TeamPerformanceView.tsx`) without requiring redundant manual invites.
-- [ ] **Task 20.3: Event Metadata on Quotes & Invoices**
-  - Support Event Name, Event Dates (Start/End), Venue/Destination, and Pax count in invoices and quotations via JSONB `business_metadata`.
+- [x] **Task 20.3: Event Metadata on Quotes & Invoices (`ImprovedInvoiceForm.tsx`, `app/(dashboard)/invoices/new/page.tsx`)**
+  - Integrated dedicated **Event & Venue Details** card into the invoice creation workflow.
+  - Rendered conditionally so it only displays when `businessType === 'event_management'` or `hasEventMilestones` is active.
+  - Added dedicated fields for **Event / Project Name**, **Venue & City**, **Event Start Date**, **Event End Date**, and **Expected Pax (Guest Count)**.
+  - Automatically compiles structured event details into invoice notes upon submission.
 - [ ] **Task 20.4: Staged Milestone Invoicing Presets**
   - Enable 1-click milestone payment schedules (e.g. 20% Booking Advance, 50% Pre-Event Vendor Lock, 30% Post-Event Settlement) for event contracts.
 - [ ] **Task 20.5: Build Verification & Deployment**

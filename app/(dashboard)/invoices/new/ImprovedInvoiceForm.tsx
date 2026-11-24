@@ -11,7 +11,7 @@ import {
   User, Receipt, FileText, 
   AlertCircle, CheckCircle2, ChevronDown, ChevronUp,
   Sparkles, Shield, Clock, X, UserPlus, Download, CheckCircle, Mail, Loader2, ExternalLink,
-  Building2, Briefcase, Repeat
+  Building2, Briefcase, Repeat, MapPin, CalendarDays, Users2, PartyPopper
 } from 'lucide-react'
 import { createInvoice } from '../actions'
 import { linkLeadToInvoice } from '@/lib/crm-actions'
@@ -47,6 +47,11 @@ interface ImprovedInvoiceFormProps {
   initialAmount?: number
   initialTitle?: string
   initialLeadId?: string
+  businessProfile?: {
+    businessType: string
+    metadata?: Record<string, any>
+    config?: any
+  } | null
 }
 
 export function ImprovedInvoiceForm({ 
@@ -58,11 +63,23 @@ export function ImprovedInvoiceForm({
   initialOrganizationId,
   initialAmount,
   initialTitle,
-  initialLeadId
+  initialLeadId,
+  businessProfile
 }: ImprovedInvoiceFormProps) {
   const safeInitialCustomers = initialCustomers || []
   const savedItems = rawSavedItems || []
   const inventoryItems = rawInventoryItems || []
+
+  // Event Management vertical detection
+  const isEventVertical = businessProfile?.businessType === 'event_management' || 
+                          businessProfile?.config?.features?.hasEventMilestones === true ||
+                          businessProfile?.metadata?.vertical === 'event_management'
+
+  const [eventName, setEventName] = useState('')
+  const [eventVenue, setEventVenue] = useState('')
+  const [eventStartDate, setEventStartDate] = useState('')
+  const [eventEndDate, setEventEndDate] = useState('')
+  const [eventPax, setEventPax] = useState('')
 
   const router = useRouter()
   const [, startTransition] = useTransition()
@@ -357,6 +374,17 @@ export function ImprovedInvoiceForm({
       const selectedOrg = organizations.find(o => o.id === selectedOrganizationId) ||
                           organizations.find(o => o.id === selectedCust?.organization_id)
 
+      let compiledNotes = formData.notes || ''
+      if (isEventVertical && (eventName || eventVenue || eventStartDate || eventPax)) {
+        const eventLines = [
+          eventName ? `🎪 Event: ${eventName}` : '',
+          eventVenue ? `📍 Venue: ${eventVenue}` : '',
+          (eventStartDate || eventEndDate) ? `📅 Dates: ${eventStartDate}${eventEndDate ? ` to ${eventEndDate}` : ''}` : '',
+          eventPax ? `👥 Expected Guests / Pax: ${eventPax}` : ''
+        ].filter(Boolean).join('\n')
+        compiledNotes = compiledNotes ? `${eventLines}\n\n${compiledNotes}` : eventLines
+      }
+
       const invoiceData = {
         customer_id: formData.customer_id,
         organization_id: selectedOrg?.id || selectedCust?.organization_id || undefined,
@@ -366,7 +394,7 @@ export function ImprovedInvoiceForm({
         gst_percentage: gstPercentage,
         supply_type: formData.supply_type,
         reverse_charge_applicable: formData.reverse_charge_applicable,
-        notes: formData.notes || undefined,
+        notes: compiledNotes || undefined,
         discount_type: formData.discount_type,
         discount_value: formData.discount_value || undefined,
         items: items.map(item => ({
@@ -1018,6 +1046,101 @@ export function ImprovedInvoiceForm({
                       </p>
                     </div>
                   </div>
+
+                  {/* Event Management & MICE Details (Only for event_management vertical) */}
+                  {isEventVertical && (
+                    <div className="bg-rose-50/50 border border-rose-200/80 rounded-2xl p-4 sm:p-5 space-y-4">
+                      <div className="flex items-center justify-between border-b border-rose-100 pb-2.5">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center font-bold">
+                            🎪
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-bold text-gray-900 flex items-center gap-1.5">
+                              Event & Venue Details
+                              <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-rose-600 text-white tracking-wider">
+                                Event Management
+                              </span>
+                            </h4>
+                            <p className="text-xs text-gray-500">
+                              Specify event coordinates, location, dates, and expected guest attendance.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="grid sm:grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-bold text-gray-800 uppercase tracking-wider flex items-center gap-1">
+                            <PartyPopper className="w-3.5 h-3.5 text-rose-600" />
+                            Event / Project Name
+                          </label>
+                          <Input
+                            placeholder="e.g. Annual Corporate MICE Gala 2026"
+                            value={eventName}
+                            onChange={(e) => setEventName(e.target.value)}
+                            className="bg-white border-rose-200 focus:border-rose-500"
+                          />
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-bold text-gray-800 uppercase tracking-wider flex items-center gap-1">
+                            <MapPin className="w-3.5 h-3.5 text-rose-600" />
+                            Venue & City
+                          </label>
+                          <Input
+                            placeholder="e.g. Grand Ballroom, Taj Palace, New Delhi"
+                            value={eventVenue}
+                            onChange={(e) => setEventVenue(e.target.value)}
+                            className="bg-white border-rose-200 focus:border-rose-500"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid sm:grid-cols-3 gap-4">
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-bold text-gray-800 uppercase tracking-wider flex items-center gap-1">
+                            <CalendarDays className="w-3.5 h-3.5 text-rose-600" />
+                            Event Start Date
+                          </label>
+                          <Input
+                            type="date"
+                            value={eventStartDate}
+                            onChange={(e) => setEventStartDate(e.target.value)}
+                            className="bg-white border-rose-200 focus:border-rose-500"
+                          />
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-bold text-gray-800 uppercase tracking-wider flex items-center gap-1">
+                            <CalendarDays className="w-3.5 h-3.5 text-rose-600" />
+                            Event End Date
+                          </label>
+                          <Input
+                            type="date"
+                            value={eventEndDate}
+                            onChange={(e) => setEventEndDate(e.target.value)}
+                            min={eventStartDate || undefined}
+                            className="bg-white border-rose-200 focus:border-rose-500"
+                          />
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-bold text-gray-800 uppercase tracking-wider flex items-center gap-1">
+                            <Users2 className="w-3.5 h-3.5 text-rose-600" />
+                            Expected Pax (Guests)
+                          </label>
+                          <Input
+                            type="number"
+                            placeholder="e.g. 350"
+                            value={eventPax}
+                            onChange={(e) => setEventPax(e.target.value)}
+                            className="bg-white border-rose-200 focus:border-rose-500"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Supply Type */}
                   <div className="space-y-2">

@@ -40,8 +40,11 @@ export async function getBusinessProfile(): Promise<{
         ])
 
         const metadata = settingsRes.data?.business_metadata || {}
-        // Ground truth priority: user_profiles.business_type is authoritative, set by Super Admin
-        const rawCandidate = profileRes.data?.business_type || metadata?.industry || metadata?.vertical || settingsRes.data?.business_type
+        // Prefer specific vertical over generic 'services' or legal entity strings
+        let rawCandidate = profileRes.data?.business_type
+        if (!rawCandidate || rawCandidate === 'services' || rawCandidate.toLowerCase().includes('proprietor') || rawCandidate.toLowerCase().includes('pvt') || rawCandidate.toLowerCase().includes('llp')) {
+            rawCandidate = metadata?.vertical || metadata?.industry || settingsRes.data?.business_type || rawCandidate
+        }
         const validProfile = normalizeBusinessType(rawCandidate)
 
         return {

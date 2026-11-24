@@ -309,24 +309,26 @@ export function normalizeBusinessType(raw: string | undefined | null): BusinessT
     if (!raw) return 'services'
     const clean = raw.toLowerCase().trim().replace(/[-\s]+/g, '_')
     if (BUSINESS_VERTICALS[clean as BusinessType]) return clean as BusinessType
+
+    // Specific verticals take precedence over generic 'services'
+    if (clean.includes('event')) return 'event_management'
+    if (clean.includes('tour') || clean.includes('travel')) return 'tours_and_travels'
     if (clean.includes('software') || clean.includes('tech') || clean.includes('dev') || clean === 'it') return 'software_it'
     if (clean.includes('marketing') || clean.includes('agency') || clean.includes('social') || clean.includes('ad_spend')) return 'digital_marketing'
     if (clean.includes('freelance') || clean.includes('contractor')) return 'freelancer'
-    if (clean.includes('consult') || clean.includes('service')) return 'services'
     if (clean.includes('salon') || clean.includes('spa') || clean.includes('parlor')) return 'salon_spa'
     if (clean.includes('dent')) return 'dental_clinic'
     if (clean.includes('clinic') || clean.includes('hospital') || clean.includes('doctor')) return 'hospital_op'
     if (clean.includes('garage') || clean.includes('workshop') || clean.includes('auto')) return 'auto_workshop'
     if (clean.includes('campsite') || clean.includes('camp') || clean.includes('glamp')) return 'camping_outdoors'
     if (clean.includes('resort') || clean.includes('farmhouse') || clean.includes('estate') || clean.includes('villa')) return 'resorts_farmhouses'
-    if (clean.includes('tour') || clean.includes('travel')) return 'tours_and_travels'
     if (clean.includes('jewel') || clean.includes('gold')) return 'jewelry_retail'
     if (clean.includes('laundry') || clean.includes('dryclean')) return 'laundry_drycleaning'
     if (clean.includes('real_estate') || clean.includes('property')) return 'real_estate'
     if (clean.includes('art') || clean.includes('craft') || clean.includes('studio')) return 'art_crafts'
-    if (clean.includes('event')) return 'event_management'
     if (clean.includes('retail') || clean.includes('supermarket') || clean.includes('mart')) return 'retail'
     if (clean.includes('wholesale') || clean.includes('distribut')) return 'wholesale'
+    if (clean.includes('consult') || clean.includes('service')) return 'services'
     return 'services'
 }
 
