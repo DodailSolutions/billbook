@@ -4,6 +4,24 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 
 ---
 
+## [Release v1.6.6 - Hotfix Implemented] - 2026-11-24
+
+### Super Admin PlansManager Type Fix, Dynamic Pro Team Limits & RPC Upgrade
+
+#### 1. PlansManager Build Failure Resolution (`app/(superadmin)/admin/plans/PlansManager.tsx`, `lib/types-admin.ts`)
+- **Resolved Vercel Type Error (`Property 'crm' does not exist on type '{}'`)**:
+  - Expanded `SubscriptionPlan.limits` in `lib/types-admin.ts` to support `team_members?: number`, `feature_flags?: Record<string, boolean>`, `excluded_features?: string[]`, and `[key: string]: any`, preventing incorrect narrowing to `{}` / `number`.
+  - Added explicit typing for `rawLimits` and `existingFlags` in `openEditModal()` to guarantee safe fallback evaluations across all 11 feature toggle switches.
+
+#### 2. Dynamic Team Limits & Pro Plan Team Management (`app/(dashboard)/team/page.tsx`, `app/api/team/invite/route.ts`)
+- **Dynamic Plan Seat Limits Sync**:
+  - In `app/(dashboard)/team/page.tsx` and `/api/team/invite`, replaced hardcoded seat allocations with dynamic lookups against `planStatus.limits.team_members`. Custom seat caps configured via Super Admin are now faithfully respected instead of being overridden by legacy defaults.
+  - Enhanced fallback heuristics for Pro (`isProOrAbove`) and custom plans with `team_members` feature access.
+- **RPC Migration (`supabase-dynamic-team-limits-migration.sql`)**:
+  - Rebuilt `check_team_member_limit(p_owner_id UUID)` to read `subscription_plans.limits->>'team_members'` dynamically from the database, and support flexible pattern matching (`%pro%`, `%enterprise%`, `%lifetime%`) rather than only exact string `'professional'`.
+
+---
+
 ## [Release v1.6.5 - In Progress / Implementing] - 2026-11-23
 
 ### Navigation Vertical Scoping, Recursive Expenses, Excel Parser & Integrations Hub

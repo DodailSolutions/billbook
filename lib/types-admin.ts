@@ -25,11 +25,15 @@ export interface SubscriptionPlan {
     currency: string
     billing_period: 'monthly' | 'yearly' | 'lifetime'
     features: string[]
+    excluded_features?: string[]
     limits: {
         invoices_per_month?: number
         customers?: number
         storage_gb?: number
-        [key: string]: number | undefined
+        team_members?: number
+        feature_flags?: Record<string, boolean>
+        excluded_features?: string[]
+        [key: string]: any
     }
     is_active: boolean
     is_popular: boolean

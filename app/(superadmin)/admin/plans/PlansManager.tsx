@@ -204,13 +204,13 @@ export default function PlansManager({ initialPlans }: PlansManagerProps) {
 
     const openEditModal = (plan: SubscriptionPlan) => {
         setEditingPlan(plan)
-        const rawLimits = plan.limits || {}
+        const rawLimits = (plan.limits || {}) as Record<string, any>
         const teamLimit = typeof rawLimits.team_members === 'number' 
             ? rawLimits.team_members 
             : (plan.slug.includes('enterprise') ? 10 : plan.slug.includes('pro') ? 2 : 0)
         setTeamMembersLimit(teamLimit)
 
-        const existingFlags = rawLimits.feature_flags || {}
+        const existingFlags = (rawLimits.feature_flags || {}) as Record<string, boolean>
         setFeatureFlags({
             crm: existingFlags.crm ?? (plan.features?.some(f => /crm|pipeline/i.test(f)) ?? true),
             organizations: existingFlags.organizations ?? true,

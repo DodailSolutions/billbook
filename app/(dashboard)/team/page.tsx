@@ -25,9 +25,12 @@ export default async function TeamMembersPage() {
   const isProOrAbove = planSlug.includes('pro') || planSlug.includes('professional') || planSlug.includes('enterprise') || isLifetimePlan
   const hasTeamAccess = (await hasPlanFeature('team_members')) || (await hasPlanFeature('team')) || isProOrAbove
 
-  // Get team member limits
-  const defaultAllowed = isProOrAbove ? (planSlug.includes('enterprise') ? 10 : 2) : 1
-  let teamLimit = { allowed: defaultAllowed, current: 0, can_add: true, base_limit: defaultAllowed, purchased_slots: 0, plan_slug: planSlug }
+  // Get team member limits: prefer dynamic package limits configured in Super Admin, then tiered defaults
+  const planConfiguredSeats = typeof (planStatus?.limits as any)?.team_members === 'number'
+    ? (planStatus?.limits as any).team_members
+    : (isProOrAbove ? (planSlug.includes('enterprise') ? 10 : 2) : 0)
+  const defaultAllowed = Math.max(planConfiguredSeats, isProOrAbove ? 2 : (hasTeamAccess ? 1 : 0))
+  let teamLimit = { allowed: defaultAllowed, current: 0, can_add: defaultAllowed > 0, base_limit: defaultAllowed, purchased_slots: 0, plan_slug: planSlug }
   try {
     const { data: limits } = await supabase.rpc('check_team_member_limit', { p_owner_id: user.id })
     if (Array.isArray(limits) && limits[0]) {

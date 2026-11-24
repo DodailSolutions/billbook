@@ -42,11 +42,14 @@ export async function POST(request: Request) {
     const isLifetimePlan = planStatus?.isLifetime ?? false
     const planSlug = (planStatus?.planSlug || '').toLowerCase()
     const isProOrAbove = planSlug.includes('pro') || planSlug.includes('professional') || planSlug.includes('enterprise') || isLifetimePlan
-    const defaultAllowed = isProOrAbove ? (planSlug.includes('enterprise') ? 10 : 2) : 0
+    const planConfiguredSeats = typeof (planStatus?.limits as any)?.team_members === 'number'
+      ? (planStatus?.limits as any).team_members
+      : (isProOrAbove ? (planSlug.includes('enterprise') ? 10 : 2) : 0)
+    const defaultAllowed = Math.max(planConfiguredSeats, isProOrAbove ? 2 : 0)
 
     let allowed = defaultAllowed
     let current = 0
-    let canAdd = isProOrAbove ? true : false
+    let canAdd = allowed > 0
 
     try {
       const { data: limits } = await supabase.rpc('check_team_member_limit', {
@@ -55,7 +58,7 @@ export async function POST(request: Request) {
       if (Array.isArray(limits) && limits[0]) {
         allowed = Math.max(limits[0].allowed || 0, defaultAllowed)
         current = limits[0].current || 0
-        canAdd = isProOrAbove ? (current < allowed) : (limits[0].can_add ?? false)
+        canAdd = current < allowed
       }
     } catch (e) {
       console.warn('RPC check_team_member_limit fallback in invite route:', e)
@@ -71,7 +74,7 @@ export async function POST(request: Request) {
 
       if (typeof count === 'number') {
         current = count
-        canAdd = isProOrAbove ? (current < allowed) : canAdd
+        canAdd = current < allowed
       }
     } catch {}
 
