@@ -12,6 +12,9 @@ DROP POLICY IF EXISTS "Users can view team members of their organization" ON tea
 DROP POLICY IF EXISTS "Super admins can manage all team members" ON team_members;
 DROP POLICY IF EXISTS "Authenticated users can insert team members" ON team_members;
 
+-- 1.1 Drop restrictive legacy check constraint on role column if present
+ALTER TABLE IF EXISTS team_members DROP CONSTRAINT IF EXISTS team_members_role_check;
+
 -- 2. Comprehensive SELECT Policy for team_members
 CREATE POLICY "Users and Admins can view team members" ON team_members
     FOR SELECT USING (

@@ -227,7 +227,6 @@ export async function POST(request: Request) {
     if (finalRoleId && uuidRegex.test(finalRoleId)) {
       insertPayload.role_id = finalRoleId
     }
-    if (roleSlug) insertPayload.role = roleSlug
     if (designation) insertPayload.designation = designation
     if (allocated_hours !== undefined) insertPayload.allocated_hours = Number(allocated_hours) || 40
     if (hourly_cost_rate !== undefined) insertPayload.hourly_cost_rate = Number(hourly_cost_rate) || 0
@@ -240,26 +239,49 @@ export async function POST(request: Request) {
     let member: any = null
     let insertError: any = null
 
-    const initialRes = await primaryClient
-      .from('team_members')
-      .insert(insertPayload)
-      .select()
-      .maybeSingle()
+    // Helper to attempt insert with graceful fallbacks for legacy check constraints and RLS
+    async function executeInsert(client: any, payload: any) {
+      return await client
+        .from('team_members')
+        .insert(payload)
+        .select()
+        .maybeSingle()
+    }
 
+    // 1. Initial attempt without legacy string 'role' to avoid team_members_role_check violations
+    const initialRes = await executeInsert(primaryClient, insertPayload)
     member = initialRes.data
     insertError = initialRes.error
 
-    // If RLS blocked primaryClient (e.g. anon fallback without service key), retry with authenticated user client
+    // 2. If blocked by RLS on primaryClient, retry with authenticated user client
     if (insertError && primaryClient !== supabase) {
       console.warn('Retrying team_members insert with authenticated user client due to:', insertError.message)
-      const retryRes = await supabase
-        .from('team_members')
-        .insert(insertPayload)
-        .select()
-        .maybeSingle()
-
+      const retryRes = await executeInsert(supabase, insertPayload)
       member = retryRes.data
       insertError = retryRes.error
+    }
+
+    // 3. If a check constraint or NOT NULL on a legacy 'role' column occurs, handle adaptively
+    if (insertError && (insertError.message?.includes('team_members_role_check') || insertError.message?.includes('violates not-null constraint'))) {
+      console.warn('Handling legacy role column constraint in team_members:', insertError.message)
+      // Try with safe standard value 'employee' or 'member' that satisfies legacy checks
+      for (const fallbackRole of ['employee', 'member']) {
+        const payloadWithRole = { ...insertPayload, role: fallbackRole }
+        const res = await executeInsert(primaryClient, payloadWithRole)
+        if (!res.error && res.data) {
+          member = res.data
+          insertError = null
+          break
+        }
+        if (primaryClient !== supabase) {
+          const userRes = await executeInsert(supabase, payloadWithRole)
+          if (!userRes.error && userRes.data) {
+            member = userRes.data
+            insertError = null
+            break
+          }
+        }
+      }
     }
 
     if (insertError || !member) {
