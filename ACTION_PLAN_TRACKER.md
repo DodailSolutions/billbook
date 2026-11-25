@@ -278,7 +278,24 @@ This document serves as the master execution tracker for multi-vertical architec
   - Rendered conditionally so it only displays when `businessType === 'event_management'` or `hasEventMilestones` is active.
   - Added dedicated fields for **Event / Project Name**, **Venue & City**, **Event Start Date**, **Event End Date**, and **Expected Pax (Guest Count)**.
   - Automatically compiles structured event details into invoice notes upon submission.
-- [ ] **Task 20.4: Staged Milestone Invoicing Presets**
-  - Enable 1-click milestone payment schedules (e.g. 20% Booking Advance, 50% Pre-Event Vendor Lock, 30% Post-Event Settlement) for event contracts.
-- [ ] **Task 20.5: Build Verification & Deployment**
-  - Run full build verification and deploy Phase 20 to production.
+- [x] **Task 20.4: Staged Milestone Invoicing Presets**
+  - Enabled 1-click milestone payment schedules (20/50/30 Event Standard, 25/35/30/10 MICE Split, and 50/50 Advance & Balance) for event contracts in `ImprovedInvoiceForm.tsx`, with live rupee breakdown, 1-click milestone collection, and automatic invoice notes formatting.
+- [x] **Task 20.5: Build Verification & Deployment**
+  - Completed Phase 20 feature implementation (`event_management` vertical gating, CRM sync, event metadata, and staged milestone invoicing presets).
+
+---
+
+### [Phase 21] - Event Management & MICE Operations Suite
+*End-to-end event project profitability, Banquet Event Orders (BEO), artist/vendor TDS, and multi-tranche milestone invoicing.*
+
+- [x] **Task 21.1: Event Command Center & Cost-Center P&L (`app/(dashboard)/events/page.tsx`)**
+  - Dedicated Event & MICE hub gated to `event_management` / `hasEventMilestones` workspaces.
+  - Track each event's Quoted Revenue, Collected Advances, Vendor & Sub-Rental Costs, Artist Payouts, and live Net Margin % (`Budget vs Actual`).
+- [x] **Task 21.2: 1-Click Banquet Event Order (BEO) / Run-of-Show Export**
+  - Generate printable internal BEO / Crew Run-Sheet from any event project (venue, dates, pax, timeline schedule, AV/decor checklist, and vendor contacts without client pricing).
+- [x] **Task 21.3: Artist & Subcontractor TDS Calculator (194C / 194J)**
+  - Built-in TDS calculation (1% Individual 194C, 2% Company 194C, 10% Artist/Professional 194J) on event vendor payouts with net payable and TDS liability summary.
+- [x] **Task 21.4: Multi-Tranche Milestone Schedule & Crew Call-Sheet**
+  - Track milestone tranches (Booking Advance, Pre-Event Lock, Post-Event Settlement) and event-day crew/freelancer call times and day-rates.
+- [x] **Task 21.5: Sidebar Navigation, Local Verification & Production Push**
+  - Wired `/events` into `Sidebar.tsx` for `event_management` workspaces, updated tracker, and pushed to production.

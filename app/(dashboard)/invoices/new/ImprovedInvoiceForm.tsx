@@ -37,6 +37,51 @@ interface InvoiceItem {
   igst: number
 }
 
+interface MilestoneStage {
+  label: string
+  percentage: number
+}
+
+interface MilestonePreset {
+  id: string
+  name: string
+  badge: string
+  stages: MilestoneStage[]
+}
+
+const EVENT_MILESTONE_PRESETS: MilestonePreset[] = [
+  {
+    id: 'standard_20_50_30',
+    name: '20 / 50 / 30 Event Standard',
+    badge: 'Popular',
+    stages: [
+      { label: 'Booking Advance', percentage: 20 },
+      { label: 'Pre-Event Vendor Lock', percentage: 50 },
+      { label: 'Post-Event Settlement', percentage: 30 },
+    ],
+  },
+  {
+    id: 'mice_25_35_30_10',
+    name: '25 / 35 / 30 / 10 MICE Split',
+    badge: 'Corporate',
+    stages: [
+      { label: 'Booking Deposit', percentage: 25 },
+      { label: 'Venue & Production Lock', percentage: 35 },
+      { label: 'Event Day Readiness', percentage: 30 },
+      { label: 'Post-Event Closure', percentage: 10 },
+    ],
+  },
+  {
+    id: 'split_50_50',
+    name: '50 / 50 Advance & Balance',
+    badge: 'Simple',
+    stages: [
+      { label: 'Booking Advance', percentage: 50 },
+      { label: 'Final Settlement', percentage: 50 },
+    ],
+  },
+]
+
 interface ImprovedInvoiceFormProps {
   customers: Customer[]
   organizations?: Organization[]
@@ -80,6 +125,8 @@ export function ImprovedInvoiceForm({
   const [eventStartDate, setEventStartDate] = useState('')
   const [eventEndDate, setEventEndDate] = useState('')
   const [eventPax, setEventPax] = useState('')
+  const [selectedMilestonePresetId, setSelectedMilestonePresetId] = useState<string | null>(null)
+  const [activeMilestonePct, setActiveMilestonePct] = useState<number | null>(null)
 
   const router = useRouter()
   const [, startTransition] = useTransition()
@@ -182,15 +229,20 @@ export function ImprovedInvoiceForm({
   const gstPercentage = items.length > 0 ? items[0].gst_rate : 18
   const total = discountedSubtotal + totalCGST + totalSGST + totalIGST
 
-  // Auto-update payment amount when total changes or mark_as_paid changes
+  const selectedMilestonePreset = EVENT_MILESTONE_PRESETS.find(p => p.id === selectedMilestonePresetId) || null
+
+  // Auto-update payment amount when total changes, mark_as_paid changes, or milestone percentage changes
   useEffect(() => {
     if (formData.mark_as_paid) {
+      const targetAmount = activeMilestonePct !== null
+        ? Math.round(total * activeMilestonePct) / 100
+        : total
       setFormData(prev => ({
         ...prev,
-        payment_amount: total
+        payment_amount: targetAmount
       }))
     }
-  }, [total, formData.mark_as_paid])
+  }, [total, formData.mark_as_paid, activeMilestonePct])
 
   // Validation
   const validateStep = (step: number): boolean => {
@@ -383,6 +435,16 @@ export function ImprovedInvoiceForm({
           eventPax ? `👥 Expected Guests / Pax: ${eventPax}` : ''
         ].filter(Boolean).join('\n')
         compiledNotes = compiledNotes ? `${eventLines}\n\n${compiledNotes}` : eventLines
+      }
+      if (isEventVertical && selectedMilestonePreset) {
+        const scheduleLines = [
+          `💳 Payment Milestone Schedule (${selectedMilestonePreset.name}):`,
+          ...selectedMilestonePreset.stages.map((stage, idx) => {
+            const stageAmt = (Math.round(total * stage.percentage) / 100).toFixed(2)
+            return `• Stage ${idx + 1} (${stage.percentage}% - ${stage.label}): ₹${stageAmt}`
+          })
+        ].join('\n')
+        compiledNotes = compiledNotes ? `${compiledNotes}\n\n${scheduleLines}` : scheduleLines
       }
 
       const invoiceData = {
@@ -1644,6 +1706,121 @@ export function ImprovedInvoiceForm({
                     </Card>
                   </div>
 
+                  {/* Event Staged Milestone Invoicing Presets (Only for event_management vertical) */}
+                  {isEventVertical && (
+                    <Card className="bg-rose-50/60 border-rose-200 dark:bg-white">
+                      <CardContent className="p-5 sm:p-6 space-y-4">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div>
+                            <h4 className="text-base font-bold text-gray-900 flex items-center gap-2">
+                              <span>🗓️</span>
+                              Staged Milestone Payment Presets
+                              <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-rose-600 text-white tracking-wider">
+                                1-Click Schedule
+                              </span>
+                            </h4>
+                            <p className="text-xs text-gray-600 mt-0.5">
+                              Apply an event contract payment schedule to print on this invoice or collect a milestone advance now.
+                            </p>
+                          </div>
+                          {selectedMilestonePreset && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setSelectedMilestonePresetId(null)
+                                setActiveMilestonePct(null)
+                              }}
+                              className="text-xs text-rose-700 hover:bg-rose-100"
+                            >
+                              Clear Schedule
+                            </Button>
+                          )}
+                        </div>
+
+                        <div className="grid sm:grid-cols-3 gap-2.5">
+                          {EVENT_MILESTONE_PRESETS.map((preset) => {
+                            const isSelected = selectedMilestonePresetId === preset.id
+                            return (
+                              <button
+                                key={preset.id}
+                                type="button"
+                                onClick={() => {
+                                  setSelectedMilestonePresetId(isSelected ? null : preset.id)
+                                  if (isSelected) setActiveMilestonePct(null)
+                                }}
+                                className={`text-left p-3 rounded-xl border transition-all ${
+                                  isSelected
+                                    ? 'bg-rose-600 text-white border-rose-700 shadow-sm'
+                                    : 'bg-white text-gray-900 border-rose-200 hover:border-rose-400 hover:bg-rose-50/50'
+                                }`}
+                              >
+                                <div className="flex items-center justify-between gap-1 mb-1">
+                                  <span className="text-xs font-bold">{preset.name}</span>
+                                  <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
+                                    isSelected ? 'bg-white/20 text-white' : 'bg-rose-100 text-rose-700'
+                                  }`}>
+                                    {preset.badge}
+                                  </span>
+                                </div>
+                                <div className={`text-[11px] ${isSelected ? 'text-rose-100' : 'text-gray-500'}`}>
+                                  {preset.stages.map(s => `${s.percentage}% ${s.label}`).join(' • ')}
+                                </div>
+                              </button>
+                            )
+                          })}
+                        </div>
+
+                        {selectedMilestonePreset && (
+                          <div className="bg-white rounded-xl border border-rose-200 divide-y divide-rose-100">
+                            {selectedMilestonePreset.stages.map((stage, idx) => {
+                              const stageAmount = Math.round(total * stage.percentage) / 100
+                              const isCollectingThis = formData.mark_as_paid && activeMilestonePct === stage.percentage
+                              return (
+                                <div key={stage.label} className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5">
+                                  <div className="flex items-center gap-2.5">
+                                    <span className="w-6 h-6 rounded-full bg-rose-100 text-rose-700 text-xs font-bold flex items-center justify-center">
+                                      {idx + 1}
+                                    </span>
+                                    <div>
+                                      <div className="text-sm font-semibold text-gray-900">{stage.label}</div>
+                                      <div className="text-xs text-gray-500">{stage.percentage}% of ₹{total.toFixed(2)}</div>
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center gap-3">
+                                    <span className="text-sm font-bold text-gray-900">₹{stageAmount.toFixed(2)}</span>
+                                    <Button
+                                      type="button"
+                                      size="sm"
+                                      variant={isCollectingThis ? 'default' : 'outline'}
+                                      onClick={() => {
+                                        setActiveMilestonePct(stage.percentage)
+                                        setFormData(prev => ({
+                                          ...prev,
+                                          mark_as_paid: true,
+                                          payment_amount: stageAmount,
+                                          payment_method: prev.payment_method || 'bank_transfer',
+                                          payment_notes: `Stage ${idx + 1}: ${stage.label} (${stage.percentage}%)`
+                                        }))
+                                      }}
+                                      className={isCollectingThis
+                                        ? 'bg-rose-600 hover:bg-rose-700 text-white text-xs h-7'
+                                        : 'border-rose-300 text-rose-700 hover:bg-rose-50 text-xs h-7'
+                                      }
+                                    >
+                                      {isCollectingThis ? 'Selected for Collection' : `Collect ${stage.percentage}%`}
+                                    </Button>
+                                  </div>
+                                </div>
+                              )
+                            })}
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  )}
+
                   {/* Payment Collection Section */}
                   <Card className="bg-linear-to-br from-blue-50 to-indigo-50 border-blue-200 dark:bg-white">
                     <CardContent className="p-6 space-y-4">
@@ -1652,11 +1829,14 @@ export function ImprovedInvoiceForm({
                           type="checkbox"
                           id="mark_as_paid"
                           checked={formData.mark_as_paid}
-                          onChange={(e) => setFormData({
-                            ...formData, 
-                            mark_as_paid: e.target.checked,
-                            payment_method: e.target.checked && !formData.payment_method ? 'cash' : formData.payment_method
-                          })}
+                          onChange={(e) => {
+                            if (!e.target.checked) setActiveMilestonePct(null)
+                            setFormData({
+                              ...formData, 
+                              mark_as_paid: e.target.checked,
+                              payment_method: e.target.checked && !formData.payment_method ? 'cash' : formData.payment_method
+                            })
+                          }}
                           className="w-5 h-5 text-blue-600 focus:ring-2 focus:ring-blue-500 rounded"
                         />
                         <label htmlFor="mark_as_paid" className="text-lg font-semibold text-gray-900 cursor-pointer">
@@ -1677,7 +1857,10 @@ export function ImprovedInvoiceForm({
                                 min="0"
                                 max={total}
                                 value={formData.payment_amount}
-                                onChange={(e) => setFormData({...formData, payment_amount: parseFloat(e.target.value) || 0})}
+                                onChange={(e) => {
+                                  setActiveMilestonePct(null)
+                                  setFormData({...formData, payment_amount: parseFloat(e.target.value) || 0})
+                                }}
                                 placeholder="Enter amount"
                                 className="text-gray-900 bg-white"
                               />
@@ -2254,6 +2437,13 @@ export function ImprovedInvoiceForm({
                   onClick={() => {
                     setShowSuccessModal(false)
                     setCreatedInvoiceId(null)
+                    setEventName('')
+                    setEventVenue('')
+                    setEventStartDate('')
+                    setEventEndDate('')
+                    setEventPax('')
+                    setSelectedMilestonePresetId(null)
+                    setActiveMilestonePct(null)
                     // Reset form
                     setFormData({
                       customer_id: '',

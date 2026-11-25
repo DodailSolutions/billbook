@@ -147,6 +147,13 @@ export function Sidebar() {
                     href: '/art-studio',
                     color: "text-pink-600",
                     badge: 'STUDIO'
+                }] : []),
+                ...(businessProfile.features?.hasEventMilestones || businessProfile.businessType === 'event_management' ? [{
+                    label: 'Events & BEO Hub',
+                    icon: CalendarDays,
+                    href: '/events',
+                    color: "text-rose-600",
+                    badge: 'MICE'
                 }] : [])
             ]
         },
