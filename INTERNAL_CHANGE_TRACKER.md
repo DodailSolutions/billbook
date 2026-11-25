@@ -4,6 +4,22 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 
 ---
 
+## [Release v1.8.0 - Implemented] - 2026-11-25
+
+### Employee & HR Login Routing, Vertical-Aware Employee Hub & CRM RM Workspace (Phase 22)
+
+#### 1. Employee & HR Login Routing Fixes (`app/(auth)/actions.ts`, `app/(employee)/layout.tsx`)
+- Updated `login()` in `app/(auth)/actions.ts` to route `hr` / `hr_executive` accounts directly to `/hr-dashboard`.
+- Relaxed `EmployeePortalLayout` (`app/(employee)/layout.tsx`) to permit `employee`, `staff`, `relationship_agent`, and linked `employees` records without bouncing them to `/dashboard`.
+
+#### 2. Vertical-Aware Employee Hub (`app/(employee)/employee/dashboard/page.tsx`)
+- Added Office/WFH mode toggle on the virtual timeclock and a vertical-aware role workspace card adapting to `event_management`, `software_it`, `digital_marketing`, `retail`, `salon_spa`, and standard businesses.
+
+#### 3. CRM Relationship Manager Workspace (`app/(dashboard)/crm/page.tsx`)
+- Added **"My Assigned Deals" vs "All Team Deals"** quick toggle for Relationship Managers and live outcome summary pills (Active Pipeline, Won, Lost, Open Follow-ups).
+
+---
+
 ## [Release v1.7.5 - Implemented] - 2026-11-24
 
 ### Unified Workforce Architecture, Dynamic Department Creator & Save Reliability (Phase 18)

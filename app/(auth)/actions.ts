@@ -63,6 +63,8 @@ export async function login(formData: FormData) {
         redirect(redirectUrl)
     } else if (profile?.role === 'employee') {
         redirect('/employee/dashboard')
+    } else if (profile?.role === 'hr' || profile?.role === 'hr_executive') {
+        redirect('/hr-dashboard')
     } else {
         // Check if the user is a CA
         const { data: caProfile } = await supabase

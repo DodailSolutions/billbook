@@ -28,25 +28,28 @@ export default function EmployeePortalLayout({
                 return
             }
 
-            // Check if they are actually an employee
+            // Check if they are an employee or have an active employee record
             const { data: profile } = await supabase
                 .from('user_profiles')
                 .select('role, business_name')
                 .eq('id', user.id)
                 .single()
 
-            if (profile?.role !== 'employee') {
-                // If they are not an employee, send them to the employer dashboard
-                router.push('/dashboard')
-                return
-            }
-
-            // Get employee name
             const { data: emp } = await supabase
                 .from('employees')
                 .select('name')
                 .eq('employee_user_id', user.id)
-                .single()
+                .maybeSingle()
+
+            const isEmployeeRole = profile?.role === 'employee' || profile?.role === 'staff' || profile?.role === 'relationship_agent'
+            if (!isEmployeeRole && !emp) {
+                if (profile?.role === 'hr' || profile?.role === 'hr_executive') {
+                    router.push('/hr-dashboard')
+                } else {
+                    router.push('/dashboard')
+                }
+                return
+            }
 
             if (emp) {
                 setUserName(emp.name)

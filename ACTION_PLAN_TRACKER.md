@@ -299,3 +299,33 @@ This document serves as the master execution tracker for multi-vertical architec
   - Track milestone tranches (Booking Advance, Pre-Event Lock, Post-Event Settlement) and event-day crew/freelancer call times and day-rates.
 - [x] **Task 21.5: Sidebar Navigation, Local Verification & Production Push**
   - Wired `/events` into `Sidebar.tsx` for `event_management` workspaces, updated tracker, and pushed to production.
+
+---
+
+### [Phase 22] - Employee Portal, Team & CRM Workspace Upgrades
+*Fixes employee login role-routing gaps, adds vertical-aware Employee Hub capabilities, and upgrades CRM for Relationship Managers.*
+
+- [x] **Task 22.1: Employee Login & Role-Routing Fix (`app/(employee)/layout.tsx`)**
+  - Allow employees with operational roles (`employee`, `staff`, `relationship_agent`, `client_rm`) to access `/employee/*` seamlessly without getting bounced.
+- [x] **Task 22.2: Vertical-Aware Employee Hub (`app/(employee)/employee/dashboard/page.tsx`)**
+  - Added Office/WFH toggle on virtual timeclock and vertical-aware role workspace card tailored to the company's business type (`event_management`, `software_it`, `digital_marketing`, `retail`, `salon_spa`, `resorts_farmhouses_camping`).
+- [x] **Task 22.3: CRM Relationship Manager Workspace (`app/(dashboard)/crm/page.tsx`)**
+  - Added **"My Assigned Deals" vs "All Team Deals"** quick toggle for RMs, plus live Active Pipeline, Won, Lost, and Open Follow-ups summary pills.
+- [x] **Task 22.4: Specialized HR Login Routing & HR Command Center (`app/(auth)/actions.ts`, `app/(dashboard)/hr-dashboard/page.tsx`)**
+  - Route `hr` / `hr_executive` logins directly to `/hr-dashboard` instead of the general accounting dashboard, and support HR-specific approvals & workforce overview.
+- [x] **Task 22.5: Tracker Update & Production Deploy**
+  - Updated `ACTION_PLAN_TRACKER.md` and `INTERNAL_CHANGE_TRACKER.md`, committed, and pushed to Vercel.
+
+---
+
+### [Phase 23] - Vertical-Specific CRM, Delivery Tracking & Agency Suite
+*Extends CRM beyond Won/Lost into post-sale project delivery, tailored for Event Management, Software/IT, and Digital Marketing agencies.*
+
+- [ ] **Task 23.1: Post-Win Delivery & Project Status Tracker (`/crm` & `/projects`)**
+  - Track Won deals through post-sale delivery (`Kickoff` → `In Progress` → `UAT / Review` → `Delivered` → `Closed`) with linked invoices and customer records in one view.
+- [ ] **Task 23.2: Software & IT Agency Suite (Change Orders, Sprint Milestones & Timesheets)**
+  - Sprint/milestone billing, Scope Change Order approvals, and billable vs. non-billable timesheet hours feeding into profitability & invoices.
+- [ ] **Task 23.3: Digital Marketing Agency Suite (Monthly Retainers, Ad-Spend Pass-Through & Deliverables)**
+  - Monthly retainer hour/deliverable caps (Reels, Ads, SEO), separate Meta/Google **Ad-Spend Pass-Through** vs **Agency Fee %** invoicing, and client approval sign-offs.
+- [ ] **Task 23.4: Event Management CRM Extensions**
+  - Capture Event Date, Venue, Expected Pax, and BEO status directly on CRM leads so sales-to-operations handoff to `/events` is 1 click.

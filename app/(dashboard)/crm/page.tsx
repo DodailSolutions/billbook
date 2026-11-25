@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { CRMLead, CRMActivity, CRMStats, CRMTeamMember } from "@/lib/crm-types"
 import { getLeadsList, getActivitiesList, getCRMStats, getCRMTeamMembers } from "@/lib/crm-actions"
+import { createClient } from "@/lib/supabase/client"
 import { KanbanBoard } from "./KanbanBoard"
 import { LeadModal } from "./LeadModal"
 import { LeadImportModal } from "./LeadImportModal"
@@ -27,19 +28,25 @@ export default function CRMPage() {
     const [isImportModalOpen, setIsImportModalOpen] = useState(false)
     const [selectedLead, setSelectedLead] = useState<CRMLead | null>(null)
     const [selectedMemberFilter, setSelectedMemberFilter] = useState<string>('all')
+    const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null)
 
     const fetchData = async () => {
         setLoading(true)
-        const [leadsData, activitiesData, statsData, membersData] = await Promise.all([
+        const supabase = createClient()
+        const [leadsData, activitiesData, statsData, membersData, userRes] = await Promise.all([
             getLeadsList(),
             getActivitiesList(),
             getCRMStats(),
-            getCRMTeamMembers()
+            getCRMTeamMembers(),
+            supabase.auth.getUser().catch(() => ({ data: { user: null } }))
         ])
         setLeads(leadsData)
         setActivities(activitiesData)
         setStats(statsData)
         setTeamMembers(membersData)
+        if (userRes?.data?.user?.email) {
+            setCurrentUserEmail(userRes.data.user.email.toLowerCase())
+        }
         setLoading(false)
     }
 
@@ -250,6 +257,67 @@ export default function CRMPage() {
                     </div>
                 </div>
             )}
+
+            {/* RM Quick Pipeline Switcher & Deal Outcome Summary */}
+            {!loading && (() => {
+                const currentMember = currentUserEmail
+                    ? teamMembers.find(m => m.email?.toLowerCase() === currentUserEmail)
+                    : undefined
+                const wonCount = leads.filter(l => l.stage === 'won').length
+                const lostCount = leads.filter(l => l.stage === 'lost').length
+                const activeCount = leads.length - wonCount - lostCount
+                const pendingTasksCount = activities.filter(a => !a.completed).length
+                const isMyFilterActive = currentMember && selectedMemberFilter === currentMember.id
+
+                return (
+                    <div className="flex flex-wrap items-center justify-between gap-3 bg-white border border-gray-200 rounded-2xl p-3 sm:px-4">
+                        <div className="flex flex-wrap items-center gap-2 text-xs font-semibold">
+                            <span className="px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                                Active Pipeline: {activeCount}
+                            </span>
+                            <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                Won: {wonCount}
+                            </span>
+                            <span className="px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200">
+                                Lost: {lostCount}
+                            </span>
+                            <span className="px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                                Open Follow-ups: {pendingTasksCount}
+                            </span>
+                        </div>
+
+                        {currentMember && (
+                            <div className="flex items-center gap-1.5 bg-gray-100 p-1 rounded-xl">
+                                <button
+                                    type="button"
+                                    onClick={() => setSelectedMemberFilter('all')}
+                                    className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+                                        !isMyFilterActive
+                                            ? 'bg-white text-gray-900 shadow-xs'
+                                            : 'text-gray-600 hover:text-gray-900'
+                                    }`}
+                                >
+                                    All Team Deals
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setSelectedMemberFilter(currentMember.id)
+                                        setActiveTab('kanban')
+                                    }}
+                                    className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+                                        isMyFilterActive
+                                            ? 'bg-indigo-600 text-white shadow-xs'
+                                            : 'text-gray-600 hover:text-gray-900'
+                                    }`}
+                                >
+                                    My Assigned Deals
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                )
+            })()}
 
             {/* Navigation Tabs */}
             <div className="flex items-center justify-between border-b border-gray-200 pb-1 overflow-x-auto whitespace-nowrap scrollbar-hide">

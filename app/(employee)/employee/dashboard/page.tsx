@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { getEmployeePortalData } from '@/lib/payroll-actions'
+import { getBusinessProfile } from '@/lib/business-profile-actions'
 import { Employee, EmployeeLeaveBalance } from '@/lib/payroll-types'
 import { Card, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
@@ -27,6 +28,7 @@ export default function EmployeeDashboard() {
     const [employee, setEmployee] = useState<Employee | null>(null)
     const [attendanceStats, setAttendanceStats] = useState({ present: 0, absent: 0, halfDay: 0, total: 0 })
     const [leaveBalances, setLeaveBalances] = useState<EmployeeLeaveBalance[]>([])
+    const [businessType, setBusinessType] = useState<string>('standard')
     const [loading, setLoading] = useState(true)
 
     // Interactive Check-In & Timeclock State
@@ -39,10 +41,16 @@ export default function EmployeeDashboard() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const data = await getEmployeePortalData()
+                const [data, profile] = await Promise.all([
+                    getEmployeePortalData(),
+                    getBusinessProfile().catch(() => null),
+                ])
                 setEmployee(data.employee)
                 setAttendanceStats(data.attendanceStats)
                 setLeaveBalances(data.leaveBalances)
+                if (profile?.businessType) {
+                    setBusinessType(profile.businessType)
+                }
             } catch (err) {
                 console.error(err)
             } finally {
@@ -159,9 +167,18 @@ export default function EmployeeDashboard() {
                             <Clock className="w-3.5 h-3.5 text-emerald-400" />
                             {currentTime || '09:30 AM'}
                         </span>
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/20 text-white">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                const nextMode = workMode === 'office' ? 'wfh' : 'office'
+                                setWorkMode(nextMode)
+                                persistTimeclock(checkedInTime, breakStartTime, checkedOutTime, nextMode)
+                            }}
+                            className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/20 hover:bg-white/30 text-white transition-colors cursor-pointer"
+                            title="Click to switch between Office and WFH"
+                        >
                             {workMode === 'office' ? '🏢 Office' : '🏠 WFH'}
-                        </span>
+                        </button>
                     </div>
 
                     <div className="text-xs space-y-1">
@@ -226,6 +243,69 @@ export default function EmployeeDashboard() {
                     </div>
                 </div>
             </div>
+
+            {/* Vertical-Aware Role Workspace Card */}
+            {(() => {
+                const verticalGuides: Record<string, { badge: string; title: string; subtitle: string; items: string[] }> = {
+                    event_management: {
+                        badge: 'Event & MICE Crew',
+                        title: 'Event Call-Sheets & On-Site Readiness',
+                        subtitle: 'Coordinate venue load-in, BEO timelines, and shift confirmations.',
+                        items: ['Check today’s BEO run-of-show & call times with your Event Lead', 'Log on-site attendance punch-in before venue handover', 'Submit travel/per-diem or regularization via Leaves & Requests']
+                    },
+                    software_it: {
+                        badge: 'Software & IT Team',
+                        title: 'Sprint Deliverables & Billable Hours',
+                        subtitle: 'Keep daily punch-ins synced with project milestones and client SLAs.',
+                        items: ['Switch between Office & WFH mode on your virtual clock above', 'Track sprint progress and closed deal commissions', 'Review HR hybrid/remote guidelines in the handbook below']
+                    },
+                    digital_marketing: {
+                        badge: 'Digital Marketing Agency',
+                        title: 'Campaign Retainers & Client Deliverables',
+                        subtitle: 'Stay aligned on monthly client deliverables, ad budgets, and RM commissions.',
+                        items: ['Track closed retainer commissions in Commissions & Payouts', 'Use WFH/Office mode toggle for daily attendance', 'Coordinate client approvals with your Relationship Manager']
+                    },
+                    retail: {
+                        badge: 'Retail & Counter Staff',
+                        title: 'Store Shift & Counter Operations',
+                        subtitle: 'Clock in at shift start and keep breaks & attendance accurate for payroll.',
+                        items: ['Punch in at counter opening and log breaks accurately', 'Apply for shift swaps or leave in My Leaves', 'Download monthly payslips from My Payslips']
+                    },
+                    salon_spa: {
+                        badge: 'Salon & Wellness',
+                        title: 'Stylist Schedule & Service Splits',
+                        subtitle: 'Track daily attendance and service commission payouts.',
+                        items: ['Punch in before your first client appointment', 'Check service commission payouts in Commissions & Payouts', 'Submit leave requests 48 hours ahead']
+                    },
+                }
+                const guide = verticalGuides[businessType] || {
+                    badge: 'Workforce Self-Service',
+                    title: 'Daily Shift, Attendance & Payroll Sync',
+                    subtitle: 'Your check-ins, leaves, and approved payouts sync directly with monthly payroll.',
+                    items: ['Use the Office / WFH toggle above before punching in', 'Submit leave or attendance regularization requests in My Leaves', 'Download verified monthly payslips in My Payslips']
+                }
+                return (
+                    <Card className="border-indigo-100 bg-linear-to-r from-indigo-50/70 via-white to-blue-50/60 shadow-2xs">
+                        <CardContent className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div className="space-y-1.5">
+                                <span className="inline-block text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700">
+                                    {guide.badge}
+                                </span>
+                                <h3 className="text-base font-bold text-gray-900">{guide.title}</h3>
+                                <p className="text-xs text-gray-600">{guide.subtitle}</p>
+                            </div>
+                            <ul className="space-y-1 text-xs text-gray-700 md:max-w-md">
+                                {guide.items.map(item => (
+                                    <li key={item} className="flex items-start gap-2">
+                                        <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 shrink-0 mt-0.5" />
+                                        <span>{item}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </CardContent>
+                    </Card>
+                )
+            })()}
 
             {/* Quick Action Hub: Leaves, Payslips, Commissions */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
