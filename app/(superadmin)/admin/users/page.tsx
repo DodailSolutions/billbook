@@ -19,7 +19,7 @@ function StatCard({
     value: number
     description: string
     icon: any
-    color: 'blue' | 'emerald' | 'rose' | 'purple' | 'amber'
+    color: 'blue' | 'emerald' | 'rose' | 'purple' | 'amber' | 'teal'
     badge?: string
 }) {
     const colorMap = {
@@ -42,6 +42,10 @@ function StatCard({
         amber: {
             bg: 'bg-amber-50 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400',
             text: 'text-amber-600 dark:text-amber-400'
+        },
+        teal: {
+            bg: 'bg-teal-50 text-teal-600 dark:bg-teal-950/50 dark:text-teal-400',
+            text: 'text-teal-600 dark:text-teal-400'
         }
     }
 
@@ -127,7 +131,8 @@ export default async function UsersManagementPage() {
         active: users?.filter(u => u?.status === 'active')?.length || 0,
         trial: users?.filter(u => u?.subscription?.status === 'trial')?.length || 0,
         suspended: users?.filter(u => u?.status === 'suspended')?.length || 0,
-        admins: users?.filter(u => u?.role === 'super_admin' || u?.role === 'admin')?.length || 0
+        admins: users?.filter(u => u?.role === 'super_admin' || u?.role === 'admin')?.length || 0,
+        employees: users?.filter(u => u?.is_employee)?.length || 0
     }
 
     return (
@@ -188,13 +193,21 @@ export default async function UsersManagementPage() {
             )}
 
             {/* Metric KPI Cards */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
                 <StatCard
                     title="Total Registered"
                     value={stats.total}
                     description="All accounts"
                     icon={Users}
                     color="blue"
+                />
+                <StatCard
+                    title="Employees"
+                    value={stats.employees}
+                    description="Company team & staff"
+                    icon={Building2}
+                    color="teal"
+                    badge="Staff"
                 />
                 <StatCard
                     title="Trial Users"

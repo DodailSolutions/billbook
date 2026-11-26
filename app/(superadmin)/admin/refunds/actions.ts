@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { checkSuperAdminAccess, createAuditLog } from '@/lib/admin-auth'
 import { revalidatePath } from 'next/cache'
 import { processRefund as baseProcessRefund } from '@/app/(dashboard)/invoices/payment-actions'
@@ -29,8 +29,17 @@ export async function createManualRefund(paymentId: string, amount: number, reas
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('Not authenticated')
 
+    let dataClient = supabase
+    try {
+        if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+            dataClient = await createAdminClient()
+        }
+    } catch {
+        // Fallback to standard client
+    }
+
     // Find payment
-    const { data: payment, error: pErr } = await supabase
+    const { data: payment, error: pErr } = await dataClient
         .from('payments')
         .select('*')
         .eq('id', paymentId)
@@ -40,7 +49,7 @@ export async function createManualRefund(paymentId: string, amount: number, reas
         throw new Error('Payment transaction not found')
     }
 
-    const { data: newRefund, error: rErr } = await supabase
+    const { data: newRefund, error: rErr } = await dataClient
         .from('refunds')
         .insert({
             payment_id: payment.id,
@@ -75,7 +84,14 @@ export async function getRecentPaymentsForRefund() {
         const hasAccess = await checkSuperAdminAccess()
         if (!hasAccess) return []
 
-        const supabase = await createClient()
+        let supabase = await createClient()
+        try {
+            if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+                supabase = await createAdminClient()
+            }
+        } catch {
+            // Fallback to standard client
+        }
         const { data: payments } = await supabase
             .from('payments')
             .select('id, amount, currency, status, gateway_payment_id, description, created_at, user_id')

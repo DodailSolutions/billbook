@@ -74,7 +74,7 @@ export default function UserManagementTable({
     const rawUsers = initialUsers ?? legacyUsers ?? []
     const [userList, setUserList] = useState<UserWithDetails[]>(rawUsers)
     const [searchQuery, setSearchQuery] = useState('')
-    const [roleFilter, setRoleFilter] = useState<'all' | 'user' | 'admin' | 'super_admin'>('all')
+    const [roleFilter, setRoleFilter] = useState<'all' | 'user' | 'employee' | 'admin' | 'super_admin'>('all')
     const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'trial' | 'suspended' | 'inactive'>(initialStatus)
     const [planFilter, setPlanFilter] = useState<string>('all')
     const [verticalFilter, setVerticalFilter] = useState<string>(verticalParam || 'all')
@@ -185,7 +185,7 @@ export default function UserManagementTable({
     }
 
     // Role badge styles
-    const getRoleBadge = (role?: string) => {
+    const getRoleBadge = (role?: string, user?: UserWithDetails) => {
         switch (role) {
             case 'super_admin':
                 return {
@@ -197,8 +197,13 @@ export default function UserManagementTable({
                     label: 'Admin',
                     className: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800'
                 }
-            case 'user':
             default:
+                if (user?.is_employee || (role && role !== 'user')) {
+                    return {
+                        label: user?.employee_role || 'Employee',
+                        className: 'bg-teal-50 text-teal-700 dark:bg-teal-950/40 dark:text-teal-300 border border-teal-200 dark:border-teal-800'
+                    }
+                }
                 // Primary account creators who register workspaces are the Workspace Owners
                 return {
                     label: 'Workspace Owner',
@@ -262,8 +267,16 @@ export default function UserManagementTable({
             }
 
             // Role filter
-            if (roleFilter !== 'all' && user.role !== roleFilter) {
-                return false
+            if (roleFilter !== 'all') {
+                if (roleFilter === 'employee') {
+                    if (!user.is_employee && (user.role === 'user' || user.role === 'admin' || user.role === 'super_admin')) {
+                        return false
+                    }
+                } else if (roleFilter === 'user') {
+                    if (user.role !== 'user' || user.is_employee) return false
+                } else if (user.role !== roleFilter) {
+                    return false
+                }
             }
 
             // Status filter
@@ -276,11 +289,20 @@ export default function UserManagementTable({
                 }
             }
 
-            // Plan filter
+            // Plan / User Type filter
             if (planFilter !== 'all') {
-                const currentPlan = user.subscription?.plan?.name?.toLowerCase() || 'free'
-                if (planFilter.toLowerCase() === 'free' && currentPlan !== 'free') return false
-                if (planFilter.toLowerCase() !== 'free' && currentPlan !== planFilter.toLowerCase()) return false
+                const targetPlan = planFilter.toLowerCase()
+                if (targetPlan === 'employee') {
+                    if (!user.is_employee) return false
+                } else if (targetPlan === 'free') {
+                    // Exclude company employees from Free accounts
+                    if (user.is_employee) return false
+                    const currentPlan = user.subscription?.plan?.name?.toLowerCase() || 'free'
+                    if (currentPlan !== 'free') return false
+                } else {
+                    const currentPlan = user.subscription?.plan?.name?.toLowerCase() || 'free'
+                    if (currentPlan !== targetPlan) return false
+                }
             }
 
             // Industry Vertical filter
@@ -376,7 +398,8 @@ export default function UserManagementTable({
                             className="text-xs font-medium bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer"
                         >
                             <option value="all">All Roles</option>
-                            <option value="user">User</option>
+                            <option value="user">Workspace Owner</option>
+                            <option value="employee">Employee</option>
                             <option value="admin">Admin</option>
                             <option value="super_admin">Super Admin</option>
                         </select>
@@ -401,24 +424,23 @@ export default function UserManagementTable({
                     </div>
 
                     {/* Plan Filter */}
-                    {availablePlanNames.length > 0 && (
-                        <div className="relative">
-                            <select
-                                value={planFilter}
-                                onChange={(e) => {
-                                    setPlanFilter(e.target.value)
-                                    setCurrentPage(1)
-                                }}
-                                className="text-xs font-medium bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer"
-                            >
-                                <option value="all">All Plans</option>
-                                <option value="free">Free</option>
-                                {availablePlanNames.map(p => (
-                                    <option key={p} value={p}>{p}</option>
-                                ))}
-                            </select>
-                        </div>
-                    )}
+                    <div className="relative">
+                        <select
+                            value={planFilter}
+                            onChange={(e) => {
+                                setPlanFilter(e.target.value)
+                                setCurrentPage(1)
+                            }}
+                            className="text-xs font-medium bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer"
+                        >
+                            <option value="all">All Plans / Types</option>
+                            <option value="free">Free</option>
+                            <option value="employee">Employee</option>
+                            {availablePlanNames.map(p => (
+                                <option key={p} value={p}>{p}</option>
+                            ))}
+                        </select>
+                    </div>
 
                     {/* Vertical Filter */}
                     <div className="relative">
@@ -488,9 +510,10 @@ export default function UserManagementTable({
                     <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80 text-sm">
                         {paginatedUsers.length > 0 ? (
                             paginatedUsers.map((user) => {
-                                const roleBadge = getRoleBadge(user.role)
+                                const roleBadge = getRoleBadge(user.role, user)
                                 const statusBadge = getStatusBadge(user.status)
-                                const planName = user.subscription?.plan?.name || 'Free'
+                                const isEmployeeAccount = !!user.is_employee && !user.subscription?.plan?.name
+                                const planName = user.subscription?.plan?.name || (user.is_employee ? 'Employee' : 'Free')
                                 const isActionBusy = actionLoading === user.id
                                 const isMenuOpen = selectedUserMenu === user.id
 
@@ -577,16 +600,30 @@ export default function UserManagementTable({
                                             </span>
                                         </td>
 
-                                        {/* Subscription Plan */}
+                                        {/* Subscription Plan / Account Type */}
                                         <td className="py-3.5 px-4 whitespace-nowrap">
-                                            <div className="flex items-center gap-1.5 flex-wrap">
-                                                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 border border-blue-200/80 dark:border-blue-900/40 text-xs font-semibold">
-                                                    <Crown className="h-3 w-3 text-blue-600 dark:text-blue-400" />
-                                                    <span>{planName}</span>
+                                            <div className="flex flex-col gap-1">
+                                                <div className="flex items-center gap-1.5 flex-wrap">
+                                                    {isEmployeeAccount ? (
+                                                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-teal-50 dark:bg-teal-950/30 text-teal-700 dark:text-teal-300 border border-teal-200/80 dark:border-teal-900/40 text-xs font-semibold">
+                                                            <Building2 className="h-3 w-3 text-teal-600 dark:text-teal-400" />
+                                                            <span>Employee</span>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 border border-blue-200/80 dark:border-blue-900/40 text-xs font-semibold">
+                                                            <Crown className="h-3 w-3 text-blue-600 dark:text-blue-400" />
+                                                            <span>{planName}</span>
+                                                        </div>
+                                                    )}
+                                                    {user.subscription?.status === 'trial' && (
+                                                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-300/80">
+                                                            Trial
+                                                        </span>
+                                                    )}
                                                 </div>
-                                                {user.subscription?.status === 'trial' && (
-                                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-300/80">
-                                                        Trial
+                                                {user.is_employee && user.employer_name && (
+                                                    <span className="text-[11px] text-slate-500 dark:text-slate-400 truncate max-w-[180px]" title={user.employer_name}>
+                                                        {user.employer_name}
                                                     </span>
                                                 )}
                                             </div>

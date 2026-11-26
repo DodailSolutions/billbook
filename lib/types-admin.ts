@@ -2,7 +2,7 @@
 
 export interface UserProfile {
     id: string
-    role: 'user' | 'admin' | 'super_admin'
+    role: 'user' | 'admin' | 'super_admin' | 'employee' | string
     business_name?: string
     business_id?: string
     business_type?: string
@@ -187,6 +187,11 @@ export interface UserWithDetails extends UserProfile {
     subscription?: UserSubscription
     total_spent?: number
     invoice_count?: number
+    is_employee?: boolean
+    employer_id?: string
+    employer_name?: string
+    employee_designation?: string
+    employee_role?: string
 }
 
 export interface VerticalDistributionStat {

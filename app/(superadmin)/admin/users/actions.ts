@@ -5,6 +5,7 @@ import { checkSuperAdminAccess, createAuditLog } from '@/lib/admin-auth'
 import { revalidatePath } from 'next/cache'
 import type { UserWithDetails, UserSubscription } from '@/lib/types-admin'
 import type { BusinessType } from '@/lib/business-profile-types'
+import { fetchEmployeeLookupMaps, isEmployeeRole } from '@/lib/admin-employee-utils'
 
 export async function getAllUsers(): Promise<UserWithDetails[]> {
     try {
@@ -99,7 +100,31 @@ export async function getAllUsers(): Promise<UserWithDetails[]> {
             console.warn('[getAllUsers] Non-fatal: could not fetch user_subscriptions:', subErr)
         }
 
-        // 3. Fetch all auth.users directly via admin client if available (includes unconfirmed / newly created signups)
+        // 3. Fetch team_members and employees to distinguish company employees from standalone free users
+        const { byUserId: employeeByUserId, byEmail: employeeByEmail } = await fetchEmployeeLookupMaps(dataClient)
+
+        const resolveEmployeeDetails = (userId: string, email?: string, role?: string) => {
+            const normalizedEmail = email ? email.toLowerCase() : ''
+            const empMatch = employeeByUserId.get(userId) || (normalizedEmail ? employeeByEmail.get(normalizedEmail) : undefined)
+            const hasEmployeeRole = isEmployeeRole(role)
+
+            if (!empMatch && !hasEmployeeRole) {
+                return { is_employee: false }
+            }
+
+            const employerProfile = empMatch?.employerId ? profileMap.get(empMatch.employerId) : undefined
+            const employerName = employerProfile?.business_name || employerProfile?.owner_name || undefined
+
+            return {
+                is_employee: true,
+                employer_id: empMatch?.employerId,
+                employer_name: employerName,
+                employee_designation: empMatch?.designation,
+                employee_role: empMatch?.roleName || (hasEmployeeRole ? role!.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) : 'Employee')
+            }
+        }
+
+        // 4. Fetch all auth.users directly via admin client if available (includes unconfirmed / newly created signups)
         const allAuthUsers: any[] = []
         try {
             if (adminClient?.auth?.admin?.listUsers) {
@@ -159,10 +184,14 @@ export async function getAllUsers(): Promise<UserWithDetails[]> {
                 }
             }
 
+            const resolvedEmail = authUser.email || profile.business_email || profile.email || 'Email not available'
+            const resolvedRole = profile.role || (authUser.app_metadata?.role as any) || meta.role || 'user'
+            const empDetails = resolveEmployeeDetails(authUser.id, authUser.email || profile.business_email || profile.email, resolvedRole)
+
             mergedUsers.push({
                 id: authUser.id,
-                email: authUser.email || profile.business_email || profile.email || 'Email not available',
-                role: profile.role || (authUser.app_metadata?.role as any) || 'user',
+                email: resolvedEmail,
+                role: resolvedRole,
                 status: profile.status || 'active',
                 business_name: profile.business_name || meta.business_name || meta.owner_name || authUser.email?.split('@')[0],
                 owner_name: profile.owner_name || meta.owner_name || meta.full_name,
@@ -172,7 +201,8 @@ export async function getAllUsers(): Promise<UserWithDetails[]> {
                 gstin: profile.gstin || meta.gstin,
                 created_at: profile.created_at || authUser.created_at || new Date().toISOString(),
                 updated_at: profile.updated_at || authUser.updated_at || new Date().toISOString(),
-                subscription: resolvedSub
+                subscription: resolvedSub,
+                ...empDetails
             })
         })
 
@@ -181,13 +211,16 @@ export async function getAllUsers(): Promise<UserWithDetails[]> {
             if (!handledUserIds.has(profile.id)) {
                 handledUserIds.add(profile.id)
                 const subscription = subscriptionsByUser[profile.id]
+                const resolvedRole = profile.role || 'user'
+                const empDetails = resolveEmployeeDetails(profile.id, profile.business_email || profile.email, resolvedRole)
                 mergedUsers.push({
                     ...profile,
                     email: profile.business_email || profile.email || 'Email not available',
-                    role: profile.role || 'user',
+                    role: resolvedRole,
                     status: profile.status || 'active',
                     created_at: profile.created_at || new Date().toISOString(),
-                    subscription
+                    subscription,
+                    ...empDetails
                 })
             }
         })
@@ -202,6 +235,19 @@ export async function getAllUsers(): Promise<UserWithDetails[]> {
     }
 }
 
+async function getAdminDataClient() {
+    const standardClient = await createClient()
+    let dataClient = standardClient
+    try {
+        if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+            dataClient = await createAdminClient()
+        }
+    } catch {
+        // Fallback to standard client
+    }
+    return { standardClient, dataClient }
+}
+
 export async function updateUserStatus(userId: string, status: 'active' | 'suspended' | 'inactive') {
     try {
         const isSuperAdmin = await checkSuperAdminAccess()
@@ -209,9 +255,13 @@ export async function updateUserStatus(userId: string, status: 'active' | 'suspe
             throw new Error('Unauthorized')
         }
 
-        const supabase = await createClient()
+        const { standardClient, dataClient } = await getAdminDataClient()
+        const { data: { user: currentUser } } = await standardClient.auth.getUser()
+        if (currentUser?.id === userId && status !== 'active') {
+            throw new Error('Cannot suspend or deactivate your own super admin account')
+        }
 
-        const { error } = await supabase
+        const { error } = await dataClient
             .from('user_profiles')
             .update({ status, updated_at: new Date().toISOString() })
             .eq('id', userId)
@@ -235,9 +285,13 @@ export async function updateUserRole(userId: string, role: 'user' | 'admin' | 's
             throw new Error('Unauthorized')
         }
 
-        const supabase = await createClient()
+        const { standardClient, dataClient } = await getAdminDataClient()
+        const { data: { user: currentUser } } = await standardClient.auth.getUser()
+        if (currentUser?.id === userId && role !== 'super_admin') {
+            throw new Error('Cannot demote your own super admin account')
+        }
 
-        const { error } = await supabase
+        const { error } = await dataClient
             .from('user_profiles')
             .update({ role, updated_at: new Date().toISOString() })
             .eq('id', userId)
@@ -316,10 +370,14 @@ export async function deleteUser(userId: string) {
             throw new Error('Unauthorized')
         }
 
-        const supabase = await createClient()
+        const { standardClient, dataClient } = await getAdminDataClient()
+        const { data: { user: currentUser } } = await standardClient.auth.getUser()
+        if (currentUser?.id === userId) {
+            throw new Error('Cannot deactivate your own super admin account')
+        }
 
         // 1. Mark as inactive or suspended in user_profiles
-        const { error } = await supabase
+        const { error } = await dataClient
             .from('user_profiles')
             .update({ status: 'inactive', updated_at: new Date().toISOString() })
             .eq('id', userId)

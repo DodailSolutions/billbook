@@ -4,6 +4,35 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 
 ---
 
+## [Release v1.8.1 - Implemented] - 2026-11-26
+
+### Super Admin Employee Categorization, Dedicated KPI Card & Tenant Metric Cleanup
+
+#### 1. Employee vs. Free User Separation (`lib/admin-employee-utils.ts`, `lib/types-admin.ts`, `app/(superadmin)/admin/users/actions.ts`, `UserManagementTable.tsx`)
+- Added shared `fetchEmployeeLookupMaps`, `isEmployeeRole`, and `isEmployeeRecord` helpers checking `team_members`, `employees`, and employee roles (`employee`, `staff`, `relationship_agent`, `hr`, `hr_executive`, `manager`, `client_relationship_manager`).
+- Updated `getAllUsers()` to attach `is_employee`, `employer_id`, `employer_name`, `employee_designation`, and `employee_role` to user records.
+- Updated `UserManagementTable.tsx` to display an **Employee** badge (with employer name underneath when available) instead of **Free**, added **Employee** to both the **Role** and **Plan / Types** filters, and excluded employees when filtering by **Free**.
+
+#### 2. Dedicated Employees KPI Card (`app/(superadmin)/admin/users/page.tsx`)
+- Added a dedicated **Employees** KPI `StatCard` (with `teal` styling) alongside `Total Registered`, `Trial Users`, `Active Accounts`, `Suspended`, and `Staff & Admins`.
+
+#### 3. Command Center, Businesses & Analytics Accuracy (`app/(superadmin)/admin/actions.ts`, `businesses/actions.ts`, `analytics/actions.ts`)
+- Fixed `getVerticalDistributionStats()` to exclude both `superadmin` and `super_admin` as well as employee accounts from `totalTenants`.
+- Fixed `getDashboardStats()` to exclude employee accounts from `total_users` and compute `active_users_today` / `active_users_7d` using distinct `user_id`s across `audit_logs` and `invoices`.
+- Updated `getAllBusinesses()` and `getUsersByBusinessType()` to use `createAdminClient()` when available and exclude employee accounts.
+
+#### 4. Payments Deduplication & Refunds RLS Bypass (`app/(superadmin)/admin/payments/actions.ts`, `refunds/actions.ts`)
+- Fixed `getAllPayments()` to deduplicate `user_subscriptions` against `payments.subscription_id` (preventing double-counted subscription payments).
+- Updated `getAllPayments()`, `createManualRefund()`, and `getRecentPaymentsForRefund()` to use `createAdminClient()` when `SUPABASE_SERVICE_ROLE_KEY` is configured so RLS does not hide non-admin user transactions.
+
+#### 5. Super Admin Security Hardening (`app/api/admin/test-smtp/route.ts`, `settings/payments/`, `users/actions.ts`, API Routes)
+- Unified `test-smtp/route.ts` to use `checkSuperAdminAccess()` instead of querying `user_roles`.
+- Moved payment gateway credential loading/saving to server actions (`settings/payments/actions.ts`), returning masked secrets (`••••`) to the browser and removing raw secret storage from `localStorage`.
+- Added self-demotion/self-deactivation guards and `createAdminClient()` usage to `updateUserStatus`, `updateUserRole`, and `deleteUser`.
+- Audited `/api/*` routes and added explicit `auth.getUser()` checks (plus SSRF/loopback host & port validation on `cctv/probe`) to `app/api/payroll/attendance/cctv/probe/route.ts`, `app/api/bookkeeping/tally-export/route.ts`, and `app/api/invoices/settings/route.ts`.
+
+---
+
 ## [Release v1.8.0 - Implemented] - 2026-11-25
 
 ### Employee & HR Login Routing, Vertical-Aware Employee Hub & CRM RM Workspace (Phase 22)

@@ -1,9 +1,10 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import type { DashboardStats, VerticalAnalyticsSummary, VerticalDistributionStat } from '@/lib/types-admin'
 import { checkSuperAdminAccess } from '@/lib/admin-auth'
 import { BUSINESS_VERTICALS, type BusinessType } from '@/lib/business-profile-types'
+import { fetchEmployeeLookupMaps, isEmployeeRecord } from '@/lib/admin-employee-utils'
 
 export async function getDashboardStats(): Promise<DashboardStats | null> {
     try {
@@ -12,26 +13,36 @@ export async function getDashboardStats(): Promise<DashboardStats | null> {
             return null
         }
 
-        const supabase = await createClient()
+        let supabase = await createClient()
+        try {
+            if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+                supabase = await createAdminClient()
+            }
+        } catch {
+            // Fallback to standard client
+        }
 
         // Fetch all stats concurrently in parallel for maximum performance
         const [
             paymentsRes,
             refundsRes,
-            usersRes,
+            profilesRes,
             subsRes,
-            ticketsRes
+            ticketsRes,
+            empMaps
         ] = await Promise.all([
             supabase.from('payments').select('amount, status'),
             supabase.from('refunds').select('amount, status'),
-            supabase.from('user_profiles').select('*', { count: 'exact', head: true }),
+            supabase.from('user_profiles').select('id, business_email, role'),
             supabase.from('user_subscriptions').select('*', { count: 'exact', head: true }).eq('status', 'active'),
-            supabase.from('support_tickets').select('*', { count: 'exact', head: true }).in('status', ['open', 'in_progress'])
+            supabase.from('support_tickets').select('*', { count: 'exact', head: true }).in('status', ['open', 'in_progress']),
+            fetchEmployeeLookupMaps(supabase)
         ])
 
         const payments = paymentsRes.data || []
         const refunds = refundsRes.data || []
-        const total_users = usersRes.count || 0
+        const nonEmployeeProfiles = (profilesRes.data || []).filter((p: any) => !isEmployeeRecord(p, empMaps))
+        const total_users = nonEmployeeProfiles.length
         const active_subscriptions = subsRes.count || 0
         const open_tickets = ticketsRes.count || 0
 
@@ -39,16 +50,24 @@ export async function getDashboardStats(): Promise<DashboardStats | null> {
         const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString()
         const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString()
 
-        // Fetch active users in last 24h and last 7 days
+        // Fetch distinct active users in last 24h and last 7 days
         const [active24hRes, active7dRes, inv24hRes, inv7dRes] = await Promise.all([
-            supabase.from('audit_logs').select('user_id', { count: 'exact', head: true }).gte('created_at', oneDayAgo),
-            supabase.from('audit_logs').select('user_id', { count: 'exact', head: true }).gte('created_at', sevenDaysAgo),
-            supabase.from('invoices').select('user_id', { count: 'exact', head: true }).gte('created_at', oneDayAgo),
-            supabase.from('invoices').select('user_id', { count: 'exact', head: true }).gte('created_at', sevenDaysAgo)
+            supabase.from('audit_logs').select('user_id').gte('created_at', oneDayAgo),
+            supabase.from('audit_logs').select('user_id').gte('created_at', sevenDaysAgo),
+            supabase.from('invoices').select('user_id').gte('created_at', oneDayAgo),
+            supabase.from('invoices').select('user_id').gte('created_at', sevenDaysAgo)
         ])
 
-        const active_users_today = Math.min(total_users, Math.max(active24hRes.count || 0, inv24hRes.count || 0, total_users > 0 ? 1 : 0))
-        const active_users_7d = Math.min(total_users, Math.max(active7dRes.count || 0, inv7dRes.count || 0, active_users_today))
+        const active24hUsers = new Set<string>()
+        ;(active24hRes.data || []).forEach((r: any) => { if (r.user_id) active24hUsers.add(r.user_id) })
+        ;(inv24hRes.data || []).forEach((r: any) => { if (r.user_id) active24hUsers.add(r.user_id) })
+
+        const active7dUsers = new Set<string>(active24hUsers)
+        ;(active7dRes.data || []).forEach((r: any) => { if (r.user_id) active7dUsers.add(r.user_id) })
+        ;(inv7dRes.data || []).forEach((r: any) => { if (r.user_id) active7dUsers.add(r.user_id) })
+
+        const active_users_today = Math.min(total_users, active24hUsers.size)
+        const active_users_7d = Math.min(total_users, active7dUsers.size)
         const inactive_users_7d = Math.max(0, total_users - active_users_7d)
 
         const total_payments = payments
@@ -123,12 +142,22 @@ export async function getVerticalDistributionStats(): Promise<VerticalAnalyticsS
             }
         }
 
-        const supabase = await createClient()
+        let supabase = await createClient()
+        try {
+            if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+                supabase = await createAdminClient()
+            }
+        } catch {
+            // Fallback to standard client
+        }
 
         // Fetch all user profiles with business_type
-        const { data: profiles } = await supabase
-            .from('user_profiles')
-            .select('id, business_type, status, role')
+        const [{ data: profiles }, empMaps] = await Promise.all([
+            supabase
+                .from('user_profiles')
+                .select('id, business_email, business_type, status, role'),
+            fetchEmployeeLookupMaps(supabase)
+        ])
 
         // Fetch invoice aggregates per user to associate volume per vertical
         const { data: invoices } = await supabase
@@ -146,8 +175,10 @@ export async function getVerticalDistributionStats(): Promise<VerticalAnalyticsS
             }
         }
 
-        // Tally profiles by vertical
-        const validProfiles = (profiles || []).filter(p => p.role !== 'superadmin')
+        // Tally profiles by vertical (exclude super admins and company employees)
+        const validProfiles = (profiles || []).filter(
+            (p: any) => p.role !== 'superadmin' && p.role !== 'super_admin' && !isEmployeeRecord(p, empMaps)
+        )
         const totalTenants = validProfiles.length
 
         const verticalMap = new Map<string, {

@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { checkSuperAdminAccess } from '@/lib/admin-auth'
 
 export interface UnifiedPayment {
@@ -22,15 +22,23 @@ export interface UnifiedPayment {
 }
 
 export async function getAllPayments(): Promise<UnifiedPayment[]> {
-    const supabase = await createClient()
-    
     // Check super admin access
     const hasAccess = await checkSuperAdminAccess()
     if (!hasAccess) {
         return []
     }
 
+    let supabase = await createClient()
+    try {
+        if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+            supabase = await createAdminClient()
+        }
+    } catch {
+        // Fallback to standard client
+    }
+
     const unified: UnifiedPayment[] = []
+    const seenSubscriptionIds = new Set<string>()
 
     try {
         // 1. Fetch from payments table
@@ -45,6 +53,9 @@ export async function getAllPayments(): Promise<UnifiedPayment[]> {
 
         if (!paymentsErr && paymentsData) {
             paymentsData.forEach((p: any) => {
+                if (p.subscription_id) {
+                    seenSubscriptionIds.add(p.subscription_id)
+                }
                 const userObj = Array.isArray(p.user) ? p.user[0] : p.user
                 unified.push({
                     id: p.id,
@@ -87,8 +98,8 @@ export async function getAllPayments(): Promise<UnifiedPayment[]> {
 
         if (!subsErr && subsData) {
             subsData.forEach((s: any) => {
-                // Check if already captured via payments table
-                const exists = unified.some(u => u.id === s.id)
+                // Skip subscriptions already captured via payments.subscription_id
+                const exists = seenSubscriptionIds.has(s.id) || unified.some(u => u.id === s.id)
                 if (!exists) {
                     const userObj = Array.isArray(s.user) ? s.user[0] : s.user
                     unified.push({

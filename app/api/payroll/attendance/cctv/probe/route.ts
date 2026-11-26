@@ -1,8 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
 import net from 'net'
+
+const BLOCKED_HOSTS = new Set(['localhost', '127.0.0.1', '0.0.0.0', '::1', '169.254.169.254'])
 
 export async function POST(req: NextRequest) {
     try {
+        const supabase = await createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) {
+            return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
+        }
+
         const body = await req.json()
         const { host, port, brand } = body
 
@@ -11,7 +20,14 @@ export async function POST(req: NextRequest) {
         }
 
         const targetPort = parseInt(port, 10) || 554
+        if (targetPort < 1 || targetPort > 65535) {
+            return NextResponse.json({ success: false, error: 'Invalid port number.' }, { status: 400 })
+        }
+
         const targetHost = host.trim().replace(/^https?:\/\//, '').replace(/^rtsp:\/\//, '').split('/')[0].split('@').pop()?.split(':')[0] || host.trim()
+        if (BLOCKED_HOSTS.has(targetHost.toLowerCase()) || targetHost.startsWith('169.254.')) {
+            return NextResponse.json({ success: false, error: 'Target host is not permitted.' }, { status: 400 })
+        }
 
         // Perform real TCP socket connection test with a 3.5s timeout
         const isReachable = await new Promise<{ ok: boolean; message: string }>((resolve) => {

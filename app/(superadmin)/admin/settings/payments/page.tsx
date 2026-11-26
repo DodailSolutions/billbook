@@ -10,12 +10,11 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
-import { createClient } from '@/lib/supabase/client'
+import { getMaskedPaymentGatewaysConfig, savePaymentGatewaysConfig } from './actions'
 
 type GatewayType = 'razorpay' | 'cashfree' | 'stripe' | 'paypal'
 
 export default function PaymentGatewaysSettingsPage() {
-  const supabase = createClient()
 
   // Active Tab
   const [activeGateway, setActiveGateway] = useState<GatewayType>('razorpay')
@@ -67,72 +66,38 @@ export default function PaymentGatewaysSettingsPage() {
 
   const loadSettings = async () => {
     try {
-      const { data } = await supabase
-        .from('system_settings')
-        .select('*')
-        .eq('key', 'payment_gateways_config')
-        .single()
+      // Remove any legacy unmasked secrets cached in localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('billbooky_gateways_config')
+      }
+      const val = await getMaskedPaymentGatewaysConfig()
+      if (val) {
+        setRazorpayKeyId(val.razorpay.keyId || '')
+        setRazorpayKeySecret(val.razorpay.keySecret || '')
+        setRazorpayWebhookSecret(val.razorpay.webhookSecret || '')
+        setRazorpayMode(val.razorpay.mode || 'live')
+        setRazorpayEnabled(val.razorpay.enabled ?? true)
 
-      if (data?.value) {
-        const val = data.value
-        if (val.razorpay) {
-          setRazorpayKeyId(val.razorpay.keyId || '')
-          setRazorpayKeySecret(val.razorpay.keySecret || '')
-          setRazorpayWebhookSecret(val.razorpay.webhookSecret || '')
-          setRazorpayMode(val.razorpay.mode || 'live')
-          setRazorpayEnabled(val.razorpay.enabled ?? true)
-        }
-        if (val.cashfree) {
-          setCashfreeAppId(val.cashfree.appId || '')
-          setCashfreeSecretKey(val.cashfree.secretKey || '')
-          setCashfreeWebhookSecret(val.cashfree.webhookSecret || '')
-          setCashfreeMode(val.cashfree.mode || 'production')
-          setCashfreeEnabled(val.cashfree.enabled ?? true)
-        }
-        if (val.stripe) {
-          setStripePublishableKey(val.stripe.publishableKey || '')
-          setStripeSecretKey(val.stripe.secretKey || '')
-          setStripeWebhookSecret(val.stripe.webhookSecret || '')
-          setStripeMode(val.stripe.mode || 'live')
-          setStripeEnabled(val.stripe.enabled ?? true)
-        }
-        if (val.paypal) {
-          setPaypalClientId(val.paypal.clientId || '')
-          setPaypalSecretKey(val.paypal.secretKey || '')
-          setPaypalWebhookId(val.paypal.webhookId || '')
-          setPaypalMode(val.paypal.mode || 'live')
-          setPaypalEnabled(val.paypal.enabled ?? true)
-        }
-      } else {
-        const cached = localStorage.getItem('billbooky_gateways_config')
-        if (cached) {
-          const parsed = JSON.parse(cached)
-          if (parsed.razorpay) {
-            setRazorpayKeyId(parsed.razorpay.keyId || '')
-            setRazorpayMode(parsed.razorpay.mode || 'live')
-          }
-          if (parsed.cashfree) {
-            setCashfreeAppId(parsed.cashfree.appId || '')
-            setCashfreeMode(parsed.cashfree.mode || 'production')
-          }
-          if (parsed.stripe) {
-            setStripePublishableKey(parsed.stripe.publishableKey || '')
-            setStripeMode(parsed.stripe.mode || 'live')
-          }
-          if (parsed.paypal) {
-            setPaypalClientId(parsed.paypal.clientId || '')
-            setPaypalMode(parsed.paypal.mode || 'live')
-          }
-        }
+        setCashfreeAppId(val.cashfree.appId || '')
+        setCashfreeSecretKey(val.cashfree.secretKey || '')
+        setCashfreeWebhookSecret(val.cashfree.webhookSecret || '')
+        setCashfreeMode(val.cashfree.mode || 'production')
+        setCashfreeEnabled(val.cashfree.enabled ?? true)
+
+        setStripePublishableKey(val.stripe.publishableKey || '')
+        setStripeSecretKey(val.stripe.secretKey || '')
+        setStripeWebhookSecret(val.stripe.webhookSecret || '')
+        setStripeMode(val.stripe.mode || 'live')
+        setStripeEnabled(val.stripe.enabled ?? true)
+
+        setPaypalClientId(val.paypal.clientId || '')
+        setPaypalSecretKey(val.paypal.secretKey || '')
+        setPaypalWebhookId(val.paypal.webhookId || '')
+        setPaypalMode(val.paypal.mode || 'live')
+        setPaypalEnabled(val.paypal.enabled ?? true)
       }
-    } catch {
-      const cached = localStorage.getItem('billbooky_gateways_config')
-      if (cached) {
-        try {
-          const parsed = JSON.parse(cached)
-          if (parsed.razorpay) setRazorpayKeyId(parsed.razorpay.keyId || '')
-        } catch {}
-      }
+    } catch (err) {
+      console.warn('Failed to load gateway settings:', err)
     }
   }
 
@@ -170,23 +135,23 @@ export default function PaymentGatewaysSettingsPage() {
         mode: paypalMode,
         enabled: paypalEnabled,
       },
-      updated_at: new Date().toISOString()
     }
 
     try {
-      localStorage.setItem('billbooky_gateways_config', JSON.stringify(payload))
-      await supabase.from('system_settings').upsert({
-        key: 'payment_gateways_config',
-        value: payload,
-        description: 'Multi-Gateway API credentials and webhook secrets for Razorpay, Cashfree, Stripe, and PayPal'
-      })
-
+      const res = await savePaymentGatewaysConfig(payload)
+      if (res?.masked) {
+        setRazorpayKeySecret(res.masked.razorpay.keySecret)
+        setRazorpayWebhookSecret(res.masked.razorpay.webhookSecret)
+        setCashfreeSecretKey(res.masked.cashfree.secretKey)
+        setCashfreeWebhookSecret(res.masked.cashfree.webhookSecret)
+        setStripeSecretKey(res.masked.stripe.secretKey)
+        setStripeWebhookSecret(res.masked.stripe.webhookSecret)
+        setPaypalSecretKey(res.masked.paypal.secretKey)
+      }
       setSaveSuccess(true)
       setTimeout(() => setSaveSuccess(false), 3000)
     } catch (err) {
-      console.warn('Saved gateway settings to localStorage fallback:', err)
-      setSaveSuccess(true)
-      setTimeout(() => setSaveSuccess(false), 3000)
+      console.error('Failed to save gateway settings:', err)
     } finally {
       setIsSaving(false)
     }

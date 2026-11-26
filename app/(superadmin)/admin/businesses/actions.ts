@@ -4,6 +4,7 @@ import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { checkSuperAdminAccess, createAuditLog } from '@/lib/admin-auth'
 import { revalidatePath } from 'next/cache'
 import type { BusinessType } from '@/lib/business-profile-types'
+import { fetchEmployeeLookupMaps, isEmployeeRecord } from '@/lib/admin-employee-utils'
 
 export async function getAllBusinesses() {
     try {
@@ -12,15 +13,25 @@ export async function getAllBusinesses() {
             return []
         }
 
-        const supabase = await createClient()
+        let supabase = await createClient()
+        try {
+            if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+                supabase = await createAdminClient()
+            }
+        } catch {
+            // Fallback to standard client
+        }
 
-        const { data } = await supabase
-            .from('user_profiles')
-            .select('*')
-            .not('business_name', 'is', null)
-            .order('created_at', { ascending: false })
+        const [{ data }, empMaps] = await Promise.all([
+            supabase
+                .from('user_profiles')
+                .select('*')
+                .not('business_name', 'is', null)
+                .order('created_at', { ascending: false }),
+            fetchEmployeeLookupMaps(supabase)
+        ])
 
-        return data || []
+        return (data || []).filter((b: any) => !isEmployeeRecord(b, empMaps))
     } catch (error) {
         console.error('Error fetching businesses:', error)
         return []
