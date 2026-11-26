@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useEffect } from "react"
-import { Loader2, FileDown } from "lucide-react"
+import { Loader2, FileDown, Printer, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/Button"
+import type { InvoiceCopyType } from "@/lib/pdf-utils"
 
 interface DownloadPDFButtonProps {
     invoiceId: string
@@ -17,6 +18,8 @@ export function DownloadPDFButton({
 }: DownloadPDFButtonProps) {
     const [isDownloading, setIsDownloading] = useState(false)
     const [showBankDetails, setShowBankDetails] = useState(initialShowBankDetails)
+    const [copyType, setCopyType] = useState<InvoiceCopyType>('original')
+    const [menuOpen, setMenuOpen] = useState(false)
 
     useEffect(() => {
         const handler = (e: any) => {
@@ -28,8 +31,9 @@ export function DownloadPDFButton({
         return () => window.removeEventListener('invoice_payment_details_toggle', handler)
     }, [invoiceId])
 
-    const handleDownload = async () => {
+    const handleDownload = async (selectedCopy: InvoiceCopyType = copyType) => {
         setIsDownloading(true)
+        setMenuOpen(false)
         let iframe: HTMLIFrameElement | null = null
         try {
             const [{ default: jsPDF }, { default: html2canvas }] = await Promise.all([
@@ -38,7 +42,7 @@ export function DownloadPDFButton({
             ])
 
             // Fetch the invoice HTML with paid bank details toggle
-            const queryParams = new URLSearchParams({ mode: 'html' })
+            const queryParams = new URLSearchParams({ mode: 'html', copy: selectedCopy })
             if (isPaid) {
                 queryParams.set('show_bank_details_when_paid', String(showBankDetails))
             }
@@ -198,19 +202,74 @@ export function DownloadPDFButton({
         }
     }
 
+    const handleThermalPrint = () => {
+        setMenuOpen(false)
+        const params = new URLSearchParams({ mode: 'download', format: 'thermal_80mm', copy: copyType })
+        if (isPaid) {
+            params.set('show_bank_details_when_paid', String(showBankDetails))
+        }
+        window.open(`/api/invoices/${invoiceId}/pdf?${params.toString()}`, '_blank')
+    }
+
     return (
-        <Button 
-            onClick={handleDownload} 
-            disabled={isDownloading}
-            className="gap-2"
-            title="Download PDF to your computer"
-        >
-            {isDownloading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-                <FileDown className="h-4 w-4" />
+        <div className="relative inline-flex items-center">
+            <Button
+                onClick={() => handleDownload(copyType)}
+                disabled={isDownloading}
+                className="gap-2 rounded-r-none"
+                title="Download PDF to your computer"
+            >
+                {isDownloading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                    <FileDown className="h-4 w-4" />
+                )}
+                {isDownloading ? 'Generating PDF...' : 'Download PDF'}
+            </Button>
+            <Button
+                type="button"
+                variant="default"
+                disabled={isDownloading}
+                onClick={() => setMenuOpen(prev => !prev)}
+                className="px-2 rounded-l-none border-l border-white/20"
+                title="Copy label & Thermal 80mm options"
+            >
+                <ChevronDown className="h-4 w-4" />
+            </Button>
+
+            {menuOpen && (
+                <div className="absolute right-0 top-full mt-1.5 w-56 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-lg z-50 p-1.5 text-sm">
+                    <div className="px-2 py-1 text-[11px] font-semibold uppercase tracking-wider text-gray-500">
+                        Download Copy
+                    </div>
+                    {(['original', 'duplicate', 'triplicate'] as InvoiceCopyType[]).map((c) => (
+                        <button
+                            key={c}
+                            type="button"
+                            onClick={() => {
+                                setCopyType(c)
+                                handleDownload(c)
+                            }}
+                            className={`w-full text-left px-2.5 py-1.5 rounded-md text-xs font-medium capitalize transition-colors ${
+                                copyType === c
+                                    ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+                                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                            }`}
+                        >
+                            {c === 'original' ? 'Original for Recipient' : c === 'duplicate' ? 'Duplicate for Transporter' : 'Triplicate for Supplier'}
+                        </button>
+                    ))}
+                    <div className="my-1 border-t border-gray-100 dark:border-gray-800" />
+                    <button
+                        type="button"
+                        onClick={handleThermalPrint}
+                        className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                    >
+                        <Printer className="h-3.5 w-3.5" />
+                        Thermal 80mm Receipt
+                    </button>
+                </div>
             )}
-            {isDownloading ? 'Generating PDF...' : 'Download PDF'}
-        </Button>
+        </div>
     )
 }

@@ -6,6 +6,17 @@ This tracker records all bugs, fixes, feature enhancements, and database migrati
 
 ## [Release v1.8.1 - Implemented] - 2026-11-26
 
+### Invoice PDF Discount Display Fix (`lib/pdf.ts`, `app/(dashboard)/invoices/actions.ts`)
+- Updated `generateInvoicePDF()` in `lib/pdf.ts` to always render the Discount row (and Taxable Value) using `discount_amount` when present or inferring it when fallback inserts omitted the column, and safely coercing numeric values.
+- Updated `createInvoice()` in `app/(dashboard)/invoices/actions.ts` so the `baseGstPayload` fallback preserves `discount_amount`, `discount_type`, and `discount_value` before falling back to a no-discount insert.
+
+### SEO & Link-Preview Metadata Refresh (`app/layout.tsx`, `app/robots.ts`)
+- Updated `metadata`, `openGraph`, `twitter`, and `SoftwareApplication` JSON-LD in `app/layout.tsx` to describe BillBooky's full suite (GST billing, CRM, payroll, inventory, client portal, and AI Accountant) and explicitly reference `/opengraph-image`.
+- Updated `app/robots.ts` to disallow `/hr-dashboard/*`, `/employee/*`, and `/portal/*` from search indexing.
+
+### Master Upgrade Roadmap & Daily Backup Plan Logged (`ACTION_PLAN_TRACKER.md`)
+- Documented Phases 24–29 covering Invoice PDF Excellence, Credit/Debit Notes & Delivery Challans, Live GST IRP/E-Way Integration, CRM Automation & Multi-Currency Invoicing, Public SEO Comparison Hub + Super Admin Governance, and Automated Daily Backups & Disaster Recovery — each with implementation steps, data flow, dependencies, linked modules, expected outcomes, end-user UX behavior, and zero-breakage guardrails.
+
 ### Super Admin Employee Categorization, Dedicated KPI Card & Tenant Metric Cleanup
 
 #### 1. Employee vs. Free User Separation (`lib/admin-employee-utils.ts`, `lib/types-admin.ts`, `app/(superadmin)/admin/users/actions.ts`, `UserManagementTable.tsx`)

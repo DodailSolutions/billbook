@@ -9,11 +9,12 @@ import { LeadModal } from "./LeadModal"
 import { LeadImportModal } from "./LeadImportModal"
 import { TeamPerformanceView } from "./TeamPerformanceView"
 import { ActivityTimeline } from "./ActivityTimeline"
+import { DeliveryTrackerView } from "./DeliveryTrackerView"
 import { Button } from "@/components/ui/Button"
 import { Card, CardContent } from "@/components/ui/Card"
 import { 
     Plus, Sparkles, TrendingUp, DollarSign, Award, Target, 
-    LayoutGrid, Clock, Users, FileSpreadsheet, Download, RefreshCw 
+    LayoutGrid, Clock, Users, FileSpreadsheet, Download, RefreshCw, Rocket
 } from "lucide-react"
 
 export default function CRMPage() {
@@ -23,7 +24,7 @@ export default function CRMPage() {
     const [teamMembers, setTeamMembers] = useState<CRMTeamMember[]>([])
     const [loading, setLoading] = useState(true)
 
-    const [activeTab, setActiveTab] = useState<'kanban' | 'team' | 'activities'>('kanban')
+    const [activeTab, setActiveTab] = useState<'kanban' | 'delivery' | 'team' | 'activities'>('kanban')
     const [isLeadModalOpen, setIsLeadModalOpen] = useState(false)
     const [isImportModalOpen, setIsImportModalOpen] = useState(false)
     const [selectedLead, setSelectedLead] = useState<CRMLead | null>(null)
@@ -334,6 +335,17 @@ export default function CRMPage() {
                         Kanban Pipeline ({leads.length})
                     </button>
                     <button
+                        onClick={() => setActiveTab('delivery')}
+                        className={`flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold rounded-xl transition-colors shrink-0 ${
+                            activeTab === 'delivery'
+                                ? 'bg-indigo-600 text-white shadow-xs'
+                                : 'text-gray-600 hover:bg-gray-100'
+                        }`}
+                    >
+                        <Rocket className="h-4 w-4" />
+                        Delivery &amp; Agency ({leads.filter(l => l.stage === 'won').length})
+                    </button>
+                    <button
                         onClick={() => setActiveTab('team')}
                         className={`flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold rounded-xl transition-colors shrink-0 ${
                             activeTab === 'team' 
@@ -372,6 +384,8 @@ export default function CRMPage() {
                     selectedMemberFilter={selectedMemberFilter}
                     onMemberFilterChange={setSelectedMemberFilter}
                 />
+            ) : activeTab === 'delivery' ? (
+                <DeliveryTrackerView leads={leads} onRefresh={fetchData} />
             ) : activeTab === 'team' ? (
                 <TeamPerformanceView 
                     leads={leads}

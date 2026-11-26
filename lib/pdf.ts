@@ -4,10 +4,20 @@ import type { InvoiceWithDetails } from '@/lib/types'
 import type { PurchaseOrder } from '@/lib/po-types'
 import { formatDate } from '@/lib/utils'
 import { getInvoiceSettings, type InvoiceSettings } from '@/app/(dashboard)/invoices/settings/actions'
+import {
+    numberToIndianWords,
+    buildHsnTaxSummary,
+    COPY_LABELS,
+    type InvoiceCopyType,
+    type InvoicePrintFormat,
+} from '@/lib/pdf-utils'
 
 export async function generateInvoicePDF(
     invoice: InvoiceWithDetails,
-    overrides?: Partial<InvoiceSettings>
+    overrides?: Partial<InvoiceSettings> & {
+        copy?: InvoiceCopyType
+        format?: InvoicePrintFormat
+    }
 ): Promise<string> {
     // Get customization settings
     const dbSettings = await getInvoiceSettings()
@@ -66,6 +76,100 @@ export async function generateInvoicePDF(
     const customerAddress = customer.address || ''
     const customerGstin = customer.gstin || ''
     const invoiceItems = Array.isArray(invoice.invoice_items) ? invoice.invoice_items : []
+    const copyType: InvoiceCopyType = overrides?.copy && COPY_LABELS[overrides.copy] ? overrides.copy : 'original'
+    const copyLabel = COPY_LABELS[copyType]
+    const printFormat: InvoicePrintFormat = overrides?.format === 'thermal_80mm' ? 'thermal_80mm' : 'a4'
+    const amountInWords = numberToIndianWords(Number(invoice.total || 0))
+    const hsnRows = buildHsnTaxSummary(
+        invoiceItems,
+        Number(invoice.gst_percentage || 0),
+        invoice.supply_type || 'intra-state'
+    )
+    const showHsnSummary = hsnRows.length > 0 && (Number(invoice.gst_percentage || 0) > 0 || hsnRows.some(r => r.hsn !== '—' || r.totalTax > 0))
+    const isIntraState = invoice.supply_type !== 'inter-state'
+    const placeOfSupply = (customer as any).state || (invoice.supply_type ? invoice.supply_type.replace('-', ' ').toUpperCase() : '')
+
+    if (printFormat === 'thermal_80mm') {
+        return `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Receipt ${invoice.invoice_number}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 11px;
+            line-height: 1.35;
+            color: #000;
+            background: #fff;
+            width: 80mm;
+            max-width: 300px;
+            margin: 0 auto;
+            padding: 8px 10px;
+        }
+        .center { text-align: center; }
+        .right { text-align: right; }
+        .bold { font-weight: 700; }
+        .divider { border-top: 1px dashed #000; margin: 6px 0; }
+        .row { display: flex; justify-content: space-between; gap: 6px; }
+        table { width: 100%; border-collapse: collapse; margin: 4px 0; }
+        th, td { font-size: 10px; padding: 2px 0; text-align: left; vertical-align: top; }
+        th.right, td.right { text-align: right; }
+        @media print {
+            @page { size: 80mm auto; margin: 2mm; }
+            body { width: 100%; max-width: none; padding: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="center bold" style="font-size: 14px;">${companyName}</div>
+    ${companyAddress ? `<div class="center" style="font-size: 10px;">${companyAddress}</div>` : ''}
+    ${companyPhone ? `<div class="center" style="font-size: 10px;">Ph: ${companyPhone}</div>` : ''}
+    ${showGstin && companyGstin ? `<div class="center bold" style="font-size: 10px;">GSTIN: ${companyGstin}</div>` : ''}
+    <div class="divider"></div>
+    <div class="center bold" style="font-size: 11px;">${companyGstin ? 'TAX INVOICE' : 'INVOICE'} (${copyType.toUpperCase()})</div>
+    <div class="row"><span>No: ${invoice.invoice_number}</span><span>${formatDate(invoice.invoice_date)}</span></div>
+    <div>Bill To: <span class="bold">${customerName}</span></div>
+    ${customerPhone ? `<div>Ph: ${customerPhone}</div>` : ''}
+    ${customerGstin ? `<div>GSTIN: ${customerGstin}</div>` : ''}
+    <div class="divider"></div>
+    <table>
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th class="right">Qty</th>
+                <th class="right">Rate</th>
+                <th class="right">Amt</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${invoiceItems.map(item => `
+            <tr>
+                <td>${item.description}${item.hsn_sac_code ? `<div style="font-size:9px;color:#444;">HSN:${item.hsn_sac_code}</div>` : ''}</td>
+                <td class="right">${item.quantity}</td>
+                <td class="right">${Number(item.unit_price || 0).toFixed(2)}</td>
+                <td class="right">${Number(item.amount || 0).toFixed(2)}</td>
+            </tr>`).join('')}
+        </tbody>
+    </table>
+    <div class="divider"></div>
+    <div class="row"><span>Subtotal</span><span>₹${Number(invoice.subtotal || 0).toFixed(2)}</span></div>
+    ${Number(invoice.discount_amount || 0) > 0 ? `<div class="row"><span>Discount</span><span>-₹${Number(invoice.discount_amount || 0).toFixed(2)}</span></div>` : ''}
+    ${Number(invoice.gst_percentage || 0) > 0 ? (isIntraState
+        ? `<div class="row"><span>CGST (${(Number(invoice.gst_percentage) / 2).toFixed(1)}%)</span><span>₹${Number(invoice.cgst_amount || 0).toFixed(2)}</span></div>
+           <div class="row"><span>SGST (${(Number(invoice.gst_percentage) / 2).toFixed(1)}%)</span><span>₹${Number(invoice.sgst_amount || 0).toFixed(2)}</span></div>`
+        : `<div class="row"><span>IGST (${invoice.gst_percentage}%)</span><span>₹${Number(invoice.igst_amount || 0).toFixed(2)}</span></div>`) : ''}
+    <div class="divider"></div>
+    <div class="row bold" style="font-size: 13px;"><span>TOTAL</span><span>₹${Number(invoice.total || 0).toFixed(2)}</span></div>
+    <div style="font-size: 9px; margin-top: 4px;">${amountInWords}</div>
+    ${isPaid ? `<div class="center bold" style="margin-top: 6px; border: 1px solid #000; padding: 2px;">PAID</div>` : ''}
+    <div class="divider"></div>
+    <div class="center" style="font-size: 10px;">${footerText}</div>
+    <div class="center" style="font-size: 9px; margin-top: 3px;">Powered by BillBooky</div>
+</body>
+</html>`
+    }
     
     // Generate HTML for PDF
     const html = `
@@ -292,8 +396,10 @@ export async function generateInvoicePDF(
                 ` : ''}
             </div>
             <div class="header-right">
+                <div style="display: inline-block; font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; background: #f3f4f6; color: #374151; border: 1px solid #d1d5db; margin-bottom: 6px;">${copyLabel}</div>
                 <div class="invoice-title">INVOICE</div>
                 <div class="invoice-number">${invoice.invoice_number}</div>
+                ${placeOfSupply ? `<div style="font-size: 10px; color: #6b7280; margin-top: 2px;">Place of Supply: <strong>${placeOfSupply}</strong></div>` : ''}
                 
                 <div class="invoice-dates">
                     <div class="date-item">
@@ -348,16 +454,37 @@ export async function generateInvoicePDF(
 
         <div class="totals-section">
             <div class="totals">
+                ${(() => {
+                    const subtotalNum = Number(invoice.subtotal || 0)
+                    const gstNum = Number(invoice.gst_amount || 0)
+                    const totalNum = Number(invoice.total || 0)
+                    const explicitDiscount = Number(invoice.discount_amount || 0)
+                    const inferredDiscount = explicitDiscount > 0
+                        ? explicitDiscount
+                        : Math.max(0, Number((subtotalNum + gstNum - totalNum).toFixed(2)))
+                    const effectiveDiscount = explicitDiscount > 0 ? explicitDiscount : (inferredDiscount > 1 ? inferredDiscount : 0)
+                    const taxableAmount = Math.max(0, subtotalNum - effectiveDiscount)
+                    const discountLabel = invoice.discount_type === 'percentage' && invoice.discount_value
+                        ? `Discount (${invoice.discount_value}%)`
+                        : 'Discount'
+
+                    return `
                 <div class="total-row subtotal">
                     <span>Subtotal:</span>
-                    <span>₹${invoice.subtotal.toFixed(2)}</span>
+                    <span>₹${subtotalNum.toFixed(2)}</span>
                 </div>
-                ${invoice.discount_amount && invoice.discount_amount > 0 ? `
+                ${effectiveDiscount > 0 ? `
                 <div class="total-row" style="color: #f97316; font-weight: 600;">
-                    <span>Discount (${invoice.discount_type === 'percentage' ? `${invoice.discount_value}%` : 'Flat'}):</span>
-                    <span>-₹${invoice.discount_amount.toFixed(2)}</span>
+                    <span>${discountLabel}:</span>
+                    <span>-₹${effectiveDiscount.toFixed(2)}</span>
+                </div>
+                <div class="total-row" style="color: #4b5563; font-size: ${Math.max(10, invoiceFontSize - 1)}px;">
+                    <span>Taxable Value:</span>
+                    <span>₹${taxableAmount.toFixed(2)}</span>
                 </div>
                 ` : ''}
+                    `
+                })()}
                 ${invoice.gst_percentage > 0 ? `
                     ${invoice.supply_type === 'intra-state' ? `
                     <div class="total-row">
@@ -399,6 +526,44 @@ export async function generateInvoicePDF(
                 ` : ''}
             </div>
         </div>
+
+        <div style="margin-bottom: 14px; padding: 8px 12px; background: #f8fafc; border-left: 3px solid ${primaryColor}; border-radius: 4px; font-size: ${Math.max(10, invoiceFontSize - 1)}px; color: #334155; page-break-inside: avoid;">
+            <span style="font-weight: 600; color: #64748b; text-transform: uppercase; font-size: 10px; letter-spacing: 0.04em;">Amount in Words: </span>
+            <span style="font-weight: 600;">${amountInWords}</span>
+        </div>
+
+        ${showHsnSummary ? `
+        <div style="margin-bottom: 16px; page-break-inside: avoid;">
+            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #475569; margin-bottom: 6px;">HSN / SAC Tax Summary</div>
+            <table style="width: 100%; border-collapse: collapse; font-size: ${Math.max(10, invoiceFontSize - 2)}px; border: 1px solid #e2e8f0;">
+                <thead>
+                    <tr style="background: #f1f5f9; color: #334155;">
+                        <th style="padding: 6px 8px; text-align: left; border-bottom: 1px solid #e2e8f0;">HSN/SAC</th>
+                        <th style="padding: 6px 8px; text-align: right; border-bottom: 1px solid #e2e8f0;">Taxable Value</th>
+                        ${isIntraState
+                            ? `<th style="padding: 6px 8px; text-align: right; border-bottom: 1px solid #e2e8f0;">CGST</th>
+                               <th style="padding: 6px 8px; text-align: right; border-bottom: 1px solid #e2e8f0;">SGST</th>`
+                            : `<th style="padding: 6px 8px; text-align: right; border-bottom: 1px solid #e2e8f0;">IGST</th>`
+                        }
+                        <th style="padding: 6px 8px; text-align: right; border-bottom: 1px solid #e2e8f0;">Total Tax</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${hsnRows.map(row => `
+                    <tr>
+                        <td style="padding: 5px 8px; border-bottom: 1px solid #f1f5f9; font-family: monospace;">${row.hsn} (${row.gstRate}%)</td>
+                        <td style="padding: 5px 8px; border-bottom: 1px solid #f1f5f9; text-align: right;">₹${row.taxableValue.toFixed(2)}</td>
+                        ${isIntraState
+                            ? `<td style="padding: 5px 8px; border-bottom: 1px solid #f1f5f9; text-align: right;">₹${row.cgst.toFixed(2)}</td>
+                               <td style="padding: 5px 8px; border-bottom: 1px solid #f1f5f9; text-align: right;">₹${row.sgst.toFixed(2)}</td>`
+                            : `<td style="padding: 5px 8px; border-bottom: 1px solid #f1f5f9; text-align: right;">₹${row.igst.toFixed(2)}</td>`
+                        }
+                        <td style="padding: 5px 8px; border-bottom: 1px solid #f1f5f9; text-align: right; font-weight: 600;">₹${row.totalTax.toFixed(2)}</td>
+                    </tr>`).join('')}
+                </tbody>
+            </table>
+        </div>
+        ` : ''}
 
         ${invoice.notes ? `
         <div class="notes-section">

@@ -504,8 +504,8 @@ export async function createInvoice(data: CreateInvoiceData) {
                 continue
             }
 
-            console.warn('Full invoice insert failed, falling back to base GST payload:', errFull?.message)
-            // 2. Try standard payload without discount / partial payment columns
+            console.warn('Full invoice insert failed, falling back to base GST + discount payload:', errFull?.message)
+            // 2. Try standard payload preserving discount columns
             const baseGstPayload = {
                 user_id: user.id,
                 customer_id: data.customer_id,
@@ -518,13 +518,30 @@ export async function createInvoice(data: CreateInvoiceData) {
                 total: roundOff.roundedAmount,
                 notes: data.notes || null,
                 status: 'draft',
+                ...(discountAmount > 0 ? {
+                    discount_amount: discountAmount,
+                    discount_type: data.discount_type || null,
+                    discount_value: data.discount_value || null,
+                } : {}),
             }
 
-            const { data: invBaseGst, error: errBaseGst } = await supabase
+            let { data: invBaseGst, error: errBaseGst } = await supabase
                 .from('invoices')
                 .insert([baseGstPayload])
                 .select()
                 .single()
+
+            // If discount columns themselves are not migrated, retry without discount columns
+            if (errBaseGst && discountAmount > 0) {
+                const { discount_amount: _da, discount_type: _dt, discount_value: _dv, ...noDiscountPayload } = baseGstPayload as any
+                const retryRes = await supabase
+                    .from('invoices')
+                    .insert([noDiscountPayload])
+                    .select()
+                    .single()
+                invBaseGst = retryRes.data
+                errBaseGst = retryRes.error
+            }
 
             if (invBaseGst) {
                 invoice = invBaseGst

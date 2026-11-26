@@ -23,10 +23,10 @@ export const metadata: Metadata = {
   applicationName: 'BillBooky',
   metadataBase: new URL('https://billbooky.dodail.com'),
   title: {
-    default: 'BillBooky - #1 Free GST Invoice Generator & Billing Software | Top Zoho Invoice Alternative India',
-    template: '%s | BillBooky - Invoice Generator India'
+    default: 'BillBooky - GST Billing, CRM, Payroll & Inventory Software for Indian Businesses',
+    template: '%s | BillBooky'
   },
-  description: 'Free GST-compliant invoice generator for Indian businesses. #1 Zoho Invoice & Vyapar alternative with instant WhatsApp sharing, GST e-invoicing, payments, and smart CRM. 100% free for Indian MSMEs.',
+  description: 'All-in-one GST billing, smart CRM, payroll & attendance, inventory, client portal, and AI Accountant built for Indian MSMEs, agencies, and freelancers.',
   keywords: [
     'free invoice generator',
     'invoice generator India',
@@ -76,15 +76,24 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_IN',
     url: 'https://billbooky.dodail.com',
-    title: 'BillBooky - Free Invoice Generator for Indian Businesses | Made in India',
-    description: 'Free GST-compliant invoice generator made in India. Perfect for MSMEs, freelancers, and enterprises. Create professional invoices in seconds!',
+    title: 'BillBooky — All-in-One GST Billing, CRM, Payroll & Client Portal',
+    description: 'Create GST-compliant invoices with UPI QR & WhatsApp sharing, manage deals in CRM, run payroll & attendance, and give clients a white-label portal — built for Indian businesses.',
     siteName: 'BillBooky',
+    images: [
+      {
+        url: '/opengraph-image',
+        width: 1200,
+        height: 630,
+        alt: 'BillBooky — GST Billing, CRM, Payroll & Inventory Software',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'BillBooky - Free Invoice Generator for Indian Businesses',
-    description: 'Free GST-compliant invoice software made in India. Start creating professional invoices today!',
+    title: 'BillBooky — GST Billing, CRM, Payroll & Client Portal for India',
+    description: 'Create GST invoices with UPI QR, manage CRM deals, run payroll, and share a live client portal — all in one platform.',
     creator: '@billbooky',
+    images: ['/opengraph-image'],
   },
   robots: {
     index: true,
@@ -175,15 +184,15 @@ export default function RootLayout({
                 ratingValue: '4.8',
                 ratingCount: '1250',
               },
-              description: 'Free GST-compliant invoice generator for Indian businesses. Made in India for MSMEs, freelancers, and enterprises.',
+              description: 'All-in-one GST billing, smart CRM, payroll & attendance, inventory, client portal, and AI Accountant for Indian businesses.',
               featureList: [
-                'Free invoice generator',
-                'GST-compliant billing',
-                'Customer management',
-                'Payment tracking',
-                'Recurring invoices',
-                'Multiple templates',
-                'Cloud storage',
+                'GST-compliant invoice generator with UPI QR',
+                'Smart CRM & Proposals',
+                'Payroll, Leaves & Attendance',
+                'Inventory Management',
+                'WhatsApp Sharing & Reminders',
+                'White-label Client Portal',
+                'AI Accountant & CA Dashboard',
               ],
               countryOfOrigin: {
                 '@type': 'Country',

@@ -13,7 +13,8 @@ function StatCard({
     description,
     icon: Icon,
     color,
-    badge
+    badge,
+    href
 }: {
     title: string
     value: number
@@ -21,6 +22,7 @@ function StatCard({
     icon: any
     color: 'blue' | 'emerald' | 'rose' | 'purple' | 'amber' | 'teal'
     badge?: string
+    href?: string
 }) {
     const colorMap = {
         blue: {
@@ -51,8 +53,8 @@ function StatCard({
 
     const current = colorMap[color]
 
-    return (
-        <Card className="border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xs">
+    const card = (
+        <Card className={`border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xs ${href ? 'hover:border-blue-400 hover:shadow-sm transition-all cursor-pointer' : ''}`}>
             <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
                 <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                     {title}
@@ -76,6 +78,8 @@ function StatCard({
             </CardContent>
         </Card>
     )
+
+    return href ? <Link href={href}>{card}</Link> : card
 }
 
 export default async function UsersManagementPage() {
@@ -192,7 +196,7 @@ export default async function UsersManagementPage() {
                 </Card>
             )}
 
-            {/* Metric KPI Cards */}
+            {/* Metric KPI Cards (Click to Filter) */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
                 <StatCard
                     title="Total Registered"
@@ -200,6 +204,7 @@ export default async function UsersManagementPage() {
                     description="All accounts"
                     icon={Users}
                     color="blue"
+                    href="/admin/users"
                 />
                 <StatCard
                     title="Employees"
@@ -208,6 +213,7 @@ export default async function UsersManagementPage() {
                     icon={Building2}
                     color="teal"
                     badge="Staff"
+                    href="/admin/users?role=employee"
                 />
                 <StatCard
                     title="Trial Users"
@@ -215,6 +221,7 @@ export default async function UsersManagementPage() {
                     description="14-day trials"
                     icon={Zap}
                     color="amber"
+                    href="/admin/users?filter=trial"
                 />
                 <StatCard
                     title="Active Accounts"
@@ -222,6 +229,7 @@ export default async function UsersManagementPage() {
                     description="Operating normally"
                     icon={UserCheck}
                     color="emerald"
+                    href="/admin/users?filter=active"
                 />
                 <StatCard
                     title="Suspended"
@@ -229,6 +237,7 @@ export default async function UsersManagementPage() {
                     description="Restricted access"
                     icon={UserX}
                     color="rose"
+                    href="/admin/users?filter=suspended"
                 />
                 <StatCard
                     title="Staff & Admins"
@@ -237,6 +246,7 @@ export default async function UsersManagementPage() {
                     icon={Shield}
                     color="purple"
                     badge="Privileged"
+                    href="/admin/users?role=super_admin"
                 />
             </div>
 

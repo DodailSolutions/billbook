@@ -88,6 +88,25 @@ export async function POST(
             return NextResponse.json({ error: result.error || 'Failed to send email' }, { status: 500 })
         }
 
+        // Phase 27: Non-blocking communication log in crm_communications
+        try {
+            await supabase.from('crm_communications').insert([
+                {
+                    user_id: user.id,
+                    invoice_id: invoice.id || id,
+                    customer_id: (invoice as any).customer_id || null,
+                    channel: 'email',
+                    direction: 'outbound',
+                    recipient: customerEmail,
+                    subject: `Invoice ${invoice.invoice_number}`,
+                    body_preview: `Sent invoice ${invoice.invoice_number} (${totalFormatted}) to ${customerName}`,
+                    status: 'sent',
+                },
+            ])
+        } catch {
+            // Table may not be migrated yet; ignore safely
+        }
+
         return NextResponse.json({ success: true })
     } catch (err) {
         const errMsg = err instanceof Error ? err.message : 'Failed to send email'

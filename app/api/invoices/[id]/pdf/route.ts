@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getInvoice } from '@/app/(dashboard)/invoices/actions'
 import { generateInvoicePDF } from '@/lib/pdf'
+import type { InvoiceCopyType, InvoicePrintFormat } from '@/lib/pdf-utils'
 
 export async function GET(
     request: Request,
@@ -10,8 +11,13 @@ export async function GET(
         const { id } = await context.params
         const url = new URL(request.url)
         const mode = url.searchParams.get('mode') || 'download'
+        const copyParam = url.searchParams.get('copy')
+        const copy: InvoiceCopyType =
+            copyParam === 'duplicate' || copyParam === 'triplicate' ? copyParam : 'original'
+        const formatParam = url.searchParams.get('format')
+        const format: InvoicePrintFormat = formatParam === 'thermal_80mm' ? 'thermal_80mm' : 'a4'
         
-        console.log('PDF Route - Invoice ID:', id, 'Mode:', mode)
+        console.log('PDF Route - Invoice ID:', id, 'Mode:', mode, 'Copy:', copy, 'Format:', format)
         
         const invoice = await getInvoice(id)
 
@@ -25,7 +31,11 @@ export async function GET(
 
         const html = await generateInvoicePDF(
             invoice,
-            showBankDetailsOverride !== undefined ? { show_bank_details_when_paid: showBankDetailsOverride } : undefined
+            {
+                ...(showBankDetailsOverride !== undefined ? { show_bank_details_when_paid: showBankDetailsOverride } : {}),
+                copy,
+                format,
+            }
         )
     
     // Add enhanced print-optimized wrapper
@@ -38,8 +48,8 @@ export async function GET(
     <style>
         @media print {
             @page {
-                margin: 1cm 1.5cm;
-                size: A4;
+                margin: ${format === 'thermal_80mm' ? '2mm' : '1cm 1.5cm'};
+                size: ${format === 'thermal_80mm' ? '80mm auto' : 'A4'};
             }
             body {
                 margin: 0;

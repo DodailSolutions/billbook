@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { 
   Database, ArrowLeft, RefreshCw, HardDrive, Server, 
@@ -14,37 +14,53 @@ export default function DatabaseSettingsPage() {
   const [optimizeMessage, setOptimizeMessage] = useState<string | null>(null)
   const [isBackingUp, setIsBackingUp] = useState(false)
   const [backupMessage, setBackupMessage] = useState<string | null>(null)
+  const [liveCounts, setLiveCounts] = useState<Record<string, number> | null>(null)
+  const [lastVerifiedAt, setLastVerifiedAt] = useState<string | null>(null)
+
+  const refreshStatus = async () => {
+    try {
+      const res = await fetch('/api/admin/backup-export')
+      if (res.ok) {
+        const data = await res.json()
+        setLiveCounts(data.counts || null)
+        setLastVerifiedAt(data.last_verified_at || null)
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  useEffect(() => {
+    refreshStatus()
+  }, [])
 
   const tables = [
-    { name: 'invoices', rows: '1,420', size: '2.8 MB', health: 'Optimal' },
-    { name: 'invoice_items', rows: '4,890', size: '3.6 MB', health: 'Optimal' },
-    { name: 'customers', rows: '680', size: '1.1 MB', health: 'Optimal' },
-    { name: 'payments', rows: '950', size: '1.4 MB', health: 'Optimal' },
-    { name: 'crm_leads', rows: '310', size: '640 KB', health: 'Optimal' },
-    { name: 'user_profiles', rows: '240', size: '420 KB', health: 'Optimal' },
-    { name: 'system_settings', rows: '28', size: '120 KB', health: 'Optimal' },
-    { name: 'audit_logs', rows: '3,200', size: '2.1 MB', health: 'Optimal' }
+    { name: 'invoices', rows: liveCounts?.invoices?.toLocaleString() ?? '—', size: 'Core', health: 'Optimal' },
+    { name: 'customers', rows: liveCounts?.customers?.toLocaleString() ?? '—', size: 'Core', health: 'Optimal' },
+    { name: 'payments', rows: liveCounts?.payments?.toLocaleString() ?? '—', size: 'Core', health: 'Optimal' },
+    { name: 'user_profiles', rows: liveCounts?.user_profiles?.toLocaleString() ?? '—', size: 'Auth/Tenants', health: 'Optimal' },
+    { name: 'employees', rows: liveCounts?.employees?.toLocaleString() ?? '—', size: 'HR/Payroll', health: 'Optimal' },
   ]
 
   const handleVacuumOptimize = async () => {
     setIsOptimizing(true)
     setOptimizeMessage(null)
-    // Simulate query planner optimization & connection refresh
-    setTimeout(() => {
-      setIsOptimizing(false)
-      setOptimizeMessage('Database statistics re-indexed and query plans refreshed!')
-      setTimeout(() => setOptimizeMessage(null), 4000)
-    }, 1200)
+    await refreshStatus()
+    setIsOptimizing(false)
+    setOptimizeMessage('Live table counts and backup status refreshed.')
+    setTimeout(() => setOptimizeMessage(null), 4000)
   }
 
   const handleTriggerBackup = async () => {
     setIsBackingUp(true)
     setBackupMessage(null)
-    setTimeout(() => {
-      setIsBackingUp(false)
-      setBackupMessage('Automated point-in-time snapshot created successfully in Supabase Vault.')
-      setTimeout(() => setBackupMessage(null), 4000)
-    }, 1500)
+    try {
+      window.location.href = '/api/admin/backup-export?export=json'
+      setBackupMessage('Emergency JSON snapshot download started for critical tables.')
+    } finally {
+      setTimeout(() => setIsBackingUp(false), 1200)
+      setTimeout(() => setBackupMessage(null), 5000)
+    }
   }
 
   return (
@@ -77,7 +93,7 @@ export default function DatabaseSettingsPage() {
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-              PostgreSQL 15 Connected
+              {lastVerifiedAt ? `Last Backup Verified: ${new Date(lastVerifiedAt).toLocaleDateString('en-IN')}` : 'PostgreSQL 15 Connected'}
             </span>
           </div>
         </div>
@@ -225,7 +241,7 @@ export default function DatabaseSettingsPage() {
                   className="w-full gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs"
                 >
                   <Download className={`h-4 w-4 ${isBackingUp ? 'animate-bounce' : ''}`} />
-                  {isBackingUp ? 'Creating Backup Snapshot...' : 'Trigger Immediate Snapshot'}
+                  {isBackingUp ? 'Preparing JSON Snapshot...' : 'Download Emergency JSON Snapshot'}
                 </Button>
               </CardContent>
             </Card>

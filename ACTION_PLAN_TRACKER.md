@@ -27,6 +27,15 @@ This document serves as the master execution tracker for multi-vertical architec
 | **Phase 16** | B2B Relationship Manager & Agent Hierarchy with Scoped RBAC Security | Team Management & B2B Verticals | **COMPLETED & IMPLEMENTED** |
 | **Phase 17** | Passwordless Client Portal & Enterprise White-Labeling Engine | Client Portal & Enterprise Tier | **COMPLETED & IMPLEMENTED** |
 | **Phase 18** | Unified Workforce Architecture, Dynamic Department Creator & Save Reliability | Core HR, Payroll & Settings | **COMPLETED & IMPLEMENTED** |
+| **Phase 21** | Event Command Center, BEO Export & Artist TDS | `event_management` | **COMPLETED & IMPLEMENTED** |
+| **Phase 22** | Employee Portal, HR Routing & CRM RM Workspace | Team, HR & CRM | **COMPLETED & IMPLEMENTED** |
+| **Phase 23** | Vertical-Specific CRM, Delivery Tracking & Agency Suite | CRM, Software/IT, Marketing, Events | **COMPLETED & IMPLEMENTED** |
+| **Phase 24** | Invoice PDF Excellence (Amount in Words, HSN Summary, Copy Labels & Thermal POS) | All Verticals (`lib/pdf.ts`, `/invoices`, `/pos`) | **COMPLETED & IMPLEMENTED** |
+| **Phase 25** | Extended Billing Documents (Credit/Debit Notes, Delivery Challans, Proforma) | Invoicing, Inventory, Bookkeeping, Portal | **COMPLETED & IMPLEMENTED** |
+| **Phase 26** | Live GST Compliance (IRP E-Invoicing, E-Way Bill & GSTR-2B Reconciliation) | GST Health, Reports, CA Dashboard | **COMPLETED & IMPLEMENTED** |
+| **Phase 27** | CRM Automation, 2-Way Email Sync & Multi-Currency FX Invoicing | CRM, Proposals, Invoices, Client Portal | **COMPLETED & IMPLEMENTED** |
+| **Phase 28** | Public SEO Comparison Hub & Super Admin Governance | Marketing (`/vs/*`), Super Admin (`/admin`) | **COMPLETED & IMPLEMENTED** |
+| **Phase 29** | Automated Daily Backups & Disaster Recovery | Supabase DB, GitHub Actions, Vercel, Super Admin (`/admin/settings/database`) | **COMPLETED & IMPLEMENTED** |
 
 ---
 
@@ -329,3 +338,108 @@ This document serves as the master execution tracker for multi-vertical architec
   - Monthly retainer hour/deliverable caps (Reels, Ads, SEO), separate Meta/Google **Ad-Spend Pass-Through** vs **Agency Fee %** invoicing, and client approval sign-offs.
 - [ ] **Task 23.4: Event Management CRM Extensions**
   - Capture Event Date, Venue, Expected Pax, and BEO status directly on CRM leads so sales-to-operations handoff to `/events` is 1 click.
+
+---
+
+## Competitive Parity & Zero-Breakage Upgrade Master Plan (Phases 24–28)
+
+### Architectural Guardrails (Zero-Breakage Rules)
+1. **Additive-Only Database Changes**: Never rename, drop, or tighten constraints on existing columns (`invoices`, `customers`, `crm_deals`, `user_profiles`). All new columns are nullable or carry safe defaults, and server actions retain multi-tier fallback inserts until migrations are confirmed live.
+2. **Shared Helper Reuse**: Centralize PDF formatting (`lib/pdf.ts`), employee/tenant filtering (`lib/admin-employee-utils.ts`), and GST/FX math (`lib/gst-utils.ts`) so dashboard previews, PDFs, client portals, and WhatsApp shares never diverge.
+3. **Feature-Flag / Tier Gating**: Gate new external integrations (GSP E-Invoicing, 2-way Email Sync) behind environment keys and `subscription_plans.limits` flags so existing workspaces continue working uninterrupted.
+
+---
+
+### [Phase 24] - Invoice PDF & Presentation Excellence (Zero DB Risk)
+*Surpasses Zoho Books, Vyapar, and TallyPrime on PDF clarity and instant settlement without altering database schemas.*
+
+- **Implementation Plan (How)**:
+  - Add `numberToIndianWords()` and `buildHsnTaxSummary()` pure helpers in `lib/pdf.ts`.
+  - Extend `generateInvoicePDF()` in `lib/pdf.ts` and `GET /api/invoices/[id]/pdf` to accept `?copy=original|duplicate|triplicate` and `?format=a4|thermal_80mm`.
+  - Add optional default copy-label preference in `app/(dashboard)/invoices/settings`.
+- **Execution Flow**:
+  `User clicks Download / Print` → `GET /api/invoices/[id]/pdf` authenticates & loads `getInvoice(id)` + `getInvoiceSettings()` → `generateInvoicePDF()` computes Amount in Words, groups `invoice_items` by `hsn_sac_code` + `gst_rate`, renders copy badge & Place of Supply, and outputs A4 or 80mm thermal HTML.
+- **Dependencies**: None (zero SQL migrations; uses existing `invoice_items.hsn_sac_code`, `gst_rate`, `item_tax_amount`, `supply_type`, and `customer.gstin`).
+- **Directly Linked Modules**: `/invoices/[id]`, `/invoices/settings`, `/pos`, `/portal/[customerId]`, `/api/invoices/[id]/send-email` (reuses `generateInvoicePDF`).
+- **Expected Outcome / Results**: 100% GST-audit-ready PDFs with zero broken existing invoices, plus instant 58mm/80mm thermal counter receipts.
+- **End-User Behavior (UX)**: Users click **Download PDF** or **Thermal Print** and immediately see Amount in Words, HSN tax breakup table, and copy label (`Original for Recipient`); emailed & Client Portal PDFs automatically inherit the exact same layout.
+
+---
+
+### [Phase 25] - Extended Billing Documents & Inventory/Ledger Connectivity
+*Closes the document-type gap with Zoho Books and TallyPrime while keeping existing `/invoices` untouched.*
+
+- **Implementation Plan (How)**:
+  - **Additive Schema**: Add nullable `document_type` (default `'invoice'`) and `linked_invoice_id` to `invoices` (with fallback if unmigrated).
+  - Add `/invoices/credit-notes` and `/invoices/challans` views reusing `InvoiceForm.tsx` and `generateInvoicePDF()`.
+- **Execution Flow**:
+  `Open Invoice` → `Click "Issue Credit Note" or "Create Delivery Challan"` → Pre-fills customer, items & GST → On save: Credit Note reduces customer balance (and optionally restores stock in `items`); Proforma/Challan converts 1-click into a final Tax Invoice.
+- **Dependencies**: Additive SQL migration for `document_type` & `linked_invoice_id`; `items` stock mutation helper.
+- **Directly Linked Modules**: `/invoices`, `/customers/[id]`, `/portal/[customerId]`, `/inventory`, `/reports` (GSTR-1 CDNR), `/bookkeeping` (`lib/tally-export.ts`).
+- **Expected Outcome / Results**: Full return/refund credit-note accounting, stock-tracked delivery challans, and non-tax Proforma quotes without touching standard invoice creation.
+- **End-User Behavior (UX)**: Business owners issue Credit Notes from any paid/unpaid invoice in 1 click; clients see the adjusted net balance in their Client Portal; CAs see Credit Notes separated in GST reports and Tally XML.
+
+---
+
+### [Phase 26] - Live GST Compliance Engine (IRP E-Invoicing & E-Way Bills)
+*Matches TallyPrime Connected Services and Zoho Books direct IRP/NIC integration.*
+
+- **Implementation Plan (How)**:
+  - Build server-only GSP adapter (`lib/gst-gsp.ts`) reading `GSP_CLIENT_ID` / `GSP_CLIENT_SECRET` from server env.
+  - Create additive table `invoice_einvoice_records` (`invoice_id`, `irn`, `ack_no`, `ack_date`, `signed_qr_code`, `eway_bill_no`, `status`).
+  - Add `/settings/gst` for GSP mode (Sandbox/Production) and GSTIN verification.
+- **Execution Flow**:
+  `Invoice finalized` → `Click "Generate IRN"` → Server validates seller/buyer GSTIN, HSN codes & totals → Calls GSP `/eicore/v1.03/Invoice` → Saves IRN + signed QR in `invoice_einvoice_records` → `generateInvoicePDF()` embeds official IRP QR & Ack No.
+- **Dependencies**: Licensed GSP API credentials (e.g., ClearTax / Masters India / NIC Sandbox) + `invoice_einvoice_records` SQL migration.
+- **Directly Linked Modules**: `/invoices/[id]`, `lib/pdf.ts`, `/gst-health`, `/ca-dashboard`, `/reports`.
+- **Expected Outcome / Results**: Legally valid B2B E-Invoices with government-signed QR codes and 1-click E-Way Bills.
+- **End-User Behavior (UX)**: Eligible B2B users click **Generate E-Invoice** on any invoice; within seconds the official IRN & QR appear on the invoice and downloadable PDF, while `/gst-health` flags any missing HSN/GSTIN before submission.
+
+---
+
+### [Phase 27] - CRM Automation, 2-Way Email Sync & Multi-Currency Invoicing
+*Connects sales pipeline → proposals → multi-currency invoices → automated collections.*
+
+- **Implementation Plan (How)**:
+  - Wire `/crm` deal stage transitions (`Won`) to auto-offer Proposal/Invoice creation with `organization_id` and `relationship_manager_id` pre-linked.
+  - Log outbound emails from `app/api/invoices/[id]/send-email` into a new `crm_communications` table.
+  - Add nullable `currency` (default `'INR'`) and `exchange_rate` (default `1`) on `invoices` and format currency symbols dynamically in `lib/pdf.ts`.
+- **Execution Flow**:
+  `Deal marked Won in /crm` → `1-click Create Proposal or Invoice` → `Send via Email / WhatsApp` → `Logged in CRM Timeline` → `Automated pre-due & overdue reminders (lib/whatsapp-reminders.ts)` → `Client pays via Portal` → `Deal & Invoice marked Paid`.
+- **Dependencies**: Additive `currency`/`exchange_rate` columns on `invoices`; `crm_communications` table; existing Resend/SMTP & WhatsApp modules.
+- **Directly Linked Modules**: `/crm`, `/proposals`, `/invoices`, `/whatsapp-crm`, `/reminders`, `/portal/[customerId]`, `/reports`.
+- **Expected Outcome / Results**: End-to-end Lead → Proposal → Invoice → Payment loop with zero manual re-entry and support for USD/AED/EUR/GBP export clients.
+- **End-User Behavior (UX)**: Sales reps & RMs convert a won deal into an invoice in 1 click, see every sent email/WhatsApp reminder on the deal timeline, and export clients see invoices in their local currency while reports convert totals to INR.
+
+---
+
+### [Phase 28] - Public SEO Comparison Hub & Super Admin Governance
+*Drives organic acquisition and strengthens platform operations.*
+
+- **Implementation Plan (How)**:
+  - Add server-rendered comparison pages (`/vs/zoho-books`, `/vs/vyapar`, `/vs/tally`) with `FAQPage` JSON-LD and register them in `app/sitemap.ts`.
+  - Add `/admin/audit-logs` viewer, make `/admin/users` KPI cards click-to-filter, and add CSV export on `/admin/users` and `/admin/payments`.
+- **Execution Flow**:
+  `Search visitor lands on /vs/*` → `Reads side-by-side comparison & signs up` → `Super Admin monitors signups, employees, payments & full audit trail in /admin/*`.
+- **Dependencies**: Existing `audit_logs` table, `app/sitemap.ts`, and Super Admin auth (`checkSuperAdminAccess()`).
+- **Directly Linked Modules**: `app/layout.tsx`, `app/sitemap.ts`, `/admin/users`, `/admin/payments`, `/admin/audit-logs`.
+- **Expected Outcome / Results**: Higher organic search visibility and 1-click operational governance/exports for Super Admins.
+- **End-User Behavior (UX)**: Prospective buyers find clear BillBooky vs. Zoho/Vyapar/Tally comparisons on Google; Super Admins filter users by clicking KPI cards, export CSVs, and inspect full audit history.
+
+---
+
+### [Phase 29] - Automated Daily Backups & Disaster Recovery (Zero-Data-Loss Plan)
+*Protects against accidental deletion, bad migrations, or system crashes with automated daily snapshots and fast restore.*
+
+- **Implementation Plan (How)**:
+  1. **Automated Daily DB Dump (GitHub Actions)**: Create `.github/workflows/daily-db-backup.yml` running daily at `02:00 IST` (`cron: '30 20 * * *'`) using `pg_dump --format=custom --no-owner` against `SUPABASE_DB_URL` (stored as an encrypted GitHub Secret), gzipping and uploading with 30-day retention (or syncing to a private S3/R2 bucket).
+  2. **Supabase Managed Backups / PITR**: Enable Supabase automated daily backups (and Point-in-Time Recovery on Pro) for instant dashboard-level rollback.
+  3. **Vercel Cron Health & Snapshot Check (`vercel.json`)**: Add `/api/cron/backup-verify` (protected by `CRON_SECRET`) to log daily backup status & row counts into `audit_logs` and alert Super Admin if a backup is missed.
+  4. **Super Admin Recovery Console (`/admin/settings/database`)**: Add a **Backup Status & Export** panel showing last backup timestamp, table counts, and 1-click JSON export for critical tables (`user_profiles`, `invoices`, `customers`, `payments`, `employees`).
+  5. **Code & Deployment Rollback**: Tag every production release (`git tag v1.8.x`) so Vercel can instantaneously promote any previous working build.
+- **Execution Flow**:
+  `02:00 IST Cron triggers` → `GitHub Action runs pg_dump against Supabase` → `Compresses & stores encrypted snapshot (30-day retention)` → `Vercel Cron verifies backup & logs status to audit_logs` → `On crash: restore DB snapshot via pg_restore / Supabase PITR + 1-click Vercel deployment rollback`.
+- **Dependencies**: `SUPABASE_DB_URL` & `CRON_SECRET` environment secrets; GitHub Actions enabled on repository; `pg_dump` (PostgreSQL client) in CI runner.
+- **Directly Linked Modules**: `vercel.json`, `.github/workflows/`, `/admin/settings/database`, `audit_logs`, Supabase PostgreSQL.
+- **Expected Outcome / Results**: Recoverability within minutes (RPO ≤ 24h on daily dump, ≤ minutes with Supabase PITR) and zero single point of failure across code and database.
+- **End-User Behavior (UX)**: End users experience zero downtime during backups; Super Admins see a green **Last Backup Verified** indicator in `/admin/settings/database` and can download emergency snapshots or restore cleanly if an incident occurs.

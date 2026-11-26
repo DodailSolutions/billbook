@@ -23,7 +23,8 @@ import {
     Sparkles, 
     UserCheck, 
     SlidersHorizontal,
-    ArrowUpDown
+    ArrowUpDown,
+    Download
 } from 'lucide-react'
 import type { UserWithDetails } from '@/lib/types-admin'
 import { BUSINESS_VERTICALS, type BusinessType } from '@/lib/business-profile-types'
@@ -66,16 +67,26 @@ export default function UserManagementTable({
 }: UserManagementTableProps) {
     const searchParams = useSearchParams()
     const filterParam = searchParams.get('filter') || searchParams.get('status')
+    const roleParam = searchParams.get('role')
     const verticalParam = searchParams.get('vertical')
     const initialStatus = (filterParam === 'inactive' || filterParam === 'active' || filterParam === 'trial' || filterParam === 'suspended')
         ? filterParam
+        : 'all'
+    const initialRole = (roleParam === 'user' || roleParam === 'employee' || roleParam === 'admin' || roleParam === 'super_admin')
+        ? roleParam
         : 'all'
 
     const rawUsers = initialUsers ?? legacyUsers ?? []
     const [userList, setUserList] = useState<UserWithDetails[]>(rawUsers)
     const [searchQuery, setSearchQuery] = useState('')
-    const [roleFilter, setRoleFilter] = useState<'all' | 'user' | 'employee' | 'admin' | 'super_admin'>('all')
+    const [roleFilter, setRoleFilter] = useState<'all' | 'user' | 'employee' | 'admin' | 'super_admin'>(initialRole)
     const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'trial' | 'suspended' | 'inactive'>(initialStatus)
+
+    useEffect(() => {
+        setStatusFilter(initialStatus)
+        setRoleFilter(initialRole)
+        setCurrentPage(1)
+    }, [initialStatus, initialRole])
     const [planFilter, setPlanFilter] = useState<string>('all')
     const [verticalFilter, setVerticalFilter] = useState<string>(verticalParam || 'all')
     const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'name'>('newest')
@@ -460,6 +471,37 @@ export default function UserManagementTable({
                             ))}
                         </select>
                     </div>
+
+                    {/* Export CSV */}
+                    <button
+                        type="button"
+                        onClick={() => {
+                            const headers = ['ID', 'Email', 'Owner Name', 'Business Name', 'Role', 'Status', 'Plan', 'Vertical', 'Created At']
+                            const rows = filteredUsers.map(u => [
+                                u.id,
+                                `"${u.email || ''}"`,
+                                `"${u.owner_name || ''}"`,
+                                `"${u.business_name || ''}"`,
+                                u.is_employee ? 'employee' : (u.role || 'user'),
+                                u.status || '',
+                                `"${u.subscription?.plan?.name || 'Free'}"`,
+                                u.business_type || '',
+                                u.created_at || ''
+                            ])
+                            const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n')
+                            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+                            const url = URL.createObjectURL(blob)
+                            const a = document.createElement('a')
+                            a.href = url
+                            a.download = `billbook-users-${new Date().toISOString().split('T')[0]}.csv`
+                            a.click()
+                            URL.revokeObjectURL(url)
+                        }}
+                        className="inline-flex items-center gap-1.5 text-xs font-medium bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-xl px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
+                    >
+                        <Download className="h-3.5 w-3.5" />
+                        Export CSV
+                    </button>
 
                     {/* Sort Order */}
                     <div className="relative">
